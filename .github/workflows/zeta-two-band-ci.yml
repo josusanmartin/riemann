@@ -1,4 +1,4 @@
-name: Zeta two-band research CI
+name: Zeta gap-matching research CI
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - "research/zeta-two-band-ci/**"
 
 concurrency:
-  group: zeta-two-band-research-ci
+  group: zeta-gap-matching-research-ci
   cancel-in-progress: true
 
 permissions:
@@ -30,40 +30,33 @@ jobs:
           cd "$RUNNER_TEMP/zeta23"
           git checkout a6bcd8a58fc9c95615fde8594c06c543fd979641
 
-      - name: Add the two-band prototype modules
+      - name: Add research modules
         run: |
-          cp research/zeta-two-band-ci/FiniteStateGapPotential.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteStateGapPotential.lean"
-          cp research/zeta-two-band-ci/FiniteStatePathWeight.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteStatePathWeight.lean"
-          cp research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialSafeNumerics.lean"
-          cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialOverlap.lean"
-          cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialAnalyticBridge.lean"
-          cp research/zeta-two-band-ci/CandidateStrictImprovement.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CandidateStrictImprovement.lean"
-          cp research/zeta-two-band-ci/v7/DNormalizedMoments.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DNormalizedMoments.lean"
-          cp research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/ScalarBonusCertificate.lean"
-          cp research/zeta-two-band-ci/TwoBandGapMatchingD.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingD.lean"
-          cp research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingDPath.lean"
-          cp research/zeta-two-band-ci/CentralPathConstructionD.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralPathConstructionD.lean"
-          cp research/zeta-two-band-ci/GuardedWindowCount.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/GuardedWindowCount.lean"
-          cp research/zeta-two-band-ci/CentralGuardCountD.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGuardCountD.lean"
-          cp research/zeta-two-band-ci/OrderedPointGaps.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/OrderedPointGaps.lean"
-          cp research/zeta-two-band-ci/DWindowLength.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DWindowLength.lean"
-          cp research/zeta-two-band-ci/CentralGapGeometryD.lean \
-            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGapGeometryD.lean"
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          cp research/zeta-two-band-ci/FiniteStateGapPotential.lean "$GAP/FiniteStateGapPotential.lean"
+          cp research/zeta-two-band-ci/FiniteStatePathWeight.lean "$GAP/FiniteStatePathWeight.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean "$GAP/TwoBandPotentialSafeNumerics.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean "$GAP/TwoBandPotentialOverlap.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean "$GAP/TwoBandPotentialAnalyticBridge.lean"
+          cp research/zeta-two-band-ci/CandidateStrictImprovement.lean "$GAP/CandidateStrictImprovement.lean"
+          cp research/zeta-two-band-ci/v7/DNormalizedMoments.lean "$GAP/DNormalizedMoments.lean"
+          cp research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean "$GAP/ScalarBonusCertificate.lean"
+          cp research/zeta-two-band-ci/TwoBandGapMatchingD.lean "$GAP/TwoBandGapMatchingD.lean"
+          cp research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean "$GAP/TwoBandGapMatchingDPath.lean"
+          cp research/zeta-two-band-ci/CentralPathConstructionD.lean "$GAP/CentralPathConstructionD.lean"
+          cp research/zeta-two-band-ci/GuardedWindowCount.lean "$GAP/GuardedWindowCount.lean"
+          cp research/zeta-two-band-ci/CentralGuardCountD.lean "$GAP/CentralGuardCountD.lean"
+          cp research/zeta-two-band-ci/OrderedPointGaps.lean "$GAP/OrderedPointGaps.lean"
+          cp research/zeta-two-band-ci/DWindowLength.lean "$GAP/DWindowLength.lean"
+          cp research/zeta-two-band-ci/CentralGapGeometryD.lean "$GAP/CentralGapGeometryD.lean"
+
+          cp research/zeta-two-band-ci/v7/DWindowOverlap.lean "$GAP/DWindowOverlap.lean"
+          cp research/zeta-two-band-ci/v7/DWindowRampEstimate.lean "$GAP/DWindowRampEstimate.lean"
+          cp research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean "$GAP/DWindowProfileAlgebra.lean"
+          cp research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean "$GAP/OneBandPotentialSafeNumerics.lean"
+          cp research/zeta-two-band-ci/OneBandPotentialOverlap.lean "$GAP/OneBandPotentialOverlap.lean"
+          base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > "$GAP/OneBandSharpProfile.lean"
+
           python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
 
@@ -79,7 +72,7 @@ jobs:
           done
           exit 1
 
-      - name: Compile the prototype
+      - name: Compile research modules
         working-directory: ${{ runner.temp }}/zeta23
         run: |
           set -o pipefail
@@ -100,4 +93,10 @@ jobs:
             Zeta23.GapMatching.OrderedPointGaps \
             Zeta23.GapMatching.DWindowLength \
             Zeta23.GapMatching.CentralGapGeometryD \
-            2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
+            Zeta23.GapMatching.DWindowOverlap \
+            Zeta23.GapMatching.DWindowRampEstimate \
+            Zeta23.GapMatching.DWindowProfileAlgebra \
+            Zeta23.GapMatching.OneBandPotentialSafeNumerics \
+            Zeta23.GapMatching.OneBandPotentialOverlap \
+            Zeta23.GapMatching.OneBandSharpProfile \
+            2>&1 | tee "$RUNNER_TEMP/zeta-gap-matching-build.log"
