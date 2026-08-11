@@ -12,7 +12,7 @@ All submission files are hostile input. Lean macros, elaborators, tactics, build
 - outbound network access is disabled during the untrusted build;
 - E2B disables sandbox internet and public traffic before source is uploaded, and the job fails closed unless a live outbound probe confirms that boundary;
 - Comparator's Landlock layer is independently probed before the proof runs; local full-verifier runs add systemd socket-family, syscall, and private-network restrictions;
-- the challenge import closure and toolchain come from a root-owned, pinned E2B template;
+- the challenge import closure and toolchain come from a root-owned, non-writable, pinned E2B template whose runtime artifacts remain readable by the unprivileged verifier;
 - a root-owned system Git configuration enumerates the pinned checkout and each sealed dependency repository exactly, permitting Lake to inspect trusted metadata after ownership sealing without trusting arbitrary repositories;
 - candidate source cannot supply compiled `.olean` files;
 - CPU, memory, disk, process count, and wall time are bounded;

@@ -52,7 +52,14 @@ export function createRiemannVerifierTemplate(
       { src: "challenge", dest: "/opt/riemann/challenge" },
       { src: "data", dest: "/opt/riemann/data" },
       { src: ".github", dest: "/opt/riemann/.github" },
-      { src: "e2b", dest: "/opt/riemann/e2b" },
+      {
+        src: "e2b/mathlib-cache-bounded-disk.patch",
+        dest: "/opt/riemann/e2b/mathlib-cache-bounded-disk.patch",
+      },
+      {
+        src: "e2b/run-verification-job.sh",
+        dest: "/opt/riemann/e2b/run-verification-job.sh",
+      },
       { src: "scripts", dest: "/opt/riemann/scripts" },
       { src: "src/lib", dest: "/opt/riemann/src/lib" },
     ])
@@ -64,6 +71,17 @@ export function createRiemannVerifierTemplate(
       ],
       { user: "riemann" },
     )
+    // These files are required by the runtime attestation digest, but not by
+    // the expensive formal-library build above. Keeping them in a late layer
+    // lets ownership-only template corrections reuse that deterministic work.
+    .copyItems([
+      {
+        src: "e2b/build-template.ts",
+        dest: "/opt/riemann/e2b/build-template.ts",
+      },
+      { src: "e2b/runtime", dest: "/opt/riemann/e2b/runtime" },
+      { src: "e2b/template.ts", dest: "/opt/riemann/e2b/template.ts" },
+    ])
     .runCmd(
       [
         // Lake must inspect the pinned Git metadata after the full verifier
@@ -74,9 +92,10 @@ export function createRiemannVerifierTemplate(
         "git config --system --add safe.directory /opt/riemann/zeta23",
         "find /opt/riemann/zeta23/.lake/packages -mindepth 2 -maxdepth 2 -type d -name .git -exec dirname {} + | LC_ALL=C sort | while IFS= read -r repo; do git config --system --add safe.directory \"$repo\"; done",
         "rm -rf /var/lib/apt/lists/* /home/riemann/.npm",
-        "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
-        "chown -R root:root /opt/riemann",
-        "chmod -R a-w /opt/riemann",
+        "chown -R root:root /opt/riemann /home/riemann/.elan",
+        "find /opt/riemann /home/riemann/.elan -type d -exec chmod a+rx,a-w {} +",
+        "find /opt/riemann /home/riemann/.elan -type f -exec chmod a+r,a-w {} +",
+        "chmod 0555 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "install -d -o root -g root -m 0755 /var/lib/riemann/jobs",
         "install -d -o riemann -g riemann -m 0700 /home/riemann/jobs",
       ],

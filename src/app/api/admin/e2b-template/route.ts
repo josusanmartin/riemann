@@ -124,6 +124,9 @@ async function smokeTemplate(templateReference: string, key: string) {
         "printf 'mathlib_remote='; git -C /opt/riemann/zeta23/.lake/packages/mathlib config --get remote.origin.url 2>/dev/null || echo unavailable; " +
         "printf 'mathlib_unprivileged_remote='; runuser -u riemann -- git -C /opt/riemann/zeta23/.lake/packages/mathlib remote get-url origin 2>/dev/null || echo unavailable; " +
         "printf 'mathlib_head='; git -C /opt/riemann/zeta23/.lake/packages/mathlib rev-parse HEAD 2>/dev/null || echo unavailable; " +
+        "printf 'mathlib_olean_mode='; stat -c '%U:%G %a' /opt/riemann/zeta23/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Analysis/CStarAlgebra/Classes.olean 2>/dev/null || echo unavailable; " +
+        "printf 'mathlib_olean_unprivileged='; runuser -u riemann -- test -r /opt/riemann/zeta23/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Analysis/CStarAlgebra/Classes.olean && echo readable || echo unreadable; " +
+        "printf 'lean_mode='; stat -c '%U:%G %a' /home/riemann/.elan/toolchains/leanprover--lean4---v4.33.0-rc2/bin/lean 2>/dev/null || echo unavailable; " +
         "printf 'safe_directory_count='; git config --system --get-all safe.directory 2>/dev/null | wc -l; " +
         "printf 'manifest_url='; jq -r '.packages[] | select(.name == \"mathlib\") | .url' /opt/riemann/zeta23/lake-manifest.json",
       { user: "root", timeoutMs: 30_000 },
