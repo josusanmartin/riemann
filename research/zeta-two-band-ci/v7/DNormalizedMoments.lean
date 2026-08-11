@@ -179,7 +179,9 @@ theorem normalized_moment_bounds
 
     have hRnonneg : 0 ≤ R₂ T := by
       simp only [hR₂]
-      positivity
+      have hcinvN : 0 ≤ cinv T * N T :=
+        mul_nonneg hcinvT.1 hNT
+      exact mul_nonneg (mul_nonneg hC₂.le hE0) hcinvN
     rw [Real.norm_eq_abs, Real.norm_eq_abs,
       abs_of_nonneg hRnonneg, abs_of_nonneg hNT] at hRsmallT
 
