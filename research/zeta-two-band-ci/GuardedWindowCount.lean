@@ -22,6 +22,7 @@ namespace Zeta23.GapMatching.GuardedWindowCount
 
 open Zeta23
 open Zeta23.Tail
+open Zeta23.Assembly
 
 /-- A local unit-window bound controls every finite interval of length `R`.
 The harmless `+4` in the logarithm absorbs the final partial unit window. -/
@@ -77,7 +78,9 @@ theorem finite_interval_count_le
       have hjR : (j : ℝ) < R + 1 := hjK.trans hKlt
       have habs : |left + (j : ℝ)| ≤ |left| + j := by
         calc
-          |left + (j : ℝ)| ≤ |left| + |(j : ℝ)| := abs_add _ _
+          |left + (j : ℝ)| ≤ |left| + |(j : ℝ)| := by
+            simpa only [Real.norm_eq_abs] using
+              (norm_add_le left (j : ℝ))
           _ = |left| + j := by rw [abs_of_nonneg (Nat.cast_nonneg j)]
       have harg : |left + (j : ℝ)| + 3 ≤ |left| + R + 4 := by
         linarith
@@ -187,6 +190,13 @@ theorem innerGuard_le
       Real.log (|2 * T - Real.sqrt T| + Real.sqrt T + 4)
         ≤ Real.log (4 * T) :=
     Real.log_le_log (by positivity) hargHi
+  have hlogLo0 : 0 ≤ Real.log (|T| + Real.sqrt T + 4) := by
+    apply Real.log_nonneg
+    nlinarith [abs_nonneg T, Real.sqrt_nonneg T]
+  have hlogHi0 :
+      0 ≤ Real.log (|2 * T - Real.sqrt T| + Real.sqrt T + 4) := by
+    apply Real.log_nonneg
+    nlinarith [abs_nonneg (2 * T - Real.sqrt T), Real.sqrt_nonneg T]
 
   have hKnonneg : (0 : ℝ) ≤ ⌈Real.sqrt T⌉₊ := Nat.cast_nonneg _
   have hlo' :
