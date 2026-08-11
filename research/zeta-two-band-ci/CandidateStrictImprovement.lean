@@ -7,6 +7,7 @@ No numerical oracle is used: the proof derives fifth- and sixth-order Taylor
 bounds from Mathlib's cubic sine bound and the derivative test.
 -/
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+import Mathlib.Analysis.Real.Pi.Bounds
 import Zeta23.ThmD.Functional
 
 open Set Real
@@ -25,13 +26,16 @@ theorem cos_le_quartic {x : ℝ} (hx : 0 ≤ x) :
     simp (disch := fun_prop) [f]
     ring
   have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0) (by fun_prop)
-    intro t ht
-    rw [interior_Ici] at ht
-    rw [hderiv]
-    nlinarith [Real.sin_ge_sub_cube ht.le]
-  have h := hmono (by simp) hx
-  simpa [f] using h
+    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
+    · fun_prop
+    · intro t ht
+      fun_prop
+    · intro t ht
+      rw [interior_Ici] at ht
+      rw [hderiv]
+      nlinarith [Real.sin_ge_sub_cube ht.le]
+  have h0 : f 0 ≤ f x := hmono (by simp) hx hx
+  simpa [f] using h0
 
 /-- Fifth-order upper Taylor bound for sine on the nonnegative half-line. -/
 theorem sin_le_quintic {x : ℝ} (hx : 0 ≤ x) :
@@ -44,13 +48,16 @@ theorem sin_le_quintic {x : ℝ} (hx : 0 ≤ x) :
     simp (disch := fun_prop) [f]
     ring
   have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0) (by fun_prop)
-    intro t ht
-    rw [interior_Ici] at ht
-    rw [hderiv]
-    exact cos_le_quartic ht.le
-  have h := hmono (by simp) hx
-  simpa [f] using h
+    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
+    · fun_prop
+    · intro t ht
+      fun_prop
+    · intro t ht
+      rw [interior_Ici] at ht
+      rw [hderiv]
+      nlinarith [cos_le_quartic ht.le]
+  have h0 : f 0 ≤ f x := hmono (by simp) hx hx
+  simpa [f] using h0
 
 /-- Sixth-order lower Taylor bound for cosine on the nonnegative half-line. -/
 theorem cos_ge_sextic {x : ℝ} (hx : 0 ≤ x) :
@@ -63,17 +70,23 @@ theorem cos_ge_sextic {x : ℝ} (hx : 0 ≤ x) :
     simp (disch := fun_prop) [f]
     ring
   have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0) (by fun_prop)
-    intro t ht
-    rw [interior_Ici] at ht
-    rw [hderiv]
-    nlinarith [sin_le_quintic ht.le]
-  have h := hmono (by simp) hx
-  simpa [f] using h
+    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
+    · fun_prop
+    · intro t ht
+      fun_prop
+    · intro t ht
+      rw [interior_Ici] at ht
+      rw [hderiv]
+      nlinarith [sin_le_quintic ht.le]
+  have h0 : f 0 ≤ f x := hmono (by simp) hx hx
+  simpa [f] using h0
 
 private def theta0 : ℝ := 1 / Real.sqrt 2
 
-private theorem sqrt_two_pos : 0 < Real.sqrt 2 := Real.sqrt_pos.2 (by norm_num)
+private theorem sqrt_two_pos : 0 < Real.sqrt 2 :=
+  Real.sqrt_pos.2 (by norm_num)
+
+private theorem sqrt_two_ne : Real.sqrt 2 ≠ 0 := ne_of_gt sqrt_two_pos
 
 private theorem sqrt_two_sq : Real.sqrt 2 ^ 2 = 2 :=
   Real.sq_sqrt (by norm_num)
@@ -88,16 +101,36 @@ private theorem theta0_lt_one : theta0 < 1 := by
   rw [theta0, div_lt_one sqrt_two_pos]
   exact hs
 
-private theorem theta0_lt_pi : theta0 < Real.pi :=
-  theta0_lt_one.trans Real.one_lt_pi
+private theorem theta0_lt_pi : theta0 < Real.pi := by
+  have hpi : (1 : ℝ) < Real.pi := by
+    linarith [Real.pi_gt_three]
+  exact theta0_lt_one.trans hpi
 
 private theorem sqrt_mul_theta0 : Real.sqrt 2 * theta0 = 1 := by
   unfold theta0
-  field_simp [ne_of_gt sqrt_two_pos]
+  field_simp [sqrt_two_ne]
 
 private theorem theta0_sq : theta0 ^ 2 = 1 / 2 := by
   unfold theta0
-  field_simp [ne_of_gt sqrt_two_pos]
+  field_simp [sqrt_two_ne]
+  nlinarith [sqrt_two_sq]
+
+private theorem theta0_four : theta0 ^ 4 = 1 / 4 := by
+  calc
+    theta0 ^ 4 = (theta0 ^ 2) ^ 2 := by ring
+    _ = (1 / 2 : ℝ) ^ 2 := by rw [theta0_sq]
+    _ = 1 / 4 := by norm_num
+
+private theorem theta0_six : theta0 ^ 6 = 1 / 8 := by
+  calc
+    theta0 ^ 6 = (theta0 ^ 2) ^ 3 := by ring
+    _ = (1 / 2 : ℝ) ^ 3 := by rw [theta0_sq]
+    _ = 1 / 8 := by norm_num
+
+private theorem theta0_div_sqrt_two :
+    theta0 / Real.sqrt 2 = 1 / 2 := by
+  unfold theta0
+  field_simp [sqrt_two_ne]
   nlinarith [sqrt_two_sq]
 
 private theorem scaled_sin_upper :
@@ -108,10 +141,11 @@ private theorem scaled_sin_upper :
     Real.sqrt 2 * Real.sin theta0
         ≤ Real.sqrt 2 *
             (theta0 - theta0 ^ 3 / 6 + theta0 ^ 5 / 120) := hscale
+    _ = (Real.sqrt 2 * theta0)
+          * (1 - theta0 ^ 2 / 6 + theta0 ^ 4 / 120) := by ring
     _ = 147 / 160 := by
-      have hsq := theta0_sq
-      have hmul := sqrt_mul_theta0
-      nlinarith [sq_nonneg theta0]
+      rw [sqrt_mul_theta0, theta0_sq, theta0_four]
+      norm_num
 
 private theorem cos_lower :
     4379 / 5760 ≤ Real.cos theta0 := by
@@ -120,15 +154,16 @@ private theorem cos_lower :
     4379 / 5760
         = 1 - theta0 ^ 2 / 2 + theta0 ^ 4 / 24
             - theta0 ^ 6 / 720 := by
-              have hsq := theta0_sq
-              nlinarith [sq_nonneg (theta0 ^ 2)]
+              rw [theta0_sq, theta0_four, theta0_six]
+              norm_num
     _ ≤ Real.cos theta0 := hc
 
+private theorem sin_theta0_pos : 0 < Real.sin theta0 :=
+  Real.sin_pos_of_pos_of_lt_pi theta0_pos theta0_lt_pi
+
 private theorem scaled_sin_pos :
-    0 < Real.sqrt 2 * Real.sin theta0 := by
-  have hsin : 0 < Real.sin theta0 :=
-    Real.sin_pos_of_pos_of_lt_pi theta0_pos theta0_lt_pi
-  exact mul_pos sqrt_two_pos hsin
+    0 < Real.sqrt 2 * Real.sin theta0 :=
+  mul_pos sqrt_two_pos sin_theta0_pos
 
 private theorem cosine_ratio_lower :
     4379 / 5292 ≤
@@ -144,8 +179,7 @@ private theorem cosine_ratio_lower :
 /-- Exact rational upper enclosure for the baseline density. -/
 theorem HD_one_le_rational :
     Zeta23.ThmD.HD 1 ≤ 3559 / 5292 := by
-  have hsine_ne : Real.sqrt 2 * Real.sin theta0 ≠ 0 :=
-    ne_of_gt scaled_sin_pos
+  have hsin_ne : Real.sin theta0 ≠ 0 := ne_of_gt sin_theta0_pos
   have hinv :
       (Zeta23.ThmD.cStar 1)⁻¹
         = 1 / 2
@@ -153,9 +187,23 @@ theorem HD_one_le_rational :
               (Real.sqrt 2 * Real.sin theta0) := by
     unfold Zeta23.ThmD.cStar Zeta23.ThmD.theta theta0
     rw [inv_div]
-    field_simp [hsine_ne, ne_of_gt sqrt_two_pos]
-    ring
-  rw [Zeta23.ThmD.HD, hinv]
+    calc
+      (Real.cos (1 / Real.sqrt 2)
+          + (1 / Real.sqrt 2) * Real.sin (1 / Real.sqrt 2))
+          * (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))⁻¹
+        = Real.cos (1 / Real.sqrt 2)
+            / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))
+          + (1 / Real.sqrt 2) / Real.sqrt 2 := by
+              field_simp [sqrt_two_ne, hsin_ne]
+              <;> ring
+      _ = 1 / 2
+          + Real.cos (1 / Real.sqrt 2)
+              / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2)) := by
+            rw [show (1 / Real.sqrt 2) / Real.sqrt 2 = 1 / 2 by
+              simpa [theta0] using theta0_div_sqrt_two]
+            ring
+  unfold Zeta23.ThmD.HD
+  rw [one_div, hinv]
   nlinarith [cosine_ratio_lower]
 
 /-- The proposed rational score is strictly above the current exact record. -/
