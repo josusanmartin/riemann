@@ -11,13 +11,13 @@ export const metadata: Metadata = { title: "Sign in" };
 function describeAuthError(code: string): string {
   switch (code) {
     case "AccessDenied":
-      return "GitHub reported that access was denied. Nothing was stored — you can retry whenever you are ready.";
+      return "GitHub reported that access was denied. Nothing was stored; you can retry whenever you are ready.";
     case "Configuration":
       return "Sign-in is misconfigured on this deployment. The public pull-request workflow still works in the meantime.";
     case "Verification":
       return "That sign-in link expired or was already used. Please start again from this page.";
     default:
-      return "GitHub sign-in did not complete. Nothing was saved — please try again.";
+      return "GitHub sign-in did not complete. Nothing was saved. Please try again.";
   }
 }
 
@@ -39,7 +39,7 @@ export default async function SignInPage({
         {errorMessage && <p className="signin-error" role="alert">{errorMessage}</p>}
         {session?.user ? (
           <>
-            <p>Authenticated as <strong>@{session.user.githubLogin ?? session.user.name}</strong>. Your formal entries still arrive as public pull requests.</p>
+            <p>Authenticated as <strong>@{session.user.githubLogin ?? session.user.name}</strong>. You can now upload a formal entry directly to the isolated verifier.</p>
             <div className="signin-actions">
               <Link className="button button-lime" href="/submit">Continue to submit</Link>
               <form action={signOutFromGitHub}><button className="button button-ghost-light" type="submit">Sign out</button></form>
@@ -47,7 +47,7 @@ export default async function SignInPage({
           </>
         ) : isGitHubAuthConfigured ? (
           <>
-            <p>Link your public GitHub identity to prepare a submission. Riemann.fail requests read-only profile and email scopes.</p>
+            <p>Sign in with GitHub to prepare a submission. The site requests read-only access to your public profile and email.</p>
             <form action={signInWithGitHub}>
               <button className="button button-lime signin-button" type="submit"><Github size={18} /> Continue with GitHub</button>
             </form>

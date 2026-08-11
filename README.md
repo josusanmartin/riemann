@@ -13,15 +13,16 @@ from Anthropic's 2026 Zeta23 result. A candidate advances the public number only
 ## What is automated
 
 ```text
-Pull request
-  → schema and scope checks
+GitHub-authenticated Lean upload
+  → server-derived manifest and exact source digest
+  → private no-egress E2B sandbox
   → trusted theorem generation
-  → isolated Lean build
+  → isolated Lean elaboration
   → exact statement comparison
   → permitted-axiom audit
   → Lean and nanoda kernel replay
   → strict exact score comparison
-  → formal record promotion
+  → immutable Git evidence and atomic record promotion
 ```
 
 The formal leaderboard does not depend on a human review. Human expert review is an independent, optional badge for exposition, attribution, and significance. Its evidence is stored separately from kernel status and can never change the score or acceptance decision.
@@ -66,7 +67,9 @@ Authorization callback:   https://riemann-fail.vercel.app/api/auth/callback/gith
 
 ## Formal submissions
 
-Copy `submissions/example`, choose an exact rational score, and implement the three declarations in `proof/Solution.lean`. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
+Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
+
+For local development, copy `submissions/example` and prepare a candidate against the pinned Zeta23 tree:
 
 Prepare a candidate against the pinned Zeta23 tree:
 
@@ -85,11 +88,11 @@ vercel
 vercel --prod
 ```
 
-Configure the OAuth and public URL variables from `.env.example` in the Vercel project. Formal proof verification runs in isolated CI rather than inside a Vercel function because Lean builds are long-running and execute untrusted elaborator code.
+Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables from `.env.example` in the Vercel project. Build the pinned E2B image with `npm run e2b:template:build`, then set its alias or ID as `E2B_TEMPLATE_ID`. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
 
-Production deploys run from `.github/workflows/deploy-production.yml` on every ordinary push to `main`. Record-promotion pushes made with `GITHUB_TOKEN` explicitly dispatch the same workflow, because GitHub intentionally suppresses recursive `push` workflows for that token. The repository stores only the encrypted `VERCEL_TOKEN` secret and the non-secret Vercel organization/project IDs.
+`GITHUB_RECORDS_TOKEN` must be a fine-grained credential limited to this repository with only **Contents: read and write**. It is held by Vercel, never sent to E2B, and used only after the server has re-read and rehashed a passing result. Promotion writes an evidence commit and a ledger commit, then publishes both with one non-forced update of `main`; a race cannot overwrite another record.
 
-External forks are first verified with a read-only token. Successful runs publish only immutable PR coordinates; the privileged promotion workflow authenticates those coordinates and the claimed author against GitHub, checks out the exact fork SHA, and independently reruns the full judge before it receives merge permission.
+Production deploys run from `.github/workflows/deploy-production.yml` on every push to `main`. Because the promotion credential is not GitHub Actions' `GITHUB_TOKEN`, a successful record update triggers the normal deployment. An authenticated status request publishes immediately; if the submitter closes the browser, a signed E2B pause webhook resumes the preserved sandbox and completes the same idempotent publication path. A daily `CRON_SECRET`-protected sweep is the final backstop for a missed webhook.
 
 ## Trust boundary
 

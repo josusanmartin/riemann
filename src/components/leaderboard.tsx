@@ -9,7 +9,7 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
     <section className="leaderboard-card" id="leaderboard" aria-labelledby="leaderboard-title">
       <div className="section-heading leaderboard-heading">
         <div>
-          <span className="eyebrow">Unconditional frontier</span>
+          <span className="eyebrow">Unconditional lower bounds</span>
           <h2 id="leaderboard-title">Record ledger</h2>
         </div>
         <div className="legend"><span className="legend-dot" /> Higher is better</div>

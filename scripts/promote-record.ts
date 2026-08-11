@@ -1,6 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { z } from "zod";
 import contractJson from "../challenge/contract.json";
 import {
   compareRationals,
@@ -8,30 +7,18 @@ import {
   rationalToDecimal,
   recordsSchema,
   submissionSchema,
+  verificationAttestationSchema,
 } from "../src/lib/challenge";
 import { computeTrustedMaterialDigest } from "./trusted-material";
+import { assertValidAttestation } from "../src/lib/attestation";
 
-const [submissionArgument, artifactArgument, sourceUrl, proofUrl, pullRequestUrl] =
+const [submissionArgument, artifactArgument, sourceUrl, proofUrl] =
   process.argv.slice(2);
 if (!submissionArgument || !artifactArgument || !sourceUrl || !proofUrl) {
   throw new Error(
-    "Usage: promote-record.ts <submission-dir> <attestation.json> <source-url> <proof-url> [pull-request-url]",
+    "Usage: promote-record.ts <submission-dir> <attestation.json> <source-url> <proof-url>",
   );
 }
-
-const attestationSchema = z.object({
-  schemaVersion: z.literal(1),
-  submissionId: z.string(),
-  score: z.object({ numerator: z.string(), denominator: z.string() }),
-  previousRecordId: z.string(),
-  upstreamCommit: z.string().regex(/^[0-9a-f]{40}$/),
-  theoremNames: z.array(z.string()).length(3),
-  result: z.literal("kernel-verified"),
-  verifiedAt: z.string().datetime(),
-  challengeDigest: z.string().regex(/^[0-9a-f]{64}$/),
-  kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
-  permittedAxioms: z.array(z.string()),
-});
 
 const submissionDirectory = resolve(submissionArgument);
 const repositoryRoot = resolve(import.meta.dirname, "..");
@@ -39,43 +26,16 @@ const contract = contractSchema.parse(contractJson);
 const submission = submissionSchema.parse(
   JSON.parse(await readFile(resolve(submissionDirectory, "submission.json"), "utf8")),
 );
-const attestation = attestationSchema.parse(
+const attestation = verificationAttestationSchema.parse(
   JSON.parse(await readFile(resolve(artifactArgument), "utf8")),
 );
-if (attestation.submissionId !== submission.id) {
-  throw new Error("Attestation belongs to a different submission");
-}
-if (attestation.upstreamCommit !== contract.trustedUpstream.commit) {
-  throw new Error("Attestation used a different trusted upstream commit");
-}
-if (
-  JSON.stringify(attestation.theoremNames) !==
-    JSON.stringify([
-      contract.theorems.strictImprovement,
-      contract.theorems.dyadicBound,
-      contract.theorems.cumulativeBound,
-    ])
-) {
-  throw new Error("Attestation theorem set differs from the current contract");
-}
-if (
-  JSON.stringify(attestation.permittedAxioms) !==
-  JSON.stringify(contract.permittedAxioms)
-) {
-  throw new Error("Attestation axiom policy differs from the current contract");
-}
-if (
-  compareRationals(attestation.score, submission.score) !== 0
-) {
-  throw new Error("Attested score differs from submission score");
-}
 if (
   compareRationals(submission.score, { numerator: "1", denominator: "1" }) > 0
 ) {
   throw new Error("A critical-line proportion cannot exceed one");
 }
 
-for (const url of [sourceUrl, proofUrl, pullRequestUrl].filter(Boolean)) {
+for (const url of [sourceUrl, proofUrl]) {
   new URL(url);
 }
 
@@ -84,9 +44,7 @@ const challengeDigest = await computeTrustedMaterialDigest(
   repositoryRoot,
   contract.trustedPaths,
 );
-if (challengeDigest !== attestation.challengeDigest) {
-  throw new Error("Trusted challenge material changed after verification");
-}
+assertValidAttestation(submission, attestation, contract, challengeDigest);
 const records = recordsSchema.parse(
   JSON.parse(await readFile(recordsPath, "utf8")),
 );
@@ -133,7 +91,7 @@ records.push({
   independentReview: null,
   sourceUrl,
   proofUrl,
-  pullRequestUrl: pullRequestUrl || null,
+  pullRequestUrl: null,
   summary: submission.summary,
 });
 

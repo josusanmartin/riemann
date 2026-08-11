@@ -26,6 +26,9 @@ if (!submissionArgument || !["prepare", "quick", "full"].includes(mode)) {
 const contract = contractSchema.parse(contractJson);
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const submissionDirectory = resolve(submissionArgument);
+const prebuiltZetaWorkspace = process.env.RIEMANN_PREBUILT_ZETA23
+  ? resolve(process.env.RIEMANN_PREBUILT_ZETA23)
+  : undefined;
 const submission = submissionSchema.parse(
   JSON.parse(await readFile(join(submissionDirectory, "submission.json"), "utf8")),
 );
@@ -119,15 +122,32 @@ async function cloneTrustedUpstream(): Promise<void> {
   throw lastError;
 }
 
-try {
+async function prepareTrustedUpstream(): Promise<void> {
+  if (prebuiltZetaWorkspace) {
+    await mkdir(zetaWorkspace, { recursive: true });
+    await run("cp", [
+      "-a",
+      "--no-preserve=ownership",
+      "--reflink=auto",
+      `${prebuiltZetaWorkspace}/.`,
+      zetaWorkspace,
+    ]);
+    await run("chmod", ["-R", "u+w", zetaWorkspace]);
+    return;
+  }
+
   await cloneTrustedUpstream();
   await run(
     "git",
     ["checkout", "--quiet", "--detach", contract.trustedUpstream.commit],
     { cwd: zetaWorkspace },
   );
+}
+
+try {
+  await prepareTrustedUpstream();
   await verifyPinnedCheckout();
-  if (mode === "full") {
+  if (mode === "full" && !prebuiltZetaWorkspace) {
     console.log("Hydrating pinned Mathlib dependencies and trusted build cache.");
     await run("lake", ["exe", "cache", "get"], { cwd: zetaWorkspace });
   }
@@ -162,9 +182,28 @@ try {
     if (process.platform !== "linux") {
       throw new Error("Full Comparator verification currently requires Linux");
     }
-    await run(
-      "systemd-run",
-      [
+    if (process.env.RIEMANN_OUTER_SANDBOX === "e2b") {
+      await run(
+        "bash",
+        [
+          join(repositoryRoot, "scripts", "run-comparator-e2b.sh"),
+          comparator,
+          "comparator/config-candidate.json",
+        ],
+        {
+          cwd: zetaWorkspace,
+          env: {
+            ...process.env,
+            COMPARATOR_LANDRUN: process.env.COMPARATOR_LANDRUN,
+            COMPARATOR_LEAN4EXPORT: process.env.COMPARATOR_LEAN4EXPORT,
+            COMPARATOR_NANODA: process.env.COMPARATOR_NANODA,
+          },
+        },
+      );
+    } else {
+      await run(
+        "systemd-run",
+        [
         // Keep only local-domain sockets at this defense-in-depth layer;
         // @network-io below denies socket/socketpair/connect altogether.
         "--property=RestrictAddressFamilies=AF_UNIX",
@@ -189,17 +228,18 @@ try {
         join(repositoryRoot, "scripts", "run-comparator-sandbox.sh"),
         comparator,
         "comparator/config-candidate.json",
-      ],
-      {
-        cwd: zetaWorkspace,
-        env: {
-          ...process.env,
-          COMPARATOR_LANDRUN: process.env.COMPARATOR_LANDRUN,
-          COMPARATOR_LEAN4EXPORT: process.env.COMPARATOR_LEAN4EXPORT,
-          COMPARATOR_NANODA: process.env.COMPARATOR_NANODA,
+        ],
+        {
+          cwd: zetaWorkspace,
+          env: {
+            ...process.env,
+            COMPARATOR_LANDRUN: process.env.COMPARATOR_LANDRUN,
+            COMPARATOR_LEAN4EXPORT: process.env.COMPARATOR_LEAN4EXPORT,
+            COMPARATOR_NANODA: process.env.COMPARATOR_NANODA,
+          },
         },
-      },
-    );
+      );
+    }
 
     if (artifactPath) {
       const prepared = JSON.parse(
@@ -215,6 +255,13 @@ try {
       const challengeDigest = await computeTrustedMaterialDigest(
         repositoryRoot,
         contract.trustedPaths,
+        process.env.RIEMANN_RECORDS_PATH
+          ? {
+              "data/records.json": await readFile(
+                resolve(process.env.RIEMANN_RECORDS_PATH),
+              ),
+            }
+          : undefined,
       );
       await mkdir(resolve(artifactPath, ".."), { recursive: true });
       await writeFile(

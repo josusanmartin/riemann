@@ -1,0 +1,255 @@
+"use client";
+
+import { useState } from "react";
+import { CheckCircle2, FileCode2, LoaderCircle, ShieldAlert, Upload } from "lucide-react";
+
+type JobPhase =
+  | "idle"
+  | "starting"
+  | "running"
+  | "verified"
+  | "superseded"
+  | "rejected"
+  | "error";
+
+type StatusPayload = {
+  status?: "running" | "verified" | "rejected";
+  submissionId?: string;
+  proofDigest?: string;
+  message?: string;
+  log?: string;
+  jobToken?: string;
+  promotion?: {
+    status?: string;
+    message?: string;
+    evidenceUrl?: string;
+  };
+};
+
+const MAX_FILE_BYTES = 2_000_000;
+
+export function DirectSubmissionForm({
+  github,
+  defaultDisplayName,
+  verifierConfigured,
+}: {
+  github: string;
+  defaultDisplayName: string;
+  verifierConfigured: boolean;
+}) {
+  const [solution, setSolution] = useState("");
+  const [phase, setPhase] = useState<JobPhase>("idle");
+  const [message, setMessage] = useState("");
+  const [log, setLog] = useState("");
+  const [digest, setDigest] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+
+  async function poll(jobToken: string) {
+    let transientFailures = 0;
+    for (;;) {
+      await new Promise((resolve) => window.setTimeout(resolve, 5_000));
+      try {
+        const response = await fetch(
+          `/api/submissions/status?job=${encodeURIComponent(jobToken)}`,
+          { cache: "no-store" },
+        );
+        const payload = (await response.json()) as StatusPayload;
+        if (!response.ok) {
+          throw new Error(payload.message ?? "Unable to read verifier status.");
+        }
+        transientFailures = 0;
+
+        if (payload.status === "running") {
+          setPhase("running");
+          setMessage(
+            "Lean and both kernels are checking the frozen theorem contract.",
+          );
+          continue;
+        }
+
+        setDigest(payload.proofDigest ?? "");
+        setLog(payload.log ?? "");
+        if (payload.status === "verified") {
+          if (payload.promotion?.status === "superseded") {
+            setPhase("superseded");
+            setMessage(
+              payload.promotion.message ??
+                "The proof passed, but another record landed first. Verify again against the new record.",
+            );
+          } else {
+            setPhase("verified");
+            setEvidenceUrl(payload.promotion?.evidenceUrl ?? "");
+            setMessage(
+              payload.promotion?.status === "promoted" ||
+                payload.promotion?.status === "already-promoted"
+                ? "Lean and nanoda accepted the source, and the new record is now published."
+                : payload.promotion?.message ??
+                    "Lean and nanoda accepted the exact uploaded source.",
+            );
+          }
+        } else {
+          setPhase("rejected");
+          setMessage(
+            payload.message ?? "The formal verifier rejected this candidate.",
+          );
+        }
+        return;
+      } catch (error) {
+        transientFailures += 1;
+        if (transientFailures <= 6) {
+          setPhase("running");
+          setMessage("Verification finished polling temporarily failed; retrying.");
+          continue;
+        }
+        setPhase("error");
+        setMessage(error instanceof Error ? error.message : "Verifier status failed.");
+        return;
+      }
+    }
+  }
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLog("");
+    setDigest("");
+    setEvidenceUrl("");
+    if (!verifierConfigured) {
+      setPhase("error");
+      setMessage("The pinned E2B verifier template is still being configured.");
+      return;
+    }
+    if (new Blob([solution]).size > MAX_FILE_BYTES) {
+      setPhase("error");
+      setMessage("Solution.lean exceeds the 2 MB source limit.");
+      return;
+    }
+
+    setPhase("starting");
+    setMessage("Creating a private no-egress E2B sandbox.");
+    const form = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: form.get("id"),
+          displayName: form.get("displayName"),
+          score: {
+            numerator: form.get("numerator"),
+            denominator: form.get("denominator"),
+          },
+          summary: form.get("summary"),
+          method: form.get("method"),
+          solution,
+          acceptLicense: form.get("acceptLicense") === "on",
+        }),
+      });
+      const payload = (await response.json()) as StatusPayload;
+      if (!response.ok || !payload.jobToken) {
+        throw new Error(payload.message ?? "The verifier could not start.");
+      }
+      setPhase("running");
+      setDigest(payload.proofDigest ?? "");
+      setMessage("Upload sealed. Formal verification is now running.");
+      void poll(payload.jobToken);
+    } catch (error) {
+      setPhase("error");
+      setMessage(error instanceof Error ? error.message : "The verifier could not start.");
+    }
+  }
+
+  async function loadFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".lean") || file.size > MAX_FILE_BYTES) {
+      setPhase("error");
+      setMessage("Choose one .lean source file no larger than 2 MB.");
+      event.target.value = "";
+      return;
+    }
+    setSolution(await file.text());
+    setPhase("idle");
+    setMessage(`${file.name} loaded into the source editor.`);
+  }
+
+  const busy = phase === "starting" || phase === "running";
+
+  return (
+    <form className="direct-submission-form" onSubmit={submit}>
+      <div className="submission-fields">
+        <label>
+          <span>Submission ID</span>
+          <input name="id" required maxLength={80} pattern="[a-z0-9][a-z0-9-]*" placeholder="your-bound-2026" disabled={busy} />
+          <small>Lowercase letters, digits, and hyphens.</small>
+        </label>
+        <label>
+          <span>Public author</span>
+          <input name="displayName" required maxLength={100} defaultValue={defaultDisplayName} disabled={busy} />
+          <small>Bound server-side to @{github}.</small>
+        </label>
+        <label>
+          <span>Exact numerator p</span>
+          <input name="numerator" required maxLength={200} inputMode="numeric" pattern="[1-9][0-9]*" placeholder="672500704" disabled={busy} />
+        </label>
+        <label>
+          <span>Exact denominator q</span>
+          <input name="denominator" required maxLength={200} inputMode="numeric" pattern="[1-9][0-9]*" placeholder="1000000000" disabled={busy} />
+        </label>
+        <label className="field-wide">
+          <span>Method</span>
+          <input name="method" required minLength={3} maxLength={200} placeholder="Name the mathematical method" disabled={busy} />
+        </label>
+        <label className="field-wide">
+          <span>Summary</span>
+          <textarea name="summary" required minLength={20} maxLength={1000} rows={4} placeholder="Describe the formal improvement and its mathematical idea." disabled={busy} />
+        </label>
+      </div>
+
+      <div className="lean-source-field">
+        <div className="lean-source-heading">
+          <div><FileCode2 size={20} /><span>proof/Solution.lean</span></div>
+          <label className="file-picker">
+            <Upload size={15} /> Upload .lean
+            <input type="file" accept=".lean,text/plain" onChange={loadFile} disabled={busy} />
+          </label>
+        </div>
+        <textarea
+          aria-label="Lean source"
+          className="lean-editor"
+          required
+          value={solution}
+          onChange={(event) => setSolution(event.target.value)}
+          placeholder="Paste the three complete Lean theorem declarations here…"
+          spellCheck={false}
+          disabled={busy}
+        />
+        <div className="source-meter">
+          <span>{new Blob([solution]).size.toLocaleString()} / {MAX_FILE_BYTES.toLocaleString()} bytes</span>
+          <span>Plain Lean source only</span>
+        </div>
+      </div>
+
+      <label className="license-consent">
+        <input name="acceptLicense" type="checkbox" required disabled={busy} />
+        <span>I publish this proof source under Apache-2.0 for verification and permanent public evidence if accepted.</span>
+      </label>
+
+      <div className={`verification-job-card ${phase}`} aria-live="polite">
+        <div className="job-icon">
+          {busy ? <LoaderCircle className="spin" size={23} /> : phase === "verified" ? <CheckCircle2 size={23} /> : <ShieldAlert size={23} />}
+        </div>
+        <div>
+          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? "Proof rejected" : phase === "error" ? "Submission unavailable" : "Verification running"}</strong>
+          <p>{message || "Nothing is accepted until Lean and nanoda independently replay the proof."}</p>
+          {digest && <code>sha256:{digest}</code>}
+          {evidenceUrl && <a href={evidenceUrl} target="_blank" rel="noreferrer">Open immutable evidence</a>}
+        </div>
+        <button className="button button-dark" type="submit" disabled={busy || !solution}>
+          {busy ? "Checking…" : "Verify formal proof"}
+        </button>
+      </div>
+
+      {log && <details className="verification-log"><summary>Verifier log</summary><pre>{log}</pre></details>}
+    </form>
+  );
+}

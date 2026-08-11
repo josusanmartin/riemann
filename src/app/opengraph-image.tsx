@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getCurrentRecord } from "@/lib/records";
 import { truncateDecimalString } from "@/components/format";
 
-export const alt = "Riemann.fail critical-line formal proof challenge";
+export const alt = "Riemann zeta function critical-line bound record";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,18 +61,18 @@ export default function OpenGraphImage(): ImageResponse {
             >
               Σ
             </div>
-            <div style={{ display: "flex", fontSize: 34, fontWeight: 700 }}>
-              Riemann<span style={{ color: "#ff7557" }}>.fail</span>
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 700 }}>
+              Riemann<span style={{ color: "#9fb0aa", fontWeight: 500 }}>&nbsp;zeta function</span>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
             <div style={{ display: "flex", maxWidth: 620, flexDirection: "column" }}>
               <div style={{ marginBottom: 18, color: "#d8f58b", fontSize: 20, letterSpacing: 3 }}>
-                OPEN FORMAL CHALLENGE
+                UNCONDITIONAL CRITICAL-LINE BOUND
               </div>
-              <div style={{ fontSize: 66, lineHeight: 1.02, letterSpacing: -3 }}>
-                The bound only moves when the proof checks.
+              <div style={{ fontSize: 60, lineHeight: 1.04, letterSpacing: -2 }}>
+                The largest proven proportion of zeros on the critical line.
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>

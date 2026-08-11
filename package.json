@@ -12,10 +12,12 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit --incremental false",
     "verify:data": "tsx scripts/verify-data.ts",
+    "e2b:template:build": "tsx e2b/build-template.ts",
     "check": "npm run verify:data && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
+    "e2b": "^2.38.3",
     "lucide-react": "^0.562.0",
     "next": "16.3.0",
     "next-auth": "5.0.0-beta.32",

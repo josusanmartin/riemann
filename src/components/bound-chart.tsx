@@ -65,7 +65,7 @@ function ChartSvg({
       className={`bound-chart bound-chart-${variant}`}
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label={`Certified critical-line lower bound by year — ${summary}`}
+      aria-label={`Certified critical-line lower bound by year. ${summary}`}
     >
       {Y_TICKS.map((tick) => (
         <g key={tick}>
@@ -126,7 +126,7 @@ export function BoundChart({ records }: { records: RecordEntry[] }) {
       <div className="section-heading chart-heading">
         <div>
           <span className="eyebrow">Record history</span>
-          <h2 id="history-title">Five decades of progress, compressed</h2>
+          <h2 id="history-title">Published lower bounds since 1974</h2>
         </div>
         <span className="chart-unit">Certified lower bound</span>
       </div>

@@ -22,11 +22,11 @@ export default function Home() {
         <div className="shell hero-panel">
           <ZetaField />
           <div className="hero-content">
-            <div className="status-pill"><span className="pulse-dot" /> Open formal challenge <span>·</span> Higher is better</div>
-            <h1>The bound only moves<br />when the <em>proof</em> checks.</h1>
-            <p className="hero-lede">Improve the unconditional proportion of Riemann zeta zeros proved to lie on the critical line. Submit Lean code; two kernels decide.</p>
+            <div className="status-pill"><span className="pulse-dot" /> Open for submissions <span>·</span> Verified in Lean</div>
+            <h1>The largest <em>proven</em> proportion of zeros on the critical line.</h1>
+            <p className="hero-lede">This site records the current unconditional lower bound on the fraction of nontrivial Riemann zeta zeros that lie on the critical line. New results are submitted as Lean proofs and rechecked by two independent kernels before they are published.</p>
             <div className="hero-actions">
-              <Link className="button button-lime" href="/submit">Enter the challenge <ArrowRight size={17} /></Link>
+              <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={17} /></Link>
               <a className="button button-ghost-light" href={repositoryUrl} target="_blank" rel="noreferrer"><Github size={17} /> View source</a>
             </div>
           </div>
@@ -46,21 +46,21 @@ export default function Home() {
           </div>
 
           <div className="hero-metrics">
-            <div><span>Record jump</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the previous published bound</p></div>
-            <div><span>Verification</span><strong>2<small> kernels</small></strong><p>Lean plus independent nanoda replay</p></div>
-            <div><span>RH hypotheses</span><strong>0<small> assumptions</small></strong><p>the theorem remains unconditional</p></div>
+            <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the previous published bound</p></div>
+            <div><span>Verification</span><strong>2<small> kernels</small></strong><p>the Lean kernel and an independent nanoda replay</p></div>
+            <div><span>Assumptions</span><strong>0</strong><p>the result does not assume the Riemann hypothesis</p></div>
           </div>
         </div>
       </section>
 
       <section className="shell section-space intro-grid">
         <div className="intro-copy">
-          <span className="eyebrow">One scalar. One frozen contract.</span>
-          <h2>A mathematical record you can compare exactly.</h2>
+          <span className="eyebrow">How the score is defined</span>
+          <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">
-          <p>The score κ is the certified lower bound for distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. A larger κ is a stronger unconditional theorem.</p>
-          <p>Every candidate is an exact rational. No benchmark noise, rounded comparisons, secret tests, or judgment calls can move the number.</p>
+          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. A larger κ is a stronger unconditional result.</p>
+          <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
         </div>
       </section>
 
@@ -78,9 +78,9 @@ export default function Home() {
 
       <section className="shell section-space contract-grid">
         <div className="contract-copy">
-          <span className="eyebrow">Immutable scoring law</span>
-          <h2>Not a numerical experiment.<br />A theorem with a number in it.</h2>
-          <p>CI writes the candidate value into a trusted statement. Your proof must establish the asymptotic inequality and separately prove that its exact rational is above the current exact record.</p>
+          <span className="eyebrow">How scoring works</span>
+          <h2>Each submission is a Lean proof of a fixed theorem.</h2>
+          <p>The build inserts the candidate value into a fixed statement. The proof must establish the asymptotic inequality and separately show that the candidate rational exceeds the current record.</p>
           <Link className="text-link" href="/challenge">Read the full challenge contract <ArrowRight size={16} /></Link>
         </div>
         <div className="theorem-card">
@@ -96,13 +96,13 @@ export default function Home() {
 
       <section className="shell final-cta">
         <div>
-          <span className="eyebrow eyebrow-light">The frontier is open</span>
-          <h2>Can you move the seventh decimal?</h2>
-          <p>A result advances the instant the exact theorem survives both kernels.</p>
+          <span className="eyebrow eyebrow-light">Submissions</span>
+          <h2>Submit a new lower bound.</h2>
+          <p>A result is published once its exact theorem passes both kernels.</p>
         </div>
         <div className="final-actions">
-          <Link className="button button-lime" href="/submit">Prepare a submission <ArrowRight size={17} /></Link>
-          <Link className="button button-ghost-light" href="/methodology">Inspect the verifier</Link>
+          <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={17} /></Link>
+          <Link className="button button-ghost-light" href="/methodology">Read the verification method</Link>
         </div>
       </section>
     </main>

@@ -59,7 +59,7 @@ export default async function SubmissionPage({ params }: PageProps) {
         <aside className="evidence-card">
           <span className="eyebrow">Primary source</span>
           <h3>{record.formalVerification ? "Machine-checkable proof" : "Peer-reviewed paper"}</h3>
-          <p>{record.formalVerification ? "Replay the public Lean source against the pinned formal definitions." : "This historical point is sourced to the published mathematical literature and is not yet formalized in this arena."}</p>
+          <p>{record.formalVerification ? "Replay the public Lean source against the pinned formal definitions." : "This historical point is sourced to the published mathematical literature and is not yet formalized here."}</p>
           <a className="button button-dark" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">Open evidence <ArrowUpRight size={16} /></a>
           {record.proofUrl && record.proofUrl !== record.sourceUrl && <a className="text-link" href={record.sourceUrl} target="_blank" rel="noreferrer">Read the research paper <ArrowUpRight size={14} /></a>}
           <div className={`independent-review ${record.independentReview ? "reviewed" : "unreviewed"}`}>

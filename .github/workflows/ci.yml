@@ -2,8 +2,6 @@ name: Application CI
 
 on:
   pull_request:
-    paths-ignore:
-      - "submissions/**"
   push:
     branches: [main]
 

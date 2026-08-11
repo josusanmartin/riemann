@@ -15,6 +15,10 @@ async function readJson(path: string): Promise<unknown> {
 
 const contract = contractSchema.parse(await readJson("challenge/contract.json"));
 const records = recordsSchema.parse(await readJson("data/records.json"));
+const recordsSource = await readFile(resolve("data/records.json"), "utf8");
+if (recordsSource !== `${JSON.stringify(records, null, 2)}\n`) {
+  throw new Error("data/records.json must use the canonical two-space JSON encoding");
+}
 const ids = new Set<string>();
 
 for (const record of records) {
@@ -73,6 +77,62 @@ for (const [sandboxEntrypoint, addressFamilyAllowList] of [
   }
   if (!source.includes("SystemCallFilter=~@network-io")) {
     throw new Error(`${sandboxEntrypoint} must deny the network-I/O syscall group`);
+  }
+}
+
+const e2bOrchestrator = await readFile(
+  resolve("src/lib/e2b-verifier.ts"),
+  "utf8",
+);
+for (const requiredBoundary of [
+  "allowInternetAccess: false",
+  "allowPublicTraffic: false",
+  'action: "pause"',
+  "keepMemory: false",
+  "e2bJobMetadataSchema.parse",
+]) {
+  if (!e2bOrchestrator.includes(requiredBoundary)) {
+    throw new Error(`The E2B orchestrator is missing: ${requiredBoundary}`);
+  }
+}
+
+const e2bComparator = await readFile(
+  resolve("scripts/run-comparator-e2b.sh"),
+  "utf8",
+);
+for (const requiredBoundary of [
+  "E2B_API_KEY",
+  "GITHUB_RECORDS_TOKEN",
+  "socket.create_connection",
+  "Landlock filesystem restrictions are unavailable",
+]) {
+  if (!e2bComparator.includes(requiredBoundary)) {
+    throw new Error(`The E2B comparator boundary is missing: ${requiredBoundary}`);
+  }
+}
+
+const e2bWrapper = await readFile(
+  resolve("e2b/run-verification-job.sh"),
+  "utf8",
+);
+for (const requiredBoundary of ["runuser -u riemann", "env -i", "finalize-e2b-job.ts"]) {
+  if (!e2bWrapper.includes(requiredBoundary)) {
+    throw new Error(`The E2B root wrapper is missing: ${requiredBoundary}`);
+  }
+}
+
+const githubPromotion = await readFile(
+  resolve("src/lib/github-promotion.ts"),
+  "utf8",
+);
+for (const requiredBoundary of [
+  "computeDirectProofDigest",
+  "assertValidAttestation",
+  "baseCommitSha",
+  "force: false",
+]) {
+  if (!githubPromotion.includes(requiredBoundary)) {
+    throw new Error(`The GitHub promoter is missing: ${requiredBoundary}`);
   }
 }
 

@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, BookOpen, GitPullRequestArrow, UserCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, UploadCloud, UserCheck } from "lucide-react";
 import { getRecords } from "@/lib/records";
-import { repositoryUrl } from "@/lib/site";
 import { truncateDecimalString } from "@/components/format";
 
 export const metadata: Metadata = {
   title: "Submissions",
   description:
-    "Every accepted critical-line record, newest first, plus the open candidate pull requests awaiting verification.",
+    "Every accepted critical-line record, newest first, with immutable proof evidence.",
 };
 
 export default function SubmissionsIndexPage() {
@@ -20,8 +19,9 @@ export default function SubmissionsIndexPage() {
         <span className="eyebrow">Record ledger</span>
         <h1>Every accepted record</h1>
         <p className="submissions-lede">
-          Newest first. Each entry links to its evidence; values are truncated, never rounded up. Open candidates
-          live as public pull requests until the verifier promotes a strict improvement.
+          Newest first. Each entry links to its evidence; values are truncated,
+          never rounded up. Uploads remain private while verification runs and
+          become public only when both kernels accept a strict improvement.
         </p>
         <ol className="submissions-list">
           {records.map((record) => (
@@ -49,14 +49,14 @@ export default function SubmissionsIndexPage() {
           ))}
         </ol>
         <div className="submissions-open">
-          <GitPullRequestArrow size={20} />
+          <UploadCloud size={20} />
           <p>
-            <strong>Working on a candidate?</strong> Open pull requests stay public on GitHub while the verifier
-            replays them against the pinned contract.
+            <strong>Working on a candidate?</strong> Submit one Lean file directly;
+            no repository fork or pull request is required.
           </p>
-          <a className="button button-dark" href={`${repositoryUrl}/pulls`} target="_blank" rel="noreferrer">
-            Open candidates <ArrowUpRight size={15} />
-          </a>
+          <Link className="button button-dark" href="/submit">
+            Submit a proof <ArrowRight size={15} />
+          </Link>
         </div>
       </section>
     </main>

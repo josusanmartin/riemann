@@ -266,7 +266,7 @@ h3 {
 .header-inner {
   display: grid;
   height: 72px;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 32px;
 }
@@ -277,9 +277,9 @@ h3 {
   align-items: center;
   gap: 10px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.28rem;
+  font-size: 1.16rem;
   font-weight: 700;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   line-height: 1;
 }
 
@@ -289,13 +289,15 @@ h3 {
   color: var(--lime);
 }
 
-.brand-dot {
-  color: var(--forest-bright);
+.brand-sub {
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .desktop-nav {
   display: flex;
   align-items: center;
+  justify-self: center;
   gap: 30px;
 }
 
@@ -1784,6 +1786,357 @@ h3 {
   font-size: 0.82rem;
 }
 
+.direct-submit-section {
+  padding-bottom: 70px;
+}
+
+.direct-submit-heading {
+  display: flex;
+  margin-bottom: 34px;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.direct-submit-heading h2 {
+  margin: 0;
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+}
+
+.current-record-chip {
+  min-width: 330px;
+  padding: 16px 19px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+}
+
+.current-record-chip span,
+.current-record-chip code {
+  display: block;
+}
+
+.current-record-chip span {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.current-record-chip code {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--forest);
+  font-size: 0.69rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.direct-submission-form {
+  padding: clamp(26px, 4vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.submission-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.submission-fields label,
+.submission-fields label > span,
+.lean-source-field {
+  display: block;
+}
+
+.submission-fields label > span {
+  margin-bottom: 7px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.submission-fields input,
+.submission-fields textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cfd5ce;
+  border-radius: 9px;
+  background: #fbfcf8;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.submission-fields input:focus,
+.submission-fields textarea:focus,
+.lean-editor:focus {
+  border-color: var(--forest-bright);
+  outline: 3px solid rgba(33, 107, 88, 0.14);
+}
+
+.submission-fields small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.submission-fields .field-wide {
+  grid-column: 1 / -1;
+}
+
+.lean-source-field {
+  margin-top: 30px;
+  overflow: hidden;
+  border: 1px solid #183c33;
+  border-radius: var(--radius-md);
+  background: #0d251f;
+}
+
+.lean-source-heading,
+.source-meter {
+  display: flex;
+  padding: 13px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.lean-source-heading {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+
+.lean-source-heading > div,
+.file-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lean-source-heading > div span {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.7rem;
+}
+
+.file-picker {
+  cursor: pointer;
+  color: var(--lime);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.lean-editor {
+  display: block;
+  width: 100%;
+  min-height: 430px;
+  padding: 22px;
+  resize: vertical;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: #0a1f1a;
+  color: #dce9e3;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.lean-editor::placeholder {
+  color: #668078;
+}
+
+.source-meter {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #819990;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.61rem;
+}
+
+.license-consent {
+  display: flex;
+  margin: 24px 0;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.license-consent input {
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--forest);
+}
+
+.verification-job-card {
+  display: grid;
+  padding: 22px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #f4f5ef;
+}
+
+.verification-job-card.running,
+.verification-job-card.starting {
+  border-color: #b9c79b;
+  background: #f3f8e7;
+}
+
+.verification-job-card.verified {
+  border-color: #83ad6b;
+  background: #eaf5d4;
+}
+
+.verification-job-card.rejected,
+.verification-job-card.superseded,
+.verification-job-card.error {
+  border-color: #e4b1a5;
+  background: #fff1ed;
+}
+
+.job-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--forest);
+}
+
+.verification-job-card.rejected .job-icon,
+.verification-job-card.superseded .job-icon,
+.verification-job-card.error .job-icon {
+  color: #b14932;
+}
+
+.verification-job-card strong,
+.verification-job-card p,
+.verification-job-card code {
+  display: block;
+}
+
+.verification-job-card a {
+  display: inline-block;
+  margin-top: 7px;
+  color: var(--forest);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.verification-job-card strong {
+  font-size: 0.82rem;
+}
+
+.verification-job-card p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.verification-job-card code {
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+  color: var(--forest);
+  font-size: 0.59rem;
+}
+
+.spin {
+  animation: spin 1.1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.verification-log {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #0a1f1a;
+  color: #c7d8d1;
+}
+
+.verification-log summary {
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.verification-log pre {
+  max-height: 420px;
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: pre-wrap;
+  font-size: 0.65rem;
+}
+
+.submission-locked-card {
+  display: flex;
+  padding: 34px;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--white);
+}
+
+.submission-locked-card > svg {
+  flex: none;
+  color: var(--forest);
+}
+
+.submission-locked-card div {
+  margin-right: auto;
+}
+
+.submission-locked-card h3 {
+  margin-bottom: 4px;
+}
+
+.submission-locked-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.inline-proof-rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #40564d;
+  font-size: 0.67rem;
+}
+
+.inline-proof-rules li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* Record detail */
 .record-hero {
   padding-top: 24px;
@@ -2742,6 +3095,49 @@ h3 {
     flex-direction: column;
   }
 
+  .direct-submit-heading,
+  .submission-locked-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-record-chip {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .submission-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .submission-fields .field-wide {
+    grid-column: auto;
+  }
+
+  .lean-source-heading,
+  .source-meter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lean-editor {
+    min-height: 360px;
+  }
+
+  .verification-job-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .verification-job-card .button {
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  .submission-locked-card form,
+  .submission-locked-card .button {
+    width: 100%;
+  }
+
   .record-hero {
     padding-top: 16px;
   }
@@ -2785,6 +3181,11 @@ h3 {
     min-height: 36px;
     padding-inline: 12px;
     font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .brand {
+    font-size: 0.98rem;
   }
 
   .header-auth .button svg {

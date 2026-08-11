@@ -10,21 +10,21 @@ All submission files are hostile input. Lean macros, elaborators, tactics, build
 
 - no secrets are exposed to the proof-verification job;
 - outbound network access is disabled during the untrusted build;
-- internet-facing socket families are excluded by an `AF_UNIX` allow-list, while the complete systemd `@network-io` syscall group denies socket operations altogether, with native-ABI enforcement and live AF_INET/AF_UNIX probes;
-- the verifier fails closed unless its outer network-syscall filter and Landlock filesystem restrictions pass live probes;
-- the challenge import closure and toolchain come from the protected base branch;
+- E2B disables sandbox internet and public traffic before source is uploaded, and the job fails closed unless a live outbound probe confirms that boundary;
+- Comparator's Landlock layer is independently probed before the proof runs; local full-verifier runs add systemd socket-family, syscall, and private-network restrictions;
+- the challenge import closure and toolchain come from a root-owned, pinned E2B template;
 - candidate source cannot supply compiled `.olean` files;
 - CPU, memory, disk, process count, and wall time are bounded;
 - Comparator builds and exports the trusted challenge before the candidate solution;
 - accepted theorems are replayed by Lean and nanoda;
-- record promotion occurs in a separate trusted workflow.
+- record promotion occurs outside E2B in a separate credentialed server path.
 
-The read-only re-verification job also dry-runs the ledger mutation and its data validator before the write-capable job is allowed to merge. The final job repeats those checks against the freshly merged `main`; a race or changed record therefore fails closed without displaying a new number.
+Before promotion, the server downloads the exact manifest and `Solution.lean` from the sandbox, recomputes their signed digest, validates the attestation against the deployed contract, and reads the record ledger at the signed `main` commit. It creates immutable evidence and ledger commits but exposes them through one `force: false` reference update. A changed record therefore fails closed without overwriting or displaying a stale result.
 
-For fork submissions, the unprivileged workflow records the exact PR, base, source repository, branch, and head SHA in a short-lived artifact. The privileged workflow verifies all of those coordinates against GitHub's API and reruns the judge before gaining write permission; artifact contents alone are never an acceptance signal.
+The E2B sandbox receives no OAuth, session-signing, webhook, GitHub, Vercel, or E2B API credential. The browser receives only an HMAC-signed opaque job handle. The GitHub write credential is fine-grained to repository Contents and exists only in the promotion function.
 
-`--mode=quick` deliberately omits the adversarial sandbox and must never be used on an unknown pull request.
+`--mode=quick` deliberately omits the adversarial sandbox and must never be used on unknown Lean source.
 
 ## Web application
 
-GitHub authentication requests read-only identity scopes. OAuth credentials and `AUTH_SECRET` belong only in encrypted deployment variables. The site uses signed JWT sessions, does not accept proof uploads, and sends contributors to GitHub pull requests so the verification boundary remains auditable.
+GitHub authentication requests read-only identity scopes. OAuth credentials, `AUTH_SECRET`, `E2B_API_KEY`, `E2B_WEBHOOK_SECRET`, and `GITHUB_RECORDS_TOKEN` belong only in encrypted deployment variables. The site uses signed JWT sessions, accepts one bounded Lean source upload, and publishes its exact bytes plus the two-kernel attestation as immutable Git evidence.

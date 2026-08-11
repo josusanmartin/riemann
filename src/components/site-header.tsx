@@ -18,9 +18,9 @@ export async function SiteHeader() {
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <Link className="brand" href="/" aria-label="Riemann.fail home">
+        <Link className="brand" href="/" aria-label="Riemann zeta function, home">
           <BrandMark className="brand-mark" />
-          <span>Riemann<span className="brand-dot">.fail</span></span>
+          <span>Riemann <span className="brand-sub">zeta function</span></span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Primary navigation">

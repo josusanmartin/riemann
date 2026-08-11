@@ -5,7 +5,7 @@ import {
   Box,
   CheckCircle2,
   FileSearch,
-  GitPullRequestArrow,
+  UploadCloud,
   KeyRound,
   Network,
   ShieldCheck,
@@ -17,7 +17,7 @@ import { contract } from "@/lib/records";
 export const metadata: Metadata = {
   title: "Verification methodology",
   description:
-    "How Riemann.fail isolates untrusted Lean code, compares exact statements, replays two kernels, and promotes records.",
+    "How untrusted Lean code is isolated, how statements are compared, how two kernels replay the proof, and how records are promoted.",
 };
 
 const command = `npm ci
@@ -36,10 +36,10 @@ export default function MethodologyPage() {
         <div className="shell inner-hero-grid">
           <div>
             <span className="eyebrow">Verification methodology</span>
-            <h1>Untrusted proof.<br />Trusted statement.<br />Two kernels.</h1>
+            <h1>How submissions are verified.</h1>
             <p>
-              Automation works because acceptance is a deterministic formal check,
-              not a judgment about whether an argument looks convincing.
+              Acceptance is a deterministic formal check, so the process runs
+              without any human judgment of the argument itself.
             </p>
           </div>
           <div className="trust-seal" aria-label="Verification guarantees">
@@ -56,25 +56,25 @@ export default function MethodologyPage() {
 
       <section className="shell section-space">
         <div className="section-heading split-heading">
-          <div><span className="eyebrow">Separation of powers</span><h2>The proof cannot rewrite the exam</h2></div>
-          <p>Verification is split across jobs so pull-request code never receives credentials or write permission.</p>
+          <div><span className="eyebrow">Separation of duties</span><h2>Verification and publication use separate trust domains</h2></div>
+          <p>Untrusted Lean and the credentialed publisher are separated so proof code can never read or use a write credential.</p>
         </div>
         <div className="trust-grid">
-          <article><GitPullRequestArrow size={23} /><h3>Candidate job</h3><p>Checks one added submission and builds it in an isolated, credential-free sandbox. Promotion independently re-verifies the exact commit against the latest record.</p><span className="permission-chip">read-only</span></article>
+          <article><UploadCloud size={23} /><h3>Candidate sandbox</h3><p>Checks one server-generated manifest and one Lean file in a private, no-egress E2B environment with no application credentials.</p><span className="permission-chip">no secrets</span></article>
           <article><FileSearch size={23} /><h3>Comparator</h3><p>Reconstructs trusted declarations and rejects any proof whose statements differ, even if the names match.</p><span className="permission-chip">no secrets</span></article>
-          <article><KeyRound size={23} /><h3>Promotion job</h3><p>Runs only after verified CI, rechecks against the latest record, then merges and updates the ledger.</p><span className="permission-chip">write after pass</span></article>
+          <article><KeyRound size={23} /><h3>Publisher</h3><p>Rehashes the sandbox source and attestation, then atomically archives evidence and updates the ledger without a pull request.</p><span className="permission-chip">write after pass</span></article>
         </div>
       </section>
 
       <section className="shell methodology-detail">
         <article className="prose-section">
-          <span className="eyebrow">Why two kernels?</span>
+          <span className="eyebrow">Two independent kernels</span>
           <h2>Independent replay narrows the trusted computing base.</h2>
           <p>
-            Lean elaborates convenient source code into a compact proof object. The
-            Lean kernel checks that object first. Comparator exports it, and nanoda—a
-            separate small implementation—checks it again. A frontend bug is not
-            enough to advance the record.
+            Lean elaborates source code into a compact proof object, which the Lean
+            kernel checks first. Comparator then exports that object, and nanoda, a
+            separate small implementation, checks it again. A bug in one checker is
+            not enough to advance the record.
           </p>
           <div className="kernel-diagram" aria-label="Proof verification flow">
             <span>Lean source</span><ArrowRight size={16} /><span>Lean kernel</span><ArrowRight size={16} /><span>export</span><ArrowRight size={16} /><span>nanoda</span>
@@ -82,7 +82,7 @@ export default function MethodologyPage() {
         </article>
         <article className="axiom-card">
           <span className="eyebrow">Permitted axioms</span>
-          <h3>A short, explicit allowlist</h3>
+          <h3>The permitted axioms</h3>
           <ul>
             {contract.permittedAxioms.map((axiom) => <li key={axiom}><CheckCircle2 size={16} /><code>{axiom}</code></li>)}
           </ul>
@@ -93,13 +93,13 @@ export default function MethodologyPage() {
       <section className="isolation-section">
         <div className="shell isolation-grid">
           <div>
-            <span className="eyebrow">Hostile-code model</span>
-            <h2>Elaboration is code execution, so CI treats every proof as hostile.</h2>
-            <p>Formal correctness is not the same thing as operational safety. Resource limits and filesystem isolation protect the runner while kernels protect the theorem.</p>
+            <span className="eyebrow">Untrusted-code model</span>
+            <h2>Elaborating a Lean proof runs code, so the verifier treats every submission as untrusted.</h2>
+            <p>Formal correctness does not imply the code is safe to run, so resource limits and filesystem isolation protect the runner while the kernels protect the theorem.</p>
           </div>
           <div className="isolation-list">
-            <div><Network size={20} /><span><strong>Network restricted</strong><small>Dependencies are pinned and fetched before untrusted code runs; the sandboxed job holds no credentials worth exfiltrating.</small></span></div>
-            <div><KeyRound size={20} /><span><strong>Credentials absent</strong><small>The verifier job cannot merge, push, or read repository secrets.</small></span></div>
+            <div><Network size={20} /><span><strong>No outbound network</strong><small>Dependencies are pinned into the template before untrusted code runs, and a live probe must confirm that egress is disabled.</small></span></div>
+            <div><KeyRound size={20} /><span><strong>Credentials absent</strong><small>The verifier cannot publish, push, or read application secrets.</small></span></div>
             <div><Box size={20} /><span><strong>Resources bounded</strong><small>CPU time, memory, processes, and writable paths are restricted.</small></span></div>
           </div>
         </div>
@@ -107,8 +107,8 @@ export default function MethodologyPage() {
 
       <section className="shell section-space local-check">
         <div>
-          <span className="eyebrow">Reproduce it</span>
-          <h2>The authoritative command is public.</h2>
+          <span className="eyebrow">Reproduce the check</span>
+          <h2>Run the verifier yourself.</h2>
           <p>The tool installer checks out every verifier component at the commit recorded in the challenge contract.</p>
           <Link className="text-link" href="/submit">Prepare your submission <ArrowRight size={16} /></Link>
         </div>

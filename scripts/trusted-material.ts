@@ -66,6 +66,7 @@ async function collectTrustedFiles(
 export async function computeTrustedMaterialDigest(
   repositoryRoot: string,
   trustedPaths: string[],
+  overrides: Readonly<Record<string, string | Buffer>> = {},
 ): Promise<string> {
   const files = (
     await Promise.all(
@@ -80,6 +81,7 @@ export async function computeTrustedMaterialDigest(
     );
 
   const seen = new Set<string>();
+  const usedOverrides = new Set<string>();
   const hash = createHash("sha256");
   hash.update("riemann.fail/trusted-material/v1\0");
   for (const file of files) {
@@ -89,10 +91,23 @@ export async function computeTrustedMaterialDigest(
     seen.add(file.path);
     hash.update(file.path);
     hash.update("\0");
-    hash.update(String(file.contents.byteLength));
+    const override = overrides[file.path];
+    const contents =
+      override === undefined
+        ? file.contents
+        : Buffer.isBuffer(override)
+          ? override
+          : Buffer.from(override, "utf8");
+    if (override !== undefined) usedOverrides.add(file.path);
+    hash.update(String(contents.byteLength));
     hash.update("\0");
-    hash.update(file.contents);
+    hash.update(contents);
     hash.update("\0");
+  }
+  for (const path of Object.keys(overrides)) {
+    if (!usedOverrides.has(path)) {
+      throw new Error(`Trusted material override is not a trusted file: ${path}`);
+    }
   }
   return hash.digest("hex");
 }

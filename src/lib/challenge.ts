@@ -25,6 +25,28 @@ const positiveIntegerString = z
   .max(200, "exact integers are limited to 200 digits")
   .regex(/^[1-9]\d*$/, "must be a positive integer string");
 
+export const isoDateStringSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "must be an ISO calendar date")
+  .refine(
+    (value) => {
+      const timestamp = Date.parse(`${value}T00:00:00.000Z`);
+      return (
+        Number.isFinite(timestamp) &&
+        new Date(timestamp).toISOString().slice(0, 10) === value
+      );
+    },
+    "must be a valid calendar date",
+  );
+
+export const isoDateTimeStringSchema = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/,
+    "must be an ISO UTC timestamp",
+  )
+  .refine((value) => Number.isFinite(Date.parse(value)), "must be a valid timestamp");
+
 export const githubLoginSchema = z
   .string()
   .regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/);
@@ -39,7 +61,7 @@ export const exactRationalSchema = z
 export const independentReviewSchema = z
   .object({
     reviewer: z.string().min(1).max(120),
-    date: z.string().date(),
+    date: isoDateStringSchema,
     url: z.string().url(),
     summary: z.string().min(20).max(500),
   })
@@ -49,7 +71,7 @@ export const recordSchema = z
   .object({
     id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
     track: trackSchema,
-    date: z.string().date(),
+    date: isoDateStringSchema,
     author: z.string().min(1),
     github: githubLoginSchema.nullable(),
     title: z.string().min(1),
@@ -137,44 +159,53 @@ export const submissionSchema = z
 
 export type Submission = z.infer<typeof submissionSchema>;
 
-export const gitShaSchema = z.string().regex(/^[0-9a-f]{40}$/);
-
-export const githubRepositorySchema = z
-  .string()
-  .max(202)
-  .regex(
-    /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38}[A-Za-z0-9])?\/[A-Za-z0-9_.-]+$/,
-    "must be an owner/repository name",
-  );
-
-export const githubRefSchema = z
-  .string()
-  .min(1)
-  .max(255)
-  .refine(
-    (value) => !/[\u0000-\u001f\u007f]/.test(value),
-    "must not contain control characters",
-  );
-
 /**
- * Immutable pull-request coordinates emitted by the unprivileged verifier and
- * checked again against GitHub's API by the privileged promotion workflow.
+ * Browser-facing fields for a direct submission. Identity, theorem names, the
+ * proof path, track, schema version, and license are deliberately absent: the
+ * trusted server derives those values instead of accepting user assertions.
  */
-export const promotionMetadataSchema = z
+export const directSubmissionInputSchema = z
   .object({
-    schemaVersion: z.literal(1),
-    workflowRunId: positiveIntegerString,
-    pullRequestNumber: z.number().int().positive(),
-    headSha: gitShaSchema,
-    headRepository: githubRepositorySchema,
-    headRef: githubRefSchema,
-    baseSha: gitShaSchema,
-    baseRepository: githubRepositorySchema,
-    baseRef: githubRefSchema,
+    id: z.string().max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
+    displayName: z.string().trim().min(1).max(100),
+    score: exactRationalSchema,
+    summary: z.string().trim().min(20).max(1000),
+    method: z.string().trim().min(3).max(200),
+    solution: z.string().min(1).max(2_000_000),
+    acceptLicense: z.literal(true),
   })
   .strict();
 
-export type PromotionMetadata = z.infer<typeof promotionMetadataSchema>;
+export type DirectSubmissionInput = z.infer<typeof directSubmissionInputSchema>;
+
+export const verificationAttestationSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    submissionId: z.string().max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
+    author: z
+      .object({
+        github: githubLoginSchema,
+        displayName: z.string().min(1).max(100),
+      })
+      .strict(),
+    score: exactRationalSchema,
+    scoreDecimal: decimalString,
+    previousRecordId: z.string().min(1),
+    upstreamCommit: z.string().regex(/^[0-9a-f]{40}$/),
+    theoremNames: z.array(z.string()).length(3),
+    result: z.literal("kernel-verified"),
+    verifiedAt: isoDateTimeStringSchema,
+    challengeDigest: z.string().regex(/^[0-9a-f]{64}$/),
+    kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
+    permittedAxioms: z.array(z.string()),
+  })
+  .strict();
+
+export type VerificationAttestation = z.infer<
+  typeof verificationAttestationSchema
+>;
+
+export const gitShaSchema = z.string().regex(/^[0-9a-f]{40}$/);
 
 export function compareRationals(
   left: { numerator: string; denominator: string },

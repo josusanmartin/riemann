@@ -4,7 +4,6 @@ import {
   compareRationals,
   decimalToPercent,
   independentReviewSchema,
-  promotionMetadataSchema,
   rationalToDecimal,
   submissionSchema,
 } from "@/lib/challenge";
@@ -77,38 +76,6 @@ describe("challenge primitives", () => {
       summary: "A candidate containing an undeclared score field.",
       method: "invalid extras",
       license: "Apache-2.0",
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it("accepts immutable promotion coordinates for an external fork", () => {
-    expect(
-      promotionMetadataSchema.parse({
-        schemaVersion: 1,
-        workflowRunId: "31415926535",
-        pullRequestNumber: 42,
-        headSha: "a".repeat(40),
-        headRepository: "outside-solver/riemann",
-        headRef: "proof/better-bound",
-        baseSha: "b".repeat(40),
-        baseRepository: "josusanmartin/riemann",
-        baseRef: "main",
-      }),
-    ).toMatchObject({ pullRequestNumber: 42 });
-  });
-
-  it("rejects output-injection characters in promotion metadata", () => {
-    const result = promotionMetadataSchema.safeParse({
-      schemaVersion: 1,
-      workflowRunId: "31415926535",
-      pullRequestNumber: 42,
-      headSha: "a".repeat(40),
-      headRepository: "outside-solver/riemann",
-      headRef: "proof/better-bound\nforged=value",
-      baseSha: "b".repeat(40),
-      baseRepository: "josusanmartin/riemann",
-      baseRef: "main",
     });
 
     expect(result.success).toBe(false);

@@ -1,7 +1,6 @@
 import { appendFile, cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve, sep } from "node:path";
 import contractJson from "../challenge/contract.json";
-import recordsJson from "../data/records.json";
 import {
   contractSchema,
   compareRationals,
@@ -20,6 +19,10 @@ const repositoryRoot = resolve(import.meta.dirname, "..");
 const submissionDirectory = resolve(submissionArgument);
 const workspace = resolve(workspaceArgument);
 const contract = contractSchema.parse(contractJson);
+const recordsPath = process.env.RIEMANN_RECORDS_PATH
+  ? resolve(process.env.RIEMANN_RECORDS_PATH)
+  : join(repositoryRoot, "data", "records.json");
+const recordsJson: unknown = JSON.parse(await readFile(recordsPath, "utf8"));
 const currentRecord = recordsSchema
   .parse(recordsJson)
   .filter((record) => record.status === "kernel-verified")

@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Riemann.fail",
-    short_name: "Riemann.fail",
+    name: "Riemann zeta function",
+    short_name: "Riemann ζ",
     description:
-      "A machine-checked frontier for unconditional critical-line bounds.",
+      "A machine-checked record of unconditional critical-line bounds for the Riemann zeta function.",
     start_url: "/",
     display: "standalone",
     background_color: "#f5f3eb",

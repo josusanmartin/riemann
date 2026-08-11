@@ -14,18 +14,27 @@ const currentPercent = truncateDecimalString(current.scorePercent, 2);
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: `Riemann.fail — improve the ${currentPercent}% bound`, template: "%s · Riemann.fail" },
-  description: "An automated formal-proof arena for improving the unconditional lower bound on Riemann zeta zeros on the critical line.",
-  applicationName: "Riemann.fail",
+  title: {
+    default: `Riemann zeta function — at least ${currentPercent}% of zeros on the critical line`,
+    template: "%s · Riemann zeta function",
+  },
+  description:
+    "A machine-checked record of the largest proven proportion of nontrivial Riemann zeta zeros on the critical line. New results are submitted as Lean proofs and rechecked before they are published.",
+  applicationName: "Riemann zeta function",
   keywords: ["Riemann zeta", "Lean 4", "formal verification", "analytic number theory", "critical line"],
   openGraph: {
     type: "website",
     url: siteUrl,
-    siteName: "Riemann.fail",
-    title: "Riemann.fail — the bound only moves when the proof checks",
-    description: "Submit Lean. Beat the current exact bound. Advance a kernel-verified mathematical record.",
+    siteName: "Riemann zeta function",
+    title: "Riemann zeta function — critical-line bound record",
+    description:
+      "The current record for the proportion of Riemann zeta zeros proven to lie on the critical line, verified in Lean and open to new submissions.",
   },
-  twitter: { card: "summary_large_image", title: "Riemann.fail", description: "A machine-checked frontier for the critical-line bound." },
+  twitter: {
+    card: "summary_large_image",
+    title: "Riemann zeta function",
+    description: "The verified record for critical-line zeros of the Riemann zeta function.",
+  },
 };
 
 export const viewport: Viewport = {

@@ -14,7 +14,7 @@ import { contract, getCurrentRecord } from "@/lib/records";
 export const metadata: Metadata = {
   title: "Challenge contract",
   description:
-    "The frozen theorem, score, rules, and trust boundary for the Riemann.fail critical-line challenge.",
+    "The fixed theorem, the scoring rule, and the trust boundary for the critical-line bound challenge.",
 };
 
 const theorem = `theorem candidate_critical_line_bound :
@@ -35,28 +35,28 @@ export default function ChallengePage() {
       <section className="inner-hero shell-wrap">
         <div className="shell inner-hero-grid">
           <div>
-            <span className="eyebrow">Challenge 001 · Critical line</span>
-            <h1>Improve one constant.<br />Keep everything else fixed.</h1>
+            <span className="eyebrow">Critical-line bound</span>
+            <h1>Improve one constant in a fixed theorem.</h1>
             <p>
-              Supply an exact rational κ and a Lean proof of the same unconditional
-              asymptotic theorem. The current record is the only number you must beat.
+              Submit an exact rational κ with a Lean proof of the fixed unconditional
+              asymptotic theorem. A submission is accepted when κ exceeds the current record.
             </p>
             <Link className="button button-lime" href="/submit">
               Start a submission <ArrowRight size={17} />
             </Link>
           </div>
           <aside className="challenge-score-card" aria-label="Current score to beat">
-            <span>Exact record to beat</span>
+            <span>Current record</span>
             <strong>{current.scoreDecimal}…</strong>
             <code>{current.exactExpression}</code>
-            <p>Strictly greater. Equality does not qualify.</p>
+            <p>A new submission must be strictly greater; equality does not qualify.</p>
           </aside>
         </div>
       </section>
 
       <section className="shell section-space contract-layout">
         <article className="prose-section">
-          <span className="eyebrow">The scored object</span>
+          <span className="eyebrow">What is scored</span>
           <h2>A lower bound for distinct zeros on Re(s) = ½</h2>
           <p>
             Let <i>N</i> count nontrivial zeros of the Riemann zeta function with
@@ -66,9 +66,9 @@ export default function ChallengePage() {
           </p>
           <CodeBlock label="Trusted statement · dyadic form">{theorem}</CodeBlock>
           <p>
-            CI also requires the cumulative form. This prevents a candidate from
-            moving the displayed scalar while proving only a differently shaped
-            result.
+            The build also requires the cumulative form, so a submission cannot
+            change the displayed value by proving only a differently shaped
+            statement.
           </p>
           <CodeBlock label="Trusted statement · cumulative form">{cumulativeTheorem}</CodeBlock>
         </article>
@@ -84,8 +84,8 @@ export default function ChallengePage() {
 
       <section className="shell rule-section" id="score">
         <div className="section-heading split-heading">
-          <div><span className="eyebrow">Scoring law</span><h2>Exact, monotone, reproducible</h2></div>
-          <p>The public percentage is presentation. The comparator uses exact terms and integer cross-multiplication.</p>
+          <div><span className="eyebrow">Scoring</span><h2>How scoring works</h2></div>
+          <p>The percentage shown is for display only. The comparator uses exact terms and integer cross-multiplication.</p>
         </div>
         <div className="rule-grid">
           <article><div className="rule-icon"><Binary size={22} /></div><h3>Exact rational</h3><p>Submit positive decimal strings <code>p</code> and <code>q</code>. Floating-point input is never accepted.</p></article>
@@ -97,9 +97,9 @@ export default function ChallengePage() {
       <section className="frozen-section" id="frozen">
         <div className="shell frozen-grid">
           <div>
-            <span className="eyebrow eyebrow-light">Immutable inputs</span>
-            <h2>The candidate controls the proof and κ. Nothing else.</h2>
-            <p>Trusted CI regenerates the target from repository-owned templates after checking the pull-request scope.</p>
+            <span className="eyebrow eyebrow-light">Fixed by the challenge</span>
+            <h2>A submission controls only the proof and κ.</h2>
+            <p>The server accepts only one Lean source file, then the isolated verifier regenerates the target from root-owned templates.</p>
           </div>
           <ul className="check-list check-list-dark">
             <li><Check size={17} /> Definitions of <i>N</i>, <i>N₀*</i>, and the critical line</li>
@@ -114,24 +114,24 @@ export default function ChallengePage() {
       <section className="shell section-space" id="accepted">
         <div className="section-heading split-heading">
           <div><span className="eyebrow">Acceptance boundary</span><h2>Formal record, or supporting evidence</h2></div>
-          <p>Both are useful. Only one changes the number.</p>
+          <p>Only a complete formal submission changes the record.</p>
         </div>
         <div className="acceptance-grid">
           <article className="acceptance-card accepted">
             <span className="acceptance-kicker"><Check size={15} /> Advances the record</span>
             <h3>Complete formal submission</h3>
-            <p>A scoped pull request whose generated statements, permitted axioms, and exported proof pass Lean and nanoda.</p>
+            <p>An authenticated Lean upload whose generated statements, permitted axioms, and exported proof pass Lean and nanoda.</p>
           </article>
           <article className="acceptance-card">
             <span className="acceptance-kicker"><FileLock2 size={15} /> Does not advance it</span>
             <h3>Paper, computation, or partial proof</h3>
-            <p>Open an issue to share the idea. Numerical evidence and expert review can guide work, but cannot certify κ.</p>
+            <p>Open an issue to share the idea. Numerical evidence and expert review can guide the work but cannot certify κ.</p>
           </article>
         </div>
       </section>
 
       <section className="shell pins-card" id="pins">
-        <div><span className="eyebrow">Reproducible foundation</span><h2>Every dependency is pinned by commit.</h2></div>
+        <div><span className="eyebrow">Pinned dependencies</span><h2>Every dependency is pinned by commit.</h2></div>
         <dl className="pin-list">
           <div><dt>Zeta23</dt><dd>{contract.trustedUpstream.commit.slice(0, 12)}</dd></div>
           <div><dt>Mathlib</dt><dd>{contract.trustedUpstream.mathlibCommit.slice(0, 12)}</dd></div>
