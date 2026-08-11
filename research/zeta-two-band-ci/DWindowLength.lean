@@ -32,11 +32,11 @@ theorem eventually_normalized_span_le_count
 
   filter_upwards
     [eventually_ge_atTop T0,
-      eventually_l_ge 1,
+      eventually_l_pos,
       eventually_ge_atTop (2 * Real.pi * C / (1 - P.lam))]
     with T hT0 hl hTlarge
 
-  have hl0 : 0 ≤ l T := by linarith
+  have hl0 : 0 ≤ l T := hl.le
   have hTpos : 0 < T := by
     have hthreshold :
         0 < 2 * Real.pi * C / (1 - P.lam) := by positivity
