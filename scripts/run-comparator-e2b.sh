@@ -92,4 +92,5 @@ trap - EXIT
 
 ulimit -f 8388608
 ulimit -u 512
-exec timeout --signal=TERM --kill-after=15s 3200s lake env "$1" "$2"
+exec timeout --signal=TERM --kill-after=15s 3200s \
+  /opt/riemann/tools/bin/lake env "$1" "$2"

@@ -42,6 +42,7 @@ export function createRiemannVerifierTemplate(
       { user: "root" },
     )
     .makeDir("/opt/riemann", { user: "root", mode: 0o755 })
+    .makeDir("/opt/riemann/scripts", { user: "root", mode: 0o755 })
     .copyItems([
       { src: "e2b/runtime/package.json", dest: "/opt/riemann/package.json" },
       {
@@ -60,7 +61,38 @@ export function createRiemannVerifierTemplate(
         src: "e2b/run-verification-job.sh",
         dest: "/opt/riemann/e2b/run-verification-job.sh",
       },
-      { src: "scripts", dest: "/opt/riemann/scripts" },
+      {
+        src: "scripts/install-lean-toolchain.sh",
+        dest: "/opt/riemann/scripts/install-lean-toolchain.sh",
+      },
+      {
+        src: "scripts/install-native-build-toolchains.sh",
+        dest: "/opt/riemann/scripts/install-native-build-toolchains.sh",
+      },
+      {
+        src: "scripts/install-verifier-tools.sh",
+        dest: "/opt/riemann/scripts/install-verifier-tools.sh",
+      },
+      {
+        src: "scripts/lake-runtime-wrapper.sh",
+        dest: "/opt/riemann/scripts/lake-runtime-wrapper.sh",
+      },
+      {
+        src: "scripts/prepare-e2b-template.sh",
+        dest: "/opt/riemann/scripts/prepare-e2b-template.sh",
+      },
+      {
+        src: "scripts/prune-lake-build-runtime.sh",
+        dest: "/opt/riemann/scripts/prune-lake-build-runtime.sh",
+      },
+      {
+        src: "scripts/prune-lean-runtime.sh",
+        dest: "/opt/riemann/scripts/prune-lean-runtime.sh",
+      },
+      {
+        src: "scripts/run-lake-build-bounded-disk.sh",
+        dest: "/opt/riemann/scripts/run-lake-build-bounded-disk.sh",
+      },
       { src: "src/lib", dest: "/opt/riemann/src/lib" },
     ])
     .runCmd("chown -R riemann:riemann /opt/riemann", { user: "root" })
@@ -75,6 +107,9 @@ export function createRiemannVerifierTemplate(
     // the expensive formal-library build above. Keeping them in a late layer
     // lets ownership-only template corrections reuse that deterministic work.
     .copyItems([
+      // Runtime-only scripts are copied after the expensive pinned formal
+      // build so verifier-wrapper fixes can reuse that deterministic layer.
+      { src: "scripts", dest: "/opt/riemann/scripts" },
       {
         src: "e2b/build-template.ts",
         dest: "/opt/riemann/e2b/build-template.ts",
