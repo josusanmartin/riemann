@@ -31,6 +31,27 @@ type TemplateBuildLogs = {
   }>;
 };
 
+function commandFailure(error: unknown): {
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+} {
+  const detail =
+    typeof error === "object" && error !== null
+      ? (error as Record<string, unknown>)
+      : {};
+  return {
+    exitCode: typeof detail.exitCode === "number" ? detail.exitCode : 124,
+    stdout: typeof detail.stdout === "string" ? detail.stdout.slice(-4_000) : "",
+    stderr:
+      typeof detail.stderr === "string"
+        ? detail.stderr.slice(-4_000)
+        : error instanceof Error
+          ? error.message.slice(-4_000)
+          : "The E2B command did not complete",
+  };
+}
+
 function noStore(status: number, body: object): Response {
   return Response.json(body, {
     status,
@@ -92,11 +113,11 @@ async function latestBuildCoordinates(
 }
 
 async function smokeTemplate(templateReference: string, key: string) {
-  const { CommandExitError, Sandbox } = await import("e2b");
+  const { Sandbox } = await import("e2b");
   const sandbox = await Sandbox.create({
     apiKey: key,
     template: templateReference,
-    timeoutMs: 5 * 60 * 1_000,
+    timeoutMs: 8 * 60 * 1_000,
     secure: true,
     allowInternetAccess: false,
     network: { allowPublicTraffic: false },
@@ -139,6 +160,7 @@ async function smokeTemplate(templateReference: string, key: string) {
         "ln -s /opt/riemann/zeta23/.lake/packages /home/riemann/tmp/zeta-smoke/.lake/packages && " +
         "for artifact_dir in lib/lean ir; do for source in /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23 /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23.*; do if [ -e \"$source\" ]; then ln -s \"$source\" \"/home/riemann/tmp/zeta-smoke/.lake/build/$artifact_dir/${source##*/}\"; fi; done; done && " +
         "test -s /home/riemann/tmp/zeta-smoke/.lake/build/lib/lean/Zeta23/Unconditional.olean && " +
+        "printf '%s\\n' 'import Zeta23.Unconditional' '#check Zeta23.two_thirds_on_critical_line' '#check Zeta23.two_thirds_on_critical_line_cumulative' > /home/riemann/tmp/zeta-smoke/ZetaRuntimeProbe.lean && " +
         "cp -R /opt/riemann/challenge/smoke/. /home/riemann/tmp/bootstrap-smoke/ && " +
         "chown -R riemann:riemann /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke",
       { user: "root", timeoutMs: 60_000 },
@@ -146,7 +168,7 @@ async function smokeTemplate(templateReference: string, key: string) {
     let zetaResult;
     try {
       zetaResult = await sandbox.commands.run(
-        "/opt/riemann/tools/bin/lake env lean Zeta23/Unconditional.lean",
+        "/opt/riemann/tools/bin/lake env lean ZetaRuntimeProbe.lean",
         {
           user: "riemann",
           cwd: "/home/riemann/tmp/zeta-smoke",
@@ -155,27 +177,42 @@ async function smokeTemplate(templateReference: string, key: string) {
         },
       );
     } catch (error) {
-      if (!(error instanceof CommandExitError)) throw error;
+      const failure = commandFailure(error);
       return {
         sandboxId: sandbox.sandboxId,
-        exitCode: error.exitCode,
-        zetaElaborationExitCode: error.exitCode,
-        stdout: error.stdout.slice(-4_000),
-        stderr: error.stderr.slice(-4_000),
+        exitCode: failure.exitCode,
+        zetaElaborationExitCode: failure.exitCode,
+        stdout: failure.stdout,
+        stderr: failure.stderr,
         diagnostics: diagnosticsResult.stdout.slice(-4_000),
-        failedStage: "zeta-elaboration" as const,
+        failedStage: "zeta-runtime-import" as const,
         networkIsolated: true,
       };
     }
-    const result = await sandbox.commands.run(
-      "bash /opt/riemann/scripts/run-comparator-e2b.sh /opt/riemann/tools/bin/comparator config.json",
-      {
-        user: "riemann",
-        cwd: "/home/riemann/tmp/bootstrap-smoke",
-        timeoutMs: 4 * 60 * 1_000,
-        envs: sandboxEnv,
-      },
-    );
+    let result;
+    try {
+      result = await sandbox.commands.run(
+        "bash /opt/riemann/scripts/run-comparator-e2b.sh /opt/riemann/tools/bin/comparator config.json",
+        {
+          user: "riemann",
+          cwd: "/home/riemann/tmp/bootstrap-smoke",
+          timeoutMs: 4 * 60 * 1_000,
+          envs: sandboxEnv,
+        },
+      );
+    } catch (error) {
+      const failure = commandFailure(error);
+      return {
+        sandboxId: sandbox.sandboxId,
+        exitCode: failure.exitCode,
+        zetaElaborationExitCode: zetaResult.exitCode,
+        stdout: failure.stdout,
+        stderr: failure.stderr,
+        diagnostics: diagnosticsResult.stdout.slice(-4_000),
+        failedStage: "comparator-nanoda" as const,
+        networkIsolated: true,
+      };
+    }
     return {
       sandboxId: sandbox.sandboxId,
       exitCode: result.exitCode,
