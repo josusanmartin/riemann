@@ -117,8 +117,7 @@ theorem localCertificate_of_dominates
           + phi previous - phi g.state := rfl
     _ ≤ stepCost B State.good previous g
           + phi previous - phi g.state := by
-      exact sub_le_sub_right (add_le_add_right h (phi previous))
-        (phi g.state)
+      nlinarith
 
 def deltaLower : ℝ := 0.67250069
 def advertised : ℝ := 0.6725391
