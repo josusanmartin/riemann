@@ -6,6 +6,7 @@ import { CheckCircle2, FileCode2, LoaderCircle, ShieldAlert, Upload } from "luci
 type JobPhase =
   | "idle"
   | "starting"
+  | "queued"
   | "running"
   | "verified"
   | "superseded"
@@ -13,12 +14,15 @@ type JobPhase =
   | "error";
 
 type StatusPayload = {
-  status?: "running" | "verified" | "rejected";
+  status?: "queued" | "running" | "verified" | "rejected";
   submissionId?: string;
   proofDigest?: string;
   message?: string;
   log?: string;
   jobToken?: string;
+  queuePosition?: number;
+  dailyUsed?: number;
+  dailyLimit?: number;
   promotion?: {
     status?: string;
     message?: string;
@@ -46,8 +50,9 @@ export function DirectSubmissionForm({
 
   async function poll(jobToken: string) {
     let transientFailures = 0;
+    let delayMs = 5_000;
     for (;;) {
-      await new Promise((resolve) => window.setTimeout(resolve, 5_000));
+      await new Promise((resolve) => window.setTimeout(resolve, delayMs));
       try {
         const response = await fetch(
           `/api/submissions/status?job=${encodeURIComponent(jobToken)}`,
@@ -59,7 +64,18 @@ export function DirectSubmissionForm({
         }
         transientFailures = 0;
 
+        if (payload.status === "queued") {
+          delayMs = 15_000;
+          setPhase("queued");
+          setMessage(
+            `Queued for linear verification · ${payload.queuePosition ?? 1} ${
+              payload.queuePosition === 1 ? "proof" : "proofs"
+            } ahead.`,
+          );
+          continue;
+        }
         if (payload.status === "running") {
+          delayMs = 5_000;
           setPhase("running");
           setMessage(
             "Lean and both kernels are checking the frozen theorem contract.",
@@ -152,9 +168,18 @@ export function DirectSubmissionForm({
       if (!response.ok || !payload.jobToken) {
         throw new Error(payload.message ?? "The verifier could not start.");
       }
-      setPhase("running");
+      const queued = payload.status === "queued";
+      setPhase(queued ? "queued" : "running");
       setDigest(payload.proofDigest ?? "");
-      setMessage("Upload sealed. Formal verification is now running.");
+      setMessage(
+        queued
+          ? `Upload sealed · queue position ${payload.queuePosition ?? 1}. ${
+              payload.dailyUsed ?? 1
+            }/${payload.dailyLimit ?? 3} submissions used today.`
+          : `Upload sealed. Formal verification is running · ${
+              payload.dailyUsed ?? 1
+            }/${payload.dailyLimit ?? 3} submissions used today.`,
+      );
       void poll(payload.jobToken);
     } catch (error) {
       setPhase("error");
@@ -176,7 +201,7 @@ export function DirectSubmissionForm({
     setMessage(`${file.name} loaded into the source editor.`);
   }
 
-  const busy = phase === "starting" || phase === "running";
+  const busy = phase === "starting" || phase === "queued" || phase === "running";
 
   return (
     <form className="direct-submission-form" onSubmit={submit}>
@@ -254,13 +279,13 @@ export function DirectSubmissionForm({
           {busy ? <LoaderCircle className="spin" size={23} /> : phase === "verified" ? <CheckCircle2 size={23} /> : <ShieldAlert size={23} />}
         </div>
         <div>
-          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? "Proof rejected" : phase === "error" ? "Submission unavailable" : "Verification running"}</strong>
+          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
           <p>{message || "Nothing is accepted until Lean and nanoda independently replay the proof."}</p>
           {digest && <code>sha256:{digest}</code>}
           {evidenceUrl && <a href={evidenceUrl} target="_blank" rel="noreferrer">Open immutable evidence</a>}
         </div>
         <button className="button button-dark" type="submit" disabled={busy || !solution}>
-          {busy ? "Checking…" : "Verify formal proof"}
+          {phase === "queued" ? "Queued…" : busy ? "Checking…" : "Verify formal proof"}
         </button>
       </div>
 

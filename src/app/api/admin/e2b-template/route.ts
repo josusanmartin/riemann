@@ -1,10 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
-import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
+import { getE2BApiKey } from "@/lib/e2b-config";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,299}$/;
+const TEMPLATE_BUILD_NAME = "riemann-fail-verifier";
 
 type TemplateSummary = {
   templateID: string;
@@ -90,11 +91,11 @@ async function latestBuildCoordinates(
   return { templateId: template.templateID, buildId: build.buildID };
 }
 
-async function smokeTemplate(templateId: string, key: string) {
+async function smokeTemplate(templateReference: string, key: string) {
   const { Sandbox } = await import("e2b");
   const sandbox = await Sandbox.create({
     apiKey: key,
-    template: templateId,
+    template: templateReference,
     timeoutMs: 5 * 60 * 1_000,
     secure: true,
     allowInternetAccess: false,
@@ -128,7 +129,7 @@ async function smokeTemplate(templateId: string, key: string) {
       { user: "root", timeoutMs: 60_000 },
     );
     const zetaResult = await sandbox.commands.run(
-      "lake env lean Zeta23/Unconditional.lean",
+      "/opt/riemann/tools/bin/lake env lean Zeta23/Unconditional.lean",
       {
         user: "riemann",
         cwd: "/home/riemann/tmp/zeta-smoke",
@@ -167,16 +168,33 @@ export async function POST(request: Request): Promise<Response> {
     const key = apiKey();
     if (action === "smoke") {
       const templateId = url.searchParams.get("templateId");
-      if (!templateId || !identifierPattern.test(templateId)) {
-        return noStore(400, { error: "invalid_template_id" });
+      const buildId = url.searchParams.get("buildId");
+      if (
+        !templateId ||
+        !buildId ||
+        !identifierPattern.test(templateId) ||
+        !identifierPattern.test(buildId)
+      ) {
+        return noStore(400, { error: "invalid_template_build_coordinates" });
       }
+      const { Template } = await import("e2b");
+      const build = await Template.getBuildStatus(
+        { templateId, buildId },
+        { apiKey: key },
+      );
+      if (build.status !== "ready") {
+        return noStore(409, { error: "template_build_not_ready" });
+      }
+      const templateReference = `${TEMPLATE_BUILD_NAME}:${buildId}`;
       return noStore(200, {
         status: "passed",
         templateId,
-        smoke: await smokeTemplate(templateId, key),
+        buildId,
+        templateReference,
+        smoke: await smokeTemplate(templateReference, key),
       });
     }
-    const name = getE2BTemplate();
+    const name = TEMPLATE_BUILD_NAME;
     const force = url.searchParams.get("force") === "1";
     const { Template } = await import("e2b");
     if (!force && (await Template.exists(name, { apiKey: key }))) {
@@ -233,7 +251,7 @@ export async function GET(request: Request): Promise<Response> {
     const logsOffset = rawLogsOffset ? Number(rawLogsOffset) : undefined;
     const { Template } = await import("e2b");
     if (url.searchParams.get("latest") === "1") {
-      const latest = await latestBuildCoordinates(getE2BTemplate(), key);
+      const latest = await latestBuildCoordinates(TEMPLATE_BUILD_NAME, key);
       if (!latest) {
         return noStore(404, { error: "template_build_not_found" });
       }
@@ -241,7 +259,7 @@ export async function GET(request: Request): Promise<Response> {
       buildId = latest.buildId;
     }
     if (!templateId && !buildId) {
-      const name = getE2BTemplate();
+      const name = TEMPLATE_BUILD_NAME;
       return noStore(200, {
         status: (await Template.exists(name, { apiKey: key }))
           ? "ready"

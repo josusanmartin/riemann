@@ -13,7 +13,7 @@ export function VerificationPipeline() {
     <section className="pipeline-section" aria-labelledby="pipeline-title">
       <div className="section-heading pipeline-heading">
         <div><span className="eyebrow eyebrow-light">How verification works</span><h2 id="pipeline-title">How a submission is checked</h2></div>
-        <p>Acceptance depends only on the automated check. Expert review is recorded separately and does not affect whether a result is published.</p>
+        <p>A durable FIFO runs one proof at a time, with three uploads per GitHub account each UTC day. Acceptance depends only on the automated check; expert review is recorded separately.</p>
       </div>
       <ol className="pipeline-grid">
         {steps.map(({ icon: Icon, number, title, text }) => (

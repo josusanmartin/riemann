@@ -6,6 +6,7 @@ import { getCurrentRecord } from "@/lib/records";
 import { isE2BConfigured } from "@/lib/e2b-config";
 import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
+import { isSubmissionQueueConfigured } from "@/lib/submission-queue";
 import { DirectSubmissionForm } from "@/components/direct-submission-form";
 
 export const metadata: Metadata = {
@@ -21,7 +22,8 @@ export default async function SubmitPage() {
   const verifierConfigured =
     isE2BConfigured() &&
     isE2BWebhookConfigured() &&
-    isGitHubPromotionConfigured();
+    isGitHubPromotionConfigured() &&
+    isSubmissionQueueConfigured();
 
   return (
     <main id="main-content">
@@ -33,7 +35,9 @@ export default async function SubmitPage() {
             <p>
               Enter an exact rational and paste or upload your Lean source. A
               private E2B sandbox rechecks the fixed theorem with Comparator, the
-              Lean kernel, and nanoda. No pull request is required.
+              Lean kernel, and nanoda. Jobs run one at a time in submission order,
+              with a limit of three uploads per GitHub account per UTC day. No pull
+              request is required.
             </p>
             {!github && isGitHubAuthConfigured && (
               <form action={signInWithGitHub}>
@@ -50,7 +54,8 @@ export default async function SubmitPage() {
             </strong>
             <p>
               The browser never receives an E2B or repository credential. Your
-              source enters a disposable, no-egress verifier with fixed tools.
+              source enters a disposable, no-egress verifier with fixed tools;
+              queued sandboxes remain paused until their turn.
             </p>
           </aside>
         </div>
@@ -66,7 +71,7 @@ export default async function SubmitPage() {
         </div>
         <ol className="numbered-steps">
           <li><span>01</span><div><h3>Upload source</h3><p>The server derives your author identity and a strict manifest from the signed GitHub session.</p></div></li>
-          <li><span>02</span><div><h3>Verify in E2B</h3><p>A no-egress VM checks statement equality, permitted axioms, Lean, and independent nanoda replay.</p></div></li>
+          <li><span>02</span><div><h3>Verify in E2B</h3><p>A durable FIFO starts exactly one no-egress VM checker at a time, then checks statement equality, permitted axioms, Lean, and independent nanoda replay.</p></div></li>
           <li><span>03</span><div><h3>Publish evidence</h3><p>A passing result is bound to the exact source digest before it can enter the public record.</p></div></li>
         </ol>
       </section>
@@ -120,6 +125,8 @@ export default async function SubmitPage() {
         <ul className="inline-proof-rules">
           <li><Check size={15} /> Lean source only</li>
           <li><Check size={15} /> 2 MB maximum</li>
+          <li><Check size={15} /> 3 uploads per UTC day</li>
+          <li><Check size={15} /> FIFO · 1 verifier at a time</li>
           <li><Check size={15} /> Apache-2.0</li>
         </ul>
       </section>

@@ -61,13 +61,15 @@ Use the production deployment URL for the production OAuth app. Only `read:user 
 The deployed project uses:
 
 ```text
-Homepage URL:              https://riemann-fail.vercel.app
-Authorization callback:   https://riemann-fail.vercel.app/api/auth/callback/github
+Homepage URL:              https://www.riemannzeta.fun
+Authorization callback:   https://www.riemannzeta.fun/api/auth/callback/github
 ```
 
 ## Formal submissions
 
 Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. Optional model and harness attribution are stored as structured, attested fields in the public record. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
+
+Formal uploads enter a durable FIFO and exactly one proof verifier runs at a time. Each authenticated GitHub account may enter at most three uploads per UTC day. Waiting proofs are sealed in paused, no-egress E2B sandboxes; advancing the queue resumes only its head. The automation-only `automation-queue` branch stores HMAC-pseudonymous ownership counters, opaque job coordinates, and terminal receipts—not GitHub usernames or Lean source. Non-forced Git reference updates serialize concurrent admissions.
 
 For local development, copy `submissions/example` and prepare a candidate against the pinned Zeta23 tree:
 
@@ -88,11 +90,11 @@ vercel
 vercel --prod
 ```
 
-Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables from `.env.example` in the Vercel project. Build the pinned E2B image with `npm run e2b:template:build`, then set its immutable ID as `E2B_TEMPLATE_ID`. If the E2B key exists only in Vercel, the authenticated `/api/admin/e2b-template` endpoint can start and inspect the same background build using a temporary `E2B_TEMPLATE_ADMIN_SECRET`; remove that secret after bootstrap. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
+Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables from `.env.example` in the Vercel project. Build the pinned E2B image with `npm run e2b:template:build`, smoke the exact build, then set its immutable `riemann-fail-verifier:<build-id>` reference as `E2B_TEMPLATE_ID`; a bare family ID is mutable and must not be activated. If the E2B key exists only in Vercel, the authenticated `/api/admin/e2b-template` endpoint can start, inspect, and smoke the same background build using a temporary `E2B_TEMPLATE_ADMIN_SECRET`; remove that secret after bootstrap. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
 
-`GITHUB_RECORDS_TOKEN` must be a fine-grained credential limited to this repository with only **Contents: read and write**. It is held by Vercel, never sent to E2B, and used only after the server has re-read and rehashed a passing result. Promotion writes an evidence commit and a ledger commit, then publishes both with one non-forced update of `main`; a race cannot overwrite another record.
+`GITHUB_RECORDS_TOKEN` must be a fine-grained credential limited to this repository with only **Contents: read and write**. It is held by Vercel and never sent to E2B. It updates the opaque queue-control branch and, only after the server has re-read and rehashed a passing result, publishes evidence. Promotion writes an evidence commit and a ledger commit, then publishes both with one non-forced update of `main`; a race cannot overwrite another record.
 
-Production deploys run from `.github/workflows/deploy-production.yml` on every push to `main`. Because the promotion credential is not GitHub Actions' `GITHUB_TOKEN`, a successful record update triggers the normal deployment. An authenticated status request publishes immediately; if the submitter closes the browser, a signed E2B pause webhook resumes the preserved sandbox and completes the same idempotent publication path. A daily `CRON_SECRET`-protected sweep is the final backstop for a missed webhook.
+Production deploys run from `.github/workflows/deploy-production.yml` on every push to `main`. Because the promotion credential is not GitHub Actions' `GITHUB_TOKEN`, a successful record update triggers the normal deployment. An authenticated status request publishes immediately; if the submitter closes the browser, a signed E2B pause webhook resumes the preserved sandbox, completes the same idempotent publication path, and advances the next FIFO entry. A daily `CRON_SECRET`-protected sweep is the final backstop for a missed webhook or interrupted queue transition.
 
 Every deployment must expose the exact source commit as `VERCEL_GIT_COMMIT_SHA` or the per-deployment fallback `RIEMANN_BASE_COMMIT_SHA`. The checked-in workflow sets the fallback from `GITHUB_SHA`; the submission endpoint refuses to start without it.
 

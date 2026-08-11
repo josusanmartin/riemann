@@ -36,6 +36,8 @@ Floating-point scores are rejected. The dashboard decimal is derived from the ex
 
 The authenticated GitHub login becomes `author.github`; it cannot be supplied or overridden in the request body. The trusted server also generates the manifest, fixed proof path, theorem names, track, and Apache-2.0 license declaration. The accepted source surface is exactly one UTF-8 Lean file of at most 2 MB. Put helper declarations in that file.
 
+The service accepts at most three uploads from one GitHub account per UTC day. Accepted uploads enter a durable first-in, first-out queue, and only its head runs the formal verifier. Other uploads remain sealed in paused no-egress sandboxes until their turn; refreshing the page does not change order or reset the limit.
+
 The browser cannot modify the challenge contract, generated theorem templates, record data, lockfiles, verifier, dependency pins, or publication logic. Infrastructure changes use the repository's ordinary development process and never receive a formal score.
 
 ## Acceptance

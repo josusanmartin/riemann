@@ -2008,6 +2008,11 @@ h3 {
   background: #f3f8e7;
 }
 
+.verification-job-card.queued {
+  border-color: #d8c58b;
+  background: #fff9e6;
+}
+
 .verification-job-card.verified {
   border-color: #83ad6b;
   background: #eaf5d4;

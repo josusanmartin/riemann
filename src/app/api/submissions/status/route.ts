@@ -12,7 +12,17 @@ import {
   assertE2BResultMatchesJob,
   promoteE2BResult,
 } from "@/lib/submission-finalization";
+import {
+  advanceVerificationQueue,
+  assertQueueJobMatches,
+  ensureQueuedJobRunning,
+  reconcileQueuedJobPause,
+} from "@/lib/queue-orchestration";
 import { verifySubmissionJob } from "@/lib/submission-jobs";
+import {
+  inspectVerificationJob,
+  type QueueCompletionReceipt,
+} from "@/lib/submission-queue";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -21,6 +31,44 @@ function noStore(status: number, body: object): Response {
   return Response.json(body, {
     status,
     headers: { "Cache-Control": "no-store" },
+  });
+}
+
+function completedReceiptResponse(
+  submissionId: string,
+  expectedDigest: string,
+  receipt: QueueCompletionReceipt,
+): Response {
+  if (receipt.proofDigest !== expectedDigest) {
+    throw new Error("The durable queue receipt does not match the verification job");
+  }
+  if (receipt.outcome === "rejected") {
+    return noStore(200, {
+      status: "rejected",
+      submissionId,
+      proofDigest: receipt.proofDigest,
+      completedAt: receipt.completedAt,
+      message:
+        receipt.message ?? "The formal verifier rejected this candidate.",
+    });
+  }
+  return noStore(200, {
+    status: "verified",
+    submissionId,
+    proofDigest: receipt.proofDigest,
+    completedAt: receipt.completedAt,
+    promotion:
+      receipt.outcome === "superseded"
+        ? {
+            status: "superseded",
+            message:
+              receipt.message ??
+              "Another verified record landed before this result was published.",
+          }
+        : {
+            status: receipt.promotionStatus,
+            evidenceUrl: receipt.evidenceUrl,
+          },
   });
 }
 
@@ -54,6 +102,49 @@ export async function GET(request: Request): Promise<Response> {
         message: "This verification job belongs to another GitHub account.",
       });
     }
+    const queue = await inspectVerificationJob(job.jobId);
+    if (queue.status === "completed") {
+      return completedReceiptResponse(
+        job.submissionId,
+        job.proofDigest,
+        queue.receipt,
+      );
+    }
+    if (queue.status === "queued") {
+      assertQueueJobMatches(queue.job, job);
+      const latest = await reconcileQueuedJobPause(queue.job).catch((error) => {
+        console.error("Unable to reaffirm a queued E2B pause", error);
+        return queue;
+      });
+      if (latest.status === "active") {
+        assertQueueJobMatches(latest.job, job);
+        await ensureQueuedJobRunning(latest.job);
+        return noStore(200, {
+          status: "running",
+          submissionId: job.submissionId,
+          proofDigest: job.proofDigest,
+        });
+      }
+      if (latest.status === "completed") {
+        return completedReceiptResponse(
+          job.submissionId,
+          job.proofDigest,
+          latest.receipt,
+        );
+      }
+      return noStore(200, {
+        status: "queued",
+        submissionId: job.submissionId,
+        proofDigest: job.proofDigest,
+        queuePosition:
+          latest.status === "queued" ? latest.position : queue.position,
+      });
+    }
+    const queueManaged = queue.status === "active";
+    if (queue.status === "active") {
+      assertQueueJobMatches(queue.job, job);
+      await ensureQueuedJobRunning(queue.job);
+    }
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
       return noStore(200, {
@@ -64,6 +155,15 @@ export async function GET(request: Request): Promise<Response> {
     }
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
+      if (queueManaged) {
+        await advanceVerificationQueue(job.jobId, {
+          outcome: "rejected",
+          promotionStatus: null,
+          message: result.message,
+          evidenceUrl: null,
+          completedAt: result.completedAt,
+        });
+      }
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, result);
     }
@@ -78,16 +178,35 @@ export async function GET(request: Request): Promise<Response> {
     }
     try {
       const promotion = await promoteE2BResult(job, result);
+      if (queueManaged) {
+        await advanceVerificationQueue(job.jobId, {
+          outcome: "promoted",
+          promotionStatus: promotion.status,
+          message: null,
+          evidenceUrl: promotion.evidenceUrl,
+          completedAt: result.completedAt,
+        });
+      }
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { ...result, promotion });
     } catch (error) {
       if (error instanceof PromotionRaceError) {
+        const message = describePromotionError(error);
+        if (queueManaged) {
+          await advanceVerificationQueue(job.jobId, {
+            outcome: "superseded",
+            promotionStatus: null,
+            message,
+            evidenceUrl: null,
+            completedAt: result.completedAt,
+          });
+        }
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
         return noStore(200, {
           ...result,
           promotion: {
             status: "superseded",
-            message: describePromotionError(error),
+            message,
           },
         });
       }
@@ -96,6 +215,21 @@ export async function GET(request: Request): Promise<Response> {
   } catch (error) {
     const { SandboxNotFoundError } = await import("e2b");
     if (error instanceof SandboxNotFoundError) {
+      let jobId: string | null = null;
+      try {
+        jobId = verifySubmissionJob(token, secret).jobId;
+        const queue = await inspectVerificationJob(jobId);
+        if (queue.status === "active") {
+          await advanceVerificationQueue(jobId, {
+            outcome: "rejected",
+            promotionStatus: null,
+            message: "The isolated verifier expired before producing a result.",
+            evidenceUrl: null,
+          });
+        }
+      } catch (queueError) {
+        console.error("Unable to advance an expired queue job", queueError);
+      }
       return noStore(410, {
         error: "job_expired",
         message: "This verification sandbox expired before a result was collected.",

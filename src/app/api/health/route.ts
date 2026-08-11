@@ -3,6 +3,7 @@ import { contract, getCurrentRecord } from "@/lib/records";
 import { getE2BTemplate, isE2BConfigured } from "@/lib/e2b-config";
 import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
+import { isSubmissionQueueConfigured } from "@/lib/submission-queue";
 import { computeTrustedMaterialDigest } from "../../../../scripts/trusted-material";
 
 export async function GET(): Promise<NextResponse> {
@@ -10,6 +11,7 @@ export async function GET(): Promise<NextResponse> {
   const e2bConfigured = isE2BConfigured();
   const e2bWebhookConfigured = isE2BWebhookConfigured();
   const promotionConfigured = isGitHubPromotionConfigured();
+  const submissionQueueConfigured = isSubmissionQueueConfigured();
   const trustedMaterialAvailable = await computeTrustedMaterialDigest(
     process.cwd(),
     contract.trustedPaths,
@@ -30,11 +32,13 @@ export async function GET(): Promise<NextResponse> {
     e2bTemplate: getE2BTemplate(),
     e2bWebhookConfigured,
     promotionConfigured,
+    submissionQueueConfigured,
     cronBackstopConfigured: Boolean(process.env.CRON_SECRET),
     directSubmissionsConfigured:
       e2bConfigured &&
       e2bWebhookConfigured &&
       promotionConfigured &&
+      submissionQueueConfigured &&
       trustedMaterialAvailable,
     trustedMaterialAvailable,
     deploymentIdentityConfigured: Boolean(
