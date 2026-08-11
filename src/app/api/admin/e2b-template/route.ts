@@ -155,6 +155,8 @@ async function smokeTemplate(templateReference: string, key: string) {
         "printf 'mathlib_olean_unprivileged='; runuser -u riemann -- test -r /opt/riemann/zeta23/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Analysis/CStarAlgebra/Classes.olean && echo readable || echo unreadable; " +
         "printf 'lean_mode='; stat -c '%U:%G %a' /home/riemann/.elan/toolchains/leanprover--lean4---v4.33.0-rc2/bin/lean 2>/dev/null || echo unavailable; " +
         "printf 'safe_directory_count='; git config --system --get-all safe.directory 2>/dev/null | wc -l; " +
+        "printf 'tls_egress='; python3 -c 'import socket, ssl; raw = socket.create_connection((\"1.1.1.1\", 443), 3); tls = ssl.create_default_context().wrap_socket(raw, server_hostname=\"one.one.one.one\"); tls.sendall(b\"HEAD / HTTP/1.0\\r\\nHost: one.one.one.one\\r\\n\\r\\n\"); tls.settimeout(3); assert tls.recv(1)' >/dev/null 2>&1 && echo reachable || echo blocked; " +
+        "printf 'http_egress='; python3 -c 'import socket; stream = socket.create_connection((\"1.1.1.1\", 80), 3); stream.sendall(b\"HEAD / HTTP/1.0\\r\\nHost: one.one.one.one\\r\\n\\r\\n\"); stream.settimeout(3); assert stream.recv(1)' >/dev/null 2>&1 && echo reachable || echo blocked; " +
         "printf 'manifest_url='; jq -r '.packages[] | select(.name == \"mathlib\") | .url' /opt/riemann/zeta23/lake-manifest.json",
       { user: "root", timeoutMs: 30_000 },
     );
