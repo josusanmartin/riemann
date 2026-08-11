@@ -1,0 +1,53 @@
+name: Zeta two-band research CI
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-two-band-ci.yml"
+      - "research/zeta-two-band-ci/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pinned Lean toolchain manager
+        run: ./scripts/install-lean-toolchain.sh
+
+      - name: Check out the gap-matching research base
+        run: |
+          git clone https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout a6bcd8a58fc9c95615fde8594c06c543fd979641
+
+      - name: Add the two-band prototype modules
+        run: |
+          cp research/zeta-two-band-ci/FiniteStateGapPotential.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteStateGapPotential.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialSafeNumerics.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialOverlap.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialAnalyticBridge.lean"
+
+      - name: Restore Mathlib cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get
+
+      - name: Compile the prototype
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set -o pipefail
+          lake build \
+            Zeta23.GapMatching.FiniteStateGapPotential \
+            Zeta23.GapMatching.TwoBandPotentialSafeNumerics \
+            Zeta23.GapMatching.TwoBandPotentialOverlap \
+            Zeta23.GapMatching.TwoBandPotentialAnalyticBridge \
+            2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
