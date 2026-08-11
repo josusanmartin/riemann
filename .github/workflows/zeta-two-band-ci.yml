@@ -7,6 +7,10 @@ on:
       - ".github/workflows/zeta-two-band-ci.yml"
       - "research/zeta-two-band-ci/**"
 
+concurrency:
+  group: zeta-two-band-research-ci
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -36,6 +40,8 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialOverlap.lean"
           cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialAnalyticBridge.lean"
+          cp research/zeta-two-band-ci/CandidateStrictImprovement.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CandidateStrictImprovement.lean"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
@@ -50,4 +56,5 @@ jobs:
             Zeta23.GapMatching.TwoBandPotentialSafeNumerics \
             Zeta23.GapMatching.TwoBandPotentialOverlap \
             Zeta23.GapMatching.TwoBandPotentialAnalyticBridge \
+            Zeta23.GapMatching.CandidateStrictImprovement \
             2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
