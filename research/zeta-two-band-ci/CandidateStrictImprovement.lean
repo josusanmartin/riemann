@@ -141,9 +141,8 @@ private theorem theta0_div_sqrt_two :
 
 private theorem half_sqrt_two_eq_theta0 :
     (1 / 2 : ℝ) * Real.sqrt 2 = theta0 := by
-  rw [eq_div_iff sqrt_two_ne]
   unfold theta0
-  field_simp [sqrt_two_ne]
+  apply (eq_div_iff sqrt_two_ne).2
   nlinarith [sqrt_two_sq]
 
 private theorem scaled_sin_upper :
@@ -209,7 +208,7 @@ theorem HD_one_le_rational :
       Real.cos theta0 + theta0 * Real.sin theta0
           = (1 / 2 : ℝ) * (Real.sqrt 2 * Real.sin theta0)
               + Real.cos theta0 := by
-                rw [mul_assoc, half_sqrt_two_eq_theta0]
+                rw [← mul_assoc, half_sqrt_two_eq_theta0]
                 ring
       _ = (1 / 2
             + Real.cos theta0 /
