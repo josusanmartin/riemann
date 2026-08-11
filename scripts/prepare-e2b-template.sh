@@ -6,6 +6,7 @@ contract_path="$repository_root/challenge/contract.json"
 zeta_dir="$repository_root/zeta23"
 tools_dir="$repository_root/tools"
 mathlib_cache_dir="/tmp/riemann-mathlib-cache"
+mathlib_cache_patch="$repository_root/e2b/mathlib-cache-bounded-disk.patch"
 
 mapfile -t trusted_upstream < <(
   node -e '
@@ -56,8 +57,32 @@ fi
 
 (
   cd "$zeta_dir"
-  MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache get
+  # Build the pinned cache utility once so Lake materializes the dependency
+  # checkout. The temporary source patch then keeps downloaded archives from
+  # filling E2B's small tmpfs while the full cache is being decompressed.
+  lake exe cache --help >/dev/null
+  mathlib_dir="$zeta_dir/.lake/packages/mathlib"
+  git -C "$mathlib_dir" apply --check "$mathlib_cache_patch"
+  git -C "$mathlib_dir" apply "$mathlib_cache_patch"
+  restore_mathlib_cache_source() {
+    git -C "$mathlib_dir" apply --reverse "$mathlib_cache_patch"
+  }
+  trap restore_mathlib_cache_source EXIT
+
+  cache_status=0
+  MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache get || cache_status=$?
+  df -h / /tmp
+  if [[ "$cache_status" -ne 0 ]]; then
+    exit "$cache_status"
+  fi
   MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache clean!
+
+  restore_mathlib_cache_source
+  trap - EXIT
+  git -C "$mathlib_dir" diff --exit-code -- Cache/Requests.lean
+  # Restore the upstream cache executable too; only its bounded build-time
+  # behavior differs from the immutable proof environment in the image.
+  lake build cache
 )
 "$repository_root/scripts/install-verifier-tools.sh" "$tools_dir"
 

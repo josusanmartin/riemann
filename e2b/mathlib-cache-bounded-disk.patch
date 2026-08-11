@@ -1,0 +1,55 @@
+diff --git a/Cache/Requests.lean b/Cache/Requests.lean
+index 783ab6e..7622f95 100644
+--- a/Cache/Requests.lean
++++ b/Cache/Requests.lean
+@@ -492,6 +492,11 @@ def decompressBatch (files : Array (FilePath × Lean.Name))
+       let preview := files.extract 0 3 |>.map (fun (p, m) => s!"{m} ({p})") |>.toList |> String.intercalate ", "
+       s!"{preview}, ... and {files.size - 3} more"
+     throw <| IO.userError s!"leantar exited with code {exitCode} on batch of {files.size} files: {firstFew}"
+-
++  -- The E2B build filesystem is intentionally small. Once leantar has closed
++  -- a successful batch, its archives are redundant because the build outputs
++  -- are already present in the pinned package tree.
++  for (path, _) in files do
++    IO.FS.removeFile path
++
+ /-- Configuration for decompression during download -/
+ structure DecompConfig where
+@@ -628,18 +633,16 @@ def monitorCurl (args : Array String) (size : Nat)
+                 -- Check if we should dispatch a batch
+                 match currentTask with
+                 | some task =>
+-                  if (← IO.hasFinished task) then
+-                    -- Harvest completed task
+-                    let (d, f, err?) := harvestDecompTask task lastBatchSize decompressed decompFailed
+-                    decompressed := d
+-                    decompFailed := f
+-                    if let some e := err? then
+-                      IO.eprintln s!"Decompression error: {e}"
+-                    -- Dispatch new batch with all pending files
+-                    lastBatchSize := pending.size
+-                    currentTask ← dispatchDecompBatch pending config
+-                    pending := #[]
+-                  -- else: task still running, just accumulate
++                  -- Wait before accepting another completed transfer. This
++                  -- applies backpressure to curl and bounds queued archives.
++                  let (d, f, err?) := harvestDecompTask task lastBatchSize decompressed decompFailed
++                  decompressed := d
++                  decompFailed := f
++                  if let some e := err? then
++                    IO.eprintln s!"Decompression error: {e}"
++                  lastBatchSize := pending.size
++                  currentTask ← dispatchDecompBatch pending config
++                  pending := #[]
+                 | none =>
+                   -- No task running, dispatch immediately
+                   lastBatchSize := pending.size
+@@ -710,7 +713,7 @@ private def downloadFilesFromContainer
+   let size := hashMap.size
+   if parallel then
+     IO.FS.writeFile IO.CURLCFG (← mkGetConfigContent container repo containerURL hashMap scope?)
+-    let args := #["--request", "GET", "--parallel",
++    let args := #["--request", "GET", "--parallel", "--parallel-max", "2",
+         -- commented as this creates a big slowdown on curl 8.13.0: "--fail",
+         "--silent",
+         "--retry", "5", -- there seem to be some intermittent failures
