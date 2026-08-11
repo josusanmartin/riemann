@@ -80,12 +80,14 @@ git -C "$tools_dir/landrun" checkout --quiet --detach "$landrun_commit"
 assert_commit "$tools_dir/landrun" "$landrun_commit"
 (
   cd "$tools_dir/landrun"
-  go build -trimpath -o landrun ./cmd/landrun
+  GOTOOLCHAIN=local \
+    go build -mod=readonly -modcacherw -trimpath -o landrun ./cmd/landrun
 )
 
 clone_with_retry https://github.com/ammkrn/nanoda_lib.git "$tools_dir/nanoda"
 git -C "$tools_dir/nanoda" checkout --quiet --detach "$nanoda_commit"
 assert_commit "$tools_dir/nanoda" "$nanoda_commit"
-cargo build --quiet --release --manifest-path "$tools_dir/nanoda/Cargo.toml"
+cargo build --locked --quiet --release \
+  --manifest-path "$tools_dir/nanoda/Cargo.toml"
 
 printf '%s\n' "Verifier tools installed in $tools_dir"

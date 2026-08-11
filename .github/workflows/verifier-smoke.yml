@@ -8,6 +8,7 @@ on:
       - ".github/workflows/verifier-smoke.yml"
       - "challenge/**"
       - "scripts/install-lean-toolchain.sh"
+      - "scripts/install-native-build-toolchains.sh"
       - "scripts/install-verifier-tools.sh"
       - "scripts/run-comparator-sandbox.sh"
       - "scripts/smoke-verifier.sh"
@@ -17,6 +18,7 @@ on:
       - ".github/workflows/verifier-smoke.yml"
       - "challenge/**"
       - "scripts/install-lean-toolchain.sh"
+      - "scripts/install-native-build-toolchains.sh"
       - "scripts/install-verifier-tools.sh"
       - "scripts/run-comparator-sandbox.sh"
       - "scripts/smoke-verifier.sh"
@@ -40,6 +42,9 @@ jobs:
 
       - name: Install pinned Lean toolchain manager
         run: ./scripts/install-lean-toolchain.sh
+
+      - name: Install pinned native build toolchains
+        run: ./scripts/install-native-build-toolchains.sh
 
       - name: Install pinned formal verifier
         run: ./scripts/install-verifier-tools.sh "$RUNNER_TEMP/riemann-tools"

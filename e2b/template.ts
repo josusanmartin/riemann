@@ -24,11 +24,9 @@ export function createRiemannVerifierTemplate(
         "bash",
         "build-essential",
         "ca-certificates",
-        "cargo",
         "coreutils",
         "curl",
         "git",
-        "golang-go",
         "jq",
         "libssl-dev",
         "pkg-config",
@@ -68,7 +66,7 @@ export function createRiemannVerifierTemplate(
     )
     .runCmd(
       [
-        "rm -rf /var/lib/apt/lists/* /home/riemann/.cache/go-build /home/riemann/.cargo/git /home/riemann/.cargo/registry /home/riemann/.npm /home/riemann/go/pkg/mod",
+        "rm -rf /var/lib/apt/lists/* /home/riemann/.npm",
         "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "chown -R root:root /opt/riemann",
         "chmod -R a-w /opt/riemann",

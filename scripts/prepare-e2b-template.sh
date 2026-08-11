@@ -7,6 +7,7 @@ zeta_dir="$repository_root/zeta23"
 tools_dir="$repository_root/tools"
 mathlib_cache_dir="/tmp/riemann-mathlib-cache"
 mathlib_cache_patch="$repository_root/e2b/mathlib-cache-bounded-disk.patch"
+build_toolchains_dir="$HOME/.riemann-build-toolchains"
 
 mapfile -t trusted_upstream < <(
   node -e '
@@ -31,6 +32,14 @@ mathlib_commit="${trusted_upstream[3]}"
 "$repository_root/scripts/install-lean-toolchain.sh"
 export PATH="$HOME/.elan/bin:$PATH"
 elan toolchain install "$lean_toolchain"
+
+RIEMANN_BUILD_TOOLCHAINS_DIR="$build_toolchains_dir" \
+  "$repository_root/scripts/install-native-build-toolchains.sh"
+export CARGO_HOME="$build_toolchains_dir/cargo"
+export RUSTUP_HOME="$build_toolchains_dir/rustup"
+export GOPATH="$build_toolchains_dir/gopath"
+export GOCACHE="$build_toolchains_dir/go-cache"
+export PATH="$build_toolchains_dir/go/bin:$CARGO_HOME/bin:$PATH"
 
 git clone --quiet --filter=blob:none --no-checkout \
   "https://github.com/$upstream_repository.git" "$zeta_dir"
@@ -68,11 +77,8 @@ install -m 0755 "$tools_dir/landrun/landrun" "$runtime_tools_dir/landrun"
 install -m 0755 "$tools_dir/nanoda/target/release/nanoda_bin" \
   "$runtime_tools_dir/nanoda_bin"
 rm -rf "$tools_dir/comparator" "$tools_dir/landrun" "$tools_dir/nanoda"
-rm -rf \
-  "$HOME/.cache/go-build" \
-  "$HOME/.cargo/git" \
-  "$HOME/.cargo/registry" \
-  "$HOME/go/pkg/mod"
+chmod -R u+w "$build_toolchains_dir"
+rm -rf "$build_toolchains_dir"
 
 (
   cd "$zeta_dir"
