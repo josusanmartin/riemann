@@ -5,6 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 The fixed-lambda Montgomery--Taylor grid is asymptotically shorter than the
 number of zeros in the dyadic window.
 -/
+import Zeta23.Assembly
 import Zeta23.PrimeSideB.Traces
 
 open Filter Real
