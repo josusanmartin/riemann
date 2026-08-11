@@ -92,7 +92,7 @@ async function latestBuildCoordinates(
 }
 
 async function smokeTemplate(templateReference: string, key: string) {
-  const { Sandbox } = await import("e2b");
+  const { CommandExitError, Sandbox } = await import("e2b");
   const sandbox = await Sandbox.create({
     apiKey: key,
     template: templateReference,
@@ -116,6 +116,15 @@ async function smokeTemplate(templateReference: string, key: string) {
       COMPARATOR_LEAN4EXPORT: "/opt/riemann/tools/bin/lean4export",
       COMPARATOR_NANODA: "/opt/riemann/tools/bin/nanoda_bin",
     };
+    const diagnosticsResult = await sandbox.commands.run(
+      "set -uo pipefail; " +
+        "printf 'lake='; test -x /opt/riemann/tools/bin/lake && echo present || echo missing; " +
+        "printf 'mathlib_git='; test -d /opt/riemann/zeta23/.lake/packages/mathlib/.git && echo present || echo missing; " +
+        "printf 'mathlib_remote='; git -C /opt/riemann/zeta23/.lake/packages/mathlib config --get remote.origin.url 2>/dev/null || echo unavailable; " +
+        "printf 'mathlib_head='; git -C /opt/riemann/zeta23/.lake/packages/mathlib rev-parse HEAD 2>/dev/null || echo unavailable; " +
+        "printf 'manifest_url='; jq -r '.packages[] | select(.name == \"mathlib\") | .url' /opt/riemann/zeta23/lake-manifest.json",
+      { user: "root", timeoutMs: 30_000 },
+    );
     await sandbox.commands.run(
       "set -euo pipefail; " +
         "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && " +
@@ -128,15 +137,30 @@ async function smokeTemplate(templateReference: string, key: string) {
         "chown -R riemann:riemann /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke",
       { user: "root", timeoutMs: 60_000 },
     );
-    const zetaResult = await sandbox.commands.run(
-      "/opt/riemann/tools/bin/lake env lean Zeta23/Unconditional.lean",
-      {
-        user: "riemann",
-        cwd: "/home/riemann/tmp/zeta-smoke",
-        timeoutMs: 4 * 60 * 1_000,
-        envs: sandboxEnv,
-      },
-    );
+    let zetaResult;
+    try {
+      zetaResult = await sandbox.commands.run(
+        "/opt/riemann/tools/bin/lake env lean Zeta23/Unconditional.lean",
+        {
+          user: "riemann",
+          cwd: "/home/riemann/tmp/zeta-smoke",
+          timeoutMs: 4 * 60 * 1_000,
+          envs: sandboxEnv,
+        },
+      );
+    } catch (error) {
+      if (!(error instanceof CommandExitError)) throw error;
+      return {
+        sandboxId: sandbox.sandboxId,
+        exitCode: error.exitCode,
+        zetaElaborationExitCode: error.exitCode,
+        stdout: error.stdout.slice(-4_000),
+        stderr: error.stderr.slice(-4_000),
+        diagnostics: diagnosticsResult.stdout.slice(-4_000),
+        failedStage: "zeta-elaboration" as const,
+        networkIsolated: true,
+      };
+    }
     const result = await sandbox.commands.run(
       "bash /opt/riemann/scripts/run-comparator-e2b.sh /opt/riemann/tools/bin/comparator config.json",
       {
@@ -152,6 +176,8 @@ async function smokeTemplate(templateReference: string, key: string) {
       zetaElaborationExitCode: zetaResult.exitCode,
       stdout: result.stdout.slice(-4_000),
       stderr: result.stderr.slice(-4_000),
+      diagnostics: diagnosticsResult.stdout.slice(-4_000),
+      failedStage: null,
       networkIsolated: true,
     };
   } finally {
@@ -186,12 +212,15 @@ export async function POST(request: Request): Promise<Response> {
         return noStore(409, { error: "template_build_not_ready" });
       }
       const templateReference = `${TEMPLATE_BUILD_NAME}:${buildId}`;
-      return noStore(200, {
-        status: "passed",
+      const smoke = await smokeTemplate(templateReference, key);
+      const passed =
+        smoke.exitCode === 0 && smoke.zetaElaborationExitCode === 0;
+      return noStore(passed ? 200 : 422, {
+        status: passed ? "passed" : "failed",
         templateId,
         buildId,
         templateReference,
-        smoke: await smokeTemplate(templateReference, key),
+        smoke,
       });
     }
     const name = TEMPLATE_BUILD_NAME;
