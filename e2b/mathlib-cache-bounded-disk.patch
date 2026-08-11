@@ -1,8 +1,8 @@
 diff --git a/Cache/Requests.lean b/Cache/Requests.lean
-index 783ab6e..7622f95 100644
+index 783ab6e..d6a7d10 100644
 --- a/Cache/Requests.lean
 +++ b/Cache/Requests.lean
-@@ -492,6 +492,11 @@ def decompressBatch (files : Array (FilePath × Lean.Name))
+@@ -492,6 +492,21 @@ def decompressBatch (files : Array (FilePath × Lean.Name))
        let preview := files.extract 0 3 |>.map (fun (p, m) => s!"{m} ({p})") |>.toList |> String.intercalate ", "
        s!"{preview}, ... and {files.size - 3} more"
      throw <| IO.userError s!"leantar exited with code {exitCode} on batch of {files.size} files: {firstFew}"
@@ -12,10 +12,20 @@ index 783ab6e..7622f95 100644
 +  -- are already present in the pinned package tree.
 +  for (path, _) in files do
 +    IO.FS.removeFile path
++  -- Riemann.fail elaborates proofs but never compiles Mathlib to native object
++  -- code. Generated C sources exceed the E2B image filesystem; retain Lean IR
++  -- because tactics execute through the interpreter during verification.
++  for (_, mod) in files do
++    if IO.isFromMathlib mod then
++      let modulePath := System.mkFilePath <| mod.components.map toString
++      for path in #[
++          mathlibDepPath / IO.IRDIR / modulePath.withExtension "c",
++          mathlibDepPath / IO.IRDIR / modulePath.withExtension "c.hash"] do
++        if ← path.pathExists then IO.FS.removeFile path
 +
  /-- Configuration for decompression during download -/
  structure DecompConfig where
-@@ -628,18 +633,16 @@ def monitorCurl (args : Array String) (size : Nat)
+@@ -628,18 +643,16 @@ def monitorCurl (args : Array String) (size : Nat)
                  -- Check if we should dispatch a batch
                  match currentTask with
                  | some task =>
@@ -44,7 +54,7 @@ index 783ab6e..7622f95 100644
                  | none =>
                    -- No task running, dispatch immediately
                    lastBatchSize := pending.size
-@@ -710,7 +713,7 @@ private def downloadFilesFromContainer
+@@ -710,7 +723,7 @@ private def downloadFilesFromContainer
    let size := hashMap.size
    if parallel then
      IO.FS.writeFile IO.CURLCFG (← mkGetConfigContent container repo containerURL hashMap scope?)

@@ -106,11 +106,33 @@ async function smokeTemplate(templateId: string, key: string) {
     if (info.allowInternetAccess !== false) {
       throw new Error("E2B did not confirm outbound network isolation");
     }
+    const sandboxEnv = {
+      HOME: "/home/riemann",
+      PATH: "/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
+      E2B_SANDBOX: "true",
+      RIEMANN_E2B_NETWORK_DISABLED: "1",
+      COMPARATOR_LANDRUN: "/opt/riemann/tools/bin/landrun",
+      COMPARATOR_LEAN4EXPORT: "/opt/riemann/tools/bin/lean4export",
+      COMPARATOR_NANODA: "/opt/riemann/tools/bin/nanoda_bin",
+    };
     await sandbox.commands.run(
-      "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/bootstrap-smoke && " +
+      "set -euo pipefail; " +
+        "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && " +
+        "tar --exclude='./.lake' -C /opt/riemann/zeta23 -cf - . | tar -C /home/riemann/tmp/zeta-smoke -xf - && " +
+        "install -d -o riemann -g riemann /home/riemann/tmp/zeta-smoke/.lake && " +
+        "ln -s /opt/riemann/zeta23/.lake/packages /home/riemann/tmp/zeta-smoke/.lake/packages && " +
         "cp -R /opt/riemann/challenge/smoke/. /home/riemann/tmp/bootstrap-smoke/ && " +
-        "chown -R riemann:riemann /home/riemann/tmp/bootstrap-smoke",
-      { user: "root", timeoutMs: 30_000 },
+        "chown -R riemann:riemann /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke",
+      { user: "root", timeoutMs: 60_000 },
+    );
+    const zetaResult = await sandbox.commands.run(
+      "lake env lean Zeta23/Unconditional.lean",
+      {
+        user: "riemann",
+        cwd: "/home/riemann/tmp/zeta-smoke",
+        timeoutMs: 4 * 60 * 1_000,
+        envs: sandboxEnv,
+      },
     );
     const result = await sandbox.commands.run(
       "bash /opt/riemann/scripts/run-comparator-e2b.sh /opt/riemann/tools/bin/comparator config.json",
@@ -118,20 +140,13 @@ async function smokeTemplate(templateId: string, key: string) {
         user: "riemann",
         cwd: "/home/riemann/tmp/bootstrap-smoke",
         timeoutMs: 4 * 60 * 1_000,
-        envs: {
-          HOME: "/home/riemann",
-          PATH: "/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
-          E2B_SANDBOX: "true",
-          RIEMANN_E2B_NETWORK_DISABLED: "1",
-          COMPARATOR_LANDRUN: "/opt/riemann/tools/bin/landrun",
-          COMPARATOR_LEAN4EXPORT: "/opt/riemann/tools/bin/lean4export",
-          COMPARATOR_NANODA: "/opt/riemann/tools/bin/nanoda_bin",
-        },
+        envs: sandboxEnv,
       },
     );
     return {
       sandboxId: sandbox.sandboxId,
       exitCode: result.exitCode,
+      zetaElaborationExitCode: zetaResult.exitCode,
       stdout: result.stdout.slice(-4_000),
       stderr: result.stderr.slice(-4_000),
       networkIsolated: true,

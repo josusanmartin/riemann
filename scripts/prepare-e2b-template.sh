@@ -55,6 +55,25 @@ if [[ "$actual_mathlib" != "$mathlib_commit" ]]; then
   exit 1
 fi
 
+"$repository_root/scripts/install-verifier-tools.sh" "$tools_dir"
+
+runtime_tools_dir="$tools_dir/bin"
+mkdir -p "$runtime_tools_dir"
+install -m 0755 "$tools_dir/comparator/.lake/build/bin/comparator" \
+  "$runtime_tools_dir/comparator"
+install -m 0755 \
+  "$tools_dir/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export" \
+  "$runtime_tools_dir/lean4export"
+install -m 0755 "$tools_dir/landrun/landrun" "$runtime_tools_dir/landrun"
+install -m 0755 "$tools_dir/nanoda/target/release/nanoda_bin" \
+  "$runtime_tools_dir/nanoda_bin"
+rm -rf "$tools_dir/comparator" "$tools_dir/landrun" "$tools_dir/nanoda"
+rm -rf \
+  "$HOME/.cache/go-build" \
+  "$HOME/.cargo/git" \
+  "$HOME/.cargo/registry" \
+  "$HOME/go/pkg/mod"
+
 (
   cd "$zeta_dir"
   # Build the pinned cache utility once so Lake materializes the dependency
@@ -80,22 +99,12 @@ fi
   restore_mathlib_cache_source
   trap - EXIT
   git -C "$mathlib_dir" diff --exit-code -- Cache/Requests.lean
-  # Restore the upstream cache executable too; only its bounded build-time
-  # behavior differs from the immutable proof environment in the image.
-  lake build cache
+  # The cache utility is build-only. Remove its patched build products after
+  # restoring the pinned source so they cannot enter the proof environment.
+  rm -rf \
+    "$mathlib_dir/.lake/build/bin/cache" \
+    "$mathlib_dir/.lake/build/lib/lean/Cache" \
+    "$mathlib_dir/.lake/build/ir/Cache"
 )
-"$repository_root/scripts/install-verifier-tools.sh" "$tools_dir"
-
-runtime_tools_dir="$tools_dir/bin"
-mkdir -p "$runtime_tools_dir"
-install -m 0755 "$tools_dir/comparator/.lake/build/bin/comparator" \
-  "$runtime_tools_dir/comparator"
-install -m 0755 \
-  "$tools_dir/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export" \
-  "$runtime_tools_dir/lean4export"
-install -m 0755 "$tools_dir/landrun/landrun" "$runtime_tools_dir/landrun"
-install -m 0755 "$tools_dir/nanoda/target/release/nanoda_bin" \
-  "$runtime_tools_dir/nanoda_bin"
-rm -rf "$tools_dir/comparator" "$tools_dir/landrun" "$tools_dir/nanoda"
 
 printf 'Pinned E2B verifier assets prepared.\n'
