@@ -155,6 +155,8 @@ for (const tracedPath of [
 for (const templateBuildPath of [
   ".github/**/*",
   "node_modules/glob/**/*",
+  "node_modules/tar/**/*",
+  "node_modules/undici/**/*",
   "tsconfig.json",
 ]) {
   if (!nextConfig.includes(`"${templateBuildPath}"`)) {
