@@ -10,13 +10,19 @@ if [[ ! -x "$COMPARATOR_LANDRUN" ]]; then
   printf 'COMPARATOR_LANDRUN is not executable: %s\n' "$COMPARATOR_LANDRUN" >&2
   exit 2
 fi
+if ! command -v python3 >/dev/null 2>&1; then
+  printf 'Refusing to run: python3 is required for the network isolation probe.\n' >&2
+  exit 96
+fi
 
 set +e
 python3 -c 'import socket; socket.socket(socket.AF_INET, socket.SOCK_STREAM)' \
   >/dev/null 2>&1
-network_probe_status=$?
+inet_probe_status=$?
+python3 -c 'import socket; socket.socketpair()' >/dev/null 2>&1
+unix_probe_status=$?
 set -e
-if [[ "$network_probe_status" -eq 0 ]]; then
+if [[ "$inet_probe_status" -eq 0 ]] || [[ "$unix_probe_status" -eq 0 ]]; then
   printf 'Refusing to run: the outer network syscall filter is not active.\n' >&2
   exit 97
 fi

@@ -42,6 +42,8 @@ Use `submissions/example/submission.json` as the manifest template. Scores are p
 
 Floating-point scores are rejected. The dashboard decimal is derived from the exact rational.
 
+`author.github` must match the GitHub account that opens the pull request. Both verification stages obtain that identity from GitHub rather than trusting the manifest alone; `author.displayName` may name the individual or research team credited in the ledger.
+
 Additional files under `proof/` must be Lean source files no larger than 2 MB each. They are copied under the `Candidate` module namespace, so `proof/AdditionalLemma.lean` is imported as `Candidate.AdditionalLemma`.
 
 ## Pull-request scope
@@ -69,6 +71,12 @@ A submission becomes a formal record when all of the following hold automaticall
 7. Both dyadic and cumulative critical-line theorems pass.
 
 Human review is welcome but is not a formal-record prerequisite. A result without a complete machine proof may be discussed in an issue, but it cannot change the displayed record.
+
+## Optional independent review
+
+After formal acceptance, a maintainer may attach an `independentReview` entry to the trusted ledger when a public review identifies its reviewer, date, evidence URL, and summary. The dashboard renders that as a separate **Expert reviewed** badge. It is never read by the score comparator or promotion decision, and the default for every machine-promoted record is `null`.
+
+Review metadata belongs in a separate infrastructure pull request. It must not be included in a scored submission PR.
 
 ## Security
 

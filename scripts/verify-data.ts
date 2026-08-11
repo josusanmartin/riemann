@@ -54,6 +54,28 @@ if (!verifierInstaller.includes("contract.trustedUpstream.leanToolchain")) {
   throw new Error("The verifier installer does not read the pinned Lean toolchain");
 }
 
+for (const [sandboxEntrypoint, addressFamilyAllowList] of [
+  [
+    "scripts/verify-submission.ts",
+    '"--property=RestrictAddressFamilies=AF_UNIX",',
+  ],
+  [
+    "scripts/smoke-verifier.sh",
+    "--property=RestrictAddressFamilies=AF_UNIX \\",
+  ],
+] as const) {
+  const source = await readFile(resolve(sandboxEntrypoint), "utf8");
+  if (!source.includes(addressFamilyAllowList)) {
+    throw new Error(`${sandboxEntrypoint} must restrict sockets to the AF_UNIX allow-list`);
+  }
+  if (!source.includes("SystemCallArchitectures=native")) {
+    throw new Error(`${sandboxEntrypoint} must prevent alternate-ABI syscall bypasses`);
+  }
+  if (!source.includes("SystemCallFilter=~@network-io")) {
+    throw new Error(`${sandboxEntrypoint} must deny the network-I/O syscall group`);
+  }
+}
+
 for (const trustedPath of contract.trustedPaths) {
   const path = resolve(trustedPath);
   const info = await lstat(path);

@@ -24,7 +24,7 @@ Pull request
   → formal record promotion
 ```
 
-The formal leaderboard does not depend on a human review. Human expert review is an independent badge for exposition, attribution, and significance.
+The formal leaderboard does not depend on a human review. Human expert review is an independent, optional badge for exposition, attribution, and significance. Its evidence is stored separately from kernel status and can never change the score or acceptance decision.
 
 ## Local website
 
@@ -44,7 +44,7 @@ Run the complete application validation with:
 npm run check
 ```
 
-The manual **Verifier smoke test** GitHub workflow builds every pinned tool, confirms that the sandbox fails closed, and replays a known theorem through both Lean and nanoda.
+The **Verifier smoke test** GitHub workflow builds every pinned tool, confirms that the sandbox fails closed, and replays a known theorem through both Lean and nanoda. It runs when verifier material changes, can be dispatched manually, and repeats weekly to catch runner or toolchain drift.
 
 ## GitHub OAuth
 
@@ -56,6 +56,13 @@ Authorization callback:   http://localhost:3000/api/auth/callback/github
 ```
 
 Use the production deployment URL for the production OAuth app. Only `read:user user:email` is requested. Sessions use signed JWTs; the application does not store GitHub access tokens in a database.
+
+The deployed project uses:
+
+```text
+Homepage URL:              https://riemann-fail.vercel.app
+Authorization callback:   https://riemann-fail.vercel.app/api/auth/callback/github
+```
 
 ## Formal submissions
 
@@ -81,6 +88,8 @@ vercel --prod
 Configure the OAuth and public URL variables from `.env.example` in the Vercel project. Formal proof verification runs in isolated CI rather than inside a Vercel function because Lean builds are long-running and execute untrusted elaborator code.
 
 Production deploys run from `.github/workflows/deploy-production.yml` on every ordinary push to `main`. Record-promotion pushes made with `GITHUB_TOKEN` explicitly dispatch the same workflow, because GitHub intentionally suppresses recursive `push` workflows for that token. The repository stores only the encrypted `VERCEL_TOKEN` secret and the non-secret Vercel organization/project IDs.
+
+External forks are first verified with a read-only token. Successful runs publish only immutable PR coordinates; the privileged promotion workflow authenticates those coordinates and the claimed author against GitHub, checks out the exact fork SHA, and independently reruns the full judge before it receives merge permission.
 
 ## Trust boundary
 

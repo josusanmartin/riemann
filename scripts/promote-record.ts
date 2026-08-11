@@ -130,6 +130,7 @@ records.push({
   exactExpression: `(${submission.score.numerator} : ℝ) / ${submission.score.denominator}`,
   status: "kernel-verified",
   formalVerification: true,
+  independentReview: null,
   sourceUrl,
   proofUrl,
   pullRequestUrl: pullRequestUrl || null,

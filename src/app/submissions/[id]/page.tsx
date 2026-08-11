@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, BadgeCheck, BookOpen, CalendarDays, CircleDot, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BadgeCheck, BookOpen, CalendarDays, CircleDot, UserCheck, UserRound } from "lucide-react";
 import { getRecord, getRecords } from "@/lib/records";
 import { truncateDecimalString } from "@/components/format";
 
@@ -27,10 +27,17 @@ export default async function SubmissionPage({ params }: PageProps) {
           <Link className="back-link back-link-light" href="/#leaderboard"><ArrowLeft size={15} /> Back to record ledger</Link>
           <div className="record-hero-grid">
             <div>
-              <span className={`verification-badge ${record.formalVerification ? "verified" : "paper"}`}>
-                {record.formalVerification ? <BadgeCheck size={16} /> : <BookOpen size={16} />}
-                {record.formalVerification ? "Kernel verified" : "Published result"}
-              </span>
+              <div className="verification-badges">
+                <span className={`verification-badge ${record.formalVerification ? "verified" : "paper"}`}>
+                  {record.formalVerification ? <BadgeCheck size={16} /> : <BookOpen size={16} />}
+                  {record.formalVerification ? "Kernel verified" : "Published result"}
+                </span>
+                {record.independentReview && (
+                  <a className="verification-badge expert" href={record.independentReview.url} target="_blank" rel="noreferrer">
+                    <UserCheck size={16} /> Expert reviewed
+                  </a>
+                )}
+              </div>
               <h1>{record.title}</h1>
               <p>{record.summary}</p>
             </div>
@@ -55,6 +62,21 @@ export default async function SubmissionPage({ params }: PageProps) {
           <p>{record.formalVerification ? "Replay the public Lean source against the pinned formal definitions." : "This historical point is sourced to the published mathematical literature and is not yet formalized in this arena."}</p>
           <a className="button button-dark" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">Open evidence <ArrowUpRight size={16} /></a>
           {record.proofUrl && record.proofUrl !== record.sourceUrl && <a className="text-link" href={record.sourceUrl} target="_blank" rel="noreferrer">Read the research paper <ArrowUpRight size={14} /></a>}
+          <div className={`independent-review ${record.independentReview ? "reviewed" : "unreviewed"}`}>
+            <UserCheck size={18} />
+            <div>
+              <strong>Independent expert review</strong>
+              {record.independentReview ? (
+                <>
+                  <span>{record.independentReview.reviewer} · {record.independentReview.date}</span>
+                  <p>{record.independentReview.summary}</p>
+                  <a href={record.independentReview.url} target="_blank" rel="noreferrer">Read review <ArrowUpRight size={13} /></a>
+                </>
+              ) : (
+                <span>Optional and not recorded. This does not affect formal acceptance.</span>
+              )}
+            </div>
+          </div>
         </aside>
       </section>
     </main>

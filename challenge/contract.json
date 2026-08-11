@@ -47,10 +47,13 @@
     "scripts/install-verifier-tools.sh",
     "scripts/prepare-candidate.ts",
     "scripts/promote-record.ts",
+    "scripts/promotion-coordinates.ts",
+    "scripts/resolve-promotion-pr.ts",
     "scripts/run-comparator-sandbox.sh",
     "scripts/smoke-verifier.sh",
     "scripts/trusted-material.ts",
     "scripts/verify-submission.ts",
+    "scripts/write-promotion-metadata.ts",
     "src/lib/challenge.ts"
   ]
 }

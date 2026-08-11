@@ -13,41 +13,23 @@ jobs:
   reverify:
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.pull_requests[0] != null &&
-      github.event.workflow_run.pull_requests[0].base.ref == 'main'
+      github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     permissions:
+      actions: read
       contents: read
+      pull-requests: read
     outputs:
       submission_id: ${{ steps.manifest.outputs.submission_id }}
       pr_number: ${{ steps.meta.outputs.pr_number }}
       head_sha: ${{ steps.meta.outputs.head_sha }}
     steps:
-      - name: Read verified pull request metadata
-        id: meta
-        env:
-          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
-          HEAD_SHA: ${{ github.event.workflow_run.pull_requests[0].head.sha }}
-          ORIGINAL_BASE_SHA: ${{ github.event.workflow_run.pull_requests[0].base.sha }}
-        run: |
-          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
-          echo "original_base_sha=$ORIGINAL_BASE_SHA" >> "$GITHUB_OUTPUT"
-
       - name: Check out latest trusted judge
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           path: judge
-          persist-credentials: false
-
-      - name: Check out candidate
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ steps.meta.outputs.head_sha }}
-          path: candidate
           fetch-depth: 0
           persist-credentials: false
 
@@ -61,14 +43,47 @@ jobs:
         working-directory: judge
         run: npm ci
 
+      - name: Download exact metadata from the successful verifier run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: promotion-metadata
+          path: ${{ runner.temp }}/promotion-metadata
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Resolve and authenticate the pull-request head
+        id: meta
+        working-directory: judge
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TRIGGER_WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          TRIGGER_PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          TRIGGER_HEAD_REPOSITORY: ${{ github.event.workflow_run.head_repository.full_name }}
+          TRIGGER_HEAD_REF: ${{ github.event.workflow_run.head_branch }}
+        run: >-
+          npx tsx scripts/resolve-promotion-pr.ts
+          "$RUNNER_TEMP/promotion-metadata/metadata.json"
+
+      - name: Check out exact candidate from its source repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ steps.meta.outputs.head_repository }}
+          ref: ${{ steps.meta.outputs.head_sha }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+
       - name: Recheck immutable PR scope
         id: scope
         working-directory: judge
         env:
-          ORIGINAL_BASE_SHA: ${{ steps.meta.outputs.original_base_sha }}
+          ORIGINAL_BASE_SHA: ${{ steps.meta.outputs.base_sha }}
           HEAD_SHA: ${{ steps.meta.outputs.head_sha }}
+          PR_AUTHOR: ${{ steps.meta.outputs.author_login }}
         run: |
-          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$ORIGINAL_BASE_SHA" "$HEAD_SHA")
+          git -C ../candidate fetch --no-tags ../judge "$ORIGINAL_BASE_SHA"
+          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$ORIGINAL_BASE_SHA" "$HEAD_SHA" "$PR_AUTHOR")
           echo "submission_dir=$submission_dir" >> "$GITHUB_OUTPUT"
 
       - name: Read submission id
@@ -100,6 +115,22 @@ jobs:
           "${{ steps.scope.outputs.submission_dir }}"
           --mode=full
           --artifact="$RUNNER_TEMP/attestation.json"
+
+      - name: Dry-run the exact ledger promotion before merging
+        working-directory: judge
+        env:
+          SUBMISSION_DIR: ${{ steps.scope.outputs.submission_dir }}
+          SUBMISSION_ID: ${{ steps.manifest.outputs.submission_id }}
+          PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          npx tsx scripts/promote-record.ts \
+            "$SUBMISSION_DIR" \
+            "$RUNNER_TEMP/attestation.json" \
+            "https://github.com/$REPOSITORY/pull/$PR_NUMBER" \
+            "https://github.com/$REPOSITORY/tree/main/submissions/$SUBMISSION_ID/proof" \
+            "https://github.com/$REPOSITORY/pull/$PR_NUMBER"
+          npm run verify:data
 
       - name: Upload kernel attestation
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

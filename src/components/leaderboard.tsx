@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, BookOpen } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, BookOpen, UserCheck } from "lucide-react";
 import type { RecordEntry } from "@/lib/challenge";
 import { truncateDecimalString } from "@/components/format";
 
@@ -33,11 +33,18 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
                 <td><strong>{record.author}</strong><small>{record.date.slice(0, 4)} · {record.title}</small></td>
                 <td><span className="method-cell">{record.method}</span></td>
                 <td>
-                  <a className="evidence-link" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">
-                    {record.formalVerification ? <BadgeCheck size={17} /> : <BookOpen size={17} />}
-                    {record.formalVerification ? "Kernel" : "Paper"}
-                    <ArrowUpRight size={13} />
-                  </a>
+                  <div className="evidence-links">
+                    <a className="evidence-link" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">
+                      {record.formalVerification ? <BadgeCheck size={17} /> : <BookOpen size={17} />}
+                      {record.formalVerification ? "Kernel" : "Paper"}
+                      <ArrowUpRight size={13} />
+                    </a>
+                    {record.independentReview && (
+                      <a className="evidence-link expert" href={record.independentReview.url} target="_blank" rel="noreferrer">
+                        <UserCheck size={17} /> Expert <ArrowUpRight size={13} />
+                      </a>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

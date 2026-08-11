@@ -1,12 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { lstat, readFile } from "node:fs/promises";
 import { dirname, join, posix, resolve } from "node:path";
-import { submissionSchema } from "../src/lib/challenge";
+import { githubLoginSchema, submissionSchema } from "../src/lib/challenge";
 
-const [checkoutArgument, baseSha, headSha] = process.argv.slice(2);
+const [checkoutArgument, baseSha, headSha, expectedGitHubArgument] =
+  process.argv.slice(2);
 if (!checkoutArgument || !baseSha || !headSha) {
   throw new Error(
-    "Usage: check-submission-pr.ts <candidate-checkout> <base-sha> <head-sha>",
+    "Usage: check-submission-pr.ts <candidate-checkout> <base-sha> <head-sha> [expected-github-login]",
   );
 }
 if (!/^[0-9a-f]{40}$/.test(baseSha) || !/^[0-9a-f]{40}$/.test(headSha)) {
@@ -23,9 +24,16 @@ if (checkedOutHead !== headSha) {
     `Candidate checkout mismatch: expected ${headSha}, received ${checkedOutHead}`,
   );
 }
+const mergeBase = execFileSync("git", ["merge-base", baseSha, headSha], {
+  cwd: checkout,
+  encoding: "utf8",
+}).trim();
+if (!/^[0-9a-f]{40}$/.test(mergeBase)) {
+  throw new Error("Unable to resolve the pull request's merge base");
+}
 const output = execFileSync(
   "git",
-  ["diff", "--name-status", "-z", baseSha, headSha, "--"],
+  ["diff", "--name-status", "-z", mergeBase, headSha, "--"],
   { cwd: checkout },
 );
 const fields = output.toString("utf8").split("\0").filter(Boolean);
@@ -90,6 +98,14 @@ if (totalBytes > 20_100_000) {
 const submission = submissionSchema.parse(
   JSON.parse(await readFile(join(checkout, manifests[0].path), "utf8")),
 );
+if (expectedGitHubArgument) {
+  const expectedGitHub = githubLoginSchema.parse(expectedGitHubArgument);
+  if (submission.author.github.toLowerCase() !== expectedGitHub.toLowerCase()) {
+    throw new Error(
+      `submission.author.github must match the pull-request author @${expectedGitHub}`,
+    );
+  }
+}
 if (dirname(manifests[0].path) !== `submissions/${submission.id}`) {
   throw new Error("submission.id must match its directory name");
 }

@@ -2,6 +2,7 @@ name: Verify formal submission
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "submissions/**"
 
@@ -22,11 +23,13 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: judge
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Check out candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
           path: candidate
           fetch-depth: 0
@@ -48,8 +51,10 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$BASE_SHA" "$HEAD_SHA")
+          git -C ../candidate fetch --no-tags ../judge "$BASE_SHA"
+          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$BASE_SHA" "$HEAD_SHA" "$PR_AUTHOR")
           echo "submission_dir=$submission_dir" >> "$GITHUB_OUTPUT"
 
       - name: Install pinned Lean toolchain manager
@@ -71,3 +76,26 @@ jobs:
           npx tsx scripts/verify-submission.ts
           "${{ steps.scope.outputs.submission_dir }}"
           --mode=full
+
+      - name: Record the exact verified pull request
+        working-directory: judge
+        env:
+          WORKFLOW_RUN_ID: ${{ github.run_id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: >-
+          npx tsx scripts/write-promotion-metadata.ts
+          "$RUNNER_TEMP/promotion-metadata/metadata.json"
+
+      - name: Upload promotion metadata
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: promotion-metadata
+          path: ${{ runner.temp }}/promotion-metadata/metadata.json
+          if-no-files-found: error
+          retention-days: 2

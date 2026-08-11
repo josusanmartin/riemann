@@ -3,6 +3,8 @@ import {
   compareDecimalStrings,
   compareRationals,
   decimalToPercent,
+  independentReviewSchema,
+  promotionMetadataSchema,
   rationalToDecimal,
   submissionSchema,
 } from "@/lib/challenge";
@@ -78,5 +80,48 @@ describe("challenge primitives", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("accepts immutable promotion coordinates for an external fork", () => {
+    expect(
+      promotionMetadataSchema.parse({
+        schemaVersion: 1,
+        workflowRunId: "31415926535",
+        pullRequestNumber: 42,
+        headSha: "a".repeat(40),
+        headRepository: "outside-solver/riemann",
+        headRef: "proof/better-bound",
+        baseSha: "b".repeat(40),
+        baseRepository: "josusanmartin/riemann",
+        baseRef: "main",
+      }),
+    ).toMatchObject({ pullRequestNumber: 42 });
+  });
+
+  it("rejects output-injection characters in promotion metadata", () => {
+    const result = promotionMetadataSchema.safeParse({
+      schemaVersion: 1,
+      workflowRunId: "31415926535",
+      pullRequestNumber: 42,
+      headSha: "a".repeat(40),
+      headRepository: "outside-solver/riemann",
+      headRef: "proof/better-bound\nforged=value",
+      baseSha: "b".repeat(40),
+      baseRepository: "josusanmartin/riemann",
+      baseRef: "main",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("keeps optional expert-review evidence structurally separate", () => {
+    expect(
+      independentReviewSchema.parse({
+        reviewer: "Independent Reviewer",
+        date: "2026-08-11",
+        url: "https://example.org/review",
+        summary: "An independent public review of the exposition and attribution.",
+      }),
+    ).toMatchObject({ reviewer: "Independent Reviewer" });
   });
 });

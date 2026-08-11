@@ -850,6 +850,13 @@ h3 {
   line-height: 1.45;
 }
 
+.evidence-links {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 7px;
+}
+
 .evidence-link {
   display: inline-flex;
   align-items: center;
@@ -858,6 +865,10 @@ h3 {
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.evidence-link.expert {
+  color: #7a5233;
 }
 
 .dark-section {
@@ -1807,9 +1818,16 @@ h3 {
   align-items: center;
 }
 
+.verification-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
 .verification-badge {
   display: inline-flex;
-  margin-bottom: 20px;
   padding: 7px 11px;
   align-items: center;
   gap: 7px;
@@ -1828,6 +1846,11 @@ h3 {
 .verification-badge.paper {
   border: 1px solid rgba(255, 255, 255, 0.24);
   color: #c5d1cc;
+}
+
+.verification-badge.expert {
+  border: 1px solid rgba(244, 167, 116, 0.6);
+  color: #ffd1b2;
 }
 
 .record-hero h1 {
@@ -1943,6 +1966,54 @@ h3 {
 .evidence-card .text-link {
   margin-top: 22px;
   font-size: 0.75rem;
+}
+
+.independent-review {
+  display: flex;
+  margin-top: 26px;
+  padding-top: 22px;
+  gap: 11px;
+  border-top: 1px solid var(--line);
+  color: #5c6a64;
+}
+
+.independent-review > div,
+.independent-review strong,
+.independent-review span,
+.independent-review a {
+  display: block;
+}
+
+.independent-review strong {
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 0.76rem;
+}
+
+.independent-review span,
+.independent-review a {
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.independent-review p {
+  margin: 6px 0 0;
+  color: #5c6a64;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.independent-review a {
+  display: inline-flex;
+  margin-top: 7px;
+  align-items: center;
+  gap: 4px;
+  color: var(--forest);
+  font-weight: 800;
+}
+
+.independent-review.reviewed {
+  color: #9b5d36;
 }
 
 /* Sign in, not found */
@@ -2226,10 +2297,23 @@ h3 {
   text-transform: uppercase;
 }
 
+.submissions-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .submissions-badge.verified {
   border-color: rgba(23, 79, 66, 0.35);
   background: rgba(216, 245, 139, 0.35);
   color: var(--forest);
+}
+
+.submissions-badge.expert {
+  border-color: rgba(180, 105, 62, 0.35);
+  background: rgba(244, 167, 116, 0.13);
+  color: #7a5233;
 }
 
 .submissions-open {
@@ -2536,7 +2620,7 @@ h3 {
     grid-area: score;
   }
 
-  .submissions-badge {
+  .submissions-badges {
     grid-area: badge;
     justify-self: end;
   }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, BookOpen, GitPullRequestArrow } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, BookOpen, GitPullRequestArrow, UserCheck } from "lucide-react";
 import { getRecords } from "@/lib/records";
 import { repositoryUrl } from "@/lib/site";
 import { truncateDecimalString } from "@/components/format";
@@ -35,9 +35,14 @@ export default function SubmissionsIndexPage() {
                 <span className="submissions-score">
                   {truncateDecimalString(record.scorePercent, record.formalVerification ? 10 : 4)}%
                 </span>
-                <span className={record.formalVerification ? "submissions-badge verified" : "submissions-badge"}>
-                  {record.formalVerification ? <BadgeCheck size={15} /> : <BookOpen size={15} />}
-                  {record.formalVerification ? "Kernel" : "Paper"}
+                <span className="submissions-badges">
+                  <span className={record.formalVerification ? "submissions-badge verified" : "submissions-badge"}>
+                    {record.formalVerification ? <BadgeCheck size={15} /> : <BookOpen size={15} />}
+                    {record.formalVerification ? "Kernel" : "Paper"}
+                  </span>
+                  {record.independentReview && (
+                    <span className="submissions-badge expert"><UserCheck size={15} /> Expert</span>
+                  )}
                 </span>
               </Link>
             </li>

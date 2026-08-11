@@ -165,7 +165,10 @@ try {
     await run(
       "systemd-run",
       [
-        "--property=RestrictAddressFamilies=~AF_UNIX",
+        // Keep only local-domain sockets at this defense-in-depth layer;
+        // @network-io below denies socket/socketpair/connect altogether.
+        "--property=RestrictAddressFamilies=AF_UNIX",
+        "--property=SystemCallArchitectures=native",
         "--property=SystemCallFilter=~@network-io",
         "--property=PrivateNetwork=yes",
         "--property=MemoryMax=12G",

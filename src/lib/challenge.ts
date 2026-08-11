@@ -25,6 +25,10 @@ const positiveIntegerString = z
   .max(200, "exact integers are limited to 200 digits")
   .regex(/^[1-9]\d*$/, "must be a positive integer string");
 
+export const githubLoginSchema = z
+  .string()
+  .regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/);
+
 export const exactRationalSchema = z
   .object({
     numerator: positiveIntegerString,
@@ -32,25 +36,37 @@ export const exactRationalSchema = z
   })
   .strict();
 
-export const recordSchema = z.object({
-  id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
-  track: trackSchema,
-  date: z.string().date(),
-  author: z.string().min(1),
-  github: z.string().nullable(),
-  title: z.string().min(1),
-  method: z.string().min(1),
-  scoreDecimal: decimalString,
-  scorePercent: decimalString,
-  exactRational: exactRationalSchema.nullable(),
-  exactExpression: z.string().min(1),
-  status: verificationStatusSchema,
-  formalVerification: z.boolean(),
-  sourceUrl: z.string().url(),
-  proofUrl: z.string().url().nullable(),
-  pullRequestUrl: z.string().url().nullable(),
-  summary: z.string().min(1),
-});
+export const independentReviewSchema = z
+  .object({
+    reviewer: z.string().min(1).max(120),
+    date: z.string().date(),
+    url: z.string().url(),
+    summary: z.string().min(20).max(500),
+  })
+  .strict();
+
+export const recordSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+    track: trackSchema,
+    date: z.string().date(),
+    author: z.string().min(1),
+    github: githubLoginSchema.nullable(),
+    title: z.string().min(1),
+    method: z.string().min(1),
+    scoreDecimal: decimalString,
+    scorePercent: decimalString,
+    exactRational: exactRationalSchema.nullable(),
+    exactExpression: z.string().min(1),
+    status: verificationStatusSchema,
+    formalVerification: z.boolean(),
+    independentReview: independentReviewSchema.nullable(),
+    sourceUrl: z.string().url(),
+    proofUrl: z.string().url().nullable(),
+    pullRequestUrl: z.string().url().nullable(),
+    summary: z.string().min(1),
+  })
+  .strict();
 
 export type RecordEntry = z.infer<typeof recordSchema>;
 
@@ -97,9 +113,7 @@ export const submissionSchema = z
     track: z.literal("critical-line"),
     author: z
       .object({
-        github: z
-          .string()
-          .regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/),
+        github: githubLoginSchema,
         displayName: z.string().min(1).max(100),
       })
       .strict(),
@@ -122,6 +136,45 @@ export const submissionSchema = z
   .strict();
 
 export type Submission = z.infer<typeof submissionSchema>;
+
+export const gitShaSchema = z.string().regex(/^[0-9a-f]{40}$/);
+
+export const githubRepositorySchema = z
+  .string()
+  .max(202)
+  .regex(
+    /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38}[A-Za-z0-9])?\/[A-Za-z0-9_.-]+$/,
+    "must be an owner/repository name",
+  );
+
+export const githubRefSchema = z
+  .string()
+  .min(1)
+  .max(255)
+  .refine(
+    (value) => !/[\u0000-\u001f\u007f]/.test(value),
+    "must not contain control characters",
+  );
+
+/**
+ * Immutable pull-request coordinates emitted by the unprivileged verifier and
+ * checked again against GitHub's API by the privileged promotion workflow.
+ */
+export const promotionMetadataSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    workflowRunId: positiveIntegerString,
+    pullRequestNumber: z.number().int().positive(),
+    headSha: gitShaSchema,
+    headRepository: githubRepositorySchema,
+    headRef: githubRefSchema,
+    baseSha: gitShaSchema,
+    baseRepository: githubRepositorySchema,
+    baseRef: githubRefSchema,
+  })
+  .strict();
+
+export type PromotionMetadata = z.infer<typeof promotionMetadataSchema>;
 
 export function compareRationals(
   left: { numerator: string; denominator: string },

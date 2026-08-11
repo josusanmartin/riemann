@@ -24,8 +24,11 @@ smoke_workspace="$(mktemp -d /tmp/riemann-verifier-smoke.XXXXXX)"
 trap 'rm -rf -- "$smoke_workspace"' EXIT
 cp -R "$repository_root/challenge/smoke/." "$smoke_workspace/"
 
+# Keep only local-domain sockets at this defense-in-depth layer; @network-io
+# below denies socket/socketpair/connect altogether.
 systemd-run \
-  --property=RestrictAddressFamilies=~AF_UNIX \
+  --property=RestrictAddressFamilies=AF_UNIX \
+  --property=SystemCallArchitectures=native \
   --property=SystemCallFilter=~@network-io \
   --property=PrivateNetwork=yes \
   --property=MemoryMax=2G \
