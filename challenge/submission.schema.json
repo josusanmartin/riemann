@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://riemann.fail/schemas/submission-v1.json",
+  "title": "Riemann.fail formal bound submission",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "track", "author", "score", "proof", "summary", "method", "license"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "maxLength": 80, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "track": { "const": "critical-line" },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["github", "displayName"],
+      "properties": {
+        "github": { "type": "string", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": { "type": "string", "maxLength": 200, "pattern": "^[1-9][0-9]*$" },
+        "denominator": { "type": "string", "maxLength": 200, "pattern": "^[1-9][0-9]*$" }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["solution", "theorem", "cumulativeTheorem", "improvementTheorem"],
+      "properties": {
+        "solution": { "type": "string", "maxLength": 240, "pattern": "^proof/(?:[A-Za-z][A-Za-z0-9_]*/)*[A-Za-z][A-Za-z0-9_]*\\.lean$" },
+        "theorem": { "const": "candidate_critical_line_bound" },
+        "cumulativeTheorem": { "const": "candidate_critical_line_bound_cumulative" },
+        "improvementTheorem": { "const": "candidate_strict_improvement" }
+      }
+    },
+    "summary": { "type": "string", "minLength": 20, "maxLength": 1000 },
+    "method": { "type": "string", "minLength": 3, "maxLength": 200 },
+    "license": { "const": "Apache-2.0" }
+  }
+}

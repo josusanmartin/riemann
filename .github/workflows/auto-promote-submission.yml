@@ -1,0 +1,175 @@
+name: Promote verified formal record
+
+on:
+  workflow_run:
+    workflows: ["Verify formal submission"]
+    types: [completed]
+
+concurrency:
+  group: formal-record-promotion
+  cancel-in-progress: false
+
+jobs:
+  reverify:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.pull_requests[0] != null &&
+      github.event.workflow_run.pull_requests[0].base.ref == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    outputs:
+      submission_id: ${{ steps.manifest.outputs.submission_id }}
+      pr_number: ${{ steps.meta.outputs.pr_number }}
+      head_sha: ${{ steps.meta.outputs.head_sha }}
+    steps:
+      - name: Read verified pull request metadata
+        id: meta
+        env:
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_SHA: ${{ github.event.workflow_run.pull_requests[0].head.sha }}
+          ORIGINAL_BASE_SHA: ${{ github.event.workflow_run.pull_requests[0].base.sha }}
+        run: |
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "original_base_sha=$ORIGINAL_BASE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Check out latest trusted judge
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          path: judge
+          persist-credentials: false
+
+      - name: Check out candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.meta.outputs.head_sha }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: judge/package-lock.json
+
+      - name: Install trusted dependencies
+        working-directory: judge
+        run: npm ci
+
+      - name: Recheck immutable PR scope
+        id: scope
+        working-directory: judge
+        env:
+          ORIGINAL_BASE_SHA: ${{ steps.meta.outputs.original_base_sha }}
+          HEAD_SHA: ${{ steps.meta.outputs.head_sha }}
+        run: |
+          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$ORIGINAL_BASE_SHA" "$HEAD_SHA")
+          echo "submission_dir=$submission_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Read submission id
+        id: manifest
+        working-directory: judge
+        env:
+          SUBMISSION_DIR: ${{ steps.scope.outputs.submission_dir }}
+        run: |
+          submission_id=$(node -e 'const fs=require("fs"); const p=process.env.SUBMISSION_DIR+"/submission.json"; process.stdout.write(JSON.parse(fs.readFileSync(p)).id)')
+          echo "submission_id=$submission_id" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Lean toolchain manager
+        working-directory: judge
+        run: ./scripts/install-lean-toolchain.sh
+
+      - name: Install pinned formal verifier
+        working-directory: judge
+        run: ./scripts/install-verifier-tools.sh "$RUNNER_TEMP/riemann-tools"
+
+      - name: Reverify against the latest exact record
+        working-directory: judge
+        env:
+          COMPARATOR_BIN: ${{ runner.temp }}/riemann-tools/comparator/.lake/build/bin/comparator
+          COMPARATOR_LANDRUN: ${{ runner.temp }}/riemann-tools/landrun/landrun
+          COMPARATOR_LEAN4EXPORT: ${{ runner.temp }}/riemann-tools/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export
+          COMPARATOR_NANODA: ${{ runner.temp }}/riemann-tools/nanoda/target/release/nanoda_bin
+        run: >-
+          npx tsx scripts/verify-submission.ts
+          "${{ steps.scope.outputs.submission_dir }}"
+          --mode=full
+          --artifact="$RUNNER_TEMP/attestation.json"
+
+      - name: Upload kernel attestation
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: formal-attestation-${{ steps.manifest.outputs.submission_id }}
+          path: ${{ runner.temp }}/attestation.json
+          if-no-files-found: error
+          retention-days: 7
+
+  merge-and-promote:
+    needs: reverify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Download kernel attestation
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: formal-attestation-${{ needs.reverify.outputs.submission_id }}
+          path: ${{ runner.temp }}/formal-attestation
+
+      - name: Merge the verified submission
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.reverify.outputs.pr_number }}
+          HEAD_SHA: ${{ needs.reverify.outputs.head_sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: >-
+          gh pr merge "$PR_NUMBER"
+          --repo "$REPOSITORY"
+          --squash
+          --match-head-commit "$HEAD_SHA"
+
+      - name: Check out the merged default branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Promote exact record data
+        env:
+          SUBMISSION_ID: ${{ needs.reverify.outputs.submission_id }}
+          PR_NUMBER: ${{ needs.reverify.outputs.pr_number }}
+          REPOSITORY: ${{ github.repository }}
+        run: >-
+          npx tsx scripts/promote-record.ts
+          "submissions/$SUBMISSION_ID"
+          "$RUNNER_TEMP/formal-attestation/attestation.json"
+          "https://github.com/$REPOSITORY/pull/$PR_NUMBER"
+          "https://github.com/$REPOSITORY/tree/main/submissions/$SUBMISSION_ID/proof"
+          "https://github.com/$REPOSITORY/pull/$PR_NUMBER"
+
+      - name: Validate promoted ledger
+        run: npm run verify:data
+
+      - name: Commit the advanced record
+        env:
+          SUBMISSION_ID: ${{ needs.reverify.outputs.submission_id }}
+        run: |
+          git config user.name "riemann-fail-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/records.json
+          git commit -m "record: promote $SUBMISSION_ID"
+          git push origin main

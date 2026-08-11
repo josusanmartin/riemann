@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "example-candidate",
+  "track": "critical-line",
+  "author": {
+    "github": "example-solver",
+    "displayName": "Example Solver"
+  },
+  "score": {
+    "numerator": "672500704",
+    "denominator": "1000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Documentation-only submission showing the exact files and theorem names required by the verifier.",
+  "method": "Replace with a concise description of the new argument",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,73 @@
+name: Verify formal submission
+
+on:
+  pull_request:
+    paths:
+      - "submissions/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: formal-submission-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Check out trusted judge
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: judge
+          persist-credentials: false
+
+      - name: Check out candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: judge/package-lock.json
+
+      - name: Install trusted JavaScript dependencies
+        working-directory: judge
+        run: npm ci
+
+      - name: Enforce the one-submission PR scope
+        id: scope
+        working-directory: judge
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          submission_dir=$(npx tsx scripts/check-submission-pr.ts ../candidate "$BASE_SHA" "$HEAD_SHA")
+          echo "submission_dir=$submission_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Lean toolchain manager
+        working-directory: judge
+        run: ./scripts/install-lean-toolchain.sh
+
+      - name: Install pinned formal verifier
+        working-directory: judge
+        run: ./scripts/install-verifier-tools.sh "$RUNNER_TEMP/riemann-tools"
+
+      - name: Kernel-verify exact improvement
+        working-directory: judge
+        env:
+          COMPARATOR_BIN: ${{ runner.temp }}/riemann-tools/comparator/.lake/build/bin/comparator
+          COMPARATOR_LANDRUN: ${{ runner.temp }}/riemann-tools/landrun/landrun
+          COMPARATOR_LEAN4EXPORT: ${{ runner.temp }}/riemann-tools/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export
+          COMPARATOR_NANODA: ${{ runner.temp }}/riemann-tools/nanoda/target/release/nanoda_bin
+        run: >-
+          npx tsx scripts/verify-submission.ts
+          "${{ steps.scope.outputs.submission_dir }}"
+          --mode=full
