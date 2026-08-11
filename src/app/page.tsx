@@ -4,17 +4,18 @@ import { ZetaField } from "@/components/zeta-field";
 import { BoundChart } from "@/components/bound-chart";
 import { Leaderboard } from "@/components/leaderboard";
 import { VerificationPipeline } from "@/components/verification-pipeline";
-import { getCurrentRecord, getRecords } from "@/lib/records";
+import { contract, getCurrentRecord, getRecords } from "@/lib/records";
 import { repositoryUrl } from "@/lib/site";
 import { truncateDecimalString } from "@/components/format";
 
 export default function Home() {
   const current = getCurrentRecord();
   const history = getRecords();
-  const prior = history.at(-2);
+  // The starting point for this arena is the Anthropic paper; improvement is
+  // measured against that fixed baseline, so it reads 0 until a record beats it.
   const currentPercent = Number(current.scorePercent);
-  const priorPercent = Number(prior?.scorePercent ?? "0");
-  const improvement = currentPercent - priorPercent;
+  const baselinePercent = Number(contract.baseline.percent);
+  const improvement = currentPercent - baselinePercent;
 
   return (
     <main id="main-content">
@@ -38,15 +39,15 @@ export default function Home() {
             <div className="frontier-progress">
               <div className="progress-labels"><span>Certified fraction</span><strong>{truncateDecimalString(current.scorePercent, 4)} / 100</strong></div>
               <div className="progress-track" role="meter" aria-label="Certified critical-line proportion" aria-valuenow={currentPercent} aria-valuemin={0} aria-valuemax={100} aria-valuetext={`${truncateDecimalString(current.scorePercent, 4)} percent of nontrivial zeros certified`}>
-                <span className="prior-marker" style={{ left: `${priorPercent}%` }} aria-hidden="true" />
+                <span className="prior-marker" style={{ left: `${baselinePercent}%` }} aria-hidden="true" />
                 <span className="progress-fill" style={{ width: `${currentPercent}%` }} />
               </div>
-              <div className="progress-scale"><span>0%</span><span>Previous {prior ? truncateDecimalString(prior.scorePercent, 2) : "0"}%</span><span>100%</span></div>
+              <div className="progress-scale"><span>0%</span><span>Previous {truncateDecimalString(contract.baseline.percent, 2)}%</span><span>100%</span></div>
             </div>
           </div>
 
           <div className="hero-metrics">
-            <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the previous published bound</p></div>
+            <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the Anthropic 2026 starting record</p></div>
             <div><span>Verification</span><strong>2<small> kernels</small></strong><p>the Lean kernel and an independent nanoda replay</p></div>
             <div><span>Assumptions</span><strong>0</strong><p>the result does not assume the Riemann hypothesis</p></div>
           </div>
