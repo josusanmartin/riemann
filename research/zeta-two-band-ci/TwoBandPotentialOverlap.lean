@@ -30,10 +30,13 @@ theorem sq_lower_of_close
     (hprofile : |profile| ≤ 1)
     (hclose : |actual - profile| ≤ eps) :
     profile ^ 2 - 2 * eps ≤ actual ^ 2 := by
+  have heps0 : 0 ≤ eps := (abs_nonneg (actual - profile)).trans hclose
   have hsum : |actual + profile| ≤ 2 := by
+    rw [← Real.norm_eq_abs, ← Real.norm_eq_abs, ← Real.norm_eq_abs]
     calc
-      |actual + profile| ≤ |actual| + |profile| := abs_add _ _
-      _ ≤ 2 := by linarith
+      ‖actual + profile‖ ≤ ‖actual‖ + ‖profile‖ := norm_add_le _ _
+      _ ≤ 2 := by
+        simpa [Real.norm_eq_abs] using add_le_add hactual hprofile
   have hprod :
       |actual ^ 2 - profile ^ 2| ≤ 2 * eps := by
     calc
@@ -42,9 +45,11 @@ theorem sq_lower_of_close
               rw [show actual ^ 2 - profile ^ 2 =
                 (actual - profile) * (actual + profile) by ring,
                 abs_mul]
-      _ ≤ eps * 2 := mul_le_mul hclose hsum (abs_nonneg _) (by positivity)
+      _ ≤ eps * 2 :=
+            mul_le_mul hclose hsum (abs_nonneg _) heps0
       _ = 2 * eps := by ring
-  nlinarith [le_abs_self (actual ^ 2 - profile ^ 2), hprod]
+  have hneg := (abs_le.mp hprod).1
+  nlinarith
 
 /-- Profile conditions sufficient for one transition. -/
 structure ProfileStep
@@ -85,23 +90,16 @@ theorem physicalFloorDominates_of_profile_close
     hactualShort hprofileShort hcloseShort
   have hsquareLong := sq_lower_of_close
     hactualLong hprofileLong hcloseLong
+  have hB0 : 0 ≤ B := parameter_ranges.2.2.1
+  have hlengthB :=
+    mul_le_mul_of_nonneg_left hprofile.length_floor hB0
   rcases hprofile with ⟨hlength, hshort, hlong⟩
   cases previous <;> cases current
   all_goals
     simp [physicalFloor, lengthFloor, shortFloor, longFloor,
-      stepCost, stepWeight, ofOverlaps] at *
-  all_goals try nlinarith
-  · rcases hlong (by decide) (by decide) with hzero | hbound
-    · simp at hzero
-    · nlinarith
-  · rcases hlong (by decide) (by decide) with hzero | hbound
-    · simp at hzero
-    · nlinarith
-  · rcases hlong (by decide) (by decide) with hzero | hbound
-    · simp at hzero
-    · nlinarith
-  · have hnonneg : 0 ≤ actualLong ^ 2 := sq_nonneg _
-    nlinarith
+      stepCost, stepWeight, ofOverlaps] at hlength hlengthB hshort hlong ⊢
+  all_goals
+    nlinarith [sq_nonneg actualShort, sq_nonneg actualLong]
 
 /-- Direct local-certificate wrapper. -/
 theorem localCertificate_of_profile_close
