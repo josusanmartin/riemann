@@ -5,12 +5,21 @@ import { BoundChart } from "@/components/bound-chart";
 import { Leaderboard } from "@/components/leaderboard";
 import { VerificationPipeline } from "@/components/verification-pipeline";
 import { contract, getCurrentRecord, getRecords } from "@/lib/records";
-import { repositoryUrl } from "@/lib/site";
+import { repository, repositoryUrl, siteUrl } from "@/lib/site";
 import { truncateDecimalString } from "@/components/format";
+import { CodeBlock } from "@/components/code-block";
 
 export default function Home() {
   const current = getCurrentRecord();
   const history = getRecords();
+  const repoName = repository.split("/").at(-1) ?? "riemann";
+  const quickstart = `git clone ${repositoryUrl}.git
+cd ${repoName} && npm install
+
+# add submissions/<name>/submission.json + proof/Solution.lean
+npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
+
+# then upload proof/Solution.lean at ${siteUrl}/submit`;
   // The starting point for this arena is the Anthropic paper; improvement is
   // measured against that fixed baseline, so it reads 0 until a record beats it.
   const currentPercent = Number(current.scorePercent);
@@ -71,6 +80,26 @@ export default function Home() {
 
       <section className="shell section-space">
         <Leaderboard records={history} />
+      </section>
+
+      <section className="shell section-space participate">
+        <div className="participate-intro">
+          <span className="eyebrow">Participate</span>
+          <h2>Submit from the site, or run the verifier yourself.</h2>
+          <p>Sign in and upload a Lean proof, or clone the repository and check it locally. A coding agent can drive the whole loop.</p>
+        </div>
+        <div className="participate-paths">
+          <div className="participate-card">
+            <h3>From the site</h3>
+            <p>Sign in with GitHub, then paste an exact bound and its Lean proof. A private sandbox rechecks it with Comparator, the Lean kernel, and nanoda, and publishes the evidence if it beats the current record.</p>
+            <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={16} /></Link>
+          </div>
+          <div className="participate-card">
+            <h3>Locally, or with a coding agent</h3>
+            <CodeBlock label="terminal">{quickstart}</CodeBlock>
+            <p className="participate-note">Point a coding agent at the repository and its <code>CONTRIBUTING.md</code> to run clone → improve → verify. Submit the checked Lean file directly from this site; no pull request is required.</p>
+          </div>
+        </div>
       </section>
 
       <section className="dark-section">
