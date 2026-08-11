@@ -166,7 +166,7 @@ export async function GET(request: Request): Promise<Response> {
       { apiKey: key },
     );
     const buildLogs = await e2bApi<TemplateBuildLogs>(
-      `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=200&direction=backward`,
+      `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=100&direction=backward`,
       key,
     );
     return noStore(200, {
