@@ -25,16 +25,41 @@ fi
 set +e
 python3 - <<'PY'
 import socket
+import ssl
 import sys
 
-socket.setdefaulttimeout(2.0)
-for address in (("1.1.1.1", 443), ("8.8.8.8", 53)):
+socket.setdefaulttimeout(3.0)
+
+
+def tls_data_reachable():
     try:
-        with socket.create_connection(address, timeout=2.0):
-            sys.exit(97)
+        with socket.create_connection(("1.1.1.1", 443), timeout=3.0) as raw:
+            with ssl.create_default_context().wrap_socket(
+                raw,
+                server_hostname="one.one.one.one",
+            ) as stream:
+                stream.settimeout(3.0)
+                stream.sendall(
+                    b"HEAD / HTTP/1.0\r\nHost: one.one.one.one\r\n\r\n"
+                )
+                return bool(stream.recv(1))
     except OSError:
-        pass
-sys.exit(0)
+        return False
+
+
+def http_data_reachable():
+    try:
+        with socket.create_connection(("1.1.1.1", 80), timeout=3.0) as stream:
+            stream.sendall(
+                b"HEAD / HTTP/1.0\r\nHost: one.one.one.one\r\n\r\n"
+            )
+            stream.settimeout(3.0)
+            return bool(stream.recv(1))
+    except OSError:
+        return False
+
+
+sys.exit(97 if tls_data_reachable() or http_data_reachable() else 0)
 PY
 network_probe_status=$?
 set -e

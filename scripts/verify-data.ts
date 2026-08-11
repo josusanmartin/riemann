@@ -119,6 +119,8 @@ for (const requiredBoundary of [
   "E2B_API_KEY",
   "GITHUB_RECORDS_TOKEN",
   "socket.create_connection",
+  "tls_data_reachable",
+  "http_data_reachable",
   "Landlock filesystem restrictions are unavailable",
 ]) {
   if (!e2bComparator.includes(requiredBoundary)) {
