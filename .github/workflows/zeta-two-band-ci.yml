@@ -34,6 +34,8 @@ jobs:
         run: |
           cp research/zeta-two-band-ci/FiniteStateGapPotential.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteStateGapPotential.lean"
+          cp research/zeta-two-band-ci/FiniteStatePathWeight.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteStatePathWeight.lean"
           cp research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialSafeNumerics.lean"
           cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean \
@@ -52,10 +54,22 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingDPath.lean"
           cp research/zeta-two-band-ci/CentralPathConstructionD.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralPathConstructionD.lean"
+          cp research/zeta-two-band-ci/GuardedWindowCount.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/GuardedWindowCount.lean"
+          cp research/zeta-two-band-ci/CentralGuardCountD.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGuardCountD.lean"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
-        run: lake exe cache get
+        run: |
+          for attempt in 1 2 3 4; do
+            if lake exe cache get; then
+              exit 0
+            fi
+            echo "Mathlib cache attempt $attempt failed; retrying..."
+            sleep $((attempt * 10))
+          done
+          exit 1
 
       - name: Compile the prototype
         working-directory: ${{ runner.temp }}/zeta23
@@ -63,6 +77,7 @@ jobs:
           set -o pipefail
           lake build \
             Zeta23.GapMatching.FiniteStateGapPotential \
+            Zeta23.GapMatching.FiniteStatePathWeight \
             Zeta23.GapMatching.TwoBandPotentialSafeNumerics \
             Zeta23.GapMatching.TwoBandPotentialOverlap \
             Zeta23.GapMatching.TwoBandPotentialAnalyticBridge \
@@ -72,4 +87,6 @@ jobs:
             Zeta23.GapMatching.TwoBandGapMatchingD \
             Zeta23.GapMatching.TwoBandGapMatchingDPath \
             Zeta23.GapMatching.CentralPathConstructionD \
+            Zeta23.GapMatching.GuardedWindowCount \
+            Zeta23.GapMatching.CentralGuardCountD \
             2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
