@@ -226,6 +226,11 @@ export async function GET(request: Request): Promise<Response> {
     const url = new URL(request.url);
     let templateId = url.searchParams.get("templateId");
     let buildId = url.searchParams.get("buildId");
+    const rawLogsOffset = url.searchParams.get("logsOffset");
+    if (rawLogsOffset && !/^\d{1,7}$/.test(rawLogsOffset)) {
+      return noStore(400, { error: "invalid_logs_offset" });
+    }
+    const logsOffset = rawLogsOffset ? Number(rawLogsOffset) : undefined;
     const { Template } = await import("e2b");
     if (url.searchParams.get("latest") === "1") {
       const latest = await latestBuildCoordinates(getE2BTemplate(), key);
@@ -255,10 +260,10 @@ export async function GET(request: Request): Promise<Response> {
 
     const build = await Template.getBuildStatus(
       { templateId, buildId },
-      { apiKey: key },
+      { apiKey: key, logsOffset },
     );
     const buildLogs =
-      build.status === "error"
+      build.status === "error" && logsOffset === undefined
         ? await e2bApi<TemplateBuildLogs>(
             `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=100&direction=backward`,
             key,
@@ -275,11 +280,21 @@ export async function GET(request: Request): Promise<Response> {
       templateId: build.templateID,
       buildId: build.buildID,
       reason: build.reason
-        ? { message: build.reason.message, step: build.reason.step }
+        ? {
+            message: build.reason.message,
+            step: build.reason.step,
+            logs: build.reason.logEntries.map((entry) => ({
+              timestamp: entry.timestamp.toISOString(),
+              level: entry.level,
+              message: entry.message.slice(0, 2_000),
+            })),
+          }
         : undefined,
+      logsOffset: logsOffset ?? 0,
+      nextLogsOffset: (logsOffset ?? 0) + build.logEntries.length,
       logs: [...buildLogs.logs]
         .sort((left, right) => left.timestamp.localeCompare(right.timestamp))
-        .slice(-80)
+        .slice(logsOffset === undefined ? -80 : 0)
         .map((entry) => ({
           timestamp: entry.timestamp,
           level: entry.level,
