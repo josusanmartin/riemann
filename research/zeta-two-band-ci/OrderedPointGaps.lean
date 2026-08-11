@@ -43,7 +43,10 @@ theorem successiveDiffs_sum : ∀ x xs,
     (successiveDiffs x xs).sum = lastFrom x xs - x
   | x, [] => by simp [successiveDiffs, lastFrom]
   | x, y :: ys => by
-      simp [successiveDiffs, lastFrom, successiveDiffs_sum y ys]
+      rw [show successiveDiffs x (y :: ys) =
+        (y - x) :: successiveDiffs y ys by rfl]
+      rw [List.sum_cons, successiveDiffs_sum y ys]
+      simp only [lastFrom]
       ring
 
 /-- Ordered points have nonnegative consecutive gaps. -/
@@ -69,14 +72,17 @@ theorem normalizedGaps_length (scale x : ℝ) (xs : List ℝ) :
   simp [normalizedGaps, successiveDiffs_length]
 
 /-- Normalized gaps telescope to scale times the endpoint displacement. -/
-theorem normalizedGaps_sum : ∀ scale x xs,
+theorem normalizedGaps_sum (scale x : ℝ) (xs : List ℝ) :
     (normalizedGaps scale x xs).sum
-      = scale * (lastFrom x xs - x)
-  | scale, x, [] => by
+      = scale * (lastFrom x xs - x) := by
+  induction xs generalizing x with
+  | nil =>
       simp [normalizedGaps, successiveDiffs, lastFrom]
-  | scale, x, y :: ys => by
-      simp [normalizedGaps, successiveDiffs, lastFrom,
-        normalizedGaps_sum scale y ys]
+  | cons y ys ih =>
+      rw [show normalizedGaps scale x (y :: ys) =
+        (scale * (y - x)) :: normalizedGaps scale y ys by rfl]
+      rw [List.sum_cons, ih]
+      simp only [lastFrom]
       ring
 
 /-- Nonnegative scale and ordered points give nonnegative normalized gaps. -/
