@@ -2,19 +2,19 @@
 Copyright (c) 2026.
 SPDX-License-Identifier: Apache-2.0
 
-Counting loss from replacing the full dyadic interval `[T,2T]` by the central
-subinterval `[T+sqrt T, 2T-sqrt T]`.
+Zero-count control for the two INNER guard strips
 
-The upstream tail development proves a unit-window count for the two outer
-boundary strips of `I'`.  The same theorem, after translating the height,
-controls the two inner guard strips.  This module also records the exact set
-inclusion converting that strip count into a lower bound for the number of
-central simple critical-line zeros.
+  (T, T + sqrt T]  and  (2T - sqrt T, 2T].
+
+The upstream tail theorem controls the corresponding outer strips.  For the
+gap-matching path we need the inner strips, because the retained simple zeros
+must stay a distance sqrt T from the finite Gabor grid endpoints.  The same
+unit-window local count gives O(sqrt T log T), hence o(N(T,2T)).
 -/
-import Zeta23.Tail.Count
+import Zeta23.Tail
 import Zeta23.ThmD.Endgame
 
-open Filter Asymptotics Real
+open Filter Asymptotics Real Finset
 
 noncomputable section
 
@@ -22,183 +22,239 @@ namespace Zeta23.GapMatching.GuardedWindowCount
 
 open Zeta23
 open Zeta23.Tail
-open Zeta23.Assembly
 
-/-- The two inner guard strips removed from `(T,2T]`. -/
-def innerGuardSet (Z : ZeroConfig) (T : ℝ) : Set ℂ :=
-  Z.window T (T + D0 T) ∪ Z.window (2 * T - D0 T) (2 * T)
+/-- A local unit-window bound controls every finite interval of length `R`.
+The harmless `+4` in the logarithm absorbs the final partial unit window. -/
+theorem finite_interval_count_le
+    {ι : Type*} {gamma : ι → ℝ} {mult : ι → ℕ}
+    {A0 left R : ℝ}
+    (hlocal : LocalCount gamma mult A0)
+    (hR : 0 < R)
+    (s : Finset ι)
+    (hs : ∀ rho ∈ s,
+      left < gamma rho ∧ gamma rho ≤ left + R) :
+    (∑ rho ∈ s, (mult rho : ℝ))
+      ≤ (⌈R⌉₊ : ℝ) *
+          (A0 * Real.log (|left| + R + 4)) := by
+  classical
+  set K : ℕ := ⌈R⌉₊ with hK
+  set C : ℝ := A0 * Real.log (|left| + R + 4) with hC
+  set key : ι → ℕ := fun rho => ⌈gamma rho - left⌉₊ - 1 with hkey
 
-/-- Number of distinct simple critical-line zeros in the two removed strips. -/
-def innerGuardCount (Z : ZeroConfig) (T : ℝ) : ℕ :=
-  (innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple).ncard
+  have hKpos : 1 ≤ K := by
+    rw [hK]
+    exact Nat.one_le_ceil_iff.mpr hR
+  have hKlt : (K : ℝ) < R + 1 := by
+    rw [hK]
+    exact Nat.ceil_lt_add_one hR.le
+  have hA0 : 0 ≤ A0 := hlocal.A₀_pos.le
 
-/-- The central simple critical-line set. -/
-def centralSimpleSet (Z : ZeroConfig) (T : ℝ) : Set ℂ :=
-  Z.window (T + D0 T) (2 * T - D0 T)
-    ∩ ZeroConfig.onLine ∩ Z.simple
+  apply (sum_mult_le_of_windows s mult key K) <;> clear hC
+  · intro rho hrho
+    have hx := hs rho hrho
+    have hceil1 : 1 ≤ ⌈gamma rho - left⌉₊ :=
+      Nat.one_le_ceil_iff.mpr (by linarith [hx.1])
+    have hceilK : ⌈gamma rho - left⌉₊ ≤ K := by
+      rw [hK]
+      exact Nat.ceil_mono (by linarith [hx.2])
+    simp only [hkey]
+    omega
+  · intro j hj
+    refine (hlocal.window (left + j) _ ?_).trans ?_
+    · intro rho hrho
+      rw [mem_filter] at hrho
+      obtain ⟨hrhos, hrhoj⟩ := hrho
+      have hx := hs rho hrhos
+      have hceil1 : 1 ≤ ⌈gamma rho - left⌉₊ :=
+        Nat.one_le_ceil_iff.mpr (by linarith [hx.1])
+      have hceil : ⌈gamma rho - left⌉₊ = j + 1 := by
+        simp only [hkey] at hrhoj
+        omega
+      have hb := (Nat.ceil_eq_iff (Nat.succ_ne_zero j)).mp hceil
+      push_cast at hb
+      constructor <;> linarith [hb.1, hb.2]
+    · have hjK : ((j : ℕ) : ℝ) < K := by exact_mod_cast hj
+      have hjR : (j : ℝ) < R + 1 := hjK.trans hKlt
+      have habs : |left + (j : ℝ)| ≤ |left| + j := by
+        calc
+          |left + (j : ℝ)| ≤ |left| + |(j : ℝ)| := abs_add _ _
+          _ = |left| + j := by rw [abs_of_nonneg (Nat.cast_nonneg j)]
+      have harg : |left + (j : ℝ)| + 3 ≤ |left| + R + 4 := by
+        linarith
+      have hlog :
+          Real.log (|left + (j : ℝ)| + 3)
+            ≤ Real.log (|left| + R + 4) :=
+        Real.log_le_log (by positivity) harg
+      simpa [C] using mul_le_mul_of_nonneg_left hlog hA0
 
-lemma innerGuardSet_subset_window (Z : ZeroConfig) {T : ℝ} (hT : 0 ≤ T) :
-    innerGuardSet Z T ⊆ Z.window T (2 * T) := by
-  intro rho hrho
-  rcases hrho with hrho | hrho
-  · rcases hrho with ⟨hcarrier, him⟩
-    exact ⟨hcarrier, ⟨him.1, by
-      have hsqrt : Real.sqrt T ≤ T := by
-        rw [Real.sqrt_le_iff]
-        constructor
-        · exact hT
-        · nlinarith
-      linarith⟩⟩
-  · rcases hrho with ⟨hcarrier, him⟩
-    exact ⟨hcarrier, ⟨by
-      have hsqrt : Real.sqrt T ≤ T := by
-        rw [Real.sqrt_le_iff]
-        constructor
-        · exact hT
-        · nlinarith
-      linarith, him.2⟩⟩
+/-- ZeroConfig version of `finite_interval_count_le`. -/
+theorem zero_interval_count_le
+    (Z : ZeroConfig) {A0 left R : ℝ}
+    (hA0 : 1 ≤ A0)
+    (hlocal : ∀ t : ℝ,
+      (Z.N t (t + 1) : ℝ) ≤ A0 * Real.log (|t| + 3))
+    (hR : 0 < R) :
+    (Z.N left (left + R) : ℝ)
+      ≤ (⌈R⌉₊ : ℝ) *
+          (A0 * Real.log (|left| + R + 4)) := by
+  classical
+  have hfinite : (Z.window left (left + R)).Finite :=
+    Z.finite_window _ _
+  set s : Finset Z.carrier :=
+    hfinite.toFinset.subtype (· ∈ Z.carrier) with hsdef
 
-/-- Every simple critical-line zero in `(T,2T]` lies either in the central
-interval or one of the two guard strips. -/
-lemma full_simple_subset_central_union_guard
-    (Z : ZeroConfig) (T : ℝ) :
-    Z.window T (2 * T) ∩ ZeroConfig.onLine ∩ Z.simple
-      ⊆ centralSimpleSet Z T
-        ∪ (innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple) := by
-  intro rho hrho
-  rcases hrho with ⟨⟨hcarrier, him⟩, hon, hsimple⟩
-  by_cases hlo : rho.im ≤ T + D0 T
-  · right
-    refine ⟨?_, hon, hsimple⟩
-    left
-    exact ⟨hcarrier, ⟨him.1, hlo⟩⟩
-  · by_cases hhi : 2 * T - D0 T < rho.im
-    · right
-      refine ⟨?_, hon, hsimple⟩
-      right
-      exact ⟨hcarrier, ⟨hhi, him.2⟩⟩
-    · left
-      exact ⟨⟨hcarrier, ⟨lt_of_not_ge hlo, le_of_not_gt hhi⟩⟩,
-        hon, hsimple⟩
+  have hcount :
+      (Z.N left (left + R) : ℝ)
+        = ∑ rho ∈ s, (Z.mult (rho : ℂ) : ℝ) := by
+    unfold ZeroConfig.N
+    rw [finsum_mem_eq_finite_toFinset_sum _ hfinite,
+      hsdef,
+      Finset.sum_subtype_of_mem
+        (f := fun rho : ℂ => (Z.mult rho : ℝ))]
+    · push_cast
+      rfl
+    · intro rho hrho
+      exact ((Set.Finite.mem_toFinset _).mp hrho).1
 
-/-- The full simple count is at most central plus guard. -/
-theorem N0s_le_central_add_guard
-    (Z : ZeroConfig) {T : ℝ} (hT : 0 ≤ T) :
-    Z.N0s T (2 * T)
-      ≤ (centralSimpleSet Z T).ncard + innerGuardCount Z T := by
-  have hcentral : (centralSimpleSet Z T).Finite :=
-    (Z.finite_window (T + D0 T) (2 * T - D0 T)).subset
-      (fun _ h => h.1.1)
-  have hguard :
-      (innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple).Finite := by
-    have hfull : (Z.window T (2 * T)).Finite := Z.finite_window T (2 * T)
-    exact hfull.subset fun rho hrho =>
-      innerGuardSet_subset_window Z hT hrho.1.1
-  calc
-    Z.N0s T (2 * T)
-        ≤ (centralSimpleSet Z T ∪
-            (innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple)).ncard :=
-          Set.ncard_le_ncard
-            (full_simple_subset_central_union_guard Z T)
-            (hcentral.union hguard)
-    _ ≤ (centralSimpleSet Z T).ncard
-          + (innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple).ncard :=
-          Set.ncard_union_le _ _
-    _ = (centralSimpleSet Z T).ncard + innerGuardCount Z T := rfl
+  have hmem : ∀ rho ∈ s,
+      left < (rho : ℂ).im ∧
+        (rho : ℂ).im ≤ left + R := by
+    intro rho hrho
+    rw [hsdef, Finset.mem_subtype,
+      Set.Finite.mem_toFinset] at hrho
+    exact hrho.2
 
-/-- Real subtraction form consumed by the gap-family bridge. -/
-theorem central_count_lower
-    (Z : ZeroConfig) {T : ℝ} (hT : 0 ≤ T) :
-    (Z.N0s T (2 * T) : ℝ) - innerGuardCount Z T
-      ≤ ((centralSimpleSet Z T).ncard : ℝ) := by
-  have h := N0s_le_central_add_guard Z hT
-  exact_mod_cast (Nat.le_add_left
-    (Z.N0s T (2 * T) - innerGuardCount Z T)
-    ((centralSimpleSet Z T).ncard)).trans (by omega :
-      Z.N0s T (2 * T) - innerGuardCount Z T
-        ≤ (centralSimpleSet Z T).ncard)
+  rw [hcount]
+  exact finite_interval_count_le
+    (LocalCount.ofWindowCount Z hA0 hlocal)
+    hR s hmem
 
-/-- Local unit-window count for the two inner guard strips. -/
-theorem inner_guard_count_le
+/-- Total multiplicity in the two inner guard strips. -/
+def innerGuard (Z : ZeroConfig) (T : ℝ) : ℝ :=
+  (Z.N T (T + Real.sqrt T) : ℝ)
+    + (Z.N (2 * T - Real.sqrt T) (2 * T) : ℝ)
+
+/-- Explicit inner-guard estimate, parallel to upstream `Tail.NII_le`. -/
+theorem innerGuard_le
     (Z : ZeroConfig) {A0 T : ℝ}
     (hA0 : 1 ≤ A0)
-    (hloc : ∀ t : ℝ,
+    (hlocal : ∀ t : ℝ,
       (Z.N t (t + 1) : ℝ) ≤ A0 * Real.log (|t| + 3))
-    (hT : T0 ≤ T) :
-    (innerGuardCount Z T : ℝ)
-      ≤ 3 * A0 * Real.sqrt T * Real.log (4 * T) := by
-  let s : Finset ℂ :=
-    ((Z.finite_window T (2 * T)).subset
-      (fun rho hrho =>
-        innerGuardSet_subset_window Z (by
-          have : 0 < T := lt_of_lt_of_le T0_pos hT
-          linarith) hrho.1.1)).toFinset
-  have hlocal : LocalCount (fun rho : ℂ => rho.im) Z.mult A0 :=
-    LocalCount.ofWindowCount Z hA0 hloc
-  have hs : ∀ rho ∈ s,
-      (T < rho.im ∧ rho.im ≤ T + Real.sqrt T) ∨
-      (2 * T - Real.sqrt T < rho.im ∧ rho.im ≤ 2 * T) := by
-    intro rho hrho
-    have hmem : rho ∈ innerGuardSet Z T ∩ ZeroConfig.onLine ∩ Z.simple :=
-      Set.Finite.mem_toFinset.mp hrho
-    rcases hmem.1.1 with hlo | hhi
-    · exact Or.inl hlo.2
-    · exact Or.inr hhi.2
-  have hshift := boundary_count_le
-    hlocal hT s (fun rho hrho => by
-      rcases hs rho hrho with hlo | hhi
-      · left
-        constructor <;> linarith
-      · right
-        constructor <;> linarith)
-  have hmult :
-      (innerGuardCount Z T : ℝ)
-        ≤ ∑ rho ∈ s, (Z.mult rho : ℝ) := by
-    unfold innerGuardCount
-    rw [Set.ncard_eq_toFinset_card _
-      (((Z.finite_window T (2 * T)).subset
-        (fun rho hrho =>
-          innerGuardSet_subset_window Z (by
-            have : 0 < T := lt_of_lt_of_le T0_pos hT
-            linarith) hrho.1.1)))]
-    exact_mod_cast Finset.card_le_sum_of_subadditive_on_pred
-      (p := fun _ : ℂ => True)
-      (f := fun rho => Z.mult rho)
-      (fun _ _ _ => Nat.zero_le _)
-      (fun rho _ => Z.one_le_mult rho
-        ((innerGuardSet_subset_window Z (by
-          have : 0 < T := lt_of_lt_of_le T0_pos hT
-          linarith)
-          (Set.Finite.mem_toFinset.mp (by assumption))).1))
-  exact hmult.trans hshift
+    (hT : Tail.T₀ ≤ T) :
+    innerGuard Z T
+      ≤ 4 * A0 * Real.sqrt T * Real.log (4 * T) := by
+  have hT300 : (300 : ℝ) ≤ T := hT
+  have hT0 : 0 < T := by linarith
+  have hsqrt0 : 0 < Real.sqrt T := Real.sqrt_pos.2 hT0
+  have hsqrt1 : 1 ≤ Real.sqrt T := by
+    rw [Real.le_sqrt (by norm_num) hT0.le]
+    linarith
+  have hsqrtT : Real.sqrt T ≤ T := by
+    nlinarith [Real.sq_sqrt hT0.le]
+  have hK : (⌈Real.sqrt T⌉₊ : ℝ) ≤ 2 * Real.sqrt T := by
+    have hceil : (⌈Real.sqrt T⌉₊ : ℝ) < Real.sqrt T + 1 :=
+      Nat.ceil_lt_add_one hsqrt0.le
+    linarith
+  have hlog0 : 0 ≤ Real.log (4 * T) := by
+    exact Real.log_nonneg (by nlinarith)
+  have hA0nonneg : 0 ≤ A0 := by linarith
 
-/-- The inner guard count is `o(N(T,2T))`. -/
-theorem innerGuardCount_isLittleO
-    (Z : ZeroConfig) (H : PaperInputs Z) :
-    (fun T => (innerGuardCount Z T : ℝ))
-      =o[atTop] (fun T => (Z.N T (2 * T) : ℝ)) := by
-  obtain ⟨A0, hA0, hloc⟩ := H.RvM.local_count
-  have hO :
-      (fun T => (innerGuardCount Z T : ℝ))
-        =O[atTop] (fun T => Real.sqrt T * l T) := by
-    refine IsBigO.of_bound (6 * A0) ?_
-    filter_upwards [eventually_ge_atTop T0,
-      eventually_l_pos] with T hT hlT
-    rw [Real.norm_eq_abs, Real.norm_eq_abs,
-      abs_of_nonneg (Nat.cast_nonneg _),
-      abs_of_nonneg (by positivity)]
-    have hguard := inner_guard_count_le Z hA0 hloc hT
-    have hlog := log_four_mul_le_two_mul_l hT
-    have hcoef : 0 ≤ 3 * A0 * Real.sqrt T := by
-      have hA0nonneg : 0 ≤ A0 := by linarith
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hlog hcoef
+  have hlo := zero_interval_count_le Z hA0 hlocal hsqrt0
+    (left := T)
+  have hhi0 := zero_interval_count_le Z hA0 hlocal hsqrt0
+    (left := 2 * T - Real.sqrt T)
+  have hhi :
+      (Z.N (2 * T - Real.sqrt T) (2 * T) : ℝ)
+        ≤ (⌈Real.sqrt T⌉₊ : ℝ) *
+            (A0 * Real.log
+              (|2 * T - Real.sqrt T| + Real.sqrt T + 4)) := by
+    simpa [sub_add_cancel] using hhi0
+
+  have hargLo : |T| + Real.sqrt T + 4 ≤ 4 * T := by
+    rw [abs_of_pos hT0]
+    nlinarith
+  have hbase : 0 ≤ 2 * T - Real.sqrt T := by
+    nlinarith
+  have hargHi :
+      |2 * T - Real.sqrt T| + Real.sqrt T + 4 ≤ 4 * T := by
+    rw [abs_of_nonneg hbase]
+    nlinarith
+  have hlogLo :
+      Real.log (|T| + Real.sqrt T + 4)
+        ≤ Real.log (4 * T) :=
+    Real.log_le_log (by positivity) hargLo
+  have hlogHi :
+      Real.log (|2 * T - Real.sqrt T| + Real.sqrt T + 4)
+        ≤ Real.log (4 * T) :=
+    Real.log_le_log (by positivity) hargHi
+
+  have hKnonneg : (0 : ℝ) ≤ ⌈Real.sqrt T⌉₊ := Nat.cast_nonneg _
+  have hlo' :
+      (Z.N T (T + Real.sqrt T) : ℝ)
+        ≤ 2 * A0 * Real.sqrt T * Real.log (4 * T) := by
     calc
-      (innerGuardCount Z T : ℝ)
-          ≤ 3 * A0 * Real.sqrt T * Real.log (4 * T) := hguard
-      _ ≤ 6 * A0 * Real.sqrt T * l T := by
-            nlinarith
-  exact hO.trans_isLittleO
+      (Z.N T (T + Real.sqrt T) : ℝ)
+          ≤ (⌈Real.sqrt T⌉₊ : ℝ) *
+              (A0 * Real.log (|T| + Real.sqrt T + 4)) := hlo
+      _ ≤ (2 * Real.sqrt T) *
+              (A0 * Real.log (4 * T)) := by
+            gcongr
+      _ = 2 * A0 * Real.sqrt T * Real.log (4 * T) := by ring
+  have hhi' :
+      (Z.N (2 * T - Real.sqrt T) (2 * T) : ℝ)
+        ≤ 2 * A0 * Real.sqrt T * Real.log (4 * T) := by
+    calc
+      (Z.N (2 * T - Real.sqrt T) (2 * T) : ℝ)
+          ≤ (⌈Real.sqrt T⌉₊ : ℝ) *
+              (A0 * Real.log
+                (|2 * T - Real.sqrt T| + Real.sqrt T + 4)) := hhi
+      _ ≤ (2 * Real.sqrt T) *
+              (A0 * Real.log (4 * T)) := by
+            gcongr
+      _ = 2 * A0 * Real.sqrt T * Real.log (4 * T) := by ring
+
+  unfold innerGuard
+  linarith
+
+/-- Eventual `O(sqrt T * l T)` form of the inner guard estimate. -/
+theorem innerGuard_isBigO
+    (Z : ZeroConfig) {A0 : ℝ}
+    (hA0 : 1 ≤ A0)
+    (hlocal : ∀ t : ℝ,
+      (Z.N t (t + 1) : ℝ) ≤ A0 * Real.log (|t| + 3)) :
+    innerGuard Z =O[atTop] (fun T => Real.sqrt T * l T) := by
+  refine IsBigO.of_bound (8 * A0) ?_
+  filter_upwards [eventually_ge_atTop Tail.T₀] with T hT
+  have h1 := innerGuard_le Z hA0 hlocal hT
+  have h2 := Tail.log_four_mul_le_two_mul_l hT
+  have hguard0 : 0 ≤ innerGuard Z T := by
+    unfold innerGuard
+    positivity
+  have hmajor0 : 0 ≤ Real.sqrt T * l T := by
+    have hl : 0 ≤ l T := by
+      have := Tail.one_le_log_four_mul hT
+      have hlog := Tail.log_four_mul_le_two_mul_l hT
+      linarith
+    positivity
+  rw [Real.norm_eq_abs, Real.norm_eq_abs,
+    abs_of_nonneg hguard0, abs_of_nonneg hmajor0]
+  have hA : 0 ≤ 4 * A0 * Real.sqrt T := by
+    have := Real.sqrt_nonneg T
+    positivity
+  calc
+    innerGuard Z T
+        ≤ 4 * A0 * Real.sqrt T * Real.log (4 * T) := h1
+    _ ≤ 4 * A0 * Real.sqrt T * (2 * l T) := by
+          exact mul_le_mul_of_nonneg_left h2 hA
+    _ = (8 * A0) * (Real.sqrt T * l T) := by ring
+
+/-- The inner guard is negligible relative to the dyadic zero count. -/
+theorem innerGuard_isLittleO_count
+    (Z : ZeroConfig) (H : PaperInputs Z) :
+    innerGuard Z =o[atTop]
+      (fun T => (Z.N T (2 * T) : ℝ)) := by
+  obtain ⟨A0, hA0, hlocal⟩ := H.RvM.local_count
+  exact (innerGuard_isBigO Z hA0 hlocal).trans_isLittleO
     (isLittleO_N_of_isLittleO_Tl Z H.RvM
       isLittleO_sqrt_mul_l_Tl)
 
