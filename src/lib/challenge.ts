@@ -58,6 +58,9 @@ export const exactRationalSchema = z
   })
   .strict();
 
+const attributionSchema = z.string().trim().min(1).max(80).nullable();
+const optionalAttributionSchema = attributionSchema.optional().default(null);
+
 export const independentReviewSchema = z
   .object({
     reviewer: z.string().min(1).max(120),
@@ -76,6 +79,8 @@ export const recordSchema = z
     github: githubLoginSchema.nullable(),
     title: z.string().min(1),
     method: z.string().min(1),
+    model: attributionSchema,
+    harness: attributionSchema,
     scoreDecimal: decimalString,
     scorePercent: decimalString,
     exactRational: exactRationalSchema.nullable(),
@@ -153,6 +158,8 @@ export const submissionSchema = z
       .strict(),
     summary: z.string().min(20).max(1000),
     method: z.string().min(3).max(200),
+    model: attributionSchema,
+    harness: attributionSchema,
     license: z.literal("Apache-2.0"),
   })
   .strict();
@@ -171,6 +178,8 @@ export const directSubmissionInputSchema = z
     score: exactRationalSchema,
     summary: z.string().trim().min(20).max(1000),
     method: z.string().trim().min(3).max(200),
+    model: optionalAttributionSchema,
+    harness: optionalAttributionSchema,
     solution: z.string().min(1).max(2_000_000),
     acceptLicense: z.literal(true),
   })
@@ -188,6 +197,8 @@ export const verificationAttestationSchema = z
         displayName: z.string().min(1).max(100),
       })
       .strict(),
+    model: attributionSchema,
+    harness: attributionSchema,
     score: exactRationalSchema,
     scoreDecimal: decimalString,
     previousRecordId: z.string().min(1),

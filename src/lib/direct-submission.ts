@@ -70,6 +70,8 @@ export function prepareDirectSubmission(
     },
     summary: input.summary,
     method: input.method,
+    model: input.model,
+    harness: input.harness,
     license: "Apache-2.0",
   });
   const manifest = `${JSON.stringify(submission, null, 2)}\n`;

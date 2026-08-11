@@ -31,7 +31,16 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
                   </Link>
                 </td>
                 <td><strong>{record.author}</strong><small>{record.date.slice(0, 4)} · {record.title}</small></td>
-                <td><span className="method-cell">{record.method}</span></td>
+                <td>
+                  <span className="method-cell">
+                    {record.method}
+                    {(record.model || record.harness) && (
+                      <small className="method-attribution">
+                        {[record.model, record.harness].filter(Boolean).join(" · ")}
+                      </small>
+                    )}
+                  </span>
+                </td>
                 <td>
                   <div className="evidence-links">
                     <a className="evidence-link" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">

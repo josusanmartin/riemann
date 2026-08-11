@@ -71,6 +71,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
         <div className="intro-text">
           <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. A larger κ is a stronger unconditional result.</p>
           <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
+          <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the reference starting point, then accepts only machine-checked improvements to that baseline.</p>
         </div>
       </section>
 

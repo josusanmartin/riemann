@@ -127,6 +127,8 @@ export function DirectSubmissionForm({
     setPhase("starting");
     setMessage("Creating a private no-egress E2B sandbox.");
     const form = new FormData(event.currentTarget);
+    const model = (form.get("model")?.toString() ?? "").trim();
+    const harness = (form.get("harness")?.toString() ?? "").trim();
     try {
       const response = await fetch("/api/submissions", {
         method: "POST",
@@ -140,6 +142,8 @@ export function DirectSubmissionForm({
           },
           summary: form.get("summary"),
           method: form.get("method"),
+          model: model || null,
+          harness: harness || null,
           solution,
           acceptLicense: form.get("acceptLicense") === "on",
         }),
@@ -178,9 +182,9 @@ export function DirectSubmissionForm({
     <form className="direct-submission-form" onSubmit={submit}>
       <div className="submission-fields">
         <label>
-          <span>Submission ID</span>
+          <span>Record name</span>
           <input name="id" required maxLength={80} pattern="[a-z0-9][a-z0-9-]*" placeholder="your-bound-2026" disabled={busy} />
-          <small>Lowercase letters, digits, and hyphens.</small>
+          <small>A short identifier for this record — lowercase letters, digits, and hyphens. It becomes the record’s URL and its entry in the public ledger, so pick something recognizable.</small>
         </label>
         <label>
           <span>Public author</span>
@@ -199,9 +203,20 @@ export function DirectSubmissionForm({
           <span>Method</span>
           <input name="method" required minLength={3} maxLength={200} placeholder="Name the mathematical method" disabled={busy} />
         </label>
+        <label>
+          <span>AI model <span className="optional">optional</span></span>
+          <input name="model" maxLength={80} placeholder="e.g. Claude Opus 4.8, GPT-5" disabled={busy} />
+          <small>The model that produced the proof. Credited in the public record.</small>
+        </label>
+        <label>
+          <span>Coding agent or harness <span className="optional">optional</span></span>
+          <input name="harness" maxLength={80} placeholder="e.g. Claude Code, autoresearch" disabled={busy} />
+          <small>Any agent or harness you used to generate or drive the proof.</small>
+        </label>
         <label className="field-wide">
           <span>Summary</span>
           <textarea name="summary" required minLength={20} maxLength={1000} rows={4} placeholder="Describe the formal improvement and its mathematical idea." disabled={busy} />
+          <small>Up to 1,000 characters. Model and harness attribution are stored separately.</small>
         </label>
       </div>
 

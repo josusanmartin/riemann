@@ -31,6 +31,9 @@ export function SiteFooter() {
             <a href="https://github.com/anthropics/zeta-23-lean" target="_blank" rel="noreferrer">
               Zeta23 <ExternalLink size={13} />
             </a>
+            <a href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">
+              Anthropic article <ExternalLink size={13} />
+            </a>
           </div>
         </div>
       </div>

@@ -243,6 +243,8 @@ function recordForSubmission(
     github: submission.author.github,
     title: `Certified critical-line bound ${scoreDecimal}`,
     method: submission.method,
+    model: submission.model,
+    harness: submission.harness,
     scoreDecimal,
     scorePercent,
     exactRational: submission.score,

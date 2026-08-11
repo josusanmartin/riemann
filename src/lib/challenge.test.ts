@@ -54,6 +54,8 @@ describe("challenge primitives", () => {
       },
       summary: "A candidate that should fail schema validation.",
       method: "invalid",
+      model: null,
+      harness: null,
       license: "Apache-2.0",
     });
 
@@ -75,6 +77,8 @@ describe("challenge primitives", () => {
       },
       summary: "A candidate containing an undeclared score field.",
       method: "invalid extras",
+      model: null,
+      harness: null,
       license: "Apache-2.0",
     });
 

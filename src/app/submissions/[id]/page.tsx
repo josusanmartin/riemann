@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, BadgeCheck, BookOpen, CalendarDays, CircleDot, UserCheck, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BadgeCheck, BookOpen, Bot, CalendarDays, CircleDot, GitBranch, UserCheck, UserRound } from "lucide-react";
 import { getRecord, getRecords } from "@/lib/records";
 import { truncateDecimalString } from "@/components/format";
 
@@ -54,6 +54,8 @@ export default async function SubmissionPage({ params }: PageProps) {
             <div><dt><CalendarDays size={16} /> Date</dt><dd>{new Date(`${record.date}T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</dd></div>
             <div><dt><UserRound size={16} /> Author</dt><dd>{record.github ? `@${record.github}` : record.author}</dd></div>
             <div><dt><CircleDot size={16} /> Method</dt><dd>{record.method}</dd></div>
+            {record.model && <div><dt><Bot size={16} /> Model</dt><dd>{record.model}</dd></div>}
+            {record.harness && <div><dt><GitBranch size={16} /> Harness</dt><dd>{record.harness}</dd></div>}
           </dl>
         </article>
         <aside className="evidence-card">

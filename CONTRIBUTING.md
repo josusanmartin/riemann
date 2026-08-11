@@ -23,7 +23,7 @@ theorem candidate_critical_line_bound_cumulative :
 
 ## Direct submission
 
-Sign in with GitHub at `/submit`. Supply a public display name, method, summary, exact numerator and denominator, and one `Solution.lean` source file. Scores are positive integers encoded as strings:
+Sign in with GitHub at `/submit`. Supply a public display name, method, summary, exact numerator and denominator, and one `Solution.lean` source file. You may also name the AI model and coding harness; these are optional structured attribution fields and do not affect scoring. Scores are positive integers encoded as strings:
 
 ```json
 "score": {

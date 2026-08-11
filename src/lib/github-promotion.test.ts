@@ -88,6 +88,8 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
       score: { numerator: "672500704", denominator: "1000000000" },
       summary: "A complete direct candidate used to test atomic publication.",
       method: "A formally checked refinement",
+      model: "Test Model",
+      harness: "Test Harness",
       solution: "import ChallengeDeps\n-- complete declarations\n",
       acceptLicense: true,
     },
@@ -99,6 +101,8 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
     schemaVersion: 1,
     submissionId: prepared.submission.id,
     author: prepared.submission.author,
+    model: prepared.submission.model,
+    harness: prepared.submission.harness,
     score: prepared.submission.score,
     scoreDecimal: rationalToDecimal("672500704", "1000000000", 30),
     previousRecordId: getCurrentRecord().id,
@@ -183,6 +187,8 @@ describe("automatic GitHub record promotion", () => {
     const promoted = JSON.parse(recordsBlob ?? "[]").at(-1);
     expect(promoted.sourceUrl).toContain(promotion.evidenceCommitSha);
     expect(promoted.pullRequestUrl).toBeNull();
+    expect(promoted.model).toBe("Test Model");
+    expect(promoted.harness).toBe("Test Harness");
   });
 
   it("fails closed when main no longer matches the verified deployment", async () => {
@@ -253,6 +259,32 @@ describe("automatic GitHub record promotion", () => {
         { token: "test-token", fetchImplementation: github.fetchImplementation },
       ),
     ).rejects.toThrow("Verifier template is stale");
+    expect(github.requests.some((request) => request.method === "POST")).toBe(false);
+  });
+
+  it("rejects model or harness attribution changed after verification", async () => {
+    const baseCommitSha = "e".repeat(40);
+    const github = fakeGitHub(baseCommitSha);
+    const { prepared, result } = await fixture();
+    const changedResult = {
+      ...result,
+      attestation: { ...result.attestation, model: "Different Model" },
+    };
+
+    await expect(
+      promoteVerifiedSubmission(
+        {
+          baseCommitSha,
+          previousRecordId: getCurrentRecord().id,
+          proofDigest: prepared.proofDigest,
+          issuedAt: Date.now() - 1_000,
+          manifest: prepared.manifest,
+          solution: prepared.solution,
+          result: changedResult,
+        },
+        { token: "test-token", fetchImplementation: github.fetchImplementation },
+      ),
+    ).rejects.toThrow("Attested model or harness differs");
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });
 });

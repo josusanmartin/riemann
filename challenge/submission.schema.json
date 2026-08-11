@@ -4,7 +4,7 @@
   "title": "Riemann.fail formal bound submission",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "id", "track", "author", "score", "proof", "summary", "method", "license"],
+  "required": ["schemaVersion", "id", "track", "author", "score", "proof", "summary", "method", "model", "harness", "license"],
   "properties": {
     "schemaVersion": { "const": 1 },
     "id": { "type": "string", "maxLength": 80, "pattern": "^[a-z0-9][a-z0-9-]*$" },
@@ -40,6 +40,8 @@
     },
     "summary": { "type": "string", "minLength": 20, "maxLength": 1000 },
     "method": { "type": "string", "minLength": 3, "maxLength": 200 },
+    "model": { "type": ["string", "null"], "minLength": 1, "maxLength": 80 },
+    "harness": { "type": ["string", "null"], "minLength": 1, "maxLength": 80 },
     "license": { "const": "Apache-2.0" }
   }
 }

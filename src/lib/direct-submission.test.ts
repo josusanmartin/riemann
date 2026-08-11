@@ -10,6 +10,8 @@ const currentRecord: RecordEntry = {
   github: null,
   title: "Current exact record",
   method: "Current method",
+  model: null,
+  harness: null,
   scoreDecimal: "0.672500703679411645734379790803",
   scorePercent: "67.2500703679411645734379790803",
   exactRational: {
@@ -36,6 +38,8 @@ const input = {
   },
   summary: "A complete direct-upload candidate with an exact rational score.",
   method: "A formal refinement",
+  model: "Test Model",
+  harness: "Test Harness",
   solution: "import ChallengeDeps\n-- complete declarations\n",
   acceptLicense: true,
 };
@@ -47,7 +51,23 @@ describe("direct submissions", () => {
     expect(prepared.submission.author.github).toBe("actual-solver");
     expect(prepared.submission.proof.solution).toBe("proof/Solution.lean");
     expect(prepared.submission.license).toBe("Apache-2.0");
+    expect(prepared.submission.model).toBe("Test Model");
+    expect(prepared.submission.harness).toBe("Test Harness");
     expect(prepared.proofDigest).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("normalizes omitted optional attribution to null", () => {
+    const withoutAttribution = { ...input };
+    Reflect.deleteProperty(withoutAttribution, "model");
+    Reflect.deleteProperty(withoutAttribution, "harness");
+    const prepared = prepareDirectSubmission(
+      withoutAttribution,
+      "actual-solver",
+      currentRecord,
+    );
+
+    expect(prepared.submission.model).toBeNull();
+    expect(prepared.submission.harness).toBeNull();
   });
 
   it("rejects a score that does not strictly improve the exact record", () => {

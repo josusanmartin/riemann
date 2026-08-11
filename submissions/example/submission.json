@@ -18,5 +18,7 @@
   },
   "summary": "Documentation-only submission showing the exact files and theorem names required by the verifier.",
   "method": "Replace with a concise description of the new argument",
+  "model": null,
+  "harness": null,
   "license": "Apache-2.0"
 }

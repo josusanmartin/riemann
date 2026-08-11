@@ -144,6 +144,8 @@ const artifact = {
   schemaVersion: 1,
   submissionId: submission.id,
   author: submission.author,
+  model: submission.model,
+  harness: submission.harness,
   score: submission.score,
   scoreDecimal: rationalToDecimal(
     submission.score.numerator,

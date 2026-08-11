@@ -8,7 +8,7 @@ The record starts at
 κ₀ = 2 - 1 / cMT = 0.672500703679411645734379790803…
 ```
 
-from Anthropic's 2026 Zeta23 result. A candidate advances the public number only when it supplies an exact rational `p/q` and Lean proves both that `p/q` is strictly greater than the current record and that the frozen unconditional theorem holds at `p/q`.
+using [Anthropic's 2026 research article](https://www.anthropic.com/research/riemann-zeta) and Zeta23 result as the reference starting point. A candidate advances the public number only when it supplies an exact rational `p/q` and Lean proves both that `p/q` is strictly greater than the current record and that the frozen unconditional theorem holds at `p/q`.
 
 ## What is automated
 
@@ -67,7 +67,7 @@ Authorization callback:   https://riemann-fail.vercel.app/api/auth/callback/gith
 
 ## Formal submissions
 
-Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
+Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. Optional model and harness attribution are stored as structured, attested fields in the public record. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
 
 For local development, copy `submissions/example` and prepare a candidate against the pinned Zeta23 tree:
 

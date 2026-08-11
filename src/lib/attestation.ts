@@ -23,6 +23,12 @@ export function assertValidAttestation(
   ) {
     throw new Error("Attested author differs from the authenticated submission");
   }
+  if (
+    attestation.model !== submission.model ||
+    attestation.harness !== submission.harness
+  ) {
+    throw new Error("Attested model or harness differs from the submission");
+  }
   if (attestation.upstreamCommit !== contract.trustedUpstream.commit) {
     throw new Error("Attestation used a different trusted upstream commit");
   }
