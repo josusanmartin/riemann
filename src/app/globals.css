@@ -1145,6 +1145,7 @@ h3 {
 }
 
 .prose-section {
+  min-width: 0;
   max-width: 780px;
 }
 
@@ -2798,6 +2799,12 @@ h3 {
   .submissions-open {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 350px) {
+  .site-header .brand > span {
+    display: none;
   }
 }
 
