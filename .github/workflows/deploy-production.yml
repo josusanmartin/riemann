@@ -36,6 +36,7 @@ jobs:
             --prod \
             --yes \
             --archive=tgz \
+            --env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
             --meta githubCommitSha="$GITHUB_SHA" \
             --meta githubCommitRef="$GITHUB_REF_NAME" \
             --meta githubRepository="$GITHUB_REPOSITORY" \

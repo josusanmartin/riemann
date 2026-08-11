@@ -94,6 +94,8 @@ Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables fr
 
 Production deploys run from `.github/workflows/deploy-production.yml` on every push to `main`. Because the promotion credential is not GitHub Actions' `GITHUB_TOKEN`, a successful record update triggers the normal deployment. An authenticated status request publishes immediately; if the submitter closes the browser, a signed E2B pause webhook resumes the preserved sandbox and completes the same idempotent publication path. A daily `CRON_SECRET`-protected sweep is the final backstop for a missed webhook.
 
+Every deployment must expose the exact source commit as `VERCEL_GIT_COMMIT_SHA` or the per-deployment fallback `RIEMANN_BASE_COMMIT_SHA`. The checked-in workflow sets the fallback from `GITHUB_SHA`; the submission endpoint refuses to start without it.
+
 ## Trust boundary
 
 The trusted statement definitions come from Mathlib-only `ChallengeDeps` at the pinned `anthropics/zeta-23-lean` commit. Candidate code cannot edit the theorem, score, toolchain, permitted axioms, or current record. Comparator requires exact statement equality, rejects undeclared axioms, and replays the proof in a kernel.

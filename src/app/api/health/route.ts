@@ -26,5 +26,8 @@ export function GET(): NextResponse {
     cronBackstopConfigured: Boolean(process.env.CRON_SECRET),
     directSubmissionsConfigured:
       e2bConfigured && e2bWebhookConfigured && promotionConfigured,
+    deploymentIdentityConfigured: Boolean(
+      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA,
+    ),
   });
 }
