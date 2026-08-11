@@ -76,8 +76,7 @@ theorem TwoBandWordFamily.toAnalyticInput
             - 2 * (B / (2 * A)) * (Z.N T (2 * T) : ℝ))
           = A * (Z.N0s T (2 * T) : ℝ)
             - B * (Z.N T (2 * T) : ℝ) := by
-      field_simp [hA]
-      ring
+      field_simp [hA] <;> ring
     rw [hid]
     exact hlower.trans hselected
   error_small := H.error_small
@@ -119,10 +118,10 @@ theorem simple_density_6725391
         ≤ (((deltaLower - B) / (1 - A)) - epsilon) := by
     exact sub_le_sub_right advertised_lt_exact.le epsilon
   have hform :
-      ((deltaLower - 2 * A * (B / (2 * A))) / (1 - A * 1))
+      ((2 - (2 - deltaLower) - 2 * A * (B / (2 * A))) /
+          (1 - A * 1))
         = (deltaLower - B) / (1 - A) := by
-    field_simp [ne_of_gt hA0]
-    ring
+    field_simp [ne_of_gt hA0] <;> ring
   rw [hform] at h
   exact (mul_le_mul_of_nonneg_right hcoef hN).trans h
 
