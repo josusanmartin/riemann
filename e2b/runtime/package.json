@@ -1,0 +1,13 @@
+{
+  "name": "riemann-verifier-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "tsx": "4.21.0",
+    "zod": "4.3.5"
+  },
+  "engines": {
+    "node": "^22.13.0"
+  }
+}

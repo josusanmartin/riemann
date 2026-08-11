@@ -1,4 +1,13 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
@@ -128,14 +137,22 @@ async function cloneTrustedUpstream(): Promise<void> {
 async function prepareTrustedUpstream(): Promise<void> {
   if (prebuiltZetaWorkspace) {
     await mkdir(zetaWorkspace, { recursive: true });
-    await run("cp", [
-      "-a",
-      "--no-preserve=ownership",
-      "--reflink=auto",
-      `${prebuiltZetaWorkspace}/.`,
-      zetaWorkspace,
-    ]);
-    await run("chmod", ["-R", "u+w", zetaWorkspace]);
+    for (const entry of await readdir(prebuiltZetaWorkspace, {
+      withFileTypes: true,
+    })) {
+      if (entry.name === ".lake") continue;
+      await cp(
+        join(prebuiltZetaWorkspace, entry.name),
+        join(zetaWorkspace, entry.name),
+        { recursive: true },
+      );
+    }
+    await mkdir(join(zetaWorkspace, ".lake"));
+    await symlink(
+      join(prebuiltZetaWorkspace, ".lake", "packages"),
+      join(zetaWorkspace, ".lake", "packages"),
+      "dir",
+    );
     return;
   }
 

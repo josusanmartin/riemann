@@ -120,6 +120,9 @@ for (const requiredBoundary of ["runuser -u riemann", "env -i", "finalize-e2b-jo
     throw new Error(`The E2B root wrapper is missing: ${requiredBoundary}`);
   }
 }
+if (!contract.trustedPaths.includes("e2b/runtime")) {
+  throw new Error("The minimal E2B runtime lockfile must be trusted material");
+}
 
 const githubPromotion = await readFile(
   resolve("src/lib/github-promotion.ts"),

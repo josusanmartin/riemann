@@ -41,6 +41,7 @@
     "data/records.json",
     "e2b/build-template.ts",
     "e2b/run-verification-job.sh",
+    "e2b/runtime",
     "e2b/template.ts",
     "package.json",
     "package-lock.json",

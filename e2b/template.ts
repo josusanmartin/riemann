@@ -38,14 +38,18 @@ export function createRiemannVerifierTemplate(
       ],
       { noInstallRecommends: true },
     )
+    .runCmd("apt-get clean && rm -rf /var/lib/apt/lists/*", { user: "root" })
     .runCmd(
       "useradd --create-home --shell /bin/bash riemann && install -d -o riemann -g riemann -m 0700 /home/riemann/tmp",
       { user: "root" },
     )
     .makeDir("/opt/riemann", { user: "root", mode: 0o755 })
     .copyItems([
-      { src: "package.json", dest: "/opt/riemann/package.json" },
-      { src: "package-lock.json", dest: "/opt/riemann/package-lock.json" },
+      { src: "e2b/runtime/package.json", dest: "/opt/riemann/package.json" },
+      {
+        src: "e2b/runtime/package-lock.json",
+        dest: "/opt/riemann/package-lock.json",
+      },
       { src: "tsconfig.json", dest: "/opt/riemann/tsconfig.json" },
       { src: "challenge", dest: "/opt/riemann/challenge" },
       { src: "data", dest: "/opt/riemann/data" },
@@ -57,14 +61,15 @@ export function createRiemannVerifierTemplate(
     .runCmd("chown -R riemann:riemann /opt/riemann", { user: "root" })
     .runCmd(
       [
-        "cd /opt/riemann && npm ci",
+        "cd /opt/riemann && npm ci && npm cache clean --force",
         "cd /opt/riemann && PATH=/home/riemann/.elan/bin:$PATH ./scripts/prepare-e2b-template.sh",
       ],
       { user: "riemann" },
     )
     .runCmd(
       [
-        "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh",
+        "rm -rf /var/lib/apt/lists/* /home/riemann/.cache/go-build /home/riemann/.cargo/git /home/riemann/.cargo/registry /home/riemann/.npm /home/riemann/go/pkg/mod",
+        "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "chown -R root:root /opt/riemann",
         "chmod -R a-w /opt/riemann",
         "install -d -o root -g root -m 0755 /var/lib/riemann/jobs",

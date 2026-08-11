@@ -40,10 +40,10 @@ timeout --signal=TERM --kill-after=15s 3240s \
     RIEMANN_OUTER_SANDBOX=e2b \
     RIEMANN_PREBUILT_ZETA23=/opt/riemann/zeta23 \
     RIEMANN_RECORDS_PATH="$submission_dir/trusted-records.json" \
-    COMPARATOR_BIN=/opt/riemann/tools/comparator/.lake/build/bin/comparator \
-    COMPARATOR_LANDRUN=/opt/riemann/tools/landrun/landrun \
-    COMPARATOR_LEAN4EXPORT=/opt/riemann/tools/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export \
-    COMPARATOR_NANODA=/opt/riemann/tools/nanoda/target/release/nanoda_bin \
+    COMPARATOR_BIN=/opt/riemann/tools/bin/comparator \
+    COMPARATOR_LANDRUN=/opt/riemann/tools/bin/landrun \
+    COMPARATOR_LEAN4EXPORT=/opt/riemann/tools/bin/lean4export \
+    COMPARATOR_NANODA=/opt/riemann/tools/bin/nanoda_bin \
     /usr/local/bin/node /opt/riemann/node_modules/tsx/dist/cli.mjs \
       /opt/riemann/scripts/verify-submission.ts \
       "$submission_dir" --mode=full --artifact="$artifact_path" \

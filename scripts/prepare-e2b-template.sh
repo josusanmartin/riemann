@@ -5,6 +5,7 @@ repository_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 contract_path="$repository_root/challenge/contract.json"
 zeta_dir="$repository_root/zeta23"
 tools_dir="$repository_root/tools"
+mathlib_cache_dir="/tmp/riemann-mathlib-cache"
 
 mapfile -t trusted_upstream < <(
   node -e '
@@ -55,8 +56,21 @@ fi
 
 (
   cd "$zeta_dir"
-  lake exe cache get
+  MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache get
+  MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache clean!
 )
 "$repository_root/scripts/install-verifier-tools.sh" "$tools_dir"
+
+runtime_tools_dir="$tools_dir/bin"
+mkdir -p "$runtime_tools_dir"
+install -m 0755 "$tools_dir/comparator/.lake/build/bin/comparator" \
+  "$runtime_tools_dir/comparator"
+install -m 0755 \
+  "$tools_dir/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export" \
+  "$runtime_tools_dir/lean4export"
+install -m 0755 "$tools_dir/landrun/landrun" "$runtime_tools_dir/landrun"
+install -m 0755 "$tools_dir/nanoda/target/release/nanoda_bin" \
+  "$runtime_tools_dir/nanoda_bin"
+rm -rf "$tools_dir/comparator" "$tools_dir/landrun" "$tools_dir/nanoda"
 
 printf 'Pinned E2B verifier assets prepared.\n'
