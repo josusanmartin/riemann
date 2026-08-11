@@ -59,8 +59,10 @@ structure ProfileStep
       (previous = .second ∧ current = .second) ∨
         longFloor previous current + crossMargin ≤ profileLong ^ 2
 
-/-- A uniform overlap error below `4e-9` preserves every transition floor. -/
-theorem stepDominates_of_profile_close
+/-- A uniform overlap error below `4e-9` preserves the physical length-and-
+overlap floor. The state potential is added only afterwards by
+`localCertificate_of_dominates`. -/
+theorem physicalFloorDominates_of_profile_close
     {previous current : State}
     {length actualShort profileShort actualLong profileLong eps : ℝ}
     (hprofile : ProfileStep previous current
@@ -72,7 +74,7 @@ theorem stepDominates_of_profile_close
     (hprofileLong : |profileLong| ≤ 1)
     (hcloseLong : |actualLong - profileLong| ≤ eps)
     (heps : eps ≤ overlapTolerance) :
-    transitionFloor previous current ≤
+    physicalFloor previous current ≤
       stepCost B State.good previous
         (ofOverlaps current length actualShort actualLong) := by
   have hshortError : 2 * eps ≤ shortMargin := by
@@ -86,8 +88,8 @@ theorem stepDominates_of_profile_close
   rcases hprofile with ⟨hlength, hshort, hlong⟩
   cases previous <;> cases current
   all_goals
-    simp [transitionFloor, lengthFloor, shortFloor, longFloor,
-      phi, stepCost, stepWeight, ofOverlaps] at *
+    simp [physicalFloor, lengthFloor, shortFloor, longFloor,
+      stepCost, stepWeight, ofOverlaps] at *
   all_goals try nlinarith
   · rcases hlong (by decide) (by decide) with hzero | hbound
     · simp at hzero
@@ -117,7 +119,7 @@ theorem localCertificate_of_profile_close
     LocalCertificate A B State.good phi previous
       (ofOverlaps current length actualShort actualLong) :=
   localCertificate_of_dominates previous _
-    (stepDominates_of_profile_close hprofile
+    (physicalFloorDominates_of_profile_close hprofile
       hactualShort hprofileShort hcloseShort
       hactualLong hprofileLong hcloseLong heps)
 
