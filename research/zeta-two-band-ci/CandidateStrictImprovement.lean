@@ -25,15 +25,17 @@ theorem cos_le_quartic {x : ℝ} (hx : 0 ≤ x) :
     intro t
     simp (disch := fun_prop) [f]
     ring
-  have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
-    · fun_prop
-    · intro t ht
-      fun_prop
-    · intro t ht
-      rw [interior_Ici] at ht
-      rw [hderiv]
-      nlinarith [Real.sin_ge_sub_cube ht.le]
+  have hdiff : Differentiable ℝ f := by
+    dsimp [f]
+    fun_prop
+  have hmono : MonotoneOn f (Set.Ici 0) :=
+    monotoneOn_of_deriv_nonneg (convex_Ici 0)
+      hdiff.continuous.continuousOn hdiff.differentiableOn
+      (by
+        intro t ht
+        rw [interior_Ici] at ht
+        rw [hderiv]
+        nlinarith [Real.sin_ge_sub_cube ht.le])
   have h0 : f 0 ≤ f x := hmono (by simp) hx hx
   simpa [f] using h0
 
@@ -47,15 +49,17 @@ theorem sin_le_quintic {x : ℝ} (hx : 0 ≤ x) :
     intro t
     simp (disch := fun_prop) [f]
     ring
-  have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
-    · fun_prop
-    · intro t ht
-      fun_prop
-    · intro t ht
-      rw [interior_Ici] at ht
-      rw [hderiv]
-      nlinarith [cos_le_quartic ht.le]
+  have hdiff : Differentiable ℝ f := by
+    dsimp [f]
+    fun_prop
+  have hmono : MonotoneOn f (Set.Ici 0) :=
+    monotoneOn_of_deriv_nonneg (convex_Ici 0)
+      hdiff.continuous.continuousOn hdiff.differentiableOn
+      (by
+        intro t ht
+        rw [interior_Ici] at ht
+        rw [hderiv]
+        nlinarith [cos_le_quartic ht.le])
   have h0 : f 0 ≤ f x := hmono (by simp) hx hx
   simpa [f] using h0
 
@@ -69,15 +73,17 @@ theorem cos_ge_sextic {x : ℝ} (hx : 0 ≤ x) :
     intro t
     simp (disch := fun_prop) [f]
     ring
-  have hmono : MonotoneOn f (Set.Ici 0) := by
-    apply monotoneOn_of_deriv_nonneg (convex_Ici 0)
-    · fun_prop
-    · intro t ht
-      fun_prop
-    · intro t ht
-      rw [interior_Ici] at ht
-      rw [hderiv]
-      nlinarith [sin_le_quintic ht.le]
+  have hdiff : Differentiable ℝ f := by
+    dsimp [f]
+    fun_prop
+  have hmono : MonotoneOn f (Set.Ici 0) :=
+    monotoneOn_of_deriv_nonneg (convex_Ici 0)
+      hdiff.continuous.continuousOn hdiff.differentiableOn
+      (by
+        intro t ht
+        rw [interior_Ici] at ht
+        rw [hderiv]
+        nlinarith [sin_le_quintic ht.le])
   have h0 : f 0 ≤ f x := hmono (by simp) hx hx
   simpa [f] using h0
 
@@ -133,6 +139,13 @@ private theorem theta0_div_sqrt_two :
   field_simp [sqrt_two_ne]
   nlinarith [sqrt_two_sq]
 
+private theorem half_sqrt_two_eq_theta0 :
+    (1 / 2 : ℝ) * Real.sqrt 2 = theta0 := by
+  rw [eq_div_iff sqrt_two_ne]
+  unfold theta0
+  field_simp [sqrt_two_ne]
+  nlinarith [sqrt_two_sq]
+
 private theorem scaled_sin_upper :
     Real.sqrt 2 * Real.sin theta0 ≤ 147 / 160 := by
   have hs := sin_le_quintic theta0_pos.le
@@ -179,29 +192,31 @@ private theorem cosine_ratio_lower :
 /-- Exact rational upper enclosure for the baseline density. -/
 theorem HD_one_le_rational :
     Zeta23.ThmD.HD 1 ≤ 3559 / 5292 := by
-  have hsin_ne : Real.sin theta0 ≠ 0 := ne_of_gt sin_theta0_pos
   have hinv :
       (Zeta23.ThmD.cStar 1)⁻¹
         = 1 / 2
           + Real.cos theta0 /
               (Real.sqrt 2 * Real.sin theta0) := by
-    unfold Zeta23.ThmD.cStar Zeta23.ThmD.theta theta0
+    change
+      (Real.sqrt 2 * Real.sin theta0 /
+          (Real.cos theta0 + theta0 * Real.sin theta0))⁻¹
+        = 1 / 2
+          + Real.cos theta0 /
+              (Real.sqrt 2 * Real.sin theta0)
     rw [inv_div]
+    rw [div_eq_iff (ne_of_gt scaled_sin_pos)]
     calc
-      (Real.cos (1 / Real.sqrt 2)
-          + (1 / Real.sqrt 2) * Real.sin (1 / Real.sqrt 2))
-          * (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))⁻¹
-        = Real.cos (1 / Real.sqrt 2)
-            / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2))
-          + (1 / Real.sqrt 2) / Real.sqrt 2 := by
-              field_simp [sqrt_two_ne, hsin_ne]
-              <;> ring
-      _ = 1 / 2
-          + Real.cos (1 / Real.sqrt 2)
-              / (Real.sqrt 2 * Real.sin (1 / Real.sqrt 2)) := by
-            rw [show (1 / Real.sqrt 2) / Real.sqrt 2 = 1 / 2 by
-              simpa [theta0] using theta0_div_sqrt_two]
-            ring
+      Real.cos theta0 + theta0 * Real.sin theta0
+          = (1 / 2 : ℝ) * (Real.sqrt 2 * Real.sin theta0)
+              + Real.cos theta0 := by
+                rw [mul_assoc, half_sqrt_two_eq_theta0]
+                ring
+      _ = (1 / 2
+            + Real.cos theta0 /
+                (Real.sqrt 2 * Real.sin theta0))
+              * (Real.sqrt 2 * Real.sin theta0) := by
+            rw [add_mul,
+              div_mul_cancel₀ _ (ne_of_gt scaled_sin_pos)]
   unfold Zeta23.ThmD.HD
   rw [one_div, hinv]
   nlinarith [cosine_ratio_lower]
