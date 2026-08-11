@@ -67,11 +67,12 @@ export function createRiemannVerifierTemplate(
     .runCmd(
       [
         // Lake must inspect the pinned Git metadata after the full verifier
-        // tree becomes root-owned. Keep Git's ownership exception in protected
-        // system configuration and scope it to trusted packages plus ephemeral
-        // verifier workspaces inside this credential-free sandbox.
-        "git config --system --add safe.directory '/opt/riemann/zeta23/.lake/packages/*'",
-        "git config --system --add safe.directory '/home/riemann/tmp/*'",
+        // tree becomes root-owned. The Debian Git release in the Node base
+        // image predates safe.directory's `dir/*` matching, so enumerate the
+        // sealed dependency repositories exactly in protected system config.
+        // Runtime workspaces remain owned by the unprivileged verifier user.
+        "git config --system --add safe.directory /opt/riemann/zeta23",
+        "find /opt/riemann/zeta23/.lake/packages -mindepth 2 -maxdepth 2 -type d -name .git -exec dirname {} + | LC_ALL=C sort | while IFS= read -r repo; do git config --system --add safe.directory \"$repo\"; done",
         "rm -rf /var/lib/apt/lists/* /home/riemann/.npm",
         "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "chown -R root:root /opt/riemann",

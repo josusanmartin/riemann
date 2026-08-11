@@ -118,10 +118,13 @@ async function smokeTemplate(templateReference: string, key: string) {
     };
     const diagnosticsResult = await sandbox.commands.run(
       "set -uo pipefail; " +
+        "printf 'git_version='; git --version; " +
         "printf 'lake='; test -x /opt/riemann/tools/bin/lake && echo present || echo missing; " +
         "printf 'mathlib_git='; test -d /opt/riemann/zeta23/.lake/packages/mathlib/.git && echo present || echo missing; " +
         "printf 'mathlib_remote='; git -C /opt/riemann/zeta23/.lake/packages/mathlib config --get remote.origin.url 2>/dev/null || echo unavailable; " +
+        "printf 'mathlib_unprivileged_remote='; runuser -u riemann -- git -C /opt/riemann/zeta23/.lake/packages/mathlib remote get-url origin 2>/dev/null || echo unavailable; " +
         "printf 'mathlib_head='; git -C /opt/riemann/zeta23/.lake/packages/mathlib rev-parse HEAD 2>/dev/null || echo unavailable; " +
+        "printf 'safe_directory_count='; git config --system --get-all safe.directory 2>/dev/null | wc -l; " +
         "printf 'manifest_url='; jq -r '.packages[] | select(.name == \"mathlib\") | .url' /opt/riemann/zeta23/lake-manifest.json",
       { user: "root", timeoutMs: 30_000 },
     );
