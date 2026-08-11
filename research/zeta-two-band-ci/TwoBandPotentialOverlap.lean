@@ -31,12 +31,10 @@ theorem sq_lower_of_close
     (hclose : |actual - profile| ≤ eps) :
     profile ^ 2 - 2 * eps ≤ actual ^ 2 := by
   have heps0 : 0 ≤ eps := (abs_nonneg (actual - profile)).trans hclose
-  have hsum : |actual + profile| ≤ 2 := by
-    rw [← Real.norm_eq_abs, ← Real.norm_eq_abs, ← Real.norm_eq_abs]
-    calc
-      ‖actual + profile‖ ≤ ‖actual‖ + ‖profile‖ := norm_add_le _ _
-      _ ≤ 2 := by
-        simpa [Real.norm_eq_abs] using add_le_add hactual hprofile
+  have htriangle : |actual + profile| ≤ |actual| + |profile| := by
+    simpa only [Real.norm_eq_abs] using (norm_add_le actual profile)
+  have hsum : |actual + profile| ≤ 2 :=
+    htriangle.trans (by nlinarith [hactual, hprofile])
   have hprod :
       |actual ^ 2 - profile ^ 2| ≤ 2 * eps := by
     calc
@@ -97,7 +95,8 @@ theorem physicalFloorDominates_of_profile_close
   cases previous <;> cases current
   all_goals
     simp [physicalFloor, lengthFloor, shortFloor, longFloor,
-      stepCost, stepWeight, ofOverlaps] at hlength hlengthB hshort hlong ⊢
+      stepCost, stepWeight, ofOverlaps, j22]
+      at hlength hlengthB hshort hlong ⊢
   all_goals
     nlinarith [sq_nonneg actualShort, sq_nonneg actualLong]
 
