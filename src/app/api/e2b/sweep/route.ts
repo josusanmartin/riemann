@@ -44,10 +44,10 @@ export async function GET(request: Request): Promise<Response> {
     if (!job) return noStore(200, { status: "idle" });
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
-      return noStore(200, {
-        status: "incomplete-cleaned",
+      return noStore(503, {
+        error: "result_not_ready",
         submissionId: job.submissionId,
+        message: "The paused sandbox remains available for a later retry.",
       });
     }
     assertE2BResultMatchesJob(job, result);

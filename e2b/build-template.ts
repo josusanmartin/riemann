@@ -1,5 +1,5 @@
 import { Template, defaultBuildLogger } from "e2b";
-import { riemannVerifierTemplate } from "./template";
+import { createRiemannVerifierTemplate } from "./template";
 
 const apiKey = process.env.E2B_API_KEY ?? process.env.E2B;
 if (!apiKey) {
@@ -7,7 +7,7 @@ if (!apiKey) {
 }
 
 const build = await Template.build(
-  riemannVerifierTemplate,
+  createRiemannVerifierTemplate(),
   "riemann-fail-verifier",
   {
     apiKey,

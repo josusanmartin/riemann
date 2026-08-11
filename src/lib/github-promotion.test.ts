@@ -20,7 +20,12 @@ function sha(value: string): string {
   return createHash("sha1").update(value).digest("hex");
 }
 
-function fakeGitHub(initialHead: string) {
+const canonicalRecordsSnapshot = `${JSON.stringify(records, null, 2)}\n`;
+
+function fakeGitHub(
+  initialHead: string,
+  baseRecordsSnapshot = canonicalRecordsSnapshot,
+) {
   let head = initialHead;
   const requests: RequestLog[] = [];
   const blobs = new Map<string, string>();
@@ -41,10 +46,13 @@ function fakeGitHub(initialHead: string) {
       return response({ object: { sha: head } });
     }
     if (url.pathname.includes("/git/commits/") && method === "GET") {
-      return response({ sha: initialHead, tree: { sha: sha("base-tree") } });
+      return response({
+        sha: url.pathname.split("/").at(-1),
+        tree: { sha: sha("base-tree") },
+      });
     }
     if (url.pathname.endsWith("/contents/data/records.json")) {
-      return response(`${JSON.stringify(records, null, 2)}\n`);
+      return response(baseRecordsSnapshot);
     }
     if (url.pathname.endsWith("/git/blobs") && method === "POST") {
       const content = String((body as { content: string }).content);
@@ -69,7 +77,7 @@ function fakeGitHub(initialHead: string) {
   return { fetchImplementation, requests, blobs, getHead: () => head };
 }
 
-async function fixture() {
+async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
   const prepared = prepareDirectSubmission(
     {
       id: "direct-record-test",
@@ -102,6 +110,7 @@ async function fixture() {
     challengeDigest: await computeTrustedMaterialDigest(
       process.cwd(),
       contract.trustedPaths,
+      { "data/records.json": recordsSnapshot },
     ),
     kernels: ["lean", "nanoda"],
     permittedAxioms: contract.permittedAxioms,
@@ -187,5 +196,27 @@ describe("automatic GitHub record promotion", () => {
       ),
     ).rejects.toBeInstanceOf(PromotionRaceError);
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
+  });
+
+  it("checks the attestation against the exact ledger bytes at the base commit", async () => {
+    const baseCommitSha = "c".repeat(40);
+    const baseRecordsSnapshot = JSON.stringify(records);
+    const github = fakeGitHub(baseCommitSha, baseRecordsSnapshot);
+    const { prepared, result } = await fixture(baseRecordsSnapshot);
+
+    await expect(
+      promoteVerifiedSubmission(
+        {
+          baseCommitSha,
+          previousRecordId: getCurrentRecord().id,
+          proofDigest: prepared.proofDigest,
+          issuedAt: Date.now() - 1_000,
+          manifest: prepared.manifest,
+          solution: prepared.solution,
+          result,
+        },
+        { token: "test-token", fetchImplementation: github.fetchImplementation },
+      ),
+    ).resolves.toMatchObject({ status: "promoted" });
   });
 });

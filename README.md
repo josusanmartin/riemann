@@ -88,7 +88,7 @@ vercel
 vercel --prod
 ```
 
-Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables from `.env.example` in the Vercel project. Build the pinned E2B image with `npm run e2b:template:build`, then set its alias or ID as `E2B_TEMPLATE_ID`. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
+Configure the OAuth, public URL, E2B, webhook, and GitHub promotion variables from `.env.example` in the Vercel project. Build the pinned E2B image with `npm run e2b:template:build`, then set its immutable ID as `E2B_TEMPLATE_ID`. If the E2B key exists only in Vercel, the authenticated `/api/admin/e2b-template` endpoint can start and inspect the same background build using a temporary `E2B_TEMPLATE_ADMIN_SECRET`; remove that secret after bootstrap. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
 
 `GITHUB_RECORDS_TOKEN` must be a fine-grained credential limited to this repository with only **Contents: read and write**. It is held by Vercel, never sent to E2B, and used only after the server has re-read and rehashed a passing result. Promotion writes an evidence commit and a ledger commit, then publishes both with one non-forced update of `main`; a race cannot overwrite another record.
 

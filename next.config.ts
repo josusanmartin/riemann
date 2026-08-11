@@ -19,9 +19,34 @@ const securityHeaders = [
   },
 ];
 
+const trustedPromotionRuntimeFiles = [
+  ".github/workflows/build-e2b-template.yml",
+  ".github/workflows/verifier-smoke.yml",
+  "challenge/**/*",
+  "data/records.json",
+  "e2b/**/*",
+  "package.json",
+  "package-lock.json",
+  "scripts/**/*",
+  "src/lib/**/*",
+];
+
+const verifierTemplateBuildFiles = [
+  ...trustedPromotionRuntimeFiles,
+  ".github/**/*",
+  "tsconfig.json",
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   turbopack: { root: process.cwd() },
+  outputFileTracingIncludes: {
+    "/api/submissions/status": trustedPromotionRuntimeFiles,
+    "/api/e2b/webhook": trustedPromotionRuntimeFiles,
+    "/api/e2b/sweep": trustedPromotionRuntimeFiles,
+    "/api/health": trustedPromotionRuntimeFiles,
+    "/api/admin/e2b-template": verifierTemplateBuildFiles,
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

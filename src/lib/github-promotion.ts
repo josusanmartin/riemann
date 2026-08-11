@@ -331,7 +331,10 @@ async function existingPromotion(
   };
 }
 
-async function validatePromotionInput(input: VerifiedPromotionInput): Promise<{
+async function validatePromotionInput(
+  input: VerifiedPromotionInput,
+  baseRecordsSnapshot: string,
+): Promise<{
   submission: Submission;
   attestation: VerificationAttestation;
 }> {
@@ -367,6 +370,7 @@ async function validatePromotionInput(input: VerifiedPromotionInput): Promise<{
   const challengeDigest = await computeTrustedMaterialDigest(
     process.cwd(),
     contract.trustedPaths,
+    { "data/records.json": baseRecordsSnapshot },
   );
   assertValidAttestation(submission, attestation, contract, challengeDigest);
   return { submission, attestation };
@@ -376,13 +380,31 @@ export async function promoteVerifiedSubmission(
   input: VerifiedPromotionInput,
   options: { fetchImplementation?: FetchImplementation; token?: string } = {},
 ): Promise<PromotionResult> {
-  const { submission, attestation } = await validatePromotionInput(input);
+  gitShaSchema.parse(input.baseCommitSha);
   const client = new GitHubClient(
     options.token ?? requireToken(),
     options.fetchImplementation ?? fetch,
   );
 
-  const initialHead = await getHead(client);
+  const [initialHead, baseCommitValue, baseRecordsSnapshot] = await Promise.all([
+    getHead(client),
+    client.json(repositoryApiPath(`git/commits/${input.baseCommitSha}`)),
+    readRepositoryFile(
+      client,
+      "data/records.json",
+      input.baseCommitSha,
+    ),
+  ]);
+  const baseCommit = commitSchema.parse(baseCommitValue);
+  if (baseCommit.sha !== input.baseCommitSha) {
+    throw new Error("GitHub returned a different base commit");
+  }
+  const records = recordsSchema.parse(JSON.parse(baseRecordsSnapshot));
+  const { submission, attestation } = await validatePromotionInput(
+    input,
+    baseRecordsSnapshot,
+  );
+
   if (initialHead !== input.baseCommitSha) {
     const existing = await existingPromotion(
       client,
@@ -394,12 +416,6 @@ export async function promoteVerifiedSubmission(
     throw new PromotionRaceError();
   }
 
-  const [baseCommit, records] = await Promise.all([
-    client
-      .json(repositoryApiPath(`git/commits/${input.baseCommitSha}`))
-      .then((value) => commitSchema.parse(value)),
-    readRecords(client, input.baseCommitSha),
-  ]);
   assertCurrentRecord(records, submission, input.previousRecordId);
 
   const paths = evidencePaths(submission.id);

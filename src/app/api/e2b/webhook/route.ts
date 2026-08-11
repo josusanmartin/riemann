@@ -72,10 +72,10 @@ export async function POST(request: Request): Promise<Response> {
     };
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
-      return noStore(200, {
-        status: "incomplete-cleaned",
+      return noStore(503, {
+        error: "result_not_ready",
         submissionId: job.submissionId,
+        message: "The paused sandbox result is not readable yet; retry this event.",
       });
     }
     assertE2BResultMatchesJob(job, result);

@@ -136,6 +136,30 @@ for (const requiredBoundary of [
   }
 }
 
+const nextConfig = await readFile(resolve("next.config.ts"), "utf8");
+for (const tracedPath of [
+  ".github/workflows/build-e2b-template.yml",
+  ".github/workflows/verifier-smoke.yml",
+  "challenge/**/*",
+  "data/records.json",
+  "e2b/**/*",
+  "package.json",
+  "package-lock.json",
+  "scripts/**/*",
+  "src/lib/**/*",
+]) {
+  if (!nextConfig.includes(`"${tracedPath}"`)) {
+    throw new Error(`next.config.ts must trace trusted runtime material: ${tracedPath}`);
+  }
+}
+for (const templateBuildPath of [".github/**/*", "tsconfig.json"]) {
+  if (!nextConfig.includes(`"${templateBuildPath}"`)) {
+    throw new Error(
+      `next.config.ts must trace E2B template build context: ${templateBuildPath}`,
+    );
+  }
+}
+
 for (const trustedPath of contract.trustedPaths) {
   const path = resolve(trustedPath);
   const info = await lstat(path);

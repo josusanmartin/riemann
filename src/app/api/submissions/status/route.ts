@@ -15,7 +15,7 @@ import {
 import { verifySubmissionJob } from "@/lib/submission-jobs";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 function noStore(status: number, body: object): Response {
   return Response.json(body, {

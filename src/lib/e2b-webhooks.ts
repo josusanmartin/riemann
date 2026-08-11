@@ -120,6 +120,8 @@ export function verifyE2BWebhookSignature(
 ): boolean {
   const secret = getE2BWebhookSecret();
   if (!secret || !suppliedSignature || signatureVersion !== "v1") return false;
+  // E2B v1 deliberately specifies SHA-256(secret || raw body), not HMAC.
+  // Keep this byte-for-byte aligned with the lifecycle-webhook documentation.
   const expected = createHash("sha256")
     .update(secret)
     .update(rawBody)
