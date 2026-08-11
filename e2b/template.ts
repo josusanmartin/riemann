@@ -54,9 +54,9 @@ export function createRiemannVerifierTemplate(
       { src: "scripts", dest: "/opt/riemann/scripts" },
       { src: "src/lib", dest: "/opt/riemann/src/lib" },
     ])
+    .runCmd("chown -R riemann:riemann /opt/riemann", { user: "root" })
     .runCmd(
       [
-        "chown -R riemann:riemann /opt/riemann",
         "cd /opt/riemann && npm ci",
         "cd /opt/riemann && PATH=/home/riemann/.elan/bin:$PATH ./scripts/prepare-e2b-template.sh",
       ],
