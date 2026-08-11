@@ -15,6 +15,7 @@ noncomputable section
 namespace Zeta23.GapMatching.DWindowLength
 
 open Zeta23
+open Zeta23.Assembly
 open Zeta23.PrimeSide
 
 /-- For every fixed `lambda < 1`, the normalized width of `[T,2T]` is at most
