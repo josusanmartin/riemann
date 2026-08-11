@@ -6,6 +6,22 @@ export const maxDuration = 60;
 
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,299}$/;
 
+type TemplateSummary = {
+  templateID: string;
+  names?: string[];
+  aliases?: string[];
+  updatedAt: string;
+};
+
+type TemplateBuild = {
+  buildID: string;
+  createdAt: string;
+};
+
+type TemplateWithBuilds = {
+  builds: TemplateBuild[];
+};
+
 function noStore(status: number, body: object): Response {
   return Response.json(body, {
     status,
@@ -26,6 +42,44 @@ function apiKey(): string {
   const key = getE2BApiKey();
   if (!key) throw new Error("E2B verification is not configured");
   return key;
+}
+
+async function e2bApi<T>(path: string, key: string): Promise<T> {
+  const response = await fetch(new URL(path, "https://api.e2b.app"), {
+    headers: { "X-API-KEY": key },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 1_000);
+    throw new Error(`E2B API ${response.status}: ${detail}`);
+  }
+  return (await response.json()) as T;
+}
+
+async function latestBuildCoordinates(
+  name: string,
+  key: string,
+): Promise<{ templateId: string; buildId: string } | undefined> {
+  const templates = await e2bApi<TemplateSummary[]>("/v2/templates?limit=100", key);
+  const template = templates
+    .filter((entry) =>
+      [...(entry.names ?? []), ...(entry.aliases ?? [])].some(
+        (candidate) => candidate === name || candidate.startsWith(`${name}:`),
+      ),
+    )
+    .sort((left, right) => left.updatedAt.localeCompare(right.updatedAt))
+    .at(-1);
+  if (!template || !identifierPattern.test(template.templateID)) return undefined;
+
+  const details = await e2bApi<TemplateWithBuilds>(
+    `/templates/${encodeURIComponent(template.templateID)}?limit=100`,
+    key,
+  );
+  const build = details.builds
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+    .at(-1);
+  if (!build || !identifierPattern.test(build.buildID)) return undefined;
+  return { templateId: template.templateID, buildId: build.buildID };
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -70,9 +124,17 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const key = apiKey();
     const url = new URL(request.url);
-    const templateId = url.searchParams.get("templateId");
-    const buildId = url.searchParams.get("buildId");
+    let templateId = url.searchParams.get("templateId");
+    let buildId = url.searchParams.get("buildId");
     const { Template } = await import("e2b");
+    if (url.searchParams.get("latest") === "1") {
+      const latest = await latestBuildCoordinates(getE2BTemplate(), key);
+      if (!latest) {
+        return noStore(404, { error: "template_build_not_found" });
+      }
+      templateId = latest.templateId;
+      buildId = latest.buildId;
+    }
     if (!templateId && !buildId) {
       const name = getE2BTemplate();
       return noStore(200, {
