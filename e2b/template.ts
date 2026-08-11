@@ -66,6 +66,12 @@ export function createRiemannVerifierTemplate(
     )
     .runCmd(
       [
+        // Lake must inspect the pinned Git metadata after the full verifier
+        // tree becomes root-owned. Keep Git's ownership exception in protected
+        // system configuration and scope it to trusted packages plus ephemeral
+        // verifier workspaces inside this credential-free sandbox.
+        "git config --system --add safe.directory '/opt/riemann/zeta23/.lake/packages/*'",
+        "git config --system --add safe.directory '/home/riemann/tmp/*'",
         "rm -rf /var/lib/apt/lists/* /home/riemann/.npm",
         "chmod 0755 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "chown -R root:root /opt/riemann",

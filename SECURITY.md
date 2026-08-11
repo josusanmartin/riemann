@@ -13,6 +13,7 @@ All submission files are hostile input. Lean macros, elaborators, tactics, build
 - E2B disables sandbox internet and public traffic before source is uploaded, and the job fails closed unless a live outbound probe confirms that boundary;
 - Comparator's Landlock layer is independently probed before the proof runs; local full-verifier runs add systemd socket-family, syscall, and private-network restrictions;
 - the challenge import closure and toolchain come from a root-owned, pinned E2B template;
+- a root-owned system Git configuration permits Lake to inspect only the pinned package tree and ephemeral verifier workspaces after ownership sealing;
 - candidate source cannot supply compiled `.olean` files;
 - CPU, memory, disk, process count, and wall time are bounded;
 - Comparator builds and exports the trusted challenge before the candidate solution;
