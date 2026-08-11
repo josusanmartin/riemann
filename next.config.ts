@@ -34,6 +34,7 @@ const trustedPromotionRuntimeFiles = [
 const verifierTemplateBuildFiles = [
   ...trustedPromotionRuntimeFiles,
   ".github/**/*",
+  "node_modules/glob/**/*",
   "tsconfig.json",
 ];
 

@@ -152,7 +152,11 @@ for (const tracedPath of [
     throw new Error(`next.config.ts must trace trusted runtime material: ${tracedPath}`);
   }
 }
-for (const templateBuildPath of [".github/**/*", "tsconfig.json"]) {
+for (const templateBuildPath of [
+  ".github/**/*",
+  "node_modules/glob/**/*",
+  "tsconfig.json",
+]) {
   if (!nextConfig.includes(`"${templateBuildPath}"`)) {
     throw new Error(
       `next.config.ts must trace E2B template build context: ${templateBuildPath}`,
