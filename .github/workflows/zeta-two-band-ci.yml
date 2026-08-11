@@ -65,6 +65,7 @@ jobs:
           cp research/zeta-two-band-ci/CentralGapGeometryD.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGapGeometryD.lean"
           python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
