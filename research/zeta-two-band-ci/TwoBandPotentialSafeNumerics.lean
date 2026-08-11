@@ -68,18 +68,24 @@ def longFloor : State → State → ℝ
   | .second, .second => j22
   | _, _ => 0
 
-def transitionFloor (previous current : State) : ℝ :=
+/-- The part of one transition supplied by length and actual candidate
+edges, before adding the telescoping state potential. -/
+def physicalFloor (previous current : State) : ℝ :=
   B * lengthFloor current
     + shortFloor current
     + longFloor previous current
-    + phi previous - phi current
+
+/-- The full local dual floor, including the state-potential difference. -/
+def transitionFloor (previous current : State) : ℝ :=
+  physicalFloor previous current + phi previous - phi current
 
 /-- All nine transition inequalities. -/
 theorem transition_certificate (previous current : State) :
     A ≤ transitionFloor previous current := by
   cases previous <;> cases current <;>
     norm_num [A, B, p, left1, left2, j11, j12, j22,
-      transitionFloor, lengthFloor, shortFloor, longFloor, phi]
+      transitionFloor, physicalFloor, lengthFloor, shortFloor,
+      longFloor, phi]
 
 theorem parameter_ranges :
     0 < A ∧ A < 1 ∧ 0 ≤ B ∧ 0 ≤ boundary := by
@@ -95,14 +101,24 @@ theorem overlap_margin_arithmetic :
     2 * overlapTolerance ≤ crossMargin := by
   norm_num [overlapTolerance, shortMargin, crossMargin]
 
-/-- A step whose actual cost dominates the exact transition floor supplies
-the generic local certificate. -/
+/-- A step whose actual physical cost dominates the physical transition floor
+supplies the generic local certificate after adding the potential difference
+once. -/
 theorem localCertificate_of_dominates
     (previous : State) (g : GapDatum State)
-    (h : transitionFloor previous g.state
+    (h : physicalFloor previous g.state
       ≤ stepCost B State.good previous g) :
-    LocalCertificate A B State.good phi previous g :=
-  (transition_certificate previous g.state).trans h
+    LocalCertificate A B State.good phi previous g := by
+  unfold LocalCertificate
+  calc
+    A ≤ transitionFloor previous g.state :=
+      transition_certificate previous g.state
+    _ = physicalFloor previous g.state
+          + phi previous - phi g.state := rfl
+    _ ≤ stepCost B State.good previous g
+          + phi previous - phi g.state := by
+      exact sub_le_sub_right (add_le_add_right h (phi previous))
+        (phi g.state)
 
 def deltaLower : ℝ := 0.67250069
 def advertised : ℝ := 0.6725391
