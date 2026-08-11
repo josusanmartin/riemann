@@ -36,6 +36,7 @@ def main() -> None:
 
   exact fixed_point_certificate""",
         """  have hden : Acoef < 1 := parameter_ranges.2.1
+  have hden' : Acoef * 1 < 1 := by simpa using hden
   have hAne : Acoef ≠ 0 := ne_of_gt parameter_ranges.1
   have hgain : ∀ᶠ T in atTop,
       Acoef * (1 * (Z.N0s T (2 * T) : ℝ)
@@ -47,7 +48,6 @@ def main() -> None:
           - 2 * (Bcoef / (2 * Acoef)) * N T)
           = Acoef * (Z.N0s T (2 * T) : ℝ) - Bcoef * N T := by
       field_simp [hAne]
-      ring
     rw [hid]
     simpa only [hNdef] using hT
 
@@ -56,7 +56,7 @@ def main() -> None:
     replace_once(
         seam,
         "    hN0 hcert hgap.gain hgap.error_small hden",
-        "    hN0 hcert hgain hgap.error_small hden",
+        "    hN0 hcert hgain hgap.error_small hden'",
     )
 
 
