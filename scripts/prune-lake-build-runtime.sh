@@ -47,6 +47,9 @@ mapfile -d '' native_outputs < <(
     printf '%s\0' "$ir_root/$module_path.c"
   fi
 )
+mapfile -d '' setup_outputs < <(
+  find "$ir_root" -type f -name '*.setup.json' -print0
+)
 if [[ "${#editor_outputs[@]}" -eq 0 || "${#native_outputs[@]}" -eq 0 ]]; then
   printf 'Expected Lake editor/native outputs were not produced for %s.\n' \
     "$module_prefix" >&2
@@ -65,8 +68,11 @@ for output in "${editor_outputs[@]}" "${native_outputs[@]}"; do
   truncate -s 0 -- "$output"
   touch -- "$hash_path"
 done
+if [[ "${#setup_outputs[@]}" -gt 0 ]]; then
+  rm -f -- "${setup_outputs[@]}"
+fi
 
 after_kib=$(du -sk "$workspace/.lake/build" | cut -f1)
-printf 'Replaced %d editor and %d native outputs for %s; %s KiB -> %s KiB.\n' \
-  "${#editor_outputs[@]}" "${#native_outputs[@]}" "$module_prefix" \
+printf 'Replaced %d editor and %d native outputs and removed %d setup files for %s; %s KiB -> %s KiB.\n' \
+  "${#editor_outputs[@]}" "${#native_outputs[@]}" "${#setup_outputs[@]}" "$module_prefix" \
   "$before_kib" "$after_kib"

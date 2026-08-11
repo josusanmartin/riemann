@@ -108,7 +108,7 @@ async function smokeTemplate(templateId: string, key: string) {
     }
     const sandboxEnv = {
       HOME: "/home/riemann",
-      PATH: "/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
+      PATH: "/opt/riemann/tools/bin:/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
       E2B_SANDBOX: "true",
       RIEMANN_E2B_NETWORK_DISABLED: "1",
       COMPARATOR_LANDRUN: "/opt/riemann/tools/bin/landrun",

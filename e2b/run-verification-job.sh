@@ -34,7 +34,7 @@ timeout --signal=TERM --kill-after=15s 3240s \
   env -i \
     HOME=/home/riemann \
     TMPDIR=/home/riemann/tmp \
-    PATH=/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin \
+    PATH=/opt/riemann/tools/bin:/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin \
     E2B_SANDBOX="${E2B_SANDBOX:-true}" \
     RIEMANN_E2B_NETWORK_DISABLED=1 \
     RIEMANN_OUTER_SANDBOX=e2b \

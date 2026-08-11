@@ -110,24 +110,29 @@ rm -rf "$build_toolchains_dir"
   fi
   MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache clean!
 
-  # Materialize the pinned Zeta module traces once, then replace only outputs
-  # unused by verification with zero-byte sentinels. Their trusted cache hashes
-  # keep subsequent candidate builds from trying to rebuild the formal library.
-  lake build +Zeta23:olean
-  "$repository_root/scripts/prune-lake-build-runtime.sh" "$zeta_dir" Zeta23
-  lake --no-build build +Zeta23:olean
-  lake env lean Zeta23/Unconditional.lean
-  df -h / /tmp
-
   restore_mathlib_cache_source
   trap - EXIT
   git -C "$mathlib_dir" diff --exit-code -- Cache/Requests.lean
-  # The cache utility is build-only. Remove its patched build products after
-  # restoring the pinned source so they cannot enter the proof environment.
+  # The cache utility and its native products are build-only. Removing them
+  # before the Zeta build leaves headroom for Lean's module setup metadata.
   rm -rf \
     "$mathlib_dir/.lake/build/bin/cache" \
     "$mathlib_dir/.lake/build/lib/lean/Cache" \
     "$mathlib_dir/.lake/build/ir/Cache"
+
+  # Materialize the pinned Zeta module traces once, then replace only outputs
+  # unused by verification with zero-byte sentinels. Their trusted cache hashes
+  # keep subsequent candidate builds from trying to rebuild the formal library.
+  real_lake="$(elan which lake)"
+  RIEMANN_SETUP_PRUNE_GRACE_SECONDS=2 \
+    "$repository_root/scripts/run-lake-build-bounded-disk.sh" \
+      "$zeta_dir" "$real_lake" build +Zeta23:olean
+  "$repository_root/scripts/prune-lake-build-runtime.sh" "$zeta_dir" Zeta23
+  lake env lean Zeta23/Unconditional.lean
+  df -h / /tmp
+
+  install -m 0755 "$repository_root/scripts/lake-runtime-wrapper.sh" \
+    "$runtime_tools_dir/lake"
 )
 
 printf 'Pinned E2B verifier assets prepared.\n'
