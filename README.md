@@ -80,6 +80,8 @@ vercel --prod
 
 Configure the OAuth and public URL variables from `.env.example` in the Vercel project. Formal proof verification runs in isolated CI rather than inside a Vercel function because Lean builds are long-running and execute untrusted elaborator code.
 
+Production deploys run from `.github/workflows/deploy-production.yml` on every ordinary push to `main`. Record-promotion pushes made with `GITHUB_TOKEN` explicitly dispatch the same workflow, because GitHub intentionally suppresses recursive `push` workflows for that token. The repository stores only the encrypted `VERCEL_TOKEN` secret and the non-secret Vercel organization/project IDs.
+
 ## Trust boundary
 
 The trusted statement definitions come from Mathlib-only `ChallengeDeps` at the pinned `anthropics/zeta-23-lean` commit. Candidate code cannot edit the theorem, score, toolchain, permitted axioms, or current record. Comparator requires exact statement equality, rejects undeclared axioms, and replays the proof in a kernel.

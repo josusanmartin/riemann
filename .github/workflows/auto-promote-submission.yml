@@ -114,6 +114,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:
@@ -173,3 +174,9 @@ jobs:
           git add data/records.json
           git commit -m "record: promote $SUBMISSION_ID"
           git push origin main
+
+      - name: Dispatch the production dashboard deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: gh workflow run deploy-production.yml --repo "$REPOSITORY" --ref main
