@@ -91,9 +91,19 @@ theorem telescope
   | cons g rest ih =>
       rcases hvalid with ⟨hstep, hrest⟩
       have htail := ih g.state hrest
+      unfold LocalCertificate at hstep
       simp only [List.length_cons, Nat.cast_add, Nat.cast_one,
         totalCost, finalState]
-      nlinarith [hstep]
+      calc
+        A * ((rest.length : ℝ) + 1)
+            = A + A * (rest.length : ℝ) := by ring
+        _ ≤ (stepCost B good previous g + phi previous - phi g.state)
+              + (totalCost B good g.state rest + phi g.state
+                  - phi (finalState g.state rest)) :=
+            add_le_add hstep htail
+        _ = stepCost B good previous g
+              + totalCost B good g.state rest + phi previous
+              - phi (finalState g.state rest) := by ring
 
 theorem totalCost_eq
     (B : ℝ) (good previous : State)
