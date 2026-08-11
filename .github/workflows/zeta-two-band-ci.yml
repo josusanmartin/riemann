@@ -42,6 +42,12 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandPotentialAnalyticBridge.lean"
           cp research/zeta-two-band-ci/CandidateStrictImprovement.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CandidateStrictImprovement.lean"
+          cp research/zeta-two-band-ci/v7/DNormalizedMoments.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DNormalizedMoments.lean"
+          cp research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/ScalarBonusCertificate.lean"
+          cp research/zeta-two-band-ci/TwoBandGapMatchingD.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingD.lean"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
@@ -57,4 +63,7 @@ jobs:
             Zeta23.GapMatching.TwoBandPotentialOverlap \
             Zeta23.GapMatching.TwoBandPotentialAnalyticBridge \
             Zeta23.GapMatching.CandidateStrictImprovement \
+            Zeta23.GapMatching.DNormalizedMoments \
+            Zeta23.GapMatching.ScalarBonusCertificate \
+            Zeta23.GapMatching.TwoBandGapMatchingD \
             2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
