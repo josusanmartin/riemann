@@ -52,8 +52,9 @@ theorem word_weight_lower
     G.length_upper G.candidate_le
   simpa [wordError] using hmain
 
+/-- This package contains actual paths, so it lives in `Type`, not `Prop`. -/
 structure TwoBandWordFamily (Z : ZeroConfig) (P : Params)
-    (energy error : ℝ → ℝ) : Prop where
+    (energy error : ℝ → ℝ) where
   data : ∀ T, TwoBandWordAt Z T
   core : ∀ᶠ T in atTop, MatchingCoreAt Z P T (energy T)
   selected : ∀ᶠ T in atTop, (data T).W ≤ 2 * energy T
