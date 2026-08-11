@@ -4,7 +4,10 @@ import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import contractJson from "../challenge/contract.json";
 import { contractSchema, submissionSchema } from "../src/lib/challenge";
-import { computeTrustedMaterialDigest } from "./trusted-material";
+import {
+  computeTrustedMaterialDigest,
+  computeVerifierTemplateDigest,
+} from "./trusted-material";
 
 type Mode = "prepare" | "quick" | "full";
 
@@ -252,17 +255,21 @@ try {
           "utf8",
         ),
       );
-      const challengeDigest = await computeTrustedMaterialDigest(
-        repositoryRoot,
-        contract.trustedPaths,
-        process.env.RIEMANN_RECORDS_PATH
-          ? {
-              "data/records.json": await readFile(
-                resolve(process.env.RIEMANN_RECORDS_PATH),
-              ),
-            }
-          : undefined,
-      );
+      const recordsOverride = process.env.RIEMANN_RECORDS_PATH
+        ? {
+            "data/records.json": await readFile(
+              resolve(process.env.RIEMANN_RECORDS_PATH),
+            ),
+          }
+        : undefined;
+      const [challengeDigest, verifierTemplateDigest] = await Promise.all([
+        computeTrustedMaterialDigest(
+          repositoryRoot,
+          contract.trustedPaths,
+          recordsOverride,
+        ),
+        computeVerifierTemplateDigest(repositoryRoot, contract.trustedPaths),
+      ]);
       await mkdir(resolve(artifactPath, ".."), { recursive: true });
       await writeFile(
         artifactPath,
@@ -272,6 +279,7 @@ try {
             result: "kernel-verified",
             verifiedAt: new Date().toISOString(),
             challengeDigest,
+            verifierTemplateDigest,
             kernels: ["lean", "nanoda"],
             permittedAxioms: contract.permittedAxioms,
           },

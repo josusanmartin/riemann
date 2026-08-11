@@ -14,7 +14,10 @@ import {
 import { assertValidAttestation } from "@/lib/attestation";
 import { computeDirectProofDigest } from "@/lib/direct-submission";
 import type { E2BVerificationResult } from "@/lib/e2b-verifier";
-import { computeTrustedMaterialDigest } from "../../scripts/trusted-material";
+import {
+  computeTrustedMaterialDigest,
+  computeVerifierTemplateDigest,
+} from "../../scripts/trusted-material";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
@@ -367,12 +370,24 @@ async function validatePromotionInput(
   }
 
   const contract = contractSchema.parse(contractJson);
-  const challengeDigest = await computeTrustedMaterialDigest(
-    process.cwd(),
-    contract.trustedPaths,
-    { "data/records.json": baseRecordsSnapshot },
+  const canonicalRecordsSnapshot = `${JSON.stringify(
+    recordsSchema.parse(JSON.parse(baseRecordsSnapshot)),
+    null,
+    2,
+  )}\n`;
+  const [challengeDigest, verifierTemplateDigest] = await Promise.all([
+    computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths, {
+      "data/records.json": canonicalRecordsSnapshot,
+    }),
+    computeVerifierTemplateDigest(process.cwd(), contract.trustedPaths),
+  ]);
+  assertValidAttestation(
+    submission,
+    attestation,
+    contract,
+    challengeDigest,
+    verifierTemplateDigest,
   );
-  assertValidAttestation(submission, attestation, contract, challengeDigest);
   return { submission, attestation };
 }
 

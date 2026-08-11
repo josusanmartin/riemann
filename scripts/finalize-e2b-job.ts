@@ -8,7 +8,10 @@ import {
 } from "../src/lib/challenge";
 import { assertValidAttestation } from "../src/lib/attestation";
 import { computeDirectProofDigest } from "../src/lib/direct-submission";
-import { computeTrustedMaterialDigest } from "./trusted-material";
+import {
+  computeTrustedMaterialDigest,
+  computeVerifierTemplateDigest,
+} from "./trusted-material";
 
 const [
   submissionArgument,
@@ -68,16 +71,21 @@ if (exitCode === 0) {
   const attestation = verificationAttestationSchema.parse(
     JSON.parse(await readFile(resolve(artifactArgument), "utf8")),
   );
-  const challengeDigest = await computeTrustedMaterialDigest(
-    repositoryRoot,
-    contract.trustedPaths,
-    {
+  const [challengeDigest, verifierTemplateDigest] = await Promise.all([
+    computeTrustedMaterialDigest(repositoryRoot, contract.trustedPaths, {
       "data/records.json": await readFile(
         resolve(submissionDirectory, "trusted-records.json"),
       ),
-    },
+    }),
+    computeVerifierTemplateDigest(repositoryRoot, contract.trustedPaths),
+  ]);
+  assertValidAttestation(
+    submission,
+    attestation,
+    contract,
+    challengeDigest,
+    verifierTemplateDigest,
   );
-  assertValidAttestation(submission, attestation, contract, challengeDigest);
   result = {
     schemaVersion: 1,
     status: "verified",

@@ -23,7 +23,7 @@ const trustedPromotionRuntimeFiles = [
   ".github/workflows/build-e2b-template.yml",
   ".github/workflows/verifier-smoke.yml",
   "challenge/**/*",
-  "data/records.json",
+  "data/**/*",
   "e2b/**/*",
   "package.json",
   "package-lock.json",

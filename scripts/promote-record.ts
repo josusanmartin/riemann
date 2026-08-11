@@ -9,7 +9,10 @@ import {
   submissionSchema,
   verificationAttestationSchema,
 } from "../src/lib/challenge";
-import { computeTrustedMaterialDigest } from "./trusted-material";
+import {
+  computeTrustedMaterialDigest,
+  computeVerifierTemplateDigest,
+} from "./trusted-material";
 import { assertValidAttestation } from "../src/lib/attestation";
 
 const [submissionArgument, artifactArgument, sourceUrl, proofUrl] =
@@ -40,11 +43,17 @@ for (const url of [sourceUrl, proofUrl]) {
 }
 
 const recordsPath = join(repositoryRoot, "data", "records.json");
-const challengeDigest = await computeTrustedMaterialDigest(
-  repositoryRoot,
-  contract.trustedPaths,
+const [challengeDigest, verifierTemplateDigest] = await Promise.all([
+  computeTrustedMaterialDigest(repositoryRoot, contract.trustedPaths),
+  computeVerifierTemplateDigest(repositoryRoot, contract.trustedPaths),
+]);
+assertValidAttestation(
+  submission,
+  attestation,
+  contract,
+  challengeDigest,
+  verifierTemplateDigest,
 );
-assertValidAttestation(submission, attestation, contract, challengeDigest);
 const records = recordsSchema.parse(
   JSON.parse(await readFile(recordsPath, "utf8")),
 );

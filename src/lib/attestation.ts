@@ -11,6 +11,7 @@ export function assertValidAttestation(
   attestation: VerificationAttestation,
   contract: ChallengeContract,
   challengeDigest: string,
+  verifierTemplateDigest: string,
 ): void {
   if (attestation.submissionId !== submission.id) {
     throw new Error("Attestation belongs to a different submission");
@@ -53,6 +54,11 @@ export function assertValidAttestation(
     )
   ) {
     throw new Error("Attested decimal differs from the exact submission score");
+  }
+  if (attestation.verifierTemplateDigest !== verifierTemplateDigest) {
+    throw new Error(
+      "Verifier template is stale; rebuild the pinned E2B template before accepting submissions",
+    );
   }
   if (attestation.challengeDigest !== challengeDigest) {
     throw new Error("Trusted challenge material changed after verification");

@@ -196,6 +196,7 @@ export const verificationAttestationSchema = z
     result: z.literal("kernel-verified"),
     verifiedAt: isoDateTimeStringSchema,
     challengeDigest: z.string().regex(/^[0-9a-f]{64}$/),
+    verifierTemplateDigest: z.string().regex(/^[0-9a-f]{64}$/),
     kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
     permittedAxioms: z.array(z.string()),
   })

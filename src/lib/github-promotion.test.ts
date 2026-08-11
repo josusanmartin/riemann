@@ -12,7 +12,10 @@ import {
   promoteVerifiedSubmission,
   PromotionRaceError,
 } from "@/lib/github-promotion";
-import { computeTrustedMaterialDigest } from "../../scripts/trusted-material";
+import {
+  computeTrustedMaterialDigest,
+  computeVerifierTemplateDigest,
+} from "../../scripts/trusted-material";
 
 type RequestLog = { url: URL; method: string; body?: unknown };
 
@@ -112,6 +115,10 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
       contract.trustedPaths,
       { "data/records.json": recordsSnapshot },
     ),
+    verifierTemplateDigest: await computeVerifierTemplateDigest(
+      process.cwd(),
+      contract.trustedPaths,
+    ),
     kernels: ["lean", "nanoda"],
     permittedAxioms: contract.permittedAxioms,
   };
@@ -202,7 +209,7 @@ describe("automatic GitHub record promotion", () => {
     const baseCommitSha = "c".repeat(40);
     const baseRecordsSnapshot = JSON.stringify(records);
     const github = fakeGitHub(baseCommitSha, baseRecordsSnapshot);
-    const { prepared, result } = await fixture(baseRecordsSnapshot);
+    const { prepared, result } = await fixture();
 
     await expect(
       promoteVerifiedSubmission(
@@ -218,5 +225,34 @@ describe("automatic GitHub record promotion", () => {
         { token: "test-token", fetchImplementation: github.fetchImplementation },
       ),
     ).resolves.toMatchObject({ status: "promoted" });
+  });
+
+  it("rejects an attestation produced by a stale verifier template", async () => {
+    const baseCommitSha = "d".repeat(40);
+    const github = fakeGitHub(baseCommitSha);
+    const { prepared, result } = await fixture();
+    const staleResult = {
+      ...result,
+      attestation: {
+        ...result.attestation,
+        verifierTemplateDigest: "0".repeat(64),
+      },
+    };
+
+    await expect(
+      promoteVerifiedSubmission(
+        {
+          baseCommitSha,
+          previousRecordId: getCurrentRecord().id,
+          proofDigest: prepared.proofDigest,
+          issuedAt: Date.now() - 1_000,
+          manifest: prepared.manifest,
+          solution: prepared.solution,
+          result: staleResult,
+        },
+        { token: "test-token", fetchImplementation: github.fetchImplementation },
+      ),
+    ).rejects.toThrow("Verifier template is stale");
+    expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });
 });

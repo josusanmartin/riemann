@@ -111,3 +111,28 @@ export async function computeTrustedMaterialDigest(
   }
   return hash.digest("hex");
 }
+
+/**
+ * Hash only the immutable verifier definition baked into an E2B template.
+ * The record ledger is uploaded per job and is bound separately to the signed
+ * base commit, so it must not make an otherwise-current template look stale.
+ */
+export function verifierTemplateTrustedPaths(
+  trustedPaths: string[],
+): string[] {
+  const paths = trustedPaths.filter((path) => path !== "data/records.json");
+  if (paths.length === trustedPaths.length) {
+    throw new Error("Trusted paths must include data/records.json");
+  }
+  return paths;
+}
+
+export function computeVerifierTemplateDigest(
+  repositoryRoot: string,
+  trustedPaths: string[],
+): Promise<string> {
+  return computeTrustedMaterialDigest(
+    repositoryRoot,
+    verifierTemplateTrustedPaths(trustedPaths),
+  );
+}

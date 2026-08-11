@@ -19,7 +19,7 @@ All submission files are hostile input. Lean macros, elaborators, tactics, build
 - accepted theorems are replayed by Lean and nanoda;
 - record promotion occurs outside E2B in a separate credentialed server path.
 
-Before promotion, the server downloads the exact manifest and `Solution.lean` from the sandbox, recomputes their signed digest, validates the attestation against the deployed contract, and reads the record ledger at the signed `main` commit. It creates immutable evidence and ledger commits but exposes them through one `force: false` reference update. A changed record therefore fails closed without overwriting or displaying a stale result.
+Before promotion, the server downloads the exact manifest and `Solution.lean` from the sandbox, recomputes their signed digest, validates the attestation against both the deployed contract and a separate immutable verifier-template digest, and reads the record ledger at the signed `main` commit. It creates immutable evidence and ledger commits but exposes them through one `force: false` reference update. A changed record therefore fails closed without overwriting or displaying a stale result, while an outdated E2B template produces an explicit rebuild error.
 
 The E2B sandbox receives no OAuth, session-signing, webhook, GitHub, Vercel, or E2B API credential. The browser receives only an HMAC-signed opaque job handle. The GitHub write credential is fine-grained to repository Contents and exists only in the promotion function.
 
