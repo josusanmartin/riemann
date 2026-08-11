@@ -5,6 +5,7 @@ import {
   readFile,
   readdir,
   rm,
+  stat,
   symlink,
   writeFile,
 } from "node:fs/promises";
@@ -153,6 +154,37 @@ async function prepareTrustedUpstream(): Promise<void> {
       join(zetaWorkspace, ".lake", "packages"),
       "dir",
     );
+    for (const relativeBuildDirectory of [
+      join("lib", "lean"),
+      "ir",
+    ]) {
+      const sourceDirectory = join(
+        prebuiltZetaWorkspace,
+        ".lake",
+        "build",
+        relativeBuildDirectory,
+      );
+      const destinationDirectory = join(
+        zetaWorkspace,
+        ".lake",
+        "build",
+        relativeBuildDirectory,
+      );
+      await mkdir(destinationDirectory, { recursive: true });
+      for (const entry of await readdir(sourceDirectory, { withFileTypes: true })) {
+        if (entry.name !== "Zeta23" && !entry.name.startsWith("Zeta23.")) {
+          continue;
+        }
+        if (!entry.isDirectory() && !entry.isFile()) {
+          throw new Error(`Unexpected trusted Zeta23 build artifact: ${entry.name}`);
+        }
+        await symlink(
+          join(sourceDirectory, entry.name),
+          join(destinationDirectory, entry.name),
+          entry.isDirectory() ? "dir" : "file",
+        );
+      }
+    }
     return;
   }
 
@@ -164,9 +196,28 @@ async function prepareTrustedUpstream(): Promise<void> {
   );
 }
 
+async function configurePrebuiltRuntime(): Promise<void> {
+  const runtimeWitness = join(
+    zetaWorkspace,
+    ".lake",
+    "build",
+    "lib",
+    "lean",
+    "Zeta23",
+    "Unconditional.olean",
+  );
+  const witness = await stat(runtimeWitness);
+  if (!witness.isFile() || witness.size === 0) {
+    throw new Error("The prebuilt trusted Zeta23 runtime is incomplete");
+  }
+}
+
 try {
   await prepareTrustedUpstream();
   await verifyPinnedCheckout();
+  if (prebuiltZetaWorkspace) {
+    await configurePrebuiltRuntime();
+  }
   if (mode === "full" && !prebuiltZetaWorkspace) {
     console.log("Hydrating pinned Mathlib dependencies and trusted build cache.");
     await run("lake", ["exe", "cache", "get"], { cwd: zetaWorkspace });

@@ -119,8 +119,10 @@ async function smokeTemplate(templateId: string, key: string) {
       "set -euo pipefail; " +
         "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && " +
         "tar --exclude='./.lake' -C /opt/riemann/zeta23 -cf - . | tar -C /home/riemann/tmp/zeta-smoke -xf - && " +
-        "install -d -o riemann -g riemann /home/riemann/tmp/zeta-smoke/.lake && " +
+        "install -d -o riemann -g riemann /home/riemann/tmp/zeta-smoke/.lake /home/riemann/tmp/zeta-smoke/.lake/build/lib/lean /home/riemann/tmp/zeta-smoke/.lake/build/ir && " +
         "ln -s /opt/riemann/zeta23/.lake/packages /home/riemann/tmp/zeta-smoke/.lake/packages && " +
+        "for artifact_dir in lib/lean ir; do for source in /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23 /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23.*; do if [ -e \"$source\" ]; then ln -s \"$source\" \"/home/riemann/tmp/zeta-smoke/.lake/build/$artifact_dir/${source##*/}\"; fi; done; done && " +
+        "test -s /home/riemann/tmp/zeta-smoke/.lake/build/lib/lean/Zeta23/Unconditional.olean && " +
         "cp -R /opt/riemann/challenge/smoke/. /home/riemann/tmp/bootstrap-smoke/ && " +
         "chown -R riemann:riemann /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke",
       { user: "root", timeoutMs: 60_000 },

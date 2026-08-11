@@ -2,7 +2,7 @@ diff --git a/Cache/Requests.lean b/Cache/Requests.lean
 index 783ab6e..d6a7d10 100644
 --- a/Cache/Requests.lean
 +++ b/Cache/Requests.lean
-@@ -492,6 +492,21 @@ def decompressBatch (files : Array (FilePath × Lean.Name))
+@@ -492,6 +492,32 @@ def decompressBatch (files : Array (FilePath × Lean.Name))
        let preview := files.extract 0 3 |>.map (fun (p, m) => s!"{m} ({p})") |>.toList |> String.intercalate ", "
        s!"{preview}, ... and {files.size - 3} more"
      throw <| IO.userError s!"leantar exited with code {exitCode} on batch of {files.size} files: {firstFew}"
@@ -12,20 +12,31 @@ index 783ab6e..d6a7d10 100644
 +  -- are already present in the pinned package tree.
 +  for (path, _) in files do
 +    IO.FS.removeFile path
-+  -- Riemann.fail elaborates proofs but never compiles Mathlib to native object
-+  -- code. Generated C sources exceed the E2B image filesystem; retain Lean IR
-+  -- because tactics execute through the interpreter during verification.
++  -- Riemann.fail elaborates proofs but never opens editor indexes or consumes
++  -- generated C. The public cache omits those files, although their trusted
++  -- hashes remain in the trace. Materialize zero-byte sentinels with the trace
++  -- hashes so Lake does not regenerate artifacts the verifier never reads.
 +  for (_, mod) in files do
 +    if IO.isFromMathlib mod then
 +      let modulePath := System.mkFilePath <| mod.components.map toString
-+      for path in #[
-+          mathlibDepPath / IO.IRDIR / modulePath.withExtension "c",
-+          mathlibDepPath / IO.IRDIR / modulePath.withExtension "c.hash"] do
-+        if ← path.pathExists then IO.FS.removeFile path
++      let tracePath := mathlibDepPath / IO.LIBDIR / modulePath.withExtension "trace"
++      let .ok trace := Lean.Json.parse (← IO.FS.readFile tracePath)
++        | throw <| IO.userError s!"Invalid trusted cache trace: {tracePath}"
++      let .ok outputs := trace.getObjValAs? Lean.Json "outputs"
++        | throw <| IO.userError s!"Missing outputs in trusted cache trace: {tracePath}"
++      for (path, field) in #[
++          (mathlibDepPath / IO.LIBDIR / modulePath.withExtension "ilean", "i"),
++          (mathlibDepPath / IO.IRDIR / modulePath.withExtension "c", "c")] do
++        let .ok outputName := outputs.getObjValAs? String field
++          | throw <| IO.userError s!"Missing {field} hash in trusted cache trace: {tracePath}"
++        let some hash := (System.FilePath.mk outputName).fileStem
++          | throw <| IO.userError s!"Invalid {field} hash in trusted cache trace: {tracePath}"
++        IO.FS.writeFile path ""
++        IO.FS.writeFile (path.addExtension "hash") hash
 +
  /-- Configuration for decompression during download -/
  structure DecompConfig where
-@@ -628,18 +643,16 @@ def monitorCurl (args : Array String) (size : Nat)
+@@ -628,18 +654,16 @@ def monitorCurl (args : Array String) (size : Nat)
                  -- Check if we should dispatch a batch
                  match currentTask with
                  | some task =>
@@ -54,7 +65,7 @@ index 783ab6e..d6a7d10 100644
                  | none =>
                    -- No task running, dispatch immediately
                    lastBatchSize := pending.size
-@@ -710,7 +723,7 @@ private def downloadFilesFromContainer
+@@ -710,7 +734,7 @@ private def downloadFilesFromContainer
    let size := hashMap.size
    if parallel then
      IO.FS.writeFile IO.CURLCFG (← mkGetConfigContent container repo containerURL hashMap scope?)
@@ -63,3 +74,13 @@ index 783ab6e..d6a7d10 100644
          -- commented as this creates a big slowdown on curl 8.13.0: "--fail",
          "--silent",
          "--retry", "5", -- there seem to be some intermittent failures
+@@ -721,7 +745,8 @@ private def downloadFilesFromContainer
+     let treatForbiddenAsMiss := container == some Container.legacy
+     let (s, served) ← monitorCurl args size "Downloaded" "speed_download" (removeOnError := true)
+       decompConfig decompState (treatForbiddenAsMiss := treatForbiddenAsMiss)
+-    IO.FS.removeFile IO.CURLCFG
++    if ← IO.CURLCFG.pathExists then
++      IO.FS.removeFile IO.CURLCFG
+     return (s, served)
+   else
+     -- Mirror the parallel path's miss/failure split: a `legacy` 403 is a miss.

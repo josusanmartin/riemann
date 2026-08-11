@@ -94,6 +94,14 @@ rm -rf "$build_toolchains_dir"
   }
   trap restore_mathlib_cache_source EXIT
 
+  # Build the patched cache executable while native compilation support still
+  # exists, then reduce the Lean installation to the elaboration/kernel runtime
+  # needed by submitted proofs before the large Mathlib cache is hydrated.
+  lake build cache
+  lean_binary="$(elan which lean)"
+  lean_toolchain_dir="$(cd -- "$(dirname -- "$lean_binary")/.." && pwd -P)"
+  "$repository_root/scripts/prune-lean-runtime.sh" "$lean_toolchain_dir"
+
   cache_status=0
   MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache get || cache_status=$?
   df -h / /tmp
@@ -101,6 +109,15 @@ rm -rf "$build_toolchains_dir"
     exit "$cache_status"
   fi
   MATHLIB_CACHE_DIR="$mathlib_cache_dir" lake exe cache clean!
+
+  # Materialize the pinned Zeta module traces once, then replace only outputs
+  # unused by verification with zero-byte sentinels. Their trusted cache hashes
+  # keep subsequent candidate builds from trying to rebuild the formal library.
+  lake build +Zeta23:olean
+  "$repository_root/scripts/prune-lake-build-runtime.sh" "$zeta_dir" Zeta23
+  lake --no-build build +Zeta23:olean
+  lake env lean Zeta23/Unconditional.lean
+  df -h / /tmp
 
   restore_mathlib_cache_source
   trap - EXIT

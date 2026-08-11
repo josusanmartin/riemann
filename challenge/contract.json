@@ -49,6 +49,8 @@
     "scripts/install-lean-toolchain.sh",
     "scripts/install-native-build-toolchains.sh",
     "scripts/install-verifier-tools.sh",
+    "scripts/prune-lake-build-runtime.sh",
+    "scripts/prune-lean-runtime.sh",
     "scripts/finalize-e2b-job.ts",
     "scripts/prepare-e2b-template.sh",
     "scripts/prepare-candidate.ts",
