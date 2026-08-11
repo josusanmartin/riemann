@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,299}$/;
 
@@ -90,13 +90,77 @@ async function latestBuildCoordinates(
   return { templateId: template.templateID, buildId: build.buildID };
 }
 
+async function smokeTemplate(templateId: string, key: string) {
+  const { Sandbox } = await import("e2b");
+  const sandbox = await Sandbox.create({
+    apiKey: key,
+    template: templateId,
+    timeoutMs: 5 * 60 * 1_000,
+    secure: true,
+    allowInternetAccess: false,
+    network: { allowPublicTraffic: false },
+  });
+
+  try {
+    const info = await sandbox.getInfo();
+    if (info.allowInternetAccess !== false) {
+      throw new Error("E2B did not confirm outbound network isolation");
+    }
+    await sandbox.commands.run(
+      "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/bootstrap-smoke && " +
+        "cp -R /opt/riemann/challenge/smoke/. /home/riemann/tmp/bootstrap-smoke/ && " +
+        "chown -R riemann:riemann /home/riemann/tmp/bootstrap-smoke",
+      { user: "root", timeoutMs: 30_000 },
+    );
+    const result = await sandbox.commands.run(
+      "bash /opt/riemann/scripts/run-comparator-e2b.sh /opt/riemann/tools/bin/comparator config.json",
+      {
+        user: "riemann",
+        cwd: "/home/riemann/tmp/bootstrap-smoke",
+        timeoutMs: 4 * 60 * 1_000,
+        envs: {
+          HOME: "/home/riemann",
+          PATH: "/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
+          E2B_SANDBOX: "true",
+          RIEMANN_E2B_NETWORK_DISABLED: "1",
+          COMPARATOR_LANDRUN: "/opt/riemann/tools/bin/landrun",
+          COMPARATOR_LEAN4EXPORT: "/opt/riemann/tools/bin/lean4export",
+          COMPARATOR_NANODA: "/opt/riemann/tools/bin/nanoda_bin",
+        },
+      },
+    );
+    return {
+      sandboxId: sandbox.sandboxId,
+      exitCode: result.exitCode,
+      stdout: result.stdout.slice(-4_000),
+      stderr: result.stderr.slice(-4_000),
+      networkIsolated: true,
+    };
+  } finally {
+    await sandbox.kill().catch(() => undefined);
+  }
+}
+
 export async function POST(request: Request): Promise<Response> {
   if (!authorized(request)) return noStore(401, { error: "unauthorized" });
+  const url = new URL(request.url);
+  const action = url.searchParams.get("action");
 
   try {
     const key = apiKey();
+    if (action === "smoke") {
+      const templateId = url.searchParams.get("templateId");
+      if (!templateId || !identifierPattern.test(templateId)) {
+        return noStore(400, { error: "invalid_template_id" });
+      }
+      return noStore(200, {
+        status: "passed",
+        templateId,
+        smoke: await smokeTemplate(templateId, key),
+      });
+    }
     const name = getE2BTemplate();
-    const force = new URL(request.url).searchParams.get("force") === "1";
+    const force = url.searchParams.get("force") === "1";
     const { Template } = await import("e2b");
     if (!force && (await Template.exists(name, { apiKey: key }))) {
       return noStore(200, { status: "ready", name });
@@ -118,10 +182,21 @@ export async function POST(request: Request): Promise<Response> {
       tags: build.tags,
     });
   } catch (error) {
-    console.error("Unable to start E2B verifier template build", error);
+    const smoke = action === "smoke";
+    console.error(
+      smoke
+        ? "E2B verifier template smoke test failed"
+        : "Unable to start E2B verifier template build",
+      error,
+    );
     return noStore(502, {
-      error: "template_build_start_failed",
-      message: error instanceof Error ? error.message : "E2B template build failed",
+      error: smoke ? "template_smoke_failed" : "template_build_start_failed",
+      message:
+        error instanceof Error
+          ? error.message
+          : smoke
+            ? "E2B template smoke test failed"
+            : "E2B template build failed",
     });
   }
 }
