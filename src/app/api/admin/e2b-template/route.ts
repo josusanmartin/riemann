@@ -22,6 +22,14 @@ type TemplateWithBuilds = {
   builds: TemplateBuild[];
 };
 
+type TemplateBuildLogs = {
+  logs: Array<{
+    timestamp: string;
+    level: string;
+    message: string;
+  }>;
+};
+
 function noStore(status: number, body: object): Response {
   return Response.json(body, {
     status,
@@ -157,6 +165,10 @@ export async function GET(request: Request): Promise<Response> {
       { templateId, buildId },
       { apiKey: key },
     );
+    const buildLogs = await e2bApi<TemplateBuildLogs>(
+      `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=200&direction=backward`,
+      key,
+    );
     return noStore(200, {
       status: build.status,
       templateId: build.templateID,
@@ -164,11 +176,11 @@ export async function GET(request: Request): Promise<Response> {
       reason: build.reason
         ? { message: build.reason.message, step: build.reason.step }
         : undefined,
-      logs: [...build.logEntries]
-        .sort((left, right) => left.timestamp.getTime() - right.timestamp.getTime())
+      logs: [...buildLogs.logs]
+        .sort((left, right) => left.timestamp.localeCompare(right.timestamp))
         .slice(-80)
         .map((entry) => ({
-          timestamp: entry.timestamp.toISOString(),
+          timestamp: entry.timestamp,
           level: entry.level,
           message: entry.message.slice(0, 2_000),
         })),
