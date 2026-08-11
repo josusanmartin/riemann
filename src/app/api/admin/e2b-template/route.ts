@@ -164,11 +164,14 @@ export async function GET(request: Request): Promise<Response> {
       reason: build.reason
         ? { message: build.reason.message, step: build.reason.step }
         : undefined,
-      logs: build.logEntries.slice(-40).map((entry) => ({
-        timestamp: entry.timestamp.toISOString(),
-        level: entry.level,
-        message: entry.message.slice(0, 2_000),
-      })),
+      logs: [...build.logEntries]
+        .sort((left, right) => left.timestamp.getTime() - right.timestamp.getTime())
+        .slice(-80)
+        .map((entry) => ({
+          timestamp: entry.timestamp.toISOString(),
+          level: entry.level,
+          message: entry.message.slice(0, 2_000),
+        })),
     });
   } catch (error) {
     console.error("Unable to inspect E2B verifier template build", error);
