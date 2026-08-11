@@ -50,6 +50,8 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingD.lean"
           cp research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingDPath.lean"
+          cp research/zeta-two-band-ci/CentralPathConstructionD.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralPathConstructionD.lean"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
@@ -69,4 +71,5 @@ jobs:
             Zeta23.GapMatching.ScalarBonusCertificate \
             Zeta23.GapMatching.TwoBandGapMatchingD \
             Zeta23.GapMatching.TwoBandGapMatchingDPath \
+            Zeta23.GapMatching.CentralPathConstructionD \
             2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
