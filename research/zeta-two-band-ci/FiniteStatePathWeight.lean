@@ -92,10 +92,10 @@ theorem finalShort_le_one
       simp [finalShort]
       split <;> linarith
   | g :: h :: rest, hall => by
+      simp only [finalShort]
       apply finalShort_le_one good (h :: rest)
       intro x hx
       exact hall x (by simp [hx])
-termination_by gaps => gaps.length
 
 /-- Endpoint-safe path comparison. -/
 theorem candidateWeight_le_path_add_one
@@ -103,7 +103,7 @@ theorem candidateWeight_le_path_add_one
     (hshort : ∀ g ∈ gaps, g.shortWeight ≤ 1) :
     candidateWeight good good gaps ≤ pathWeight good gaps + 1 := by
   rw [candidateWeight_eq_path_add_final]
-  exact add_le_add_left (finalShort_le_one good gaps hshort)
-    (pathWeight good gaps)
+  have hfinal := finalShort_le_one good gaps hshort
+  nlinarith
 
 end Zeta23.GapMatching.FiniteStatePathWeight
