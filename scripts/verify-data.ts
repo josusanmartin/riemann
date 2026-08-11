@@ -96,6 +96,21 @@ for (const requiredBoundary of [
   }
 }
 
+const e2bQueueOrchestrator = await readFile(
+  resolve("src/lib/e2b-queue.ts"),
+  "utf8",
+);
+for (const requiredBoundary of [
+  "allowInternetAccess: false",
+  "allowPublicTraffic: false",
+  'denyOut: ["0.0.0.0/0"]',
+  'info.network?.denyOut?.includes("0.0.0.0/0")',
+]) {
+  if (!e2bQueueOrchestrator.includes(requiredBoundary)) {
+    throw new Error(`The queued E2B orchestrator is missing: ${requiredBoundary}`);
+  }
+}
+
 const e2bComparator = await readFile(
   resolve("scripts/run-comparator-e2b.sh"),
   "utf8",

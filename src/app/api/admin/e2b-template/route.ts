@@ -120,13 +120,19 @@ async function smokeTemplate(templateReference: string, key: string) {
     timeoutMs: 8 * 60 * 1_000,
     secure: true,
     allowInternetAccess: false,
-    network: { allowPublicTraffic: false },
+    network: {
+      allowPublicTraffic: false,
+      denyOut: ["0.0.0.0/0"],
+    },
   });
 
   try {
     const info = await sandbox.getInfo();
-    if (info.allowInternetAccess !== false) {
-      throw new Error("E2B did not confirm outbound network isolation");
+    if (
+      info.allowInternetAccess !== false ||
+      !info.network?.denyOut?.includes("0.0.0.0/0")
+    ) {
+      throw new Error("E2B did not confirm the deny-all outbound rule");
     }
     const sandboxEnv = {
       HOME: "/home/riemann",

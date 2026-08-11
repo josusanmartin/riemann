@@ -75,7 +75,10 @@ export async function stageE2BVerification(
     timeoutMs: E2B_JOB_TIMEOUT_MS,
     secure: true,
     allowInternetAccess: false,
-    network: { allowPublicTraffic: false },
+    network: {
+      allowPublicTraffic: false,
+      denyOut: ["0.0.0.0/0"],
+    },
     lifecycle: {
       onTimeout: { action: "pause", keepMemory: false },
       autoResume: false,
@@ -95,8 +98,11 @@ export async function stageE2BVerification(
 
   try {
     const info = await sandbox.getInfo();
-    if (info.allowInternetAccess !== false) {
-      throw new Error("E2B did not confirm that internet access is disabled");
+    if (
+      info.allowInternetAccess !== false ||
+      !info.network?.denyOut?.includes("0.0.0.0/0")
+    ) {
+      throw new Error("E2B did not confirm the deny-all outbound rule");
     }
     await sandbox.commands.run(
       `install -d -o riemann -g riemann -m 0700 ${uploadDirectory}/proof && ` +
@@ -154,8 +160,11 @@ export async function launchQueuedE2BVerification(input: {
     requestTimeoutMs: 30_000,
   });
   const info = await sandbox.getInfo();
-  if (info.allowInternetAccess !== false) {
-    throw new Error("E2B did not confirm that internet access is disabled");
+  if (
+    info.allowInternetAccess !== false ||
+    !info.network?.denyOut?.includes("0.0.0.0/0")
+  ) {
+    throw new Error("E2B did not confirm the deny-all outbound rule");
   }
 
   const resultPath = `${jobDirectory}/result.json`;
