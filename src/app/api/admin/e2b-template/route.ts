@@ -165,10 +165,19 @@ export async function GET(request: Request): Promise<Response> {
       { templateId, buildId },
       { apiKey: key },
     );
-    const buildLogs = await e2bApi<TemplateBuildLogs>(
-      `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=100&direction=backward`,
-      key,
-    );
+    const buildLogs =
+      build.status === "error"
+        ? await e2bApi<TemplateBuildLogs>(
+            `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=100&direction=backward`,
+            key,
+          )
+        : {
+            logs: build.logEntries.map((entry) => ({
+              timestamp: entry.timestamp.toISOString(),
+              level: entry.level,
+              message: entry.message,
+            })),
+          };
     return noStore(200, {
       status: build.status,
       templateId: build.templateID,
