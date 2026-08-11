@@ -58,6 +58,12 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/GuardedWindowCount.lean"
           cp research/zeta-two-band-ci/CentralGuardCountD.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGuardCountD.lean"
+          cp research/zeta-two-band-ci/OrderedPointGaps.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/OrderedPointGaps.lean"
+          cp research/zeta-two-band-ci/DWindowLength.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DWindowLength.lean"
+          cp research/zeta-two-band-ci/CentralGapGeometryD.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGapGeometryD.lean"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
@@ -89,4 +95,7 @@ jobs:
             Zeta23.GapMatching.CentralPathConstructionD \
             Zeta23.GapMatching.GuardedWindowCount \
             Zeta23.GapMatching.CentralGuardCountD \
+            Zeta23.GapMatching.OrderedPointGaps \
+            Zeta23.GapMatching.DWindowLength \
+            Zeta23.GapMatching.CentralGapGeometryD \
             2>&1 | tee "$RUNNER_TEMP/zeta-two-band-build.log"
