@@ -65,6 +65,48 @@ jobs:
           cp research/zeta-two-band-ci/CentralGapGeometryD.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/CentralGapGeometryD.lean"
 
+          python3 - <<'PY'
+          from pathlib import Path
+
+          guarded = Path("$RUNNER_TEMP/zeta23/Zeta23/GapMatching/GuardedWindowCount.lean")
+          text = guarded.read_text()
+          old = """          _ = |left| + j := by rw [abs_of_nonneg (Nat.cast_nonneg j)]"""
+          new = """          _ = |left| + j := by
+            rw [show |(j : ℝ)| = (j : ℝ) from
+              abs_of_nonneg (Nat.cast_nonneg j)]"""
+          assert old in text
+          guarded.write_text(text.replace(old, new, 1))
+
+          seam = Path("$RUNNER_TEMP/zeta23/Zeta23/GapMatching/TwoBandGapMatchingD.lean")
+          text = seam.read_text()
+          marker = """  have hden : Acoef < 1 := parameter_ranges.2.1
+
+  exact fixed_point_certificate"""
+          replacement = """  have hden : Acoef < 1 := parameter_ranges.2.1
+  have hAne : Acoef ≠ 0 := ne_of_gt parameter_ranges.1
+  have hgain : ∀ᶠ T in atTop,
+      Acoef * (1 * (Z.N0s T (2 * T) : ℝ)
+        - 2 * (Bcoef / (2 * Acoef)) * N T)
+        - error T ≤ 2 * energy T := by
+    filter_upwards [hgap.gain] with T hT
+    have hid :
+        Acoef * (1 * (Z.N0s T (2 * T) : ℝ)
+          - 2 * (Bcoef / (2 * Acoef)) * N T)
+          = Acoef * (Z.N0s T (2 * T) : ℝ) - Bcoef * N T := by
+      field_simp [hAne]
+      ring
+    rw [hid]
+    simpa only [hNdef] using hT
+
+  exact fixed_point_certificate"""
+          assert marker in text
+          text = text.replace(marker, replacement, 1)
+          old_arg = """    hN0 hcert hgap.gain hgap.error_small hden"""
+          new_arg = """    hN0 hcert hgain hgap.error_small hden"""
+          assert old_arg in text
+          seam.write_text(text.replace(old_arg, new_arg, 1))
+          PY
+
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
         run: |
