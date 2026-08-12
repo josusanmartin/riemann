@@ -48,8 +48,18 @@ theorem pathWeight_wordFrom_succ
       simp [wordFrom, pathWeight]
   | succ count ih =>
       rw [Finset.sum_range_succ']
-      simp only [wordFrom, pathWeight]
-      have htail := ih (start + 1)
+      have hrec :
+          pathWeight State.good
+              (wordFrom U length shortWeight longWeight start
+                ((count + 1) + 1))
+            = startWeight U shortWeight longWeight start
+              + pathWeight State.good
+                  (wordFrom U length shortWeight longWeight
+                    (start + 1) (count + 1)) := by
+        cases h0 : U start <;> cases h1 : U (start + 1) <;>
+          simp [wordFrom, pathWeight, datumAt, stateOf, startWeight,
+            h0, h1]
+      rw [hrec, ih (start + 1)]
       have hshift :
           (∑ j ∈ Finset.range count,
               startWeight U shortWeight longWeight (start + 1 + j))
@@ -59,10 +69,9 @@ theorem pathWeight_wordFrom_succ
         intro j hj
         congr 1
         omega
-      rw [htail, hshift]
-      cases h0 : U start <;> cases h1 : U (start + 1) <;>
-        simp [datumAt, stateOf, startWeight, h0, h1,
-          Nat.add_assoc] <;> ring
+      rw [hshift]
+      simp only [Nat.add_zero]
+      ring
 
 /-- Full-word version. -/
 theorem pathWeight_word_succ
@@ -111,12 +120,13 @@ theorem pathWeight_eq_candidateEnergy
           (V.n + 1))
       = candidateEnergy (canonicalPathData V) := by
   rw [pathWeight_word_succ]
-  rw [Finset.sum_range]
+  rw [← Fin.sum_univ_eq_sum_range]
   unfold candidateEnergy activeEdges
   rw [Finset.sum_filter]
   apply Finset.sum_congr rfl
   intro i hi
-  exact startWeight_edgeAtNat V i
+  rw [startWeight_edgeAtNat V i]
+  rfl
 
 /-- The full finite-state candidate weight differs from the candidate energy
 by at most the sole omitted final short edge. -/
@@ -128,22 +138,29 @@ theorem candidateWeight_le_candidateEnergy_add_one
         (word (badFlag V) length (edgeAtNat V) (edgeAtNat V)
           (V.n + 1))
       ≤ candidateEnergy (canonicalPathData V) + 1 := by
+  have hwordShort :
+      ∀ start count (g : GapDatum State),
+        g ∈ wordFrom (badFlag V) length (edgeAtNat V) (edgeAtNat V)
+            start count →
+          g.shortWeight ≤ 1 := by
+    intro start count
+    induction count generalizing start with
+    | zero =>
+        intro g hg
+        simp [wordFrom] at hg
+    | succ count ih =>
+        intro g hg
+        simp only [wordFrom, List.mem_cons] at hg
+        rcases hg with rfl | hg
+        · exact hshort start
+        · exact ih (start + 1) g hg
   have hendpoint := candidateWeight_le_path_add_one State.good
     (word (badFlag V) length (edgeAtNat V) (edgeAtNat V)
       (V.n + 1))
     (by
       intro g hg
-      simp only [word, wordFrom] at hg
-      induction V.n generalizing g with
-      | zero =>
-          simp [wordFrom, datumAt] at hg
-          rcases hg with rfl
-          exact hshort 0
-      | succ n ih =>
-          simp [wordFrom] at hg
-          rcases hg with rfl | hg
-          · exact hshort 0
-          · exact hshort _)
+      apply hwordShort 0 (V.n + 1) g
+      simpa [word] using hg)
   rw [pathWeight_eq_candidateEnergy V length] at hendpoint
   exact hendpoint
 

@@ -34,9 +34,12 @@ def main() -> None:
         push_cast
         ring
       rw [hexponent, Complex.exp_mul_I]
-      simp [Complex.mul_re, Complex.cos_ofReal_re,
-        Complex.cos_ofReal_im, Complex.sin_ofReal_re,
-        Complex.sin_ofReal_im]"""
+      simp only [Complex.mul_re, Complex.add_re, Complex.add_im,
+        Complex.ofReal_re, Complex.ofReal_im,
+        Complex.cos_ofReal_re, Complex.cos_ofReal_im,
+        Complex.sin_ofReal_re, Complex.sin_ofReal_im,
+        Complex.I_re, Complex.I_im, mul_one, mul_zero, zero_mul,
+        add_zero, zero_add, sub_zero]"""
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")

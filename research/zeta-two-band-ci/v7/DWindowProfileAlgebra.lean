@@ -56,6 +56,8 @@ theorem normalized_overlap_close
   have hactualL : 0 < actualA * L := mul_pos hactualPos hL
   have hsharpL : 0 < sharpA * L := mul_pos hsharpPos hL
   have hwL : 0 ≤ w / L := div_nonneg hw hL.le
+  have hfourwL : 0 ≤ 4 * w / L :=
+    div_nonneg (mul_nonneg (by norm_num) hw) hL.le
 
   have hsplit :
       actualNumerator / (actualA * L)
@@ -77,20 +79,38 @@ theorem normalized_overlap_close
     _ = |actualNumerator - sharpNumerator| / (actualA * L)
           + |sharpNumerator| * |sharpA - actualA|
               / (actualA * sharpA * L) := by
-          rw [abs_div, abs_div, abs_mul,
+          rw [abs_div, abs_div,
+            abs_mul sharpNumerator (sharpA - actualA),
             abs_of_pos hactualL,
             abs_of_pos (by positivity : 0 < actualA * sharpA * L)]
     _ ≤ (2 * w) / ((1 / 2) * L)
           + (sharpA * L) * (4 * w / L)
               / ((1 / 2) * sharpA * L) := by
-          gcongr
-          · exact hNumClose
-          · exact mul_le_mul_of_nonneg_right hactualA hL.le
-          · exact hSharpNum
-          · simpa [abs_sub_comm] using hAclose
-          · exact mul_le_mul_of_nonneg_right
-              (mul_le_mul_of_nonneg_right hactualA hsharpPos.le)
-              hL.le
+          have hden1 : (1 / 2 : ℝ) * L ≤ actualA * L :=
+            mul_le_mul_of_nonneg_right hactualA hL.le
+          have hfirst :
+              |actualNumerator - sharpNumerator| / (actualA * L)
+                ≤ (2 * w) / ((1 / 2) * L) :=
+            div_le_div₀ (mul_nonneg (by norm_num) hw) hNumClose
+              (mul_pos (by norm_num) hL) hden1
+          have hdiff : |sharpA - actualA| ≤ 4 * w / L := by
+            simpa [abs_sub_comm] using hAclose
+          have hnum :
+              |sharpNumerator| * |sharpA - actualA|
+                ≤ (sharpA * L) * (4 * w / L) :=
+            mul_le_mul hSharpNum hdiff (abs_nonneg _)
+              (mul_nonneg hsharpPos.le hL.le)
+          have hden2 :
+              (1 / 2 : ℝ) * sharpA * L ≤ actualA * sharpA * L := by
+            nlinarith
+          have hsecond :
+              |sharpNumerator| * |sharpA - actualA|
+                  / (actualA * sharpA * L)
+                ≤ (sharpA * L) * (4 * w / L)
+                  / ((1 / 2) * sharpA * L) :=
+            div_le_div₀ (mul_nonneg (mul_nonneg hsharpPos.le hL.le) hfourwL)
+              hnum (by positivity) hden2
+          exact add_le_add hfirst hsecond
     _ = 12 * w / L := by
           field_simp [hL.ne', hsharpPos.ne']
           ring
@@ -145,8 +165,9 @@ theorem integralOverlapD_close_sharp
     (rho := P.ϱ) (lam := P.lam) (L := P.L T)
     (w := P.w) (r := tau - tau')
     hP.taper hP.lam_pos hP.lam_le_one hP.one_le_w h8
+  have hw : 0 ≤ P.w := le_trans zero_le_one hP.one_le_w
   unfold integralOverlapD sharpOverlap
-  exact normalized_overlap_close hL (by positivity)
+  exact normalized_overlap_close hL hw
     haActual haSharp hAclose hNumClose hSharpNum
 
 
@@ -201,12 +222,11 @@ theorem three_quarters_le_aStar
     (Continuous.intervalIntegrable
       (by unfold vStar; fun_prop) _ _)
   intro s hs
-  rw [Set.uIcc_of_le (by norm_num)] at hs
   have h := cos_factor_ge
     (lam := lam) (L := (1 : ℝ)) h0 h1 one_pos
     (u := s) (by
       rw [abs_le]
-      exact hs)
+      constructor <;> linarith [hs.1, hs.2])
   simpa using h
 
 /-- Public scale substitution for the sharp profile mass. -/
@@ -222,10 +242,8 @@ theorem sharp_mass_integral
       (f := vStar lam) hL.ne', smul_eq_mul]
   have hlo : -(L / 2) / L = -(1 : ℝ) / 2 := by
     field_simp [hL.ne']
-    ring
   have hhi : (L / 2) / L = (1 : ℝ) / 2 := by
     field_simp [hL.ne']
-    ring
   rw [hlo, hhi]
   unfold aStar
   ring
@@ -292,12 +310,13 @@ theorem fullGridOverlapD_close_sharp_canonical
       1 / 2 ≤ AdmWindow.av (P.phiD T) (P.L T) := by
     simpa [atD_a_eq_av hP T] using haActual0
   have haSharp : 1 / 2 ≤ aStar P.lam := by
-    exact (by linarith [three_quarters_le_aStar
-      hP.lam_pos hP.lam_le_one])
+    have hthree := three_quarters_le_aStar
+      hP.lam_pos hP.lam_le_one
+    linarith
   have hAclose :
       |AdmWindow.av (P.phiD T) (P.L T) - aStar P.lam|
         ≤ 4 * P.w / P.L T := by
-    simpa [AdmWindow.av] using
+    simpa [AdmWindow.av, Params.phiD] using
       (aD_close hP.taper hP.lam_pos hP.lam_le_one
         hP.one_le_w h8)
   have hSharpNum := abs_sharp_numerator_le
@@ -311,6 +330,7 @@ This theorem is the exact interface consumed by the finite-grid tail proof. -/
 theorem fullGridOverlapD_close_sharp
     {P : Params} {T tau tau' : ℝ}
     (hL : 0 < P.L T)
+    (hw : 0 ≤ P.w)
     (haActual : 1 / 2 ≤ AdmWindow.av (P.phiD T) (P.L T))
     (haSharp : 1 / 2 ≤ aStar P.lam)
     (hAclose :
@@ -331,7 +351,7 @@ theorem fullGridOverlapD_close_sharp
         - sharpOverlap P.lam (P.L T) (tau - tau')|
       ≤ 12 * P.w / P.L T := by
   unfold fullGridOverlap sharpOverlap
-  exact normalized_overlap_close hL (by positivity)
+  exact normalized_overlap_close hL hw
     haActual haSharp hAclose hNumClose hSharpNum
 
 end Zeta23.GapMatching.DWindowProfileAlgebra

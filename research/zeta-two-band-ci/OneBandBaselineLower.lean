@@ -137,8 +137,8 @@ private theorem scaled_sin_lower :
             - (lam ^ 2 / 2) ^ 5 / 39916800) := by
           rw [sqrt_two_mul_theta, theta_sq]
       _ = sinLower := by
-          unfold sinLower
-          ring
+        unfold sinLower
+        ring
   rw [← heq]
   exact hscaled
 
@@ -161,8 +161,8 @@ private theorem cosine_upper : Real.cos (theta lam) ≤ cosUpper := by
           - (lam ^ 2 / 2) ^ 5 / 3628800
           + (lam ^ 2 / 2) ^ 6 / 479001600 := by rw [theta_sq]
     _ = cosUpper := by
-          unfold cosUpper
-          ring
+      unfold cosUpper
+      ring
 
 private theorem ratio_arithmetic :
     cosUpper ≤ ratioUpper * sinLower := by
@@ -188,8 +188,9 @@ private theorem cosine_ratio_upper :
 private theorem theta_eq_half_lam_sqrt_two :
     theta lam = lam / 2 * Real.sqrt 2 := by
   unfold theta
-  field_simp [sqrt_two_ne]
-  rw [sqrt_two_sq]
+  apply (div_eq_iff sqrt_two_ne).2
+  rw [mul_assoc, ← pow_two, sqrt_two_sq]
+  ring
 
 private theorem cStar_inv_identity :
     (cStar lam)⁻¹ = lam / 2 +
