@@ -81,7 +81,8 @@ theorem badFlag_eq_false_iff
           ¬ (badLeft ≤ gapAt V ⟨i, hi⟩ ∧
             gapAt V ⟨i, hi⟩ ≤ badRight) := by
   by_cases hi : i < V.n + 1
-  · simp [badFlag, hi, not_le]
+  · have hnot : ¬ V.n + 1 ≤ i := not_le.mpr hi
+    simp [badFlag, hi, hnot]
   · have hle : V.n + 1 ≤ i := not_lt.mp hi
     simp [badFlag, hi, hle]
 
@@ -91,7 +92,7 @@ theorem gapAt_nonneg
     (hL : 0 ≤ P.L T) (i : Fin (V.n + 1)) :
     0 ≤ gapAt V i := by
   have him : ordinate V i.castSucc < ordinate V i.succ :=
-    V.strictMono_im (Fin.castSucc_lt_succ i)
+    V.strictMono_im (by exact Fin.castSucc_lt_succ)
   have hscale : 0 ≤ gapScale P T := by
     unfold gapScale
     positivity
