@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle2, FileCode2, LoaderCircle, ShieldAlert, Upload } from "lucide-react";
 
 type JobPhase =
@@ -31,6 +31,50 @@ type StatusPayload = {
 };
 
 const MAX_FILE_BYTES = 2_000_000;
+const ACTIVE_JOB_STORAGE_PREFIX = "riemann.fail:active-verification:v1";
+
+type StoredActiveJob = {
+  jobToken: string;
+  proofDigest: string;
+};
+
+function readStoredActiveJob(storageKey: string): StoredActiveJob | null {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(storageKey) ?? "null") as unknown;
+    if (
+      typeof value === "object" &&
+      value !== null &&
+      "jobToken" in value &&
+      typeof value.jobToken === "string" &&
+      value.jobToken.length > 0 &&
+      "proofDigest" in value &&
+      typeof value.proofDigest === "string" &&
+      /^[0-9a-f]{64}$/.test(value.proofDigest)
+    ) {
+      return value as StoredActiveJob;
+    }
+  } catch {
+    // Treat corrupt or unavailable browser storage as an absent job handle.
+  }
+  return null;
+}
+
+function storeActiveJob(storageKey: string, job: StoredActiveJob): void {
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(job));
+  } catch {
+    // Verification still works in browsers that block local storage; only
+    // cross-refresh recovery is unavailable.
+  }
+}
+
+function clearActiveJob(storageKey: string): void {
+  try {
+    window.localStorage.removeItem(storageKey);
+  } catch {
+    // Nothing else is required when browser storage is unavailable.
+  }
+}
 
 export function DirectSubmissionForm({
   github,
@@ -47,12 +91,16 @@ export function DirectSubmissionForm({
   const [log, setLog] = useState("");
   const [digest, setDigest] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
+  const pollGeneration = useRef(0);
+  const storageKey = `${ACTIVE_JOB_STORAGE_PREFIX}:${github.toLowerCase()}`;
 
-  async function poll(jobToken: string) {
+  const poll = useCallback(async (jobToken: string) => {
+    const generation = ++pollGeneration.current;
     let transientFailures = 0;
     let delayMs = 5_000;
     for (;;) {
       await new Promise((resolve) => window.setTimeout(resolve, delayMs));
+      if (pollGeneration.current !== generation) return;
       try {
         const response = await fetch(
           `/api/submissions/status?job=${encodeURIComponent(jobToken)}`,
@@ -60,6 +108,12 @@ export function DirectSubmissionForm({
         );
         const payload = (await response.json()) as StatusPayload;
         if (!response.ok) {
+          if (response.status >= 400 && response.status < 500) {
+            clearActiveJob(storageKey);
+            setPhase("error");
+            setMessage(payload.message ?? "This verification job is no longer available.");
+            return;
+          }
           throw new Error(payload.message ?? "Unable to read verifier status.");
         }
         transientFailures = 0;
@@ -85,6 +139,7 @@ export function DirectSubmissionForm({
 
         setDigest(payload.proofDigest ?? "");
         setLog(payload.log ?? "");
+        clearActiveJob(storageKey);
         if (payload.status === "verified") {
           if (payload.promotion?.status === "superseded") {
             setPhase("superseded");
@@ -110,19 +165,33 @@ export function DirectSubmissionForm({
           );
         }
         return;
-      } catch (error) {
+      } catch {
         transientFailures += 1;
-        if (transientFailures <= 6) {
-          setPhase("running");
-          setMessage("Verification finished polling temporarily failed; retrying.");
-          continue;
-        }
-        setPhase("error");
-        setMessage(error instanceof Error ? error.message : "Verifier status failed.");
-        return;
+        delayMs = Math.min(60_000, 5_000 * 2 ** Math.min(transientFailures, 4));
+        setPhase("running");
+        setMessage(
+          transientFailures <= 6
+            ? "Verifier status is temporarily unavailable; retrying automatically."
+            : "The verification is still saved in this browser; reconnecting automatically.",
+        );
       }
     }
-  }
+  }, [storageKey]);
+
+  useEffect(() => {
+    const storedJob = readStoredActiveJob(storageKey);
+    if (!storedJob) return;
+    const restoreTimer = window.setTimeout(() => {
+      setDigest(storedJob.proofDigest);
+      setPhase("running");
+      setMessage("Restoring this browser's active verification job.");
+      void poll(storedJob.jobToken);
+    }, 0);
+    return () => {
+      window.clearTimeout(restoreTimer);
+      pollGeneration.current += 1;
+    };
+  }, [poll, storageKey]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -180,6 +249,10 @@ export function DirectSubmissionForm({
               payload.dailyUsed ?? 1
             }/${payload.dailyLimit ?? 3} submissions used today.`,
       );
+      storeActiveJob(storageKey, {
+        jobToken: payload.jobToken,
+        proofDigest: payload.proofDigest ?? "",
+      });
       void poll(payload.jobToken);
     } catch (error) {
       setPhase("error");
