@@ -38,7 +38,7 @@ theorem tsum_inv_pow_four_le
 theorem summable_inv_pow_four
     {D h : ℝ} (hD : 0 < D) (hh : 0 < h) :
     Summable (fun n : ℕ => ((D + n * h) ^ 4)⁻¹) := by
-  apply Real.summable_of_sum_range_le
+  apply summable_of_sum_range_le
   · intro n
     positivity
   · intro n
@@ -70,7 +70,8 @@ theorem norm_tsum_mul_le_of_sq_tsum_le
             exact Finset.sum_le_sum fun n _ =>
               abs_mul_le_sq_average (x n) (y n)
       _ = ((∑ n ∈ u, x n ^ 2) + (∑ n ∈ u, y n ^ 2)) / 2 := by
-            rw [Finset.sum_div, Finset.sum_add_distrib]
+            simp only [div_eq_mul_inv, Finset.sum_add_distrib,
+              Finset.sum_mul]
             ring
       _ ≤ ((∑' n, x n ^ 2) + (∑' n, y n ^ 2)) / 2 := by
             gcongr
@@ -82,7 +83,7 @@ theorem norm_tsum_mul_le_of_sq_tsum_le
             linarith
 
   have habs : Summable (fun n => |x n * y n|) :=
-    Real.summable_of_sum_le (fun n => abs_nonneg (x n * y n)) hfin
+    summable_of_sum_le (fun n => abs_nonneg (x n * y n)) hfin
   have hnorm :
       ‖∑' n, x n * y n‖ ≤ ∑' n, |x n * y n| := by
     simpa only [Real.norm_eq_abs] using
