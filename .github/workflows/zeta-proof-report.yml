@@ -1,0 +1,123 @@
+name: Zeta deterministic proof report
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-proof-report.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+
+      - name: Prepare pinned proof workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStatePathWeight.lean" "$GAP/FiniteStatePathWeight.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean" "$GAP/TwoBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialOverlap.lean" "$GAP/TwoBandPotentialOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean" "$GAP/TwoBandPotentialAnalyticBridge.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CandidateStrictImprovement.lean" "$GAP/CandidateStrictImprovement.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CandidateStrictImprovementTight.lean" "$GAP/CandidateStrictImprovementTight.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DNormalizedMoments.lean" "$GAP/DNormalizedMoments.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean" "$GAP/ScalarBonusCertificate.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingD.lean" "$GAP/TwoBandGapMatchingD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean" "$GAP/TwoBandGapMatchingDPath.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralPathConstructionD.lean" "$GAP/CentralPathConstructionD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/GuardedWindowCount.lean" "$GAP/GuardedWindowCount.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGuardCountD.lean" "$GAP/CentralGuardCountD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OrderedPointGaps.lean" "$GAP/OrderedPointGaps.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/DWindowLength.lean" "$GAP/DWindowLength.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGapGeometryD.lean" "$GAP/CentralGapGeometryD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowOverlap.lean" "$GAP/DWindowOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowRampEstimate.lean" "$GAP/DWindowRampEstimate.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean" "$GAP/DWindowProfileAlgebra.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialOverlap.lean" "$GAP/OneBandPotentialOverlap.lean"
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandGapWord.lean" "$GAP/OneBandGapWord.lean"
+
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteGridTailAlgebra.lean" "$GAP/FiniteGridTailAlgebra.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFourierTail.lean" "$GAP/DWindowFourierTail.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/IntegerGridSplit.lean" "$GAP/IntegerGridSplit.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteBlockApproximation.lean" "$GAP/FiniteBlockApproximation.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFiniteGridApprox.lean" "$GAP/DWindowFiniteGridApprox.lean"
+
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+
+      - name: Restore Mathlib cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+
+      - name: Compile isolated proof tracks
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set +e
+          lake build Zeta23.GapMatching.DWindowRampEstimate > /tmp/main.log 2>&1
+          main_status=$?
+          lake build Zeta23.GapMatching.DWindowFiniteGridApprox > /tmp/tail.log 2>&1
+          tail_status=$?
+          lake build Zeta23.GapMatching.OneBandGapWord > /tmp/join.log 2>&1
+          join_status=$?
+          printf '%s\n%s\n%s\n' "$main_status" "$tail_status" "$join_status" > /tmp/statuses
+          exit 0
+
+      - name: Write concise report
+        run: |
+          readarray -t STATUS < /tmp/statuses
+          mkdir -p ci-results
+          {
+            echo '# Zeta proof compiler report'
+            echo
+            echo "Commit: $GITHUB_SHA"
+            echo "Generated: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo "- Main ramp stack: ${STATUS[0]}"
+            echo "- Finite-grid tail bridge: ${STATUS[1]}"
+            echo "- One-band gap-word join: ${STATUS[2]}"
+            for item in main tail join; do
+              echo
+              echo "## ${item} errors"
+              grep -n -A18 -B4 'error:' "/tmp/${item}.log" || echo 'No Lean errors.'
+              echo
+              echo "## ${item} log tail"
+              tail -n 40 "/tmp/${item}.log"
+            done
+          } > ci-results/zeta-proof-status.txt
+
+      - name: Commit report
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ci-results/zeta-proof-status.txt
+          git commit -m 'ci: update deterministic zeta proof report' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
+
+      - name: Preserve failing status
+        run: |
+          readarray -t STATUS < /tmp/statuses
+          test "${STATUS[0]}" = 0
+          test "${STATUS[1]}" = 0
+          test "${STATUS[2]}" = 0
