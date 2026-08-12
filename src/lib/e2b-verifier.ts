@@ -77,27 +77,37 @@ export type PausedE2BVerification = {
 
 export type E2BVerificationProgress = {
   resultBytes: number;
+  temporaryResultBytes: number;
+  artifactBytes: number;
   logBytes: number;
   logModifiedAtUnix: number;
+  logTailBase64: string;
   runnerLockHeld: boolean;
   runnerElapsedSeconds: number;
   timeoutProcesses: number;
   leanProcesses: number;
   nanodaProcesses: number;
   nodeProcesses: number;
+  verifierProcesses: number;
+  finalizerProcesses: number;
 };
 
 const e2bVerificationProgressSchema = z
   .object({
     resultBytes: z.number().int().nonnegative(),
+    temporaryResultBytes: z.number().int().nonnegative(),
+    artifactBytes: z.number().int().nonnegative(),
     logBytes: z.number().int().nonnegative(),
     logModifiedAtUnix: z.number().int().nonnegative(),
+    logTailBase64: z.string().max(4_000).regex(/^[A-Za-z0-9+/]*={0,2}$/),
     runnerLockHeld: z.boolean(),
     runnerElapsedSeconds: z.number().int().nonnegative(),
     timeoutProcesses: z.number().int().nonnegative(),
     leanProcesses: z.number().int().nonnegative(),
     nanodaProcesses: z.number().int().nonnegative(),
     nodeProcesses: z.number().int().nonnegative(),
+    verifierProcesses: z.number().int().nonnegative(),
+    finalizerProcesses: z.number().int().nonnegative(),
   })
   .strict();
 
@@ -244,14 +254,18 @@ export async function inspectE2BVerificationProgress(
   const result = await sandbox.commands.run(
     `job_dir=${jobDirectory}; ` +
       `result_bytes=$(stat -c %s "$job_dir/result.json" 2>/dev/null || printf 0); ` +
+      `tmp_bytes=$(stat -c %s "$job_dir/result.json.tmp" 2>/dev/null || printf 0); ` +
+      `artifact_bytes=$(stat -c %s "/home/riemann/jobs/${parsedJobId}/output/attestation.json" 2>/dev/null || printf 0); ` +
       `log_bytes=$(stat -c %s "$job_dir/verifier.log" 2>/dev/null || printf 0); ` +
       `log_mtime=$(stat -c %Y "$job_dir/verifier.log" 2>/dev/null || printf 0); ` +
+      `log_tail=$(tail -c 2000 "$job_dir/verifier.log" 2>/dev/null | base64 -w0); ` +
       `lock_held=false; flock -n "$job_dir/runner.lock" -c true 2>/dev/null || lock_held=true; ` +
       `runner_elapsed=$(ps -eo etimes=,args= | awk '/run-verification-job[.]sh/ && /${parsedJobId}/ { print $1; exit }'); ` +
-      `printf '{"resultBytes":%s,"logBytes":%s,"logModifiedAtUnix":%s,"runnerLockHeld":%s,"runnerElapsedSeconds":%s,"timeoutProcesses":%s,"leanProcesses":%s,"nanodaProcesses":%s,"nodeProcesses":%s}\n' ` +
-      `"$result_bytes" "$log_bytes" "$log_mtime" "$lock_held" "\${runner_elapsed:-0}" ` +
+      `printf '{"resultBytes":%s,"temporaryResultBytes":%s,"artifactBytes":%s,"logBytes":%s,"logModifiedAtUnix":%s,"logTailBase64":"%s","runnerLockHeld":%s,"runnerElapsedSeconds":%s,"timeoutProcesses":%s,"leanProcesses":%s,"nanodaProcesses":%s,"nodeProcesses":%s,"verifierProcesses":%s,"finalizerProcesses":%s}\n' ` +
+      `"$result_bytes" "$tmp_bytes" "$artifact_bytes" "$log_bytes" "$log_mtime" "$log_tail" "$lock_held" "\${runner_elapsed:-0}" ` +
       `"$(pgrep -xc timeout 2>/dev/null || true)" "$(pgrep -xc lean 2>/dev/null || true)" ` +
-      `"$(pgrep -xc nanoda_bin 2>/dev/null || true)" "$(pgrep -xc node 2>/dev/null || true)"`,
+      `"$(pgrep -xc nanoda_bin 2>/dev/null || true)" "$(pgrep -xc node 2>/dev/null || true)" ` +
+      `"$(pgrep -fc 'verify-submission[.]ts' 2>/dev/null || true)" "$(pgrep -fc 'finalize-e2b-job[.]ts' 2>/dev/null || true)"`,
     { user: "root", timeoutMs: 10_000 },
   );
   return e2bVerificationProgressSchema.parse(JSON.parse(result.stdout));
