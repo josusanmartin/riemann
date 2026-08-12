@@ -1,0 +1,41 @@
+name: Zeta finite-grid tail CI
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-tail-ci.yml"
+      - "research/zeta-tail-ci/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install pinned Lean toolchain manager
+        run: ./scripts/install-lean-toolchain.sh
+      - name: Check out research base
+        run: |
+          git clone https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout a6bcd8a58fc9c95615fde8594c06c543fd979641
+      - name: Add tail modules
+        run: |
+          cp research/zeta-tail-ci/FiniteGridTailAlgebra.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteGridTailAlgebra.lean"
+          cp research/zeta-tail-ci/DWindowFourierTail.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DWindowFourierTail.lean"
+      - name: Restore Mathlib cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get
+      - name: Compile tail modules
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          lake build \
+            Zeta23.GapMatching.FiniteGridTailAlgebra \
+            Zeta23.GapMatching.DWindowFourierTail
