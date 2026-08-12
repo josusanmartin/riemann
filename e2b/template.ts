@@ -118,6 +118,14 @@ export function createRiemannVerifierTemplate(
       { src: "e2b/template.ts", dest: "/opt/riemann/e2b/template.ts" },
     ])
     .runCmd(
+      "install -d -o root -g root -m 0755 /opt/riemann/.runtime && " +
+        "cd /opt/riemann && ./node_modules/@esbuild/linux-x64/bin/esbuild " +
+        "scripts/verify-submission.ts scripts/prepare-candidate.ts " +
+        "scripts/finalize-e2b-job.ts --bundle --platform=node --format=esm " +
+        "--outdir=/opt/riemann/.runtime --out-extension:.js=.mjs",
+      { user: "root" },
+    )
+    .runCmd(
       [
         // Lake must inspect the pinned Git metadata after the full verifier
         // tree becomes root-owned. The Debian Git release in the Node base
@@ -130,10 +138,8 @@ export function createRiemannVerifierTemplate(
         "chown -R root:root /opt/riemann /home/riemann/.elan",
         "find /opt/riemann /home/riemann/.elan -type d -exec chmod a+rx,a-w {} +",
         "find /opt/riemann /home/riemann/.elan -type f -exec chmod a+r,a-w {} +",
-        "install -o root -g root -m 0555 /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild /usr/local/bin/riemann-esbuild",
-        "rm -f /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild && ln -s /usr/local/bin/riemann-esbuild /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild",
         "chmod 0555 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
-        "runuser -u riemann -- /usr/local/bin/riemann-esbuild --version",
+        "test -s /opt/riemann/.runtime/verify-submission.mjs && test -s /opt/riemann/.runtime/prepare-candidate.mjs && test -s /opt/riemann/.runtime/finalize-e2b-job.mjs",
         "install -d -o root -g root -m 0755 /var/lib/riemann/jobs",
         "install -d -o riemann -g riemann -m 0700 /home/riemann/jobs",
       ],

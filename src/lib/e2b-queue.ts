@@ -14,6 +14,18 @@ import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 const E2B_JOB_TIMEOUT_MS = 60 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
+const E2B_TSX_RUNTIME_SHIM = `import { pathToFileURL } from "node:url";
+
+const target = new Map([
+  ["/opt/riemann/scripts/verify-submission.ts", "/opt/riemann/.runtime/verify-submission.mjs"],
+  ["/opt/riemann/scripts/prepare-candidate.ts", "/opt/riemann/.runtime/prepare-candidate.mjs"],
+  ["/opt/riemann/scripts/finalize-e2b-job.ts", "/opt/riemann/.runtime/finalize-e2b-job.mjs"],
+]).get(process.argv[2]);
+
+if (!target) throw new Error("Unsupported sealed TypeScript entrypoint");
+process.argv = [process.argv[0], target, ...process.argv.slice(3)];
+await import(pathToFileURL(target).href);
+`;
 
 const sandboxIdSchema = z
   .string()
@@ -188,6 +200,30 @@ export async function launchQueuedE2BVerification(input: {
     sandboxId,
     esbuildVersion: runtime.stdout.trim(),
   });
+  await sandbox.commands.run(
+    `install -d -o root -g root -m 0755 /opt/riemann/.runtime && ` +
+      `cd /opt/riemann && ${executableEsbuild} ` +
+      `scripts/verify-submission.ts scripts/prepare-candidate.ts ` +
+      `scripts/finalize-e2b-job.ts --bundle --platform=node --format=esm ` +
+      `--outdir=/opt/riemann/.runtime --out-extension:.js=.mjs && ` +
+      `chmod 0644 /opt/riemann/node_modules/tsx/dist/cli.mjs`,
+    { user: "root", timeoutMs: 30_000 },
+  );
+  await sandbox.files.write(
+    "/opt/riemann/node_modules/tsx/dist/cli.mjs",
+    E2B_TSX_RUNTIME_SHIM,
+    { user: "root", requestTimeoutMs: 30_000 },
+  );
+  await sandbox.commands.run(
+    `chmod 0444 /opt/riemann/.runtime/*.mjs ` +
+      `/opt/riemann/node_modules/tsx/dist/cli.mjs && ` +
+      `runuser -u riemann -- env -i HOME=/home/riemann ` +
+      `PATH=/usr/local/bin:/usr/bin:/bin /usr/local/bin/node ` +
+      `/opt/riemann/node_modules/tsx/dist/cli.mjs ` +
+      `/opt/riemann/scripts/verify-submission.ts 2>&1 | ` +
+      `grep -q 'Usage: verify-submission.ts'`,
+    { user: "root", timeoutMs: 30_000 },
+  );
   await sandbox.commands.run(
     `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
       `'if [[ ! -s ${resultPath} ]]; then exec ` +

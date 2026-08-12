@@ -224,12 +224,18 @@ try {
   }
   await run(
     process.execPath,
-    [
-      join(repositoryRoot, "node_modules", "tsx", "dist", "cli.mjs"),
-      join(repositoryRoot, "scripts", "prepare-candidate.ts"),
-      submissionDirectory,
-      zetaWorkspace,
-    ],
+    process.env.RIEMANN_PRECOMPILED_RUNTIME === "1"
+      ? [
+          join(repositoryRoot, ".runtime", "prepare-candidate.mjs"),
+          submissionDirectory,
+          zetaWorkspace,
+        ]
+      : [
+          join(repositoryRoot, "node_modules", "tsx", "dist", "cli.mjs"),
+          join(repositoryRoot, "scripts", "prepare-candidate.ts"),
+          submissionDirectory,
+          zetaWorkspace,
+        ],
     { cwd: repositoryRoot },
   );
 

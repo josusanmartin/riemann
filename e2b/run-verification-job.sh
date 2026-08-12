@@ -38,21 +38,20 @@ timeout --signal=TERM --kill-after=15s 3240s \
     E2B_SANDBOX="${E2B_SANDBOX:-true}" \
     RIEMANN_E2B_NETWORK_DISABLED=1 \
     RIEMANN_OUTER_SANDBOX=e2b \
+    RIEMANN_PRECOMPILED_RUNTIME=1 \
     RIEMANN_PREBUILT_ZETA23=/opt/riemann/zeta23 \
     RIEMANN_RECORDS_PATH="$submission_dir/trusted-records.json" \
     COMPARATOR_BIN=/opt/riemann/tools/bin/comparator \
     COMPARATOR_LANDRUN=/opt/riemann/tools/bin/landrun \
     COMPARATOR_LEAN4EXPORT=/opt/riemann/tools/bin/lean4export \
     COMPARATOR_NANODA=/opt/riemann/tools/bin/nanoda_bin \
-    /usr/local/bin/node /opt/riemann/node_modules/tsx/dist/cli.mjs \
-      /opt/riemann/scripts/verify-submission.ts \
+    /usr/local/bin/node /opt/riemann/.runtime/verify-submission.mjs \
       "$submission_dir" --mode=full --artifact="$artifact_path" \
       >"$log_path" 2>&1
 verifier_status=$?
 set -e
 
-/usr/local/bin/node /opt/riemann/node_modules/tsx/dist/cli.mjs \
-  /opt/riemann/scripts/finalize-e2b-job.ts \
+/usr/local/bin/node /opt/riemann/.runtime/finalize-e2b-job.mjs \
   "$submission_dir" "$artifact_path" "$log_path" "$result_path" \
   "$proof_digest" "$verifier_status"
 

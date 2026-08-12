@@ -133,7 +133,13 @@ const e2bWrapper = await readFile(
   resolve("e2b/run-verification-job.sh"),
   "utf8",
 );
-for (const requiredBoundary of ["runuser -u riemann", "env -i", "finalize-e2b-job.ts"]) {
+for (const requiredBoundary of [
+  "runuser -u riemann",
+  "env -i",
+  "RIEMANN_PRECOMPILED_RUNTIME=1",
+  ".runtime/verify-submission.mjs",
+  ".runtime/finalize-e2b-job.mjs",
+]) {
   if (!e2bWrapper.includes(requiredBoundary)) {
     throw new Error(`The E2B root wrapper is missing: ${requiredBoundary}`);
   }
