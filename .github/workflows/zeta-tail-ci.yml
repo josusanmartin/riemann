@@ -8,6 +8,10 @@ on:
       - "research/zeta-tail-ci/**"
   workflow_dispatch:
 
+concurrency:
+  group: zeta-finite-grid-tail-ci
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
