@@ -32,32 +32,24 @@ jobs:
           set -o pipefail
           cat > Query.lean <<'LEAN'
           import Mathlib
-          open Finset Filter
-          #check HasSum.sub
-          #check HasSum.add
-          #check HasSum.sum_add_compl
-          #check HasSum.sum_add_compl_iff
-          #check HasSum.sum_add_tsum_nat_add
-          #check Summable.sum_add_tsum_nat_add
-          #check Summable.tsum_add_tsum_compl
+          open Finset Filter MeasureTheory
+          #check HasSum.const_mul
+          #check HasSum.mul_const
           #check Summable.sum_add_tsum_compl
-          #check tsum_subtype
-          #check tsum_compl
-          #check tsum_of_add_one_of_neg_add_one
+          #check Summable.sum_add_tsum_nat_add
           #check tsum_of_nat_of_neg_add_one
-          #check HasSum.of_add_one_of_neg_add_one
-          #check Summable.of_add_one_of_neg_add_one
-          #check summable_int_iff_summable_nat_and_neg_add_one
-          #check HasSum.comp_injective
-          #check Equiv.hasSum_iff
-          #check Finset.sum_subtype
-          #check Finset.sum_attach
-          #check Fin.sum_univ_succ
-          #check Fin.sum_univ_two
-          #check MeasureTheory.IntegrableOn.abs
+          #check tsum_of_add_one_of_neg_add_one
+          #check integral_re
+          #check integral_im
+          #check Integrable.abs
+          #check IntegrableOn
+          #check setIntegral_mono_on
           #check ContinuousOn.integrableOn_compact
-          #check MeasureTheory.integral_re
-          #check RCLike.integral_re
-          #check Int.cast_natCast
+          #check Real.summable_of_sum_range_le
+          #check Real.summable_of_sum_le
+          #check Real.tsum_le_of_sum_range_le
+          #check Real.tsum_le_of_sum_le
+          #check Summable.hasSum
+          #check summable_iff_cauchySeq_finset
           LEAN
           lake env lean Query.lean 2>&1 | tee "$RUNNER_TEMP/query.log"
