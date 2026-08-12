@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/zeta-two-band-ci.yml"
       - "research/zeta-two-band-ci/**"
+      - "research/zeta-join-ci/**"
   workflow_dispatch:
 
 concurrency:
@@ -58,6 +59,9 @@ jobs:
           cp research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean "$GAP/DWindowProfileAlgebra.lean"
           cp research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean "$GAP/OneBandPotentialSafeNumerics.lean"
           cp research/zeta-two-band-ci/OneBandPotentialOverlap.lean "$GAP/OneBandPotentialOverlap.lean"
+          cp research/zeta-join-ci/OneBandGapWord.lean "$GAP/OneBandGapWord.lean"
+          cp research/zeta-join-ci/CanonicalOneBandPathD.lean "$GAP/CanonicalOneBandPathD.lean"
+          cp research/zeta-two-band-ci/OneBandPathEnergy.lean "$GAP/OneBandPathEnergy.lean"
           base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > "$GAP/OneBandSharpProfile.lean"
 
           python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
@@ -108,4 +112,7 @@ jobs:
             Zeta23.GapMatching.OneBandPotentialSafeNumerics \
             Zeta23.GapMatching.OneBandPotentialOverlap \
             Zeta23.GapMatching.OneBandSharpProfile \
+            Zeta23.GapMatching.OneBandGapWord \
+            Zeta23.GapMatching.CanonicalOneBandPathD \
+            Zeta23.GapMatching.OneBandPathEnergy \
             2>&1 | tee "$RUNNER_TEMP/zeta-gap-matching-build.log"
