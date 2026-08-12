@@ -130,7 +130,7 @@ export function createRiemannVerifierTemplate(
         "chown -R root:root /opt/riemann /home/riemann/.elan",
         "find /opt/riemann /home/riemann/.elan -type d -exec chmod a+rx,a-w {} +",
         "find /opt/riemann /home/riemann/.elan -type f -exec chmod a+r,a-w {} +",
-        "chmod 0555 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
+        "chmod 0555 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/* /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild",
         "install -d -o root -g root -m 0755 /var/lib/riemann/jobs",
         "install -d -o riemann -g riemann -m 0700 /home/riemann/jobs",
       ],

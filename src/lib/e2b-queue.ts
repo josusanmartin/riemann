@@ -174,7 +174,8 @@ export async function launchQueuedE2BVerification(input: {
   const resultPath = `${jobDirectory}/result.json`;
   const lockPath = `${jobDirectory}/runner.lock`;
   await sandbox.commands.run(
-    `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
+    `chmod 0555 /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild && ` +
+      `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
       `'if [[ ! -s ${resultPath} ]]; then exec ` +
       `/opt/riemann/e2b/run-verification-job.sh ${uploadDirectory} ` +
       `${jobDirectory} ${proofDigest}; fi'`,
