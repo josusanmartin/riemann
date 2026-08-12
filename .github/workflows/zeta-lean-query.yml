@@ -29,9 +29,9 @@ jobs:
       - name: Query declarations
         working-directory: ${{ runner.temp }}/zeta23
         run: |
+          set -o pipefail
           cat > Query.lean <<'LEAN'
           import Mathlib
-          import Zeta23.Poisson
           open Finset Filter
           #check HasSum.sub
           #check HasSum.add
