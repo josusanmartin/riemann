@@ -343,14 +343,24 @@ async function startExtendedSmokeTemplate(
       user: "riemann",
       timeoutMs: 30_000,
     });
-    await sandbox.commands.run(`${EXTENDED_SMOKE_ROOT}/run.sh`, {
-      user: "riemann",
-      background: true,
-      timeoutMs: 30_000,
-      envs: smokeSandboxEnv(),
-    });
+    const smokeCommand = await sandbox.commands.run(
+      `${EXTENDED_SMOKE_ROOT}/run.sh`,
+      {
+        user: "riemann",
+        background: true,
+        timeoutMs: 30_000,
+        envs: smokeSandboxEnv(),
+      },
+    );
+    await sandbox.files.write(
+      `${EXTENDED_SMOKE_ROOT}/command.pid`,
+      `${smokeCommand.pid}\n`,
+      { user: "riemann", requestTimeoutMs: 30_000 },
+    );
+    await smokeCommand.disconnect();
     return {
       sandboxId: sandbox.sandboxId,
+      commandPid: smokeCommand.pid,
       diagnostics: diagnostics.stdout.slice(-4_000),
     };
   } catch (error) {
@@ -385,9 +395,10 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
       "--arg zetaSeconds \"$(read_value zeta.seconds)\" " +
       "--arg comparatorStatus \"$(read_value comparator.status)\" " +
       "--arg comparatorSeconds \"$(read_value comparator.seconds)\" " +
+      "--arg commandPid \"$(read_value command.pid)\" " +
       "--arg zetaLog \"$(read_log zeta.log)\" " +
       "--arg comparatorLog \"$(read_log comparator.log)\" " +
-      "'{state: (if $state == \"\" then \"starting\" else $state end), zetaStatus: $zetaStatus, zetaSeconds: $zetaSeconds, comparatorStatus: $comparatorStatus, comparatorSeconds: $comparatorSeconds, zetaLog: $zetaLog, comparatorLog: $comparatorLog}'",
+      "'{state: (if $state == \"\" then \"starting\" else $state end), zetaStatus: $zetaStatus, zetaSeconds: $zetaSeconds, comparatorStatus: $comparatorStatus, comparatorSeconds: $comparatorSeconds, commandPid: $commandPid, zetaLog: $zetaLog, comparatorLog: $comparatorLog}'",
     { user: "riemann", timeoutMs: 30_000 },
   );
   const snapshot = JSON.parse(snapshotResult.stdout) as {
@@ -396,10 +407,23 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
     zetaSeconds: string;
     comparatorStatus: string;
     comparatorSeconds: string;
+    commandPid: string;
     zetaLog: string;
     comparatorLog: string;
   };
-  const completed = snapshot.state === "done";
+  const runningCommands = await sandbox.commands.list({
+    requestTimeoutMs: 30_000,
+  });
+  const commandPid = snapshot.commandPid ? Number(snapshot.commandPid) : null;
+  const commandRunning = commandPid
+    ? runningCommands.some((process) => process.pid === commandPid)
+    : runningCommands.some((process) =>
+        [process.cmd, ...process.args].join(" ").includes(
+          `${EXTENDED_SMOKE_ROOT}/run.sh`,
+        ),
+      );
+  const abandoned = snapshot.state !== "done" && !commandRunning;
+  const completed = snapshot.state === "done" || abandoned;
   const passed =
     completed &&
     snapshot.zetaStatus === "0" &&
@@ -407,8 +431,12 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
   if (completed) await sandbox.kill().catch(() => undefined);
   return {
     status: completed ? (passed ? "passed" : "failed") : "running",
-    stage: snapshot.state || "starting",
+    stage: abandoned
+      ? "orchestrator-command-missing"
+      : snapshot.state || "starting",
     sandboxId,
+    commandPid,
+    commandRunning,
     networkIsolated: true,
     zetaElaborationExitCode: snapshot.zetaStatus
       ? Number(snapshot.zetaStatus)
