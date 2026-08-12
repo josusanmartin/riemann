@@ -29,8 +29,10 @@ jobs:
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandGapWord.lean" "$GAP/OneBandGapWord.lean"
           python3 - <<'PY'
+          import os
           from pathlib import Path
-          p = Path("$RUNNER_TEMP/zeta23/Zeta23/GapMatching/OneBandPotentialSafeNumerics.lean")
+
+          p = Path(os.environ["RUNNER_TEMP"]) / "zeta23/Zeta23/GapMatching/OneBandPotentialSafeNumerics.lean"
           s = p.read_text()
           old = '''def transitionFloor (previous current : State) : ℝ :=
             B * lengthFloor current
