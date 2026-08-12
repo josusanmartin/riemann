@@ -367,6 +367,14 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
     requestTimeoutMs: 30_000,
   });
   await assertSmokeNetworkIsolation(sandbox);
+  const runtimeDiagnosticsResult = await sandbox.commands.run(
+    "set -u; " +
+      "printf 'disk='; df -h / | tail -1; " +
+      "printf 'setup_files='; find /home/riemann/tmp/zeta-smoke/.lake/build/ir -type f -name '*.setup.json' 2>/dev/null | wc -l; " +
+      "printf 'setup_disk='; du -sh /home/riemann/tmp/zeta-smoke/.lake/build/ir 2>/dev/null || true; " +
+      "printf 'processes=\\n'; ps -eo pid,ppid,stat,etime,pcpu,pmem,args | grep -E '[l]ake|[l]ean|extended-smoke/run.sh' || true",
+    { user: "root", timeoutMs: 30_000 },
+  );
   const snapshotResult = await sandbox.commands.run(
     `root=${EXTENDED_SMOKE_ROOT}; ` +
       "read_value() { if [[ -f \"$root/$1\" ]]; then tr -d '\\r\\n' < \"$root/$1\"; fi; }; " +
@@ -412,6 +420,7 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
     comparatorSeconds: snapshot.comparatorSeconds
       ? Number(snapshot.comparatorSeconds)
       : null,
+    runtimeDiagnostics: runtimeDiagnosticsResult.stdout.slice(-8_000),
     zetaLog: snapshot.zetaLog,
     comparatorLog: snapshot.comparatorLog,
   };
