@@ -75,6 +75,32 @@ export type PausedE2BVerification = {
   issuedAt: number;
 };
 
+export type E2BVerificationProgress = {
+  resultBytes: number;
+  logBytes: number;
+  logModifiedAtUnix: number;
+  runnerLockHeld: boolean;
+  runnerElapsedSeconds: number;
+  timeoutProcesses: number;
+  leanProcesses: number;
+  nanodaProcesses: number;
+  nodeProcesses: number;
+};
+
+const e2bVerificationProgressSchema = z
+  .object({
+    resultBytes: z.number().int().nonnegative(),
+    logBytes: z.number().int().nonnegative(),
+    logModifiedAtUnix: z.number().int().nonnegative(),
+    runnerLockHeld: z.boolean(),
+    runnerElapsedSeconds: z.number().int().nonnegative(),
+    timeoutProcesses: z.number().int().nonnegative(),
+    leanProcesses: z.number().int().nonnegative(),
+    nanodaProcesses: z.number().int().nonnegative(),
+    nodeProcesses: z.number().int().nonnegative(),
+  })
+  .strict();
+
 function requireApiKey(): string {
   const apiKey = getE2BApiKey();
   if (!apiKey) {
@@ -194,6 +220,41 @@ export async function readE2BVerification(
     if (error instanceof FileNotFoundError) return null;
     throw error;
   }
+}
+
+export async function inspectE2BVerificationProgress(
+  sandboxId: string,
+  jobId: string,
+): Promise<E2BVerificationProgress> {
+  const parsedJobId = z.string().uuid().parse(jobId);
+  const parsedSandboxId = z
+    .string()
+    .min(10)
+    .max(160)
+    .regex(/^[A-Za-z0-9-]+$/)
+    .parse(sandboxId);
+  const apiKey = requireApiKey();
+  const { Sandbox } = await import("e2b");
+  const sandbox = await Sandbox.connect(parsedSandboxId, {
+    apiKey,
+    timeoutMs: E2B_JOB_TIMEOUT_MS,
+    requestTimeoutMs: 30_000,
+  });
+  const jobDirectory = `${E2B_JOB_ROOT}/${parsedJobId}`;
+  const result = await sandbox.commands.run(
+    `job_dir=${jobDirectory}; ` +
+      `result_bytes=$(stat -c %s "$job_dir/result.json" 2>/dev/null || printf 0); ` +
+      `log_bytes=$(stat -c %s "$job_dir/verifier.log" 2>/dev/null || printf 0); ` +
+      `log_mtime=$(stat -c %Y "$job_dir/verifier.log" 2>/dev/null || printf 0); ` +
+      `lock_held=false; flock -n "$job_dir/runner.lock" -c true 2>/dev/null || lock_held=true; ` +
+      `runner_elapsed=$(ps -eo etimes=,args= | awk '/run-verification-job[.]sh/ && /${parsedJobId}/ { print $1; exit }'); ` +
+      `printf '{"resultBytes":%s,"logBytes":%s,"logModifiedAtUnix":%s,"runnerLockHeld":%s,"runnerElapsedSeconds":%s,"timeoutProcesses":%s,"leanProcesses":%s,"nanodaProcesses":%s,"nodeProcesses":%s}\n' ` +
+      `"$result_bytes" "$log_bytes" "$log_mtime" "$lock_held" "\${runner_elapsed:-0}" ` +
+      `"$(pgrep -xc timeout 2>/dev/null || true)" "$(pgrep -xc lean 2>/dev/null || true)" ` +
+      `"$(pgrep -xc nanoda_bin 2>/dev/null || true)" "$(pgrep -xc node 2>/dev/null || true)"`,
+    { user: "root", timeoutMs: 10_000 },
+  );
+  return e2bVerificationProgressSchema.parse(JSON.parse(result.stdout));
 }
 
 export async function readE2BSubmissionBundle(

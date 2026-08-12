@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import {
+  inspectE2BVerificationProgress,
   killE2BSandbox,
   listPausedE2BVerifications,
   readE2BVerification,
@@ -65,6 +66,15 @@ export async function GET(request: Request): Promise<Response> {
     if (!job) return noStore(200, { status: "idle" });
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
+      const progress = await inspectE2BVerificationProgress(
+        job.sandboxId,
+        job.jobId,
+      );
+      console.info("E2B verification result not ready", {
+        jobId: job.jobId,
+        sandboxId: job.sandboxId,
+        ...progress,
+      });
       return noStore(503, {
         error: "result_not_ready",
         submissionId: job.submissionId,
