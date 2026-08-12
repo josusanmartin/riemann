@@ -59,7 +59,6 @@ theorem vHatR_sq_le_inv_four
     _ = (c / w) ^ 2 * (|r| ^ 4)⁻¹ := by
           rw [show r ^ 2 = |r| ^ 2 by rw [sq_abs]]
           field_simp [hrabs.ne']
-          ring
     _ ≤ (c / w) ^ 2 * (D ^ 4)⁻¹ := by
           exact mul_le_mul_of_nonneg_left hinv (sq_nonneg (c / w))
 
@@ -97,7 +96,7 @@ theorem summable_vHatR_sq
     (r : ℕ → ℝ)
     (harg : ∀ n, D + n * h ≤ |r n|) :
     Summable (fun n => vHatR v (r n) ^ 2) := by
-  apply Real.summable_of_sum_range_le
+  apply summable_of_sum_range_le
   · intro n
     exact sq_nonneg _
   · intro m
