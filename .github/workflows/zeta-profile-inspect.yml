@@ -1,0 +1,28 @@
+name: Inspect one-band profile declarations
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-profile-inspect.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Decode and print declarations
+        run: |
+          base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 \
+            | gzip -d > /tmp/OneBandSharpProfile.lean
+          echo '=== line count ==='
+          wc -l /tmp/OneBandSharpProfile.lean
+          echo '=== declarations ==='
+          grep -nE '^(private )?(def|abbrev|structure|lemma|theorem) ' \
+            /tmp/OneBandSharpProfile.lean || true
+          echo '=== final 180 lines ==='
+          tail -n 180 /tmp/OneBandSharpProfile.lean
