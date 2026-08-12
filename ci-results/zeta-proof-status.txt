@@ -1,0 +1,360 @@
+# Zeta proof compiler report
+
+Commit: 68010f5265fd4e75731f245f2e434b3e159a7442
+Generated: 2026-08-12T09:35:53Z
+
+- Main ramp stack: 1
+- Finite-grid tail bridge: 1
+- One-band gap-word join: 1
+
+## main errors
+32-    (Set.Icc (-(L / 2)) (-(L / 2) + w)).indicator (1 : ℝ → ℝ) u +
+33-      (Set.Icc (L / 2 - w) (L / 2)).indicator (1 : ℝ → ℝ) u' tactic does nothing
+34-
+35-Note: This linter can be disabled with `set_option linter.unusedTactic false`
+36:error: Zeta23/GapMatching/DWindowRampEstimate.lean:229:43: unsolved goals
+37-v : ℝ → ℝ
+38-L w c r : ℝ
+39-hW : AdmWindow v L w c
+40-hexp : Continuous fun u ↦ Complex.exp (Complex.I * ↑r * ↑u)
+41-hcont : Continuous fun u ↦ ↑(v u ^ 2) * Complex.exp (Complex.I * ↑r * ↑u)
+42-hint : Integrable (fun u ↦ ↑(v u ^ 2) * Complex.exp (Complex.I * ↑r * ↑u)) volume
+43-u : ℝ
+44-hexponent : Complex.I * ↑r * ↑u = ↑(r * u) * Complex.I
+45-⊢ (↑(v u) ^ 2).re * ((Complex.cos (↑r * ↑u)).re + -(Complex.sin (↑r * ↑u)).im) -
+46-      (↑(v u) ^ 2).im * ((Complex.cos (↑r * ↑u)).im + (Complex.sin (↑r * ↑u)).re) =
+47-    v u ^ 2 * cos (r * u)
+48-warning: Zeta23/GapMatching/DWindowRampEstimate.lean:242:28: This simp argument is unused:
+49-  Complex.cos_ofReal_re
+50-
+51-Hint: Omit it from the simp argument list.
+52-  [apply] simp [Complex.mul_re, Complex.cos_ofReal_im, Complex.sin_ofReal_re, Complex.sin_ofReal_im]
+53-
+54-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+--
+72-Hint: Omit it from the simp argument list.
+73-  [apply] simp [Complex.mul_re, Complex.cos_ofReal_re, Complex.cos_ofReal_im, Complex.sin_ofReal_re]
+74-
+75-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+76:error: Lean exited with code 1
+77-Some required targets logged failures:
+78-- Zeta23.GapMatching.DWindowRampEstimate
+79:error: build failed
+
+## main log tail
+hexp : Continuous fun u ↦ Complex.exp (Complex.I * ↑r * ↑u)
+hcont : Continuous fun u ↦ ↑(v u ^ 2) * Complex.exp (Complex.I * ↑r * ↑u)
+hint : Integrable (fun u ↦ ↑(v u ^ 2) * Complex.exp (Complex.I * ↑r * ↑u)) volume
+u : ℝ
+hexponent : Complex.I * ↑r * ↑u = ↑(r * u) * Complex.I
+⊢ (↑(v u) ^ 2).re * ((Complex.cos (↑r * ↑u)).re + -(Complex.sin (↑r * ↑u)).im) -
+      (↑(v u) ^ 2).im * ((Complex.cos (↑r * ↑u)).im + (Complex.sin (↑r * ↑u)).re) =
+    v u ^ 2 * cos (r * u)
+warning: Zeta23/GapMatching/DWindowRampEstimate.lean:242:28: This simp argument is unused:
+  Complex.cos_ofReal_re
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Complex.mul_re, Complex.cos_ofReal_im, Complex.sin_ofReal_re, Complex.sin_ofReal_im]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Zeta23/GapMatching/DWindowRampEstimate.lean:243:8: This simp argument is unused:
+  Complex.cos_ofReal_im
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Complex.mul_re, Complex.cos_ofReal_re, Complex.sin_ofReal_re, Complex.sin_ofReal_im]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Zeta23/GapMatching/DWindowRampEstimate.lean:243:31: This simp argument is unused:
+  Complex.sin_ofReal_re
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Complex.mul_re, Complex.cos_ofReal_re, Complex.cos_ofReal_im, Complex.sin_ofReal_im]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Zeta23/GapMatching/DWindowRampEstimate.lean:244:8: This simp argument is unused:
+  Complex.sin_ofReal_im
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Complex.mul_re, Complex.cos_ofReal_re, Complex.cos_ofReal_im, Complex.sin_ofReal_re]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: Lean exited with code 1
+Some required targets logged failures:
+- Zeta23.GapMatching.DWindowRampEstimate
+error: build failed
+
+## tail errors
+24-
+25-Note: This linter can be disabled with `set_option linter.unusedTactic false`
+26-✖ [8721/8721] Building Zeta23.GapMatching.DWindowFiniteGridApprox (4.7s)
+27-trace: .> LEAN_PATH=/home/runner/work/_temp/zeta23/.lake/packages/Cli/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/batteries/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/Qq/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/aesop/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/importGraph/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/plausible/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/mathlib/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/build/lib/lean /home/runner/.elan/toolchains/leanprover--lean4---v4.33.0-rc2/bin/lean /home/runner/work/_temp/zeta23/Zeta23/GapMatching/DWindowFiniteGridApprox.lean -o /home/runner/work/_temp/zeta23/.lake/build/lib/lean/Zeta23/GapMatching/DWindowFiniteGridApprox.olean -i /home/runner/work/_temp/zeta23/.lake/build/lib/lean/Zeta23/GapMatching/DWindowFiniteGridApprox.ilean -c /home/runner/work/_temp/zeta23/.lake/build/ir/Zeta23/GapMatching/DWindowFiniteGridApprox.c --setup /home/runner/work/_temp/zeta23/.lake/build/ir/Zeta23/GapMatching/DWindowFiniteGridApprox.setup.json --json
+28:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:63:2: Type mismatch: After simplification, term
+29-  hscaled
+30- has type
+31-  @HasSum ℝ ℤ instAddCommMonoid PseudoMetricSpace.toUniformSpace.toTopologicalSpace
+32-    (fun k ↦ (av v L * L ^ 2)⁻¹ * (vHatR v (tau - (T + ↑k * (2 * π / L))) * vHatR v (tau' - (T + ↑k * (2 * π / L)))))
+33-    ((av v L * L ^ 2)⁻¹ * (L * VPhiR v (tau - tau'))) (SummationFilter.unconditional ℤ)
+34-but is expected to have type
+35-  @HasSum ℝ ℤ instAddCommMonoid PseudoMetricSpace.toUniformSpace.toTopologicalSpace (normalizedTerm v L T tau tau')
+36-    ((av v L * L ^ 2)⁻¹ * (L * VPhiR v (tau - tau'))) (SummationFilter.unconditional ℤ)
+37:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:84:4: failed to prove positivity/nonnegativity/nonzeroness
+38:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:97:4: Type mismatch
+39-  left_argument_lower (LT.lt.le hD) (LT.lt.le hh) hleftTau
+40-has type
+41-  ∀ (n : ℕ), D + ↑n * h ≤ |tau - (T - (↑n + 1) * h)|
+42-but is expected to have type
+43-  ∀ (n : ℝ), D + n * h ≤ |tau - (T - (n + 1) * h)|
+44:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:100:4: Type mismatch
+45-  left_argument_lower (LT.lt.le hD) (LT.lt.le hh) hleftTau'
+46-has type
+47-  ∀ (n : ℕ), D + ↑n * h ≤ |tau' - (T - (↑n + 1) * h)|
+48-but is expected to have type
+49-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T - (n + 1) * h)|
+50:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:102:33: Application type mismatch: The argument
+51-  hxLeftArg
+52-has type
+53-  ∀ (n : ℝ), D + n * h ≤ |tau - (T - (n + 1) * h)|
+54-but is expected to have type
+55-  ∀ (n : ℕ), D + ↑n * h ≤ |tau - (T - (↑n + 1) * h)|
+56-in the application
+57-  summable_vHatR_sq hW hD hh (fun n ↦ tau - (T - (↑n + 1) * h)) hxLeftArg
+58:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:104:33: Application type mismatch: The argument
+59-  hyLeftArg
+60-has type
+61-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T - (n + 1) * h)|
+62-but is expected to have type
+63-  ∀ (n : ℕ), D + ↑n * h ≤ |tau' - (T - (↑n + 1) * h)|
+64-in the application
+65-  summable_vHatR_sq hW hD hh (fun n ↦ tau' - (T - (↑n + 1) * h)) hyLeftArg
+66:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:107:35: Application type mismatch: The argument
+67-  hxLeftArg
+68-has type
+69-  ∀ (n : ℝ), D + n * h ≤ |tau - (T - (n + 1) * h)|
+70-but is expected to have type
+71-  ∀ (n : ℕ), D + ↑n * h ≤ |?m.408 n|
+72-in the application
+73-  tsum_vHatR_sq_le hW hD hh ?m.408 hxLeftArg
+74:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:110:35: Application type mismatch: The argument
+75-  hyLeftArg
+76-has type
+77-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T - (n + 1) * h)|
+78-but is expected to have type
+79-  ∀ (n : ℕ), D + ↑n * h ≤ |?m.452 n|
+80-in the application
+81-  tsum_vHatR_sq_le hW hD hh ?m.452 hyLeftArg
+82:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:123:4: Type mismatch
+83-  right_argument_lower (LT.lt.le hD) (LT.lt.le hh) hrightTau
+84-has type
+85-  ∀ (n : ℕ), D + ↑n * h ≤ |tau - (T + (↑d + ↑n) * h)|
+86-but is expected to have type
+87-  ∀ (n : ℝ), D + n * h ≤ |tau - (T + (↑d + n) * h)|
+88:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:126:4: Type mismatch
+89-  right_argument_lower (LT.lt.le hD) (LT.lt.le hh) hrightTau'
+90-has type
+91-  ∀ (n : ℕ), D + ↑n * h ≤ |tau' - (T + (↑d + ↑n) * h)|
+92-but is expected to have type
+93-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T + (↑d + n) * h)|
+94:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:128:33: Application type mismatch: The argument
+95-  hxRightArg
+96-has type
+97-  ∀ (n : ℝ), D + n * h ≤ |tau - (T + (↑d + n) * h)|
+98-but is expected to have type
+99-  ∀ (n : ℕ), D + ↑n * h ≤ |tau - (T + (↑d + ↑n) * h)|
+100-in the application
+101-  summable_vHatR_sq hW hD hh (fun n ↦ tau - (T + (↑d + ↑n) * h)) hxRightArg
+102:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:130:33: Application type mismatch: The argument
+103-  hyRightArg
+104-has type
+105-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T + (↑d + n) * h)|
+106-but is expected to have type
+107-  ∀ (n : ℕ), D + ↑n * h ≤ |tau' - (T + (↑d + ↑n) * h)|
+108-in the application
+109-  summable_vHatR_sq hW hD hh (fun n ↦ tau' - (T + (↑d + ↑n) * h)) hyRightArg
+110:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:133:35: Application type mismatch: The argument
+111-  hxRightArg
+112-has type
+113-  ∀ (n : ℝ), D + n * h ≤ |tau - (T + (↑d + n) * h)|
+114-but is expected to have type
+115-  ∀ (n : ℕ), D + ↑n * h ≤ |?m.727 n|
+116-in the application
+117-  tsum_vHatR_sq_le hW hD hh ?m.727 hxRightArg
+118:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:136:35: Application type mismatch: The argument
+119-  hyRightArg
+120-has type
+121-  ∀ (n : ℝ), D + n * h ≤ |tau' - (T + (↑d + n) * h)|
+122-but is expected to have type
+123-  ∀ (n : ℕ), D + ↑n * h ≤ |?m.771 n|
+124-in the application
+125-  tsum_vHatR_sq_le hW hD hh ?m.771 hyRightArg
+126:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:148:4: Type mismatch: After simplification, term
+127-  hleftRaw
+128- has type
+129-  |∑' (n : ℕ),
+130-        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+131-          (vHatR v (tau - (T - (↑n + 1) * (2 * π / L))) * vHatR v (tau' - (T - (↑n + 1) * (2 * π / L))))| ≤
+132-    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+133-but is expected to have type
+134-  |∑' (n : ℕ),
+135-        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+136-          (vHatR v (tau - (T + (-1 + -↑n) * (2 * π / L))) * vHatR v (tau' - (T + (-1 + -↑n) * (2 * π / L))))| ≤
+137-    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+138:error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:151:4: Type mismatch: After simplification, term
+139-  hrightRaw
+140- has type
+141-  |∑' (n : ℕ),
+142-        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+143-          (vHatR v (tau - (T + (↑d + ↑n) * (2 * π / L))) * vHatR v (tau' - (T + (↑d + ↑n) * (2 * π / L))))| ≤
+144-    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+145-but is expected to have type
+146-  |∑' (n : ℕ),
+147-        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+148-          (vHatR v (tau - (T + (↑n + ↑d) * (2 * π / L))) * vHatR v (tau' - (T + (↑n + ↑d) * (2 * π / L))))| ≤
+149-    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+150:error: Lean exited with code 1
+151-Some required targets logged failures:
+152-- Zeta23.GapMatching.DWindowFiniteGridApprox
+153:error: build failed
+
+## tail log tail
+but is expected to have type
+  ∀ (n : ℕ), D + ↑n * h ≤ |?m.727 n|
+in the application
+  tsum_vHatR_sq_le hW hD hh ?m.727 hxRightArg
+error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:136:35: Application type mismatch: The argument
+  hyRightArg
+has type
+  ∀ (n : ℝ), D + n * h ≤ |tau' - (T + (↑d + n) * h)|
+but is expected to have type
+  ∀ (n : ℕ), D + ↑n * h ≤ |?m.771 n|
+in the application
+  tsum_vHatR_sq_le hW hD hh ?m.771 hyRightArg
+error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:148:4: Type mismatch: After simplification, term
+  hleftRaw
+ has type
+  |∑' (n : ℕ),
+        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+          (vHatR v (tau - (T - (↑n + 1) * (2 * π / L))) * vHatR v (tau' - (T - (↑n + 1) * (2 * π / L))))| ≤
+    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+but is expected to have type
+  |∑' (n : ℕ),
+        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+          (vHatR v (tau - (T + (-1 + -↑n) * (2 * π / L))) * vHatR v (tau' - (T + (-1 + -↑n) * (2 * π / L))))| ≤
+    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+error: Zeta23/GapMatching/DWindowFiniteGridApprox.lean:151:4: Type mismatch: After simplification, term
+  hrightRaw
+ has type
+  |∑' (n : ℕ),
+        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+          (vHatR v (tau - (T + (↑d + ↑n) * (2 * π / L))) * vHatR v (tau' - (T + (↑d + ↑n) * (2 * π / L))))| ≤
+    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+but is expected to have type
+  |∑' (n : ℕ),
+        (L ^ 2)⁻¹ * (av v L)⁻¹ *
+          (vHatR v (tau - (T + (↑n + ↑d) * (2 * π / L))) * vHatR v (tau' - (T + (↑n + ↑d) * (2 * π / L))))| ≤
+    (L ^ 2)⁻¹ * (av v L)⁻¹ * q
+error: Lean exited with code 1
+Some required targets logged failures:
+- Zeta23.GapMatching.DWindowFiniteGridApprox
+error: build failed
+
+## join errors
+1-✔ [8697/8699] Built Zeta23.GapMatching.FiniteStateGapPotential (4.1s)
+2-✔ [8698/8699] Built Zeta23.GapMatching.OneBandPotentialSafeNumerics (3.9s)
+3-✖ [8699/8699] Building Zeta23.GapMatching.OneBandGapWord (3.5s)
+4-trace: .> LEAN_PATH=/home/runner/work/_temp/zeta23/.lake/packages/Cli/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/batteries/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/Qq/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/aesop/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/importGraph/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/plausible/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/packages/mathlib/.lake/build/lib/lean:/home/runner/work/_temp/zeta23/.lake/build/lib/lean /home/runner/.elan/toolchains/leanprover--lean4---v4.33.0-rc2/bin/lean /home/runner/work/_temp/zeta23/Zeta23/GapMatching/OneBandGapWord.lean -o /home/runner/work/_temp/zeta23/.lake/build/lib/lean/Zeta23/GapMatching/OneBandGapWord.olean -i /home/runner/work/_temp/zeta23/.lake/build/lib/lean/Zeta23/GapMatching/OneBandGapWord.ilean -c /home/runner/work/_temp/zeta23/.lake/build/ir/Zeta23/GapMatching/OneBandGapWord.c --setup /home/runner/work/_temp/zeta23/.lake/build/ir/Zeta23/GapMatching/OneBandGapWord.setup.json --json
+5:error: Zeta23/GapMatching/OneBandGapWord.lean:98:6: Type mismatch: After simplification, term
+6-  ih (start + 1)
+7- has type
+8-  @ValidPath State instDecidableEqState A B State.good phi (stateOf U start)
+9-    (wordFrom U length shortWeight longWeight (start + 1) count)
+10-but is expected to have type
+11-  @ValidPath State instDecidableEqState A B State.good phi (datumAt U length shortWeight longWeight start).state
+12-    (wordFrom U length shortWeight longWeight (start + 1) count)
+13:error: Zeta23/GapMatching/OneBandGapWord.lean:158:30: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+14-  candidateWeight State.good (previousState U (start + 1)) (wordFrom U length shortWeight longWeight (start + 1) count)
+15-in the target expression
+16-  localWeight U shortWeight longWeight start +
+17-      candidateWeight State.good (datumAt U length shortWeight longWeight start).state
+18-        (wordFrom U length shortWeight longWeight (start + 1) count) =
+19-    ∑ k ∈ Finset.range count, localWeight U shortWeight longWeight (start + (k + 1)) +
+20-      localWeight U shortWeight longWeight (start + 0)
+21-
+22-case succ
+23-U : ℕ → Bool
+24-length shortWeight longWeight : ℕ → ℝ
+25-count : ℕ
+26-ih :
+27-  ∀ (start : ℕ),
+28-    candidateWeight State.good (previousState U start) (wordFrom U length shortWeight longWeight start count) =
+29-      ∑ j ∈ Finset.range count, localWeight U shortWeight longWeight (start + j)
+30-start : ℕ
+31-⊢ localWeight U shortWeight longWeight start +
+32-      candidateWeight State.good (datumAt U length shortWeight longWeight start).state
+33-        (wordFrom U length shortWeight longWeight (start + 1) count) =
+34-    ∑ k ∈ Finset.range count, localWeight U shortWeight longWeight (start + (k + 1)) +
+35-      localWeight U shortWeight longWeight (start + 0)
+36:error: Zeta23/GapMatching/OneBandGapWord.lean:191:6: Tactic `apply` failed: could not unify the conclusion of `congrArg fun x ↦ length start + x`
+37-  length start + ?m.49 = length start + ?m.50
+38-with the goal
+39-  (datumAt U length shortWeight longWeight start).length + ∑ j ∈ Finset.range count, length (start + 1 + j) =
+40-    ∑ k ∈ Finset.range count, length (start + (k + 1)) + length (start + 0)
+41-
+42-Note: The full type of `congrArg fun x ↦ length start + x` is
+43-  ?m.49 = ?m.50 → length start + ?m.49 = length start + ?m.50
+44-
+45-case succ
+46-U : ℕ → Bool
+47-length shortWeight longWeight : ℕ → ℝ
+48-count : ℕ
+49-ih :
+50-  ∀ (start : ℕ),
+51-    totalLength (wordFrom U length shortWeight longWeight start count) = ∑ j ∈ Finset.range count, length (start + j)
+52-start : ℕ
+53-⊢ (datumAt U length shortWeight longWeight start).length + ∑ j ∈ Finset.range count, length (start + 1 + j) =
+54-    ∑ k ∈ Finset.range count, length (start + (k + 1)) + length (start + 0)
+55:error: Lean exited with code 1
+56-Some required targets logged failures:
+57-- Zeta23.GapMatching.OneBandGapWord
+58:error: build failed
+
+## join log tail
+    ∑ k ∈ Finset.range count, localWeight U shortWeight longWeight (start + (k + 1)) +
+      localWeight U shortWeight longWeight (start + 0)
+
+case succ
+U : ℕ → Bool
+length shortWeight longWeight : ℕ → ℝ
+count : ℕ
+ih :
+  ∀ (start : ℕ),
+    candidateWeight State.good (previousState U start) (wordFrom U length shortWeight longWeight start count) =
+      ∑ j ∈ Finset.range count, localWeight U shortWeight longWeight (start + j)
+start : ℕ
+⊢ localWeight U shortWeight longWeight start +
+      candidateWeight State.good (datumAt U length shortWeight longWeight start).state
+        (wordFrom U length shortWeight longWeight (start + 1) count) =
+    ∑ k ∈ Finset.range count, localWeight U shortWeight longWeight (start + (k + 1)) +
+      localWeight U shortWeight longWeight (start + 0)
+error: Zeta23/GapMatching/OneBandGapWord.lean:191:6: Tactic `apply` failed: could not unify the conclusion of `congrArg fun x ↦ length start + x`
+  length start + ?m.49 = length start + ?m.50
+with the goal
+  (datumAt U length shortWeight longWeight start).length + ∑ j ∈ Finset.range count, length (start + 1 + j) =
+    ∑ k ∈ Finset.range count, length (start + (k + 1)) + length (start + 0)
+
+Note: The full type of `congrArg fun x ↦ length start + x` is
+  ?m.49 = ?m.50 → length start + ?m.49 = length start + ?m.50
+
+case succ
+U : ℕ → Bool
+length shortWeight longWeight : ℕ → ℝ
+count : ℕ
+ih :
+  ∀ (start : ℕ),
+    totalLength (wordFrom U length shortWeight longWeight start count) = ∑ j ∈ Finset.range count, length (start + j)
+start : ℕ
+⊢ (datumAt U length shortWeight longWeight start).length + ∑ j ∈ Finset.range count, length (start + 1 + j) =
+    ∑ k ∈ Finset.range count, length (start + (k + 1)) + length (start + 0)
+error: Lean exited with code 1
+Some required targets logged failures:
+- Zeta23.GapMatching.OneBandGapWord
+error: build failed
