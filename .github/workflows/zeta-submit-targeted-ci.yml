@@ -1,0 +1,75 @@
+name: Zeta submission targeted CI
+
+on:
+  push:
+    branches: ["research/zeta-two-band-submit"]
+    paths: [".github/workflows/zeta-submit-targeted-ci.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: zeta-submit-targeted-ci
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install pinned Lean toolchain manager
+        run: ./scripts/install-lean-toolchain.sh
+      - name: Check out research base
+        run: |
+          git clone --depth 1 https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git fetch --depth 1 origin a6bcd8a58fc9c95615fde8594c06c543fd979641
+          git checkout a6bcd8a58fc9c95615fde8594c06c543fd979641
+      - name: Assemble research tree
+        run: |
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          cp research/zeta-two-band-ci/FiniteStateGapPotential.lean "$GAP/FiniteStateGapPotential.lean"
+          cp research/zeta-two-band-ci/FiniteStatePathWeight.lean "$GAP/FiniteStatePathWeight.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean "$GAP/TwoBandPotentialSafeNumerics.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean "$GAP/TwoBandPotentialOverlap.lean"
+          cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean "$GAP/TwoBandPotentialAnalyticBridge.lean"
+          cp research/zeta-two-band-ci/CandidateStrictImprovement.lean "$GAP/CandidateStrictImprovement.lean"
+          cp research/zeta-two-band-ci/CandidateStrictImprovementTight.lean "$GAP/CandidateStrictImprovementTight.lean"
+          cp research/zeta-two-band-ci/OneBandBaselineLower.lean "$GAP/OneBandBaselineLower.lean"
+          cp research/zeta-two-band-ci/v7/DNormalizedMoments.lean "$GAP/DNormalizedMoments.lean"
+          cp research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean "$GAP/ScalarBonusCertificate.lean"
+          cp research/zeta-two-band-ci/TwoBandGapMatchingD.lean "$GAP/TwoBandGapMatchingD.lean"
+          cp research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean "$GAP/TwoBandGapMatchingDPath.lean"
+          cp research/zeta-two-band-ci/CentralPathConstructionD.lean "$GAP/CentralPathConstructionD.lean"
+          cp research/zeta-two-band-ci/GuardedWindowCount.lean "$GAP/GuardedWindowCount.lean"
+          cp research/zeta-two-band-ci/CentralGuardCountD.lean "$GAP/CentralGuardCountD.lean"
+          cp research/zeta-two-band-ci/OrderedPointGaps.lean "$GAP/OrderedPointGaps.lean"
+          cp research/zeta-two-band-ci/DWindowLength.lean "$GAP/DWindowLength.lean"
+          cp research/zeta-two-band-ci/CentralGapGeometryD.lean "$GAP/CentralGapGeometryD.lean"
+          cp research/zeta-two-band-ci/v7/DWindowOverlap.lean "$GAP/DWindowOverlap.lean"
+          cp research/zeta-two-band-ci/v7/DWindowRampEstimate.lean "$GAP/DWindowRampEstimate.lean"
+          cp research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean "$GAP/DWindowProfileAlgebra.lean"
+          cp research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean "$GAP/OneBandPotentialSafeNumerics.lean"
+          cp research/zeta-two-band-ci/OneBandPotentialOverlap.lean "$GAP/OneBandPotentialOverlap.lean"
+          cp research/zeta-join-ci/OneBandGapWord.lean "$GAP/OneBandGapWord.lean"
+          cp research/zeta-join-ci/CanonicalOneBandPathD.lean "$GAP/CanonicalOneBandPathD.lean"
+          cp research/zeta-two-band-ci/OneBandPathEnergy.lean "$GAP/OneBandPathEnergy.lean"
+          base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/patch_ci_sources_v2.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/patch_ci_sources_v3.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/generate_one_band_d.py "$RUNNER_TEMP/zeta23"
+      - name: Restore Mathlib cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get
+      - name: Compile targeted modules
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set -o pipefail
+          lake build \
+            Zeta23.GapMatching.OneBandBaselineLower \
+            Zeta23.GapMatching.OneBandPathEnergy \
+            2>&1 | tee "$RUNNER_TEMP/zeta-submit-targeted.log"
