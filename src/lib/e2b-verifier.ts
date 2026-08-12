@@ -10,8 +10,9 @@ import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 
 // E2B's `timeoutMs` is the sandbox lifetime, including on `connect`; it is not
 // a client connection timeout. Keep every create/read/finalize connection
-// comfortably beyond the verifier's 54-minute hard limit.
-const E2B_JOB_TIMEOUT_MS = 65 * 60 * 1_000;
+// beyond the verifier's 54-minute hard limit. E2B caps this account's sandbox
+// lifetime at exactly one hour.
+const E2B_JOB_TIMEOUT_MS = 60 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
 

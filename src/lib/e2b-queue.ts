@@ -9,9 +9,9 @@ import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 // invalidate an already smoke-tested immutable E2B template.
 // E2B's `timeoutMs` is the sandbox lifetime, including on `connect`; it is not
 // a client connection timeout. Keep it comfortably beyond the verifier's
-// 54-minute hard limit so the result finalizer always has time to write its
-// durable receipt.
-const E2B_JOB_TIMEOUT_MS = 65 * 60 * 1_000;
+// 54-minute hard limit so the result finalizer has time to write its durable
+// receipt. E2B caps this account's sandbox lifetime at exactly one hour.
+const E2B_JOB_TIMEOUT_MS = 60 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
 
