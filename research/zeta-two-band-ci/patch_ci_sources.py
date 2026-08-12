@@ -150,7 +150,8 @@ def main() -> None:
       .integrable_of_hasCompactSupport
         hW.vSqC_hasCompactSupport.mul_right
   unfold AdmWindow.VPhiR AdmWindow.VPhi
-  rw [paperFT_def, integral_re_C hint]""",
+  rw [paperFT_def, integral_re_C hint]
+  apply integral_congr_ae""",
         """  have hexp : Continuous
       (fun u : ℝ => Complex.exp
         (Complex.I * (r : ℂ) * (u : ℂ))) := by
@@ -165,7 +166,15 @@ def main() -> None:
     hcont.integrable_of_hasCompactSupport
       hW.vSqC_hasCompactSupport.mul_right
   unfold AdmWindow.VPhiR AdmWindow.VPhi
-  rw [paperFT_def, ← integral_re hint]""",
+  rw [paperFT_def]
+  calc
+    (∫ u, (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))).re
+        = ∫ u, ((((v u) ^ 2 : ℝ) : ℂ)
+          * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))).re := by
+            exact (integral_re hint).symm
+    _ = ∫ u, v u ^ 2 * Real.cos (r * u) := by
+      apply integral_congr_ae""",
     )
 
     one_band = gap_dir / "OneBandPotentialSafeNumerics.lean"
