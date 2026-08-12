@@ -60,10 +60,9 @@ theorem norm_finite_sub_tsum_le
             + ∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
     ring
   rw [hid, abs_neg]
-  have htri := norm_add_le
+  exact abs_add_le
     (∑' n : ℕ, f (-((n : ℤ) + 1)))
     (∑' n : ℕ, f ((n + d : ℕ) : ℤ))
-  simpa only [Real.norm_eq_abs] using htri
 
 /-- Quantitative wrapper for two separately controlled tails. -/
 theorem norm_finite_sub_tsum_le_of_tail_bounds
