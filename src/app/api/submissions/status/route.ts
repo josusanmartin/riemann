@@ -23,6 +23,7 @@ import {
   inspectVerificationJob,
   type QueueCompletionReceipt,
 } from "@/lib/submission-queue";
+import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -43,13 +44,19 @@ function completedReceiptResponse(
     throw new Error("The durable queue receipt does not match the verification job");
   }
   if (receipt.outcome === "rejected") {
+    const feedback =
+      receipt.feedback ??
+      describeVerifierRejection(
+        "",
+        receipt.message ?? "The formal verifier rejected this candidate.",
+      );
     return noStore(200, {
       status: "rejected",
       submissionId,
       proofDigest: receipt.proofDigest,
       completedAt: receipt.completedAt,
-      message:
-        receipt.message ?? "The formal verifier rejected this candidate.",
+      message: feedback.detail,
+      feedback,
     });
   }
   return noStore(200, {
@@ -155,17 +162,23 @@ export async function GET(request: Request): Promise<Response> {
     }
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
+      const feedback = describeVerifierRejection(result.log, result.message);
       if (queueManaged) {
         await advanceVerificationQueue(job.jobId, {
           outcome: "rejected",
           promotionStatus: null,
-          message: result.message,
+          message: feedback.detail,
+          feedback,
           evidenceUrl: null,
           completedAt: result.completedAt,
         });
       }
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
-      return noStore(200, result);
+      return noStore(200, {
+        ...result,
+        message: feedback.detail,
+        feedback,
+      });
     }
     if (!isGitHubPromotionConfigured()) {
       return noStore(200, {
@@ -215,6 +228,10 @@ export async function GET(request: Request): Promise<Response> {
   } catch (error) {
     const { SandboxNotFoundError } = await import("e2b");
     if (error instanceof SandboxNotFoundError) {
+      const feedback = describeVerifierRejection(
+        "",
+        "The isolated verifier expired before producing a result.",
+      );
       let jobId: string | null = null;
       try {
         jobId = verifySubmissionJob(token, secret).jobId;
@@ -223,7 +240,8 @@ export async function GET(request: Request): Promise<Response> {
           await advanceVerificationQueue(jobId, {
             outcome: "rejected",
             promotionStatus: null,
-            message: "The isolated verifier expired before producing a result.",
+            message: feedback.detail,
+            feedback,
             evidenceUrl: null,
           });
         }
@@ -232,7 +250,8 @@ export async function GET(request: Request): Promise<Response> {
       }
       return noStore(410, {
         error: "job_expired",
-        message: "This verification sandbox expired before a result was collected.",
+        message: feedback.detail,
+        feedback,
       });
     }
     const message = error instanceof Error ? error.message : "Invalid verification job.";

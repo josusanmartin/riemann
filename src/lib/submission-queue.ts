@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { z } from "zod";
 import { githubLoginSchema } from "@/lib/challenge";
 import { RECORDS_BRANCH, RECORDS_REPOSITORY } from "@/lib/github-promotion";
+import { verifierFeedbackSchema } from "@/lib/verifier-feedback";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
@@ -39,6 +40,7 @@ export const queueCompletionReceiptSchema = z
     outcome: z.enum(["rejected", "promoted", "superseded"]),
     promotionStatus: z.enum(["promoted", "already-promoted"]).nullable(),
     message: z.string().min(1).max(2_000).nullable(),
+    feedback: verifierFeedbackSchema.optional(),
     evidenceUrl: z.url().max(1_000).nullable(),
     completedAt: z.string().datetime({ offset: true }),
   })
@@ -54,6 +56,12 @@ export const queueCompletionReceiptSchema = z
       context.addIssue({
         code: "custom",
         message: "Only promoted queue receipts may have a promotion status",
+      });
+    }
+    if (receipt.outcome !== "rejected" && receipt.feedback) {
+      context.addIssue({
+        code: "custom",
+        message: "Only rejected queue receipts may include verifier feedback",
       });
     }
   });

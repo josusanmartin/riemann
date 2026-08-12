@@ -23,6 +23,7 @@ import {
   ensureQueuedJobRunning,
 } from "@/lib/queue-orchestration";
 import { inspectVerificationJob } from "@/lib/submission-queue";
+import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -107,11 +108,13 @@ export async function POST(request: Request): Promise<Response> {
     }
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
+      const feedback = describeVerifierRejection(result.log, result.message);
       if (queueManaged) {
         await advanceVerificationQueue(job.jobId, {
           outcome: "rejected",
           promotionStatus: null,
-          message: result.message,
+          message: feedback.detail,
+          feedback,
           evidenceUrl: null,
           completedAt: result.completedAt,
         });
@@ -120,6 +123,7 @@ export async function POST(request: Request): Promise<Response> {
       return noStore(200, {
         status: "rejected-cleaned",
         submissionId: job.submissionId,
+        feedbackCode: feedback.code,
       });
     }
     if (!isGitHubPromotionConfigured()) {

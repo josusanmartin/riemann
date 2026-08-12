@@ -10,6 +10,7 @@ import {
   type QueueInspection,
   type QueuedVerificationJob,
 } from "@/lib/submission-queue";
+import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
 type QueueCoordinates = {
   sandboxId: string;
@@ -69,11 +70,16 @@ export async function advanceVerificationQueue(
       console.error("Skipping an expired queued verification sandbox", {
         jobId: next.jobId,
       });
+      const feedback = describeVerifierRejection(
+        "",
+        "The isolated verifier expired before producing a result.",
+      );
       next = (
         await completeVerificationJob(next.jobId, {
           outcome: "rejected",
           promotionStatus: null,
-          message: "The isolated verifier expired before producing a result.",
+          message: feedback.detail,
+          feedback,
           evidenceUrl: null,
         })
       ).next;

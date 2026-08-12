@@ -13,6 +13,20 @@ type JobPhase =
   | "rejected"
   | "error";
 
+type VerifierFeedbackPayload = {
+  code: string;
+  stage: string;
+  title: string;
+  detail: string;
+  action: string;
+  retryable: boolean;
+  location?: {
+    file: "Solution.lean";
+    line: number;
+    column: number;
+  };
+};
+
 type StatusPayload = {
   status?: "queued" | "running" | "verified" | "rejected";
   submissionId?: string;
@@ -23,6 +37,7 @@ type StatusPayload = {
   queuePosition?: number;
   dailyUsed?: number;
   dailyLimit?: number;
+  feedback?: VerifierFeedbackPayload;
   promotion?: {
     status?: string;
     message?: string;
@@ -36,6 +51,18 @@ type RecoveryPayload = Omit<StatusPayload, "status"> & {
 
 const MAX_FILE_BYTES = 2_000_000;
 const ACTIVE_JOB_STORAGE_PREFIX = "riemann.fail:active-verification:v1";
+
+const feedbackStageLabels: Record<string, string> = {
+  submission: "Submission intake",
+  "lean-compilation": "Lean compilation",
+  "theorem-contract": "Theorem contract",
+  "axiom-audit": "Axiom audit",
+  "nanoda-kernel": "Nanoda kernel",
+  "lean-kernel": "Lean kernel",
+  runtime: "Runtime limit",
+  infrastructure: "Verifier infrastructure",
+  unknown: "Unclassified verifier stage",
+};
 
 type StoredActiveJob = {
   jobToken: string;
@@ -93,6 +120,7 @@ export function DirectSubmissionForm({
   const [phase, setPhase] = useState<JobPhase>("idle");
   const [message, setMessage] = useState("");
   const [log, setLog] = useState("");
+  const [feedback, setFeedback] = useState<VerifierFeedbackPayload | null>(null);
   const [digest, setDigest] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const pollGeneration = useRef(0);
@@ -114,7 +142,8 @@ export function DirectSubmissionForm({
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
             clearActiveJob(storageKey);
-            setPhase("error");
+            setFeedback(payload.feedback ?? null);
+            setPhase(payload.feedback ? "rejected" : "error");
             setMessage(payload.message ?? "This verification job is no longer available.");
             return;
           }
@@ -143,6 +172,7 @@ export function DirectSubmissionForm({
 
         setDigest(payload.proofDigest ?? "");
         setLog(payload.log ?? "");
+        setFeedback(payload.feedback ?? null);
         clearActiveJob(storageKey);
         if (payload.status === "verified") {
           if (payload.promotion?.status === "superseded") {
@@ -235,6 +265,7 @@ export function DirectSubmissionForm({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLog("");
+    setFeedback(null);
     setDigest("");
     setEvidenceUrl("");
     if (!verifierConfigured) {
@@ -391,7 +422,7 @@ export function DirectSubmissionForm({
           {busy ? <LoaderCircle className="spin" size={23} /> : phase === "verified" ? <CheckCircle2 size={23} /> : <ShieldAlert size={23} />}
         </div>
         <div>
-          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
+          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? feedback?.title ?? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
           <p>{message || "Nothing is accepted until Lean and nanoda independently replay the proof."}</p>
           {digest && <code>sha256:{digest}</code>}
           {evidenceUrl && <a href={evidenceUrl} target="_blank" rel="noreferrer">Open immutable evidence</a>}
@@ -401,7 +432,28 @@ export function DirectSubmissionForm({
         </button>
       </div>
 
-      {log && <details className="verification-log"><summary>Verifier log</summary><pre>{log}</pre></details>}
+      {phase === "rejected" && feedback && (
+        <section className="verification-feedback" aria-label="Verifier diagnosis">
+          <div className="verification-feedback-meta">
+            <span>
+              Failed at {feedbackStageLabels[feedback.stage] ?? "Verification"}
+              {feedback.location
+                ? ` · ${feedback.location.file}:${feedback.location.line}:${feedback.location.column}`
+                : ""}
+            </span>
+            <code>{feedback.code}</code>
+          </div>
+          <h4>What to do next</h4>
+          <p>{feedback.action}</p>
+          <small>
+            {feedback.retryable
+              ? "The checker marked this as retryable infrastructure trouble; it is not a mathematical rejection."
+              : "Change or diagnose the source before using another daily submission."}
+          </small>
+        </section>
+      )}
+
+      {log && <details className="verification-log"><summary>Technical verifier log (not published)</summary><pre>{log}</pre></details>}
     </form>
   );
 }

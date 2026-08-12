@@ -24,6 +24,7 @@ import {
   getActiveVerificationJob,
   type QueuedVerificationJob,
 } from "@/lib/submission-queue";
+import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -83,11 +84,13 @@ export async function GET(request: Request): Promise<Response> {
     }
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
+      const feedback = describeVerifierRejection(result.log, result.message);
       if (queueManaged) {
         await advanceVerificationQueue(job.jobId, {
           outcome: "rejected",
           promotionStatus: null,
-          message: result.message,
+          message: feedback.detail,
+          feedback,
           evidenceUrl: null,
           completedAt: result.completedAt,
         });
@@ -96,6 +99,7 @@ export async function GET(request: Request): Promise<Response> {
       return noStore(200, {
         status: "rejected-cleaned",
         submissionId: job.submissionId,
+        feedbackCode: feedback.code,
       });
     }
     try {
@@ -134,10 +138,15 @@ export async function GET(request: Request): Promise<Response> {
   } catch (error) {
     const { SandboxNotFoundError } = await import("e2b");
     if (activeQueueJob && error instanceof SandboxNotFoundError) {
+      const feedback = describeVerifierRejection(
+        "",
+        "The isolated verifier expired before producing a result.",
+      );
       await advanceVerificationQueue(activeQueueJob.jobId, {
         outcome: "rejected",
         promotionStatus: null,
-        message: "The isolated verifier expired before producing a result.",
+        message: feedback.detail,
+        feedback,
         evidenceUrl: null,
       }).catch((queueError) => {
         console.error("Unable to advance an expired queue job", queueError);

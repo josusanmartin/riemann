@@ -2074,6 +2074,59 @@ h3 {
   font-size: 0.59rem;
 }
 
+.verification-feedback {
+  display: grid;
+  margin-top: 14px;
+  padding: 18px 20px;
+  gap: 7px;
+  border: 1px solid #ddb2a6;
+  border-radius: var(--radius-sm);
+  background: #fff8f5;
+}
+
+.verification-feedback-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #9a3e2b;
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.verification-feedback-meta code {
+  max-width: 100%;
+  padding: 3px 6px;
+  overflow-wrap: anywhere;
+  border-radius: 5px;
+  background: #f5dfd8;
+  color: #7b3021;
+  font-size: 0.55rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.verification-feedback h4 {
+  margin: 3px 0 0;
+  font-size: 0.76rem;
+}
+
+.verification-feedback p,
+.verification-feedback small {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.69rem;
+  line-height: 1.55;
+}
+
+.verification-feedback small {
+  color: #7b3021;
+  font-size: 0.62rem;
+}
+
 .spin {
   animation: spin 1.1s linear infinite;
 }

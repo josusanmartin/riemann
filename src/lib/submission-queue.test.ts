@@ -170,7 +170,15 @@ describe("durable formal verification queue", () => {
       {
         outcome: "rejected",
         promotionStatus: null,
-        message: "The formal verifier rejected the candidate.",
+        message: "Lean could not elaborate the proof.",
+        feedback: {
+          code: "lean-elaboration-failed",
+          stage: "lean-compilation",
+          title: "Lean could not elaborate the proof",
+          detail: "Lean found a type or elaboration error.",
+          action: "Fix the first Lean error and submit again.",
+          retryable: false,
+        },
         evidenceUrl: null,
       },
       firstDay,
@@ -185,7 +193,13 @@ describe("durable formal verification queue", () => {
     );
     expect(inspectQueueState(completion.state, input(1).jobId)).toMatchObject({
       status: "completed",
-      receipt: { outcome: "rejected" },
+      receipt: {
+        outcome: "rejected",
+        feedback: {
+          code: "lean-elaboration-failed",
+          retryable: false,
+        },
+      },
     });
   });
 
@@ -232,6 +246,33 @@ describe("durable formal verification queue", () => {
         firstDay,
       ),
     ).not.toThrow();
+  });
+
+  it("keeps rejected receipts from before structured feedback readable", () => {
+    const admission = enqueueQueueState(
+      createEmptyQueueState("2026-08-11"),
+      input(1),
+      "legacy-solver",
+      ownerSecret,
+      firstDay,
+    );
+    const completion = completeQueueState(
+      admission.state,
+      input(1).jobId,
+      {
+        outcome: "rejected",
+        promotionStatus: null,
+        message: "The formal verifier exited with status 1.",
+        evidenceUrl: null,
+      },
+      firstDay,
+    );
+
+    expect(completion.result.receipt).toMatchObject({
+      outcome: "rejected",
+      message: "The formal verifier exited with status 1.",
+    });
+    expect(completion.result.receipt?.feedback).toBeUndefined();
   });
 
   it("resets admission counts at the UTC day boundary", () => {
