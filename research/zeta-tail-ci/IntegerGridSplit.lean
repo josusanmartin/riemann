@@ -60,7 +60,7 @@ theorem norm_finite_sub_tsum_le
             + ∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
     ring
   rw [hid, abs_neg]
-  exact abs_add _ _
+  exact abs_add_le _ _
 
 /-- Quantitative wrapper for two separately controlled tails. -/
 theorem norm_finite_sub_tsum_le_of_tail_bounds
