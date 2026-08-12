@@ -39,6 +39,7 @@ jobs:
           cp research/zeta-two-band-ci/TwoBandPotentialOverlap.lean "$GAP/TwoBandPotentialOverlap.lean"
           cp research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean "$GAP/TwoBandPotentialAnalyticBridge.lean"
           cp research/zeta-two-band-ci/CandidateStrictImprovement.lean "$GAP/CandidateStrictImprovement.lean"
+          cp research/zeta-two-band-ci/CandidateStrictImprovementTight.lean "$GAP/CandidateStrictImprovementTight.lean"
           cp research/zeta-two-band-ci/v7/DNormalizedMoments.lean "$GAP/DNormalizedMoments.lean"
           cp research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean "$GAP/ScalarBonusCertificate.lean"
           cp research/zeta-two-band-ci/TwoBandGapMatchingD.lean "$GAP/TwoBandGapMatchingD.lean"
@@ -84,6 +85,7 @@ jobs:
             Zeta23.GapMatching.TwoBandPotentialOverlap \
             Zeta23.GapMatching.TwoBandPotentialAnalyticBridge \
             Zeta23.GapMatching.CandidateStrictImprovement \
+            Zeta23.GapMatching.CandidateStrictImprovementTight \
             Zeta23.GapMatching.DNormalizedMoments \
             Zeta23.GapMatching.ScalarBonusCertificate \
             Zeta23.GapMatching.TwoBandGapMatchingD \
