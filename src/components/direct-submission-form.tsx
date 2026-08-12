@@ -30,6 +30,10 @@ type StatusPayload = {
   };
 };
 
+type RecoveryPayload = Omit<StatusPayload, "status"> & {
+  status?: StatusPayload["status"] | "none";
+};
+
 const MAX_FILE_BYTES = 2_000_000;
 const ACTIVE_JOB_STORAGE_PREFIX = "riemann.fail:active-verification:v1";
 
@@ -179,15 +183,50 @@ export function DirectSubmissionForm({
   }, [storageKey]);
 
   useEffect(() => {
-    const storedJob = readStoredActiveJob(storageKey);
-    if (!storedJob) return;
-    const restoreTimer = window.setTimeout(() => {
+    let cancelled = false;
+    const restore = async () => {
+      let storedJob = readStoredActiveJob(storageKey);
+      let recoveredStatus: "queued" | "running" = "running";
+      let queuePosition: number | undefined;
+      if (!storedJob) {
+        try {
+          const response = await fetch("/api/submissions/active", {
+            cache: "no-store",
+          });
+          const payload = (await response.json()) as RecoveryPayload;
+          if (
+            !response.ok ||
+            payload.status === "none" ||
+            !payload.jobToken ||
+            !payload.proofDigest ||
+            !/^[0-9a-f]{64}$/.test(payload.proofDigest)
+          ) {
+            return;
+          }
+          storedJob = {
+            jobToken: payload.jobToken,
+            proofDigest: payload.proofDigest,
+          };
+          recoveredStatus = payload.status === "queued" ? "queued" : "running";
+          queuePosition = payload.queuePosition;
+          storeActiveJob(storageKey, storedJob);
+        } catch {
+          return;
+        }
+      }
+      if (cancelled) return;
       setDigest(storedJob.proofDigest);
-      setPhase("running");
-      setMessage("Restoring this browser's active verification job.");
+      setPhase(recoveredStatus);
+      setMessage(
+        recoveredStatus === "queued"
+          ? `Recovered queued verification · position ${queuePosition ?? 1}.`
+          : "Recovered the active verification job. Reconnecting now.",
+      );
       void poll(storedJob.jobToken);
-    }, 0);
+    };
+    const restoreTimer = window.setTimeout(() => void restore(), 0);
     return () => {
+      cancelled = true;
       window.clearTimeout(restoreTimer);
       pollGeneration.current += 1;
     };

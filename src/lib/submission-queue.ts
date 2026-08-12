@@ -131,6 +131,11 @@ export type QueueInspection =
   | { status: "completed"; receipt: QueueCompletionReceipt }
   | { status: "missing" };
 
+export type OwnerQueueInspection =
+  | { status: "active"; position: 0; job: QueuedVerificationJob }
+  | { status: "queued"; position: number; job: QueuedVerificationJob }
+  | { status: "missing" };
+
 export type QueueAdvance = {
   advanced: boolean;
   next: QueuedVerificationJob | null;
@@ -369,6 +374,26 @@ export function inspectQueueState(
   }
   const receipt = parsed.completed.find((item) => item.jobId === jobId);
   return receipt ? { status: "completed", receipt } : { status: "missing" };
+}
+
+export function inspectOwnerQueueState(
+  state: SubmissionQueueState,
+  github: string,
+  ownerSecret: string,
+): OwnerQueueInspection {
+  const parsed = submissionQueueStateSchema.parse(state);
+  const ownerKey = hmacKey(
+    "owner",
+    githubLoginSchema.parse(github),
+    ownerSecret,
+  );
+  if (parsed.active?.ownerKey === ownerKey) {
+    return { status: "active", position: 0, job: parsed.active };
+  }
+  const index = parsed.pending.findIndex((job) => job.ownerKey === ownerKey);
+  return index >= 0
+    ? { status: "queued", position: index + 1, job: parsed.pending[index] }
+    : { status: "missing" };
 }
 
 function requiredToken(options: QueueOptions): string {
@@ -680,6 +705,25 @@ export async function inspectVerificationJob(
   const head = await queueHead(client, now, false);
   return head
     ? inspectQueueState(await readState(client, head), jobId)
+    : { status: "missing" };
+}
+
+export async function inspectVerificationJobForOwner(
+  github: string,
+  options: QueueOptions = {},
+): Promise<OwnerQueueInspection> {
+  const now = options.now ?? new Date();
+  const client = new QueueGitHubClient(
+    requiredToken(options),
+    options.fetchImplementation ?? fetch,
+  );
+  const head = await queueHead(client, now, false);
+  return head
+    ? inspectOwnerQueueState(
+        await readState(client, head),
+        github,
+        requiredOwnerSecret(options),
+      )
     : { status: "missing" };
 }
 

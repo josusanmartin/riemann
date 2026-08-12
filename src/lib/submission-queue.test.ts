@@ -7,6 +7,7 @@ import {
   enqueueVerificationJob,
   enqueueQueueState,
   getDailySubmissionUsage,
+  inspectOwnerQueueState,
   inspectQueueState,
   MAX_DAILY_SUBMISSIONS,
   SubmissionAlreadyQueuedError,
@@ -151,6 +152,16 @@ describe("durable formal verification queue", () => {
       status: "queued",
       position: 1,
     });
+    expect(
+      inspectOwnerQueueState(state, "ANOTHER-SOLVER", ownerSecret),
+    ).toMatchObject({
+      status: "queued",
+      position: 1,
+      job: { jobId: input(2).jobId },
+    });
+    expect(
+      inspectOwnerQueueState(state, "missing-solver", ownerSecret),
+    ).toEqual({ status: "missing" });
 
     const completion = completeQueueState(
       state,
