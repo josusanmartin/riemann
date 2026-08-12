@@ -58,6 +58,7 @@ jobs:
           base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > "$GAP/OneBandSharpProfile.lean"
 
           python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/patch_ci_sources_v2.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
 
       - name: Restore Mathlib cache
