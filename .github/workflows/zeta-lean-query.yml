@@ -1,0 +1,63 @@
+name: Query pinned Lean APIs
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-lean-query.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  query:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install pinned Lean toolchain manager
+        run: ./scripts/install-lean-toolchain.sh
+      - name: Check out research base
+        run: |
+          git clone https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout a6bcd8a58fc9c95615fde8594c06c543fd979641
+      - name: Restore Mathlib cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get
+      - name: Query declarations
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          cat > Query.lean <<'LEAN'
+          import Mathlib
+          import Zeta23.Poisson
+          open Finset Filter
+          #check HasSum.sub
+          #check HasSum.add
+          #check HasSum.sum_add_compl
+          #check HasSum.sum_add_compl_iff
+          #check HasSum.sum_add_tsum_nat_add
+          #check Summable.sum_add_tsum_nat_add
+          #check Summable.tsum_add_tsum_compl
+          #check Summable.sum_add_tsum_compl
+          #check tsum_subtype
+          #check tsum_compl
+          #check tsum_of_add_one_of_neg_add_one
+          #check tsum_of_nat_of_neg_add_one
+          #check HasSum.of_add_one_of_neg_add_one
+          #check Summable.of_add_one_of_neg_add_one
+          #check summable_int_iff_summable_nat_and_neg_add_one
+          #check HasSum.comp_injective
+          #check Equiv.hasSum_iff
+          #check Finset.sum_subtype
+          #check Finset.sum_attach
+          #check Fin.sum_univ_succ
+          #check Fin.sum_univ_two
+          #check MeasureTheory.IntegrableOn.abs
+          #check ContinuousOn.integrableOn_compact
+          #check MeasureTheory.integral_re
+          #check RCLike.integral_re
+          #check Int.cast_natCast
+          LEAN
+          lake env lean Query.lean 2>&1 | tee "$RUNNER_TEMP/query.log"
