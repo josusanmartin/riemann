@@ -23,15 +23,19 @@ namespace Zeta23.GapMatching.IntegerGridSplit
 theorem tsum_int_eq_left_add_finite_add_right
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ) :
     ∑' k : ℤ, f k =
-      (∑' n : ℕ, f (-(n + 1)))
-        + (∑ n ∈ Finset.range d, f n)
-        + ∑' n : ℕ, f (n + d) := by
-  have hparts :=
-    (summable_int_iff_summable_nat_and_neg_add_one.mp hf)
-  have hnat : Summable (fun n : ℕ => f n) := hparts.1
-  have hneg : Summable (fun n : ℕ => f (-(n + 1))) := hparts.2
-  rw [tsum_of_nat_of_neg_add_one hnat hneg]
+      (∑' n : ℕ, f (-((n : ℤ) + 1)))
+        + (∑ n ∈ Finset.range d, f (n : ℤ))
+        + ∑' n : ℕ, f ((n + d : ℕ) : ℤ) := by
+  have hnat : Summable (fun n : ℕ => f (n : ℤ)) := by
+    apply hf.comp_injective
+    intro a b hab
+    exact_mod_cast hab
+  have hneg : Summable (fun n : ℕ => f (-((n : ℤ) + 1))) := by
+    apply hf.comp_injective
+    intro a b hab
+    omega
   have hsplit := hnat.sum_add_tsum_nat_add d
+  rw [tsum_of_nat_of_neg_add_one hnat hneg]
   rw [← hsplit]
   ring
 
@@ -39,17 +43,17 @@ theorem tsum_int_eq_left_add_finite_add_right
 the norms of its two omitted tails. -/
 theorem norm_finite_sub_tsum_le
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ) :
-    ‖(∑ n ∈ Finset.range d, f n) - ∑' k : ℤ, f k‖
-      ≤ ‖∑' n : ℕ, f (-(n + 1))‖
-        + ‖∑' n : ℕ, f (n + d)‖ := by
+    ‖(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)‖
+      ≤ ‖(∑' n : ℕ, f (-((n : ℤ) + 1)))‖
+        + ‖(∑' n : ℕ, f ((n + d : ℕ) : ℤ))‖ := by
   rw [tsum_int_eq_left_add_finite_add_right hf d]
   have hid :
-      (∑ n ∈ Finset.range d, f n)
-          - ((∑' n : ℕ, f (-(n + 1)))
-            + (∑ n ∈ Finset.range d, f n)
-            + ∑' n : ℕ, f (n + d))
-        = -((∑' n : ℕ, f (-(n + 1)))
-            + ∑' n : ℕ, f (n + d)) := by
+      (∑ n ∈ Finset.range d, f (n : ℤ))
+          - ((∑' n : ℕ, f (-((n : ℤ) + 1)))
+            + (∑ n ∈ Finset.range d, f (n : ℤ))
+            + ∑' n : ℕ, f ((n + d : ℕ) : ℤ))
+        = -((∑' n : ℕ, f (-((n : ℤ) + 1)))
+            + ∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
     ring
   rw [hid, norm_neg]
   exact norm_add_le _ _
@@ -58,9 +62,9 @@ theorem norm_finite_sub_tsum_le
 theorem norm_finite_sub_tsum_le_of_tail_bounds
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ)
     {qLeft qRight : ℝ}
-    (hleft : ‖∑' n : ℕ, f (-(n + 1))‖ ≤ qLeft)
-    (hright : ‖∑' n : ℕ, f (n + d)‖ ≤ qRight) :
-    ‖(∑ n ∈ Finset.range d, f n) - ∑' k : ℤ, f k‖
+    (hleft : ‖(∑' n : ℕ, f (-((n : ℤ) + 1)))‖ ≤ qLeft)
+    (hright : ‖(∑' n : ℕ, f ((n + d : ℕ) : ℤ))‖ ≤ qRight) :
+    ‖(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)‖
       ≤ qLeft + qRight :=
   (norm_finite_sub_tsum_le hf d).trans (add_le_add hleft hright)
 
