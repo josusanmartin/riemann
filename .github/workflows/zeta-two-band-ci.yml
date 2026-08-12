@@ -63,6 +63,7 @@ jobs:
           python3 research/zeta-two-band-ci/patch_ci_sources_v2.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_ci_sources_v3.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
+          python3 research/zeta-two-band-ci/generate_one_band_d.py "$RUNNER_TEMP/zeta23"
 
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
@@ -91,6 +92,7 @@ jobs:
             Zeta23.GapMatching.DNormalizedMoments \
             Zeta23.GapMatching.ScalarBonusCertificate \
             Zeta23.GapMatching.TwoBandGapMatchingD \
+            Zeta23.GapMatching.OneBandGapMatchingD \
             Zeta23.GapMatching.TwoBandGapMatchingDPath \
             Zeta23.GapMatching.CentralPathConstructionD \
             Zeta23.GapMatching.GuardedWindowCount \
