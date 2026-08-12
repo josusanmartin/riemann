@@ -74,9 +74,9 @@ def main() -> None:
   rw [show fullGridOverlap v L tau tau' =
       (av v L * L ^ 2)⁻¹ * (L * VPhiR v (tau - tau')) by
     unfold fullGridOverlap
-    field_simp [ha.ne', hW.L_pos.ne']
-    ring]
-  exact hraw.const_mul (av v L * L ^ 2)⁻¹""",
+    field_simp [ha.ne', hW.L_pos.ne']]
+  simpa only [Finset.mul_sum] using
+    hraw.const_mul (av v L * L ^ 2)⁻¹""",
     )
     replace_once(
         overlap,
@@ -92,6 +92,16 @@ def main() -> None:
         ramp,
         "import Zeta23.ThmD.Window\n",
         "import Zeta23.ThmD.Window\nimport Zeta23.ThmD.WindowCore\n",
+    )
+    replace_once(
+        ramp,
+        """      have hone : 1 ≤ majorant u := by
+        rw [hmajorant]
+        rcases le_or_gt u 0 with hneg | hpos""",
+        """      have hone : 1 ≤ majorant u := by
+        rw [hmajorant]
+        dsimp only
+        rcases le_or_gt u 0 with hneg | hpos""",
     )
     replace_once(
         ramp,
@@ -126,11 +136,36 @@ def main() -> None:
         """          have hIabs :
               MeasureTheory.IntegrableOn
                 (fun u => |h u * p u - h u|)
-                (Set.Icc (-(L / 2)) (L / 2)) :=
-            ((((hhc.mul hpc).sub hhc).abs).continuousOn)
-              .integrableOn_compact isCompact_Icc
+                (Set.Icc (-(L / 2)) (L / 2)) := by
+            simpa only [Pi.sub_apply] using (hIhp.sub hIh).abs
           exact MeasureTheory.setIntegral_mono_on hIabs
             hImajorant.integrableOn measurableSet_Icc hpointwise""",
+    )
+    replace_once(
+        ramp,
+        """  have hint : Integrable
+      (fun u : ℝ => (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))) :=
+    (hW.vSqC_continuous.mul (by fun_prop))
+      .integrable_of_hasCompactSupport
+        hW.vSqC_hasCompactSupport.mul_right
+  unfold AdmWindow.VPhiR AdmWindow.VPhi
+  rw [paperFT_def, integral_re_C hint]""",
+        """  have hexp : Continuous
+      (fun u : ℝ => Complex.exp
+        (Complex.I * (r : ℂ) * (u : ℂ))) := by
+    fun_prop
+  have hcont : Continuous
+      (fun u : ℝ => (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))) :=
+    hW.vSqC_continuous.mul hexp
+  have hint : Integrable
+      (fun u : ℝ => (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))) :=
+    hcont.integrable_of_hasCompactSupport
+      hW.vSqC_hasCompactSupport.mul_right
+  unfold AdmWindow.VPhiR AdmWindow.VPhi
+  rw [paperFT_def, ← integral_re hint]""",
     )
 
     one_band = gap_dir / "OneBandPotentialSafeNumerics.lean"
@@ -188,26 +223,12 @@ def transitionFloor (previous current : State) : ℝ :=
         """    physicalFloor previous current ≤
       stepCost B State.good previous""",
     )
-    replace_once(
-        one_overlap,
-        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
-        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
-    )
-    replace_once(
-        one_overlap,
-        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
-        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
-    )
-    replace_once(
-        one_overlap,
-        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
-        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
-    )
-    replace_once(
-        one_overlap,
-        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
-        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
-    )
+    for _ in range(4):
+        replace_once(
+            one_overlap,
+            """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
+            """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
+        )
 
     central = gap_dir / "CentralPathConstructionD.lean"
     replace_once(
@@ -243,6 +264,13 @@ def transitionFloor (previous current : State) : ℝ :=
         (by simpa [k] using hkn)]
       simp
     rcases hz with ⟨i, hi⟩""",
+    )
+    replace_once(
+        central,
+        """    change ((centralEmbedding (ordered i)).1.1 : ℂ) = rho
+    simpa [z] using congrArg Subtype.val hi""",
+        """    change ((ordered i).1 : ℂ) = rho
+    simpa [z] using congrArg Subtype.val hi""",
     )
 
 
