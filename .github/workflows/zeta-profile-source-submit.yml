@@ -1,0 +1,20 @@
+name: Inspect one-band sharp source
+
+on:
+  push:
+    branches: ["research/zeta-two-band-submit"]
+    paths: [".github/workflows/zeta-profile-source-submit.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Decode and print source
+        run: |
+          base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > /tmp/OneBandSharpProfile.lean
+          cat /tmp/OneBandSharpProfile.lean
