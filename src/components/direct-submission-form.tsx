@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckCircle2, FileCode2, LoaderCircle, ShieldAlert, Upload } from "lucide-react";
+import {
+  CheckCircle2,
+  FileCode2,
+  FilePlus2,
+  LoaderCircle,
+  ShieldAlert,
+  Upload,
+} from "lucide-react";
 
 type JobPhase =
   | "idle"
@@ -111,10 +118,12 @@ export function DirectSubmissionForm({
   github,
   defaultDisplayName,
   verifierConfigured,
+  starterSource,
 }: {
   github: string;
   defaultDisplayName: string;
   verifierConfigured: boolean;
+  starterSource: string;
 }) {
   const [solution, setSolution] = useState("");
   const [phase, setPhase] = useState<JobPhase>("idle");
@@ -125,6 +134,17 @@ export function DirectSubmissionForm({
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const pollGeneration = useRef(0);
   const storageKey = `${ACTIVE_JOB_STORAGE_PREFIX}:${github.toLowerCase()}`;
+  const busy = phase === "starting" || phase === "queued" || phase === "running";
+
+  function replaceEditorSource(nextSource: string, nextMessage: string): void {
+    setSolution(nextSource);
+    setPhase("idle");
+    setMessage(nextMessage);
+    setLog("");
+    setFeedback(null);
+    setDigest("");
+    setEvidenceUrl("");
+  }
 
   const poll = useCallback(async (jobToken: string) => {
     const generation = ++pollGeneration.current;
@@ -273,6 +293,14 @@ export function DirectSubmissionForm({
       setMessage("The pinned E2B verifier template is still being configured.");
       return;
     }
+    const starterPlaceholders = solution.match(/^\s{2}sorry\s*$/gm)?.length ?? 0;
+    if (starterPlaceholders > 0) {
+      setPhase("error");
+      setMessage(
+        `Replace the ${starterPlaceholders} starter sorry placeholder${starterPlaceholders === 1 ? "" : "s"} before verifying. Nothing was submitted, so no daily slot was used.`,
+      );
+      return;
+    }
     if (new Blob([solution]).size > MAX_FILE_BYTES) {
       setPhase("error");
       setMessage("Solution.lean exceeds the 2 MB source limit.");
@@ -339,12 +367,18 @@ export function DirectSubmissionForm({
       event.target.value = "";
       return;
     }
-    setSolution(await file.text());
-    setPhase("idle");
-    setMessage(`${file.name} loaded into the source editor.`);
+    replaceEditorSource(
+      await file.text(),
+      `${file.name} loaded into the source editor.`,
+    );
   }
 
-  const busy = phase === "starting" || phase === "queued" || phase === "running";
+  function loadStarterTemplate(): void {
+    replaceEditorSource(
+      starterSource,
+      "Starter loaded. Replace all three sorry placeholders before submitting.",
+    );
+  }
 
   return (
     <form className="direct-submission-form" onSubmit={submit}>
@@ -391,17 +425,34 @@ export function DirectSubmissionForm({
       <div className="lean-source-field">
         <div className="lean-source-heading">
           <div><FileCode2 size={20} /><span>proof/Solution.lean</span></div>
-          <label className="file-picker">
-            <Upload size={15} /> Upload .lean
-            <input type="file" accept=".lean,text/plain" onChange={loadFile} disabled={busy} />
-          </label>
+          <div className="lean-source-actions">
+            <button
+              className="starter-picker"
+              type="button"
+              onClick={loadStarterTemplate}
+              disabled={busy}
+            >
+              <FilePlus2 size={15} /> Use starter
+            </button>
+            <label className="file-picker">
+              <Upload size={15} /> Upload .lean
+              <input type="file" accept=".lean,text/plain" onChange={loadFile} disabled={busy} />
+            </label>
+          </div>
         </div>
         <textarea
           aria-label="Lean source"
           className="lean-editor"
           required
           value={solution}
-          onChange={(event) => setSolution(event.target.value)}
+          onChange={(event) => {
+            const nextSolution = event.target.value;
+            if (phase === "idle") {
+              setSolution(nextSolution);
+            } else {
+              replaceEditorSource(nextSolution, "Source changed. Ready to verify again.");
+            }
+          }}
           placeholder="Paste the three complete Lean theorem declarations here…"
           spellCheck={false}
           disabled={busy}

@@ -34,9 +34,11 @@ Sign in with GitHub at `/submit`. Supply a public display name, method, summary,
 
 Floating-point scores are rejected. The dashboard decimal is derived from the exact rational.
 
+Start from the downloadable [`Solution.lean` template](https://www.riemannzeta.fun/templates/Solution.lean), also checked in at `submissions/example/proof/Solution.lean`. Keep all three theorem names and statements unchanged, replace all three `sorry` placeholders, and place any imports or helper declarations in that one file. The form—not the Lean source—supplies the exact numerator and denominator used to generate `candidateKappa`.
+
 The authenticated GitHub login becomes `author.github`; it cannot be supplied or overridden in the request body. The trusted server also generates the manifest, fixed proof path, theorem names, track, and Apache-2.0 license declaration. The accepted source surface is exactly one UTF-8 Lean file of at most 2 MB. Put helper declarations in that file.
 
-The service accepts at most three uploads from one GitHub account per UTC day. Accepted uploads enter a durable first-in, first-out queue, and only its head runs the formal verifier. Other uploads remain sealed in paused no-egress sandboxes until their turn; refreshing the page does not change order or reset the limit.
+The service accepts at most **three admitted uploads from one GitHub account per UTC calendar day**, resetting at **00:00 UTC**. An input rejected before durable queue admission does not count. Once admitted, the slot is consumed regardless of the result: syntax and elaboration errors, theorem or axiom mismatch, Lean or nanoda rejection, timeout, sandbox expiration, and successful verification all count. Slots are not automatically refunded, so validate locally before submitting when possible. Admitted uploads enter a durable first-in, first-out queue, and only its head runs the formal verifier. Other uploads remain sealed in paused no-egress sandboxes until their turn; refreshing the page does not change order or reset the limit.
 
 The browser cannot modify the challenge contract, generated theorem templates, record data, lockfiles, verifier, dependency pins, or publication logic. Infrastructure changes use the repository's ordinary development process and never receive a formal score.
 

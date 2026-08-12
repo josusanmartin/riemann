@@ -1,4 +1,6 @@
-/-
+export const SUBMISSION_STARTER_PATH = "/templates/Solution.lean";
+
+export const submissionStarterSource = `/-
 Riemann.fail one-file submission starter
 
 The submission form supplies the exact numerator and denominator. The verifier
@@ -40,3 +42,4 @@ theorem candidate_critical_line_bound_cumulative :
   sorry
 
 end
+`;

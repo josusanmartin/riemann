@@ -67,13 +67,11 @@ Authorization callback:   https://www.riemannzeta.fun/api/auth/callback/github
 
 ## Formal submissions
 
-Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. Optional model and harness attribution are stored as structured, attested fields in the public record. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
+Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. Download the canonical [one-file starter](https://www.riemannzeta.fun/templates/Solution.lean), replace its three `sorry` placeholders, and keep the theorem names and statements unchanged. Optional model and harness attribution are stored as structured, attested fields in the public record. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
 
-Formal uploads enter a durable FIFO and exactly one proof verifier runs at a time. Each authenticated GitHub account may enter at most three uploads per UTC day. Waiting proofs are sealed in paused, no-egress E2B sandboxes; advancing the queue resumes only its head. The automation-only `automation-queue` branch stores HMAC-pseudonymous ownership counters, opaque job coordinates, and terminal receipts—not GitHub usernames or Lean source. Non-forced Git reference updates serialize concurrent admissions.
+Formal uploads enter a durable FIFO and exactly one proof verifier runs at a time. The rate limit is **three admitted uploads per authenticated GitHub account per UTC calendar day**, resetting at **00:00 UTC**. Input rejected before durable queue admission does not use a slot. Once admitted, every terminal outcome uses that slot—including Lean syntax or elaboration errors, statement or axiom mismatch, kernel rejection, timeout, and sandbox expiration. Admitted slots are not automatically refunded. Waiting proofs are sealed in paused, no-egress E2B sandboxes; advancing the queue resumes only its head. The automation-only `automation-queue` branch stores HMAC-pseudonymous ownership counters, opaque job coordinates, and terminal receipts—not GitHub usernames or Lean source. Non-forced Git reference updates serialize concurrent admissions.
 
-For local development, copy `submissions/example` and prepare a candidate against the pinned Zeta23 tree:
-
-Prepare a candidate against the pinned Zeta23 tree:
+For local development, copy `submissions/example`, replace every placeholder in `proof/Solution.lean`, update the exact rational in `submission.json`, and prepare the candidate against the pinned Zeta23 tree:
 
 ```bash
 npx tsx scripts/verify-submission.ts submissions/your-id --mode=prepare
