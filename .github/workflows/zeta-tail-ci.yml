@@ -30,6 +30,8 @@ jobs:
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/FiniteGridTailAlgebra.lean"
           cp research/zeta-tail-ci/DWindowFourierTail.lean \
             "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DWindowFourierTail.lean"
+          cp research/zeta-tail-ci/IntegerGridSplit.lean \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/IntegerGridSplit.lean"
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get
@@ -38,4 +40,5 @@ jobs:
         run: |
           lake build \
             Zeta23.GapMatching.FiniteGridTailAlgebra \
-            Zeta23.GapMatching.DWindowFourierTail
+            Zeta23.GapMatching.DWindowFourierTail \
+            Zeta23.GapMatching.IntegerGridSplit
