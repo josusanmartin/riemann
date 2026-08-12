@@ -59,21 +59,18 @@ def longFloor : State → State → ℝ
   | .bad, .bad => j
   | _, _ => 0
 
-/-- The physical part of a transition, before the telescoping potential. -/
-def physicalFloor (previous current : State) : ℝ :=
+def transitionFloor (previous current : State) : ℝ :=
   B * lengthFloor current
     + shortFloor current
     + longFloor previous current
-
-def transitionFloor (previous current : State) : ℝ :=
-  physicalFloor previous current + phi previous - phi current
+    + phi previous - phi current
 
 /-- All four state transitions satisfy the exact local certificate. -/
 theorem transition_certificate (previous current : State) :
     A ≤ transitionFloor previous current := by
   cases previous <;> cases current <;>
     norm_num [A, B, p, j, badLeft, transitionFloor,
-      physicalFloor, lengthFloor, shortFloor, longFloor, phi]
+      lengthFloor, shortFloor, longFloor, phi]
 
 theorem parameter_ranges :
     0 < A ∧ A < 1 ∧ 0 ≤ B ∧ 0 ≤ boundary := by
@@ -102,22 +99,14 @@ theorem floor_arithmetic :
   norm_num [overlapTolerance, sharpAbsFloor, sharpSqFloor,
     finiteSqFloor, p, j]
 
-/-- A step whose physical cost dominates the physical transition floor gives
-the abstract local certificate after adding the potential difference once. -/
+/-- A step whose physical cost dominates the exact transition floor gives the
+abstract local certificate. -/
 theorem localCertificate_of_dominates
     (previous : State) (g : GapDatum State)
-    (h : physicalFloor previous g.state
+    (h : transitionFloor previous g.state
       ≤ stepCost B State.good previous g) :
-    LocalCertificate A B State.good phi previous g := by
-  unfold LocalCertificate
-  calc
-    A ≤ transitionFloor previous g.state :=
-      transition_certificate previous g.state
-    _ = physicalFloor previous g.state
-          + phi previous - phi g.state := rfl
-    _ ≤ stepCost B State.good previous g
-          + phi previous - phi g.state := by
-      nlinarith
+    LocalCertificate A B State.good phi previous g :=
+  (transition_certificate previous g.state).trans h
 
 /-- A safe lower bound for the fixed-window baseline. -/
 def deltaLower : ℝ := 0.67250069
