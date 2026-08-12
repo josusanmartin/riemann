@@ -22,15 +22,15 @@ def main() -> None:
     ring
   rw [hexponent, Complex.exp_mul_I]
   simp [Complex.mul_re]"""
-    new = """      apply integral_congr_ae
-      exact Filter.Eventually.of_forall (fun u => by
-        have hexponent :
-            Complex.I * (r : ℂ) * (u : ℂ)
-              = ((r * u : ℝ) : ℂ) * Complex.I := by
-          push_cast
-          ring
-        rw [hexponent, Complex.exp_mul_I]
-        simp [Complex.mul_re])"""
+    new = """      refine integral_congr_ae ?_
+      filter_upwards with u
+      have hexponent :
+          Complex.I * (r : ℂ) * (u : ℂ)
+            = ((r * u : ℝ) : ℂ) * Complex.I := by
+        push_cast
+        ring
+      rw [hexponent, Complex.exp_mul_I]
+      simp [Complex.mul_re]"""
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")
