@@ -33,7 +33,13 @@ def main() -> None:
             = ((r * u : ℝ) : ℂ) * Complex.I := by
         push_cast
         ring
-      rw [hexponent, Complex.exp_mul_I]
+      have hru :
+          (r : ℂ) * (u : ℂ) = ((r * u : ℝ) : ℂ) := by
+        norm_num
+      have hvpow :
+          (v u : ℂ) ^ 2 = ((v u ^ 2 : ℝ) : ℂ) := by
+        norm_num
+      rw [hexponent, Complex.exp_mul_I, hru, hvpow]
       simp [Complex.mul_re, Complex.cos_ofReal_re,
         Complex.cos_ofReal_im, Complex.sin_ofReal_re,
         Complex.sin_ofReal_im]"""
