@@ -33,23 +33,15 @@ jobs:
           cat > Query.lean <<'LEAN'
           import Mathlib
           open Finset Filter MeasureTheory
-          #check HasSum.const_mul
-          #check HasSum.mul_const
-          #check Summable.sum_add_tsum_compl
+          #check abs_add
+          #check abs_add_le
+          #check norm_add_le
+          #check abs_sub_comm
+          #check abs_neg
+          #check HasSum.const_smul
           #check Summable.sum_add_tsum_nat_add
           #check tsum_of_nat_of_neg_add_one
-          #check tsum_of_add_one_of_neg_add_one
-          #check integral_re
-          #check integral_im
-          #check Integrable.abs
-          #check IntegrableOn
-          #check setIntegral_mono_on
-          #check ContinuousOn.integrableOn_compact
-          #check Real.summable_of_sum_range_le
-          #check Real.summable_of_sum_le
-          #check Real.tsum_le_of_sum_range_le
-          #check Real.tsum_le_of_sum_le
-          #check Summable.hasSum
-          #check summable_iff_cauchySeq_finset
+          #check integral_congr_ae
+          #check Filter.Eventually.of_forall
           LEAN
           lake env lean Query.lean 2>&1 | tee "$RUNNER_TEMP/query.log"
