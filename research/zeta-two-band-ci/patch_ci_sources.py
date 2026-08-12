@@ -59,6 +59,192 @@ def main() -> None:
         "    hN0 hcert hgain hgap.error_small hden'",
     )
 
+    overlap = gap_dir / "DWindowOverlap.lean"
+    replace_once(
+        overlap,
+        """  have hraw := hW.hasSum_vHatR_mul T tau tau'
+  have hscaled := hraw.const_mul (av v L * L ^ 2)⁻¹
+  convert hscaled using 1
+  · funext k
+    ring
+  · unfold fullGridOverlap
+    field_simp [ha.ne', hW.L_pos.ne']
+    ring""",
+        """  have hraw := hW.hasSum_vHatR_mul T tau tau'
+  rw [show fullGridOverlap v L tau tau' =
+      (av v L * L ^ 2)⁻¹ * (L * VPhiR v (tau - tau')) by
+    unfold fullGridOverlap
+    field_simp [ha.ne', hW.L_pos.ne']
+    ring]
+  exact hraw.const_mul (av v L * L ^ 2)⁻¹""",
+    )
+    replace_once(
+        overlap,
+        """  have hcross : -2 * eps ≤ 2 * y * (x - y) := by
+    exact (neg_le_of_abs_le habsMul)""",
+        """  have hcross : -2 * eps ≤ 2 * y * (x - y) := by
+    have h := neg_le_of_abs_le habsMul
+    linarith""",
+    )
+
+    ramp = gap_dir / "DWindowRampEstimate.lean"
+    replace_once(
+        ramp,
+        "import Zeta23.ThmD.Window\n",
+        "import Zeta23.ThmD.Window\nimport Zeta23.ThmD.WindowCore\n",
+    )
+    replace_once(
+        ramp,
+        """          rw [Set.indicator_of_mem hu1, Pi.one_apply]
+          linarith""",
+        """          change 1 ≤
+            (Set.Icc (-(L / 2)) (-(L / 2) + w)).indicator
+                (1 : ℝ → ℝ) u
+              + (Set.Icc (L / 2 - w) (L / 2)).indicator
+                (1 : ℝ → ℝ) u
+          rw [Set.indicator_of_mem hu1, Pi.one_apply]
+          linarith""",
+    )
+    replace_once(
+        ramp,
+        """          rw [Set.indicator_of_mem hu1, Pi.one_apply]
+          linarith""",
+        """          change 1 ≤
+            (Set.Icc (-(L / 2)) (-(L / 2) + w)).indicator
+                (1 : ℝ → ℝ) u
+              + (Set.Icc (L / 2 - w) (L / 2)).indicator
+                (1 : ℝ → ℝ) u
+          rw [Set.indicator_of_mem hu1, Pi.one_apply]
+          linarith""",
+    )
+    replace_once(
+        ramp,
+        """          apply MeasureTheory.setIntegral_mono_on
+            (((hhc.mul hpc).sub hhc).abs.continuousOn
+              .integrableOn_compact isCompact_Icc)
+            hImajorant.integrableOn measurableSet_Icc hpointwise""",
+        """          have hIabs :
+              MeasureTheory.IntegrableOn
+                (fun u => |h u * p u - h u|)
+                (Set.Icc (-(L / 2)) (L / 2)) :=
+            ((((hhc.mul hpc).sub hhc).abs).continuousOn)
+              .integrableOn_compact isCompact_Icc
+          exact MeasureTheory.setIntegral_mono_on hIabs
+            hImajorant.integrableOn measurableSet_Icc hpointwise""",
+    )
+
+    one_band = gap_dir / "OneBandPotentialSafeNumerics.lean"
+    replace_once(
+        one_band,
+        """def transitionFloor (previous current : State) : ℝ :=
+  B * lengthFloor current
+    + shortFloor current
+    + longFloor previous current
+    + phi previous - phi current""",
+        """def physicalFloor (previous current : State) : ℝ :=
+  B * lengthFloor current
+    + shortFloor current
+    + longFloor previous current
+
+def transitionFloor (previous current : State) : ℝ :=
+  physicalFloor previous current + phi previous - phi current""",
+    )
+    replace_once(
+        one_band,
+        """    norm_num [A, B, p, j, badLeft, transitionFloor,
+      lengthFloor, shortFloor, longFloor, phi]""",
+        """    norm_num [A, B, p, j, badLeft, transitionFloor,
+      physicalFloor, lengthFloor, shortFloor, longFloor, phi]""",
+    )
+    replace_once(
+        one_band,
+        """theorem localCertificate_of_dominates
+    (previous : State) (g : GapDatum State)
+    (h : transitionFloor previous g.state
+      ≤ stepCost B State.good previous g) :
+    LocalCertificate A B State.good phi previous g :=
+  (transition_certificate previous g.state).trans h""",
+        """theorem localCertificate_of_dominates
+    (previous : State) (g : GapDatum State)
+    (h : physicalFloor previous g.state
+      ≤ stepCost B State.good previous g) :
+    LocalCertificate A B State.good phi previous g := by
+  unfold LocalCertificate
+  calc
+    A ≤ transitionFloor previous g.state :=
+      transition_certificate previous g.state
+    _ = physicalFloor previous g.state
+          + phi previous - phi g.state := rfl
+    _ ≤ stepCost B State.good previous g
+          + phi previous - phi g.state := by
+      nlinarith""",
+    )
+
+    one_overlap = gap_dir / "OneBandPotentialOverlap.lean"
+    replace_once(
+        one_overlap,
+        """    transitionFloor previous current ≤
+      stepCost B State.good previous""",
+        """    physicalFloor previous current ≤
+      stepCost B State.good previous""",
+    )
+    replace_once(
+        one_overlap,
+        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
+        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
+    )
+    replace_once(
+        one_overlap,
+        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
+        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
+    )
+    replace_once(
+        one_overlap,
+        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
+        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
+    )
+    replace_once(
+        one_overlap,
+        """simp [transitionFloor, lengthFloor, shortFloor, longFloor,""",
+        """simp [physicalFloor, lengthFloor, shortFloor, longFloor,""",
+    )
+
+    central = gap_dir / "CentralPathConstructionD.lean"
+    replace_once(
+        central,
+        """  · have hsqrt := Real.sqrt_nonneg T
+    linarith
+  · have hsqrt := Real.sqrt_nonneg T
+    linarith""",
+        """  · dsimp [D0] at hlow ⊢
+    nlinarith [Real.sqrt_nonneg T]
+  · dsimp [D0] at hhigh ⊢
+    nlinarith [Real.sqrt_nonneg T]""",
+    )
+    replace_once(
+        central,
+        """    change (blockData Z T (P.atD T) (dConj P T)).σ zi = zi
+    rw [mkData_σ_eq_iff]
+    exact z.2.1.2""",
+        """    apply Subtype.ext
+    change reflect (zi : ℂ) = (zi : ℂ)
+    exact (reflect_eq_self_iff (zi : ℂ)).2 z.2.1.2""",
+    )
+    replace_once(
+        central,
+        """    have hz : z ∈ (Finset.univ : Finset (centralSimpleSet Z T)) := by simp
+    rw [← Finset.range_orderEmbOfFin
+      (Finset.univ : Finset (centralSimpleSet Z T))
+      (by simpa [k] using hkn)] at hz
+    rcases hz with ⟨i, hi⟩""",
+        """    have hz : z ∈ Set.range ordered := by
+      rw [Finset.range_orderEmbOfFin
+        (Finset.univ : Finset (centralSimpleSet Z T))
+        (by simpa [k] using hkn)]
+      simp
+    rcases hz with ⟨i, hi⟩""",
+    )
+
 
 if __name__ == "__main__":
     main()
