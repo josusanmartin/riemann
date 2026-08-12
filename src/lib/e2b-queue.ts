@@ -185,45 +185,64 @@ export async function launchQueuedE2BVerification(input: {
 
   const resultPath = `${jobDirectory}/result.json`;
   const lockPath = `${jobDirectory}/runner.lock`;
-  const packagedEsbuild =
-    "/opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild";
-  const executableEsbuild = "/usr/local/bin/riemann-esbuild";
-  const runtime = await sandbox.commands.run(
-    `if [[ ! -L ${packagedEsbuild} ]]; then ` +
-      `install -o root -g root -m 0555 ${packagedEsbuild} ${executableEsbuild} && ` +
-      `rm -f ${packagedEsbuild} && ln -s ${executableEsbuild} ${packagedEsbuild}; ` +
-      `fi && chmod 0555 ${executableEsbuild} && ` +
-      `runuser -u riemann -- ${executableEsbuild} --version`,
+  const precompiledRuntime = await sandbox.commands.run(
+    `if grep -Fq '/opt/riemann/.runtime/verify-submission.mjs' ` +
+      `/opt/riemann/e2b/run-verification-job.sh && ` +
+      `test -r /opt/riemann/.runtime/verify-submission.mjs && ` +
+      `test -r /opt/riemann/.runtime/prepare-candidate.mjs && ` +
+      `test -r /opt/riemann/.runtime/finalize-e2b-job.mjs; then ` +
+      `printf precompiled; else printf legacy; fi`,
     { user: "root", timeoutMs: 30_000 },
   );
-  console.info("E2B verifier JavaScript runtime is executable", {
-    sandboxId,
-    esbuildVersion: runtime.stdout.trim(),
-  });
-  await sandbox.commands.run(
-    `install -d -o root -g root -m 0755 /opt/riemann/.runtime && ` +
-      `cd /opt/riemann && ${executableEsbuild} ` +
-      `scripts/verify-submission.ts scripts/prepare-candidate.ts ` +
-      `scripts/finalize-e2b-job.ts --bundle --platform=node --format=esm ` +
-      `--outdir=/opt/riemann/.runtime --out-extension:.js=.mjs && ` +
-      `chmod 0644 /opt/riemann/node_modules/tsx/dist/cli.mjs`,
-    { user: "root", timeoutMs: 30_000 },
-  );
-  await sandbox.files.write(
-    "/opt/riemann/node_modules/tsx/dist/cli.mjs",
-    E2B_TSX_RUNTIME_SHIM,
-    { user: "root", requestTimeoutMs: 30_000 },
-  );
-  await sandbox.commands.run(
-    `chmod 0444 /opt/riemann/.runtime/*.mjs ` +
-      `/opt/riemann/node_modules/tsx/dist/cli.mjs && ` +
-      `runuser -u riemann -- env -i HOME=/home/riemann ` +
-      `PATH=/usr/local/bin:/usr/bin:/bin /usr/local/bin/node ` +
-      `/opt/riemann/node_modules/tsx/dist/cli.mjs ` +
-      `/opt/riemann/scripts/verify-submission.ts 2>&1 | ` +
-      `grep -q 'Usage: verify-submission.ts'`,
-    { user: "root", timeoutMs: 30_000 },
-  );
+
+  if (precompiledRuntime.stdout.trim() === "precompiled") {
+    console.info("E2B verifier is using its sealed precompiled runtime", {
+      sandboxId,
+    });
+  } else {
+    // Compatibility repair for immutable templates created before the
+    // verifier runtime was precompiled at image-build time. Never rewrite a
+    // current image's sealed runtime while a proof may be importing it.
+    const packagedEsbuild =
+      "/opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild";
+    const executableEsbuild = "/usr/local/bin/riemann-esbuild";
+    const runtime = await sandbox.commands.run(
+      `if [[ ! -L ${packagedEsbuild} ]]; then ` +
+        `install -o root -g root -m 0555 ${packagedEsbuild} ${executableEsbuild} && ` +
+        `rm -f ${packagedEsbuild} && ln -s ${executableEsbuild} ${packagedEsbuild}; ` +
+        `fi && chmod 0555 ${executableEsbuild} && ` +
+        `runuser -u riemann -- ${executableEsbuild} --version`,
+      { user: "root", timeoutMs: 30_000 },
+    );
+    console.info("E2B verifier JavaScript runtime is executable", {
+      sandboxId,
+      esbuildVersion: runtime.stdout.trim(),
+    });
+    await sandbox.commands.run(
+      `install -d -o root -g root -m 0755 /opt/riemann/.runtime && ` +
+        `cd /opt/riemann && ${executableEsbuild} ` +
+        `scripts/verify-submission.ts scripts/prepare-candidate.ts ` +
+        `scripts/finalize-e2b-job.ts --bundle --platform=node --format=esm ` +
+        `--outdir=/opt/riemann/.runtime --out-extension:.js=.mjs && ` +
+        `chmod 0644 /opt/riemann/node_modules/tsx/dist/cli.mjs`,
+      { user: "root", timeoutMs: 30_000 },
+    );
+    await sandbox.files.write(
+      "/opt/riemann/node_modules/tsx/dist/cli.mjs",
+      E2B_TSX_RUNTIME_SHIM,
+      { user: "root", requestTimeoutMs: 30_000 },
+    );
+    await sandbox.commands.run(
+      `chmod 0444 /opt/riemann/.runtime/*.mjs ` +
+        `/opt/riemann/node_modules/tsx/dist/cli.mjs && ` +
+        `runuser -u riemann -- env -i HOME=/home/riemann ` +
+        `PATH=/usr/local/bin:/usr/bin:/bin /usr/local/bin/node ` +
+        `/opt/riemann/node_modules/tsx/dist/cli.mjs ` +
+        `/opt/riemann/scripts/verify-submission.ts 2>&1 | ` +
+        `grep -q 'Usage: verify-submission.ts'`,
+      { user: "root", timeoutMs: 30_000 },
+    );
+  }
   await sandbox.commands.run(
     `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
       `'if [[ ! -s ${resultPath} ]]; then exec ` +
