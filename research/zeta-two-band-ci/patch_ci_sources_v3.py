@@ -24,6 +24,10 @@ def main() -> None:
   simp [Complex.mul_re]"""
     new = """      refine integral_congr_ae ?_
       filter_upwards with u
+      change
+        ((↑(v u ^ 2) *
+            Complex.exp (Complex.I * ↑r * ↑u)).re)
+          = v u ^ 2 * Real.cos (r * u)
       have hexponent :
           Complex.I * (r : ℂ) * (u : ℂ)
             = ((r * u : ℝ) : ℂ) * Complex.I := by
