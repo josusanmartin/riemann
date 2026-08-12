@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import type { Sandbox as E2BSandbox } from "e2b";
 import { getE2BApiKey } from "@/lib/e2b-config";
 
 export const runtime = "nodejs";
@@ -6,6 +7,40 @@ export const maxDuration = 300;
 
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,299}$/;
 const TEMPLATE_BUILD_NAME = "riemann-fail-verifier";
+const EXTENDED_SMOKE_ROOT = "/home/riemann/tmp/extended-smoke";
+const EXTENDED_SMOKE_SCRIPT = `#!/usr/bin/env bash
+set -uo pipefail
+
+root="${EXTENDED_SMOKE_ROOT}"
+printf 'zeta-runtime-import\n' > "$root/state"
+zeta_started=$(date +%s)
+cd /home/riemann/tmp/zeta-smoke || exit 2
+/opt/riemann/tools/bin/lake env lean ZetaRuntimeProbe.lean \
+  > "$root/zeta.log" 2>&1
+zeta_status=$?
+printf '%s\n' "$zeta_status" > "$root/zeta.status"
+printf '%s\n' "$(( $(date +%s) - zeta_started ))" > "$root/zeta.seconds"
+
+if [[ "$zeta_status" -eq 0 ]]; then
+  printf 'comparator-nanoda\n' > "$root/state"
+  comparator_started=$(date +%s)
+  cd /home/riemann/tmp/bootstrap-smoke || exit 2
+  bash /opt/riemann/scripts/run-comparator-e2b.sh \
+    /opt/riemann/tools/bin/comparator config.json \
+    > "$root/comparator.log" 2>&1
+  comparator_status=$?
+  printf '%s\n' "$comparator_status" > "$root/comparator.status"
+  printf '%s\n' "$(( $(date +%s) - comparator_started ))" \
+    > "$root/comparator.seconds"
+else
+  printf '125\n' > "$root/comparator.status"
+  printf '0\n' > "$root/comparator.seconds"
+  printf 'Skipped because the Zeta runtime import failed.\n' \
+    > "$root/comparator.log"
+fi
+
+printf 'done\n' > "$root/state"
+`;
 
 type TemplateSummary = {
   templateID: string;
@@ -236,6 +271,152 @@ async function smokeTemplate(templateReference: string, key: string) {
   }
 }
 
+function smokeSandboxEnv() {
+  return {
+    HOME: "/home/riemann",
+    PATH: "/opt/riemann/tools/bin:/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
+    E2B_SANDBOX: "true",
+    RIEMANN_E2B_NETWORK_DISABLED: "1",
+    COMPARATOR_LANDRUN: "/opt/riemann/tools/bin/landrun",
+    COMPARATOR_LEAN4EXPORT: "/opt/riemann/tools/bin/lean4export",
+    COMPARATOR_NANODA: "/opt/riemann/tools/bin/nanoda_bin",
+  };
+}
+
+async function assertSmokeNetworkIsolation(sandbox: E2BSandbox): Promise<void> {
+  const info = await sandbox.getInfo();
+  if (
+    info.allowInternetAccess !== false ||
+    !info.network?.denyOut?.includes("0.0.0.0/0")
+  ) {
+    throw new Error("E2B did not confirm the deny-all outbound rule");
+  }
+}
+
+async function startExtendedSmokeTemplate(
+  templateReference: string,
+  key: string,
+) {
+  const { Sandbox } = await import("e2b");
+  const sandbox = await Sandbox.create({
+    apiKey: key,
+    template: templateReference,
+    timeoutMs: 20 * 60 * 1_000,
+    secure: true,
+    allowInternetAccess: false,
+    network: {
+      allowPublicTraffic: false,
+      denyOut: ["0.0.0.0/0"],
+    },
+  });
+
+  try {
+    await assertSmokeNetworkIsolation(sandbox);
+    const diagnostics = await sandbox.commands.run(
+      "set -euo pipefail; " +
+        "printf 'mathlib_head='; git -C /opt/riemann/zeta23/.lake/packages/mathlib rev-parse HEAD; " +
+        "printf 'mathlib_olean='; runuser -u riemann -- test -r /opt/riemann/zeta23/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Analysis/CStarAlgebra/Classes.olean && echo readable; " +
+        "printf 'tls_egress='; python3 -c 'import socket, ssl; raw = socket.create_connection((\"1.1.1.1\", 443), 3); tls = ssl.create_default_context().wrap_socket(raw, server_hostname=\"one.one.one.one\"); tls.sendall(b\"HEAD / HTTP/1.0\\r\\nHost: one.one.one.one\\r\\n\\r\\n\"); tls.settimeout(3); assert tls.recv(1)' >/dev/null 2>&1 && echo reachable || echo blocked; " +
+        "printf 'http_egress='; python3 -c 'import socket; stream = socket.create_connection((\"1.1.1.1\", 80), 3); stream.sendall(b\"HEAD / HTTP/1.0\\r\\nHost: one.one.one.one\\r\\n\\r\\n\"); stream.settimeout(3); assert stream.recv(1)' >/dev/null 2>&1 && echo reachable || echo blocked",
+      { user: "root", timeoutMs: 30_000 },
+    );
+    await sandbox.commands.run(
+      "set -euo pipefail; " +
+        `rm -rf ${EXTENDED_SMOKE_ROOT} /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && ` +
+        `install -d -o riemann -g riemann -m 0700 ${EXTENDED_SMOKE_ROOT} /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && ` +
+        "tar --exclude='./.lake' -C /opt/riemann/zeta23 -cf - . | tar -C /home/riemann/tmp/zeta-smoke -xf - && " +
+        "install -d -o riemann -g riemann /home/riemann/tmp/zeta-smoke/.lake /home/riemann/tmp/zeta-smoke/.lake/build/lib/lean /home/riemann/tmp/zeta-smoke/.lake/build/ir && " +
+        "ln -s /opt/riemann/zeta23/.lake/packages /home/riemann/tmp/zeta-smoke/.lake/packages && " +
+        "for artifact_dir in lib/lean ir; do for source in /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23 /opt/riemann/zeta23/.lake/build/$artifact_dir/Zeta23.*; do if [ -e \"$source\" ]; then ln -s \"$source\" \"/home/riemann/tmp/zeta-smoke/.lake/build/$artifact_dir/${source##*/}\"; fi; done; done && " +
+        "test -s /home/riemann/tmp/zeta-smoke/.lake/build/lib/lean/Zeta23/Unconditional.olean && " +
+        "printf '%s\\n' 'import Zeta23.Unconditional' '#check Zeta23.two_thirds_on_critical_line' '#check Zeta23.two_thirds_on_critical_line_cumulative' > /home/riemann/tmp/zeta-smoke/ZetaRuntimeProbe.lean && " +
+        "cp -R /opt/riemann/challenge/smoke/. /home/riemann/tmp/bootstrap-smoke/ && " +
+        `chown -R riemann:riemann ${EXTENDED_SMOKE_ROOT} /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke`,
+      { user: "root", timeoutMs: 60_000 },
+    );
+    await sandbox.files.write(
+      `${EXTENDED_SMOKE_ROOT}/run.sh`,
+      EXTENDED_SMOKE_SCRIPT,
+      { user: "riemann", requestTimeoutMs: 30_000 },
+    );
+    await sandbox.commands.run(`chmod 0500 ${EXTENDED_SMOKE_ROOT}/run.sh`, {
+      user: "riemann",
+      timeoutMs: 30_000,
+    });
+    await sandbox.commands.run(`${EXTENDED_SMOKE_ROOT}/run.sh`, {
+      user: "riemann",
+      background: true,
+      timeoutMs: 30_000,
+      envs: smokeSandboxEnv(),
+    });
+    return {
+      sandboxId: sandbox.sandboxId,
+      diagnostics: diagnostics.stdout.slice(-4_000),
+    };
+  } catch (error) {
+    await sandbox.kill().catch(() => undefined);
+    throw error;
+  }
+}
+
+async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
+  const { Sandbox } = await import("e2b");
+  const sandbox = await Sandbox.connect(sandboxId, {
+    apiKey: key,
+    timeoutMs: 20 * 60 * 1_000,
+    requestTimeoutMs: 30_000,
+  });
+  await assertSmokeNetworkIsolation(sandbox);
+  const snapshotResult = await sandbox.commands.run(
+    `root=${EXTENDED_SMOKE_ROOT}; ` +
+      "read_value() { if [[ -f \"$root/$1\" ]]; then tr -d '\\r\\n' < \"$root/$1\"; fi; }; " +
+      "read_log() { if [[ -f \"$root/$1\" ]]; then tail -c 4000 \"$root/$1\"; fi; }; " +
+      "jq -n " +
+      "--arg state \"$(read_value state)\" " +
+      "--arg zetaStatus \"$(read_value zeta.status)\" " +
+      "--arg zetaSeconds \"$(read_value zeta.seconds)\" " +
+      "--arg comparatorStatus \"$(read_value comparator.status)\" " +
+      "--arg comparatorSeconds \"$(read_value comparator.seconds)\" " +
+      "--arg zetaLog \"$(read_log zeta.log)\" " +
+      "--arg comparatorLog \"$(read_log comparator.log)\" " +
+      "'{state: (if $state == \"\" then \"starting\" else $state end), zetaStatus: $zetaStatus, zetaSeconds: $zetaSeconds, comparatorStatus: $comparatorStatus, comparatorSeconds: $comparatorSeconds, zetaLog: $zetaLog, comparatorLog: $comparatorLog}'",
+    { user: "riemann", timeoutMs: 30_000 },
+  );
+  const snapshot = JSON.parse(snapshotResult.stdout) as {
+    state: string;
+    zetaStatus: string;
+    zetaSeconds: string;
+    comparatorStatus: string;
+    comparatorSeconds: string;
+    zetaLog: string;
+    comparatorLog: string;
+  };
+  const completed = snapshot.state === "done";
+  const passed =
+    completed &&
+    snapshot.zetaStatus === "0" &&
+    snapshot.comparatorStatus === "0";
+  if (completed) await sandbox.kill().catch(() => undefined);
+  return {
+    status: completed ? (passed ? "passed" : "failed") : "running",
+    stage: snapshot.state || "starting",
+    sandboxId,
+    networkIsolated: true,
+    zetaElaborationExitCode: snapshot.zetaStatus
+      ? Number(snapshot.zetaStatus)
+      : null,
+    zetaSeconds: snapshot.zetaSeconds ? Number(snapshot.zetaSeconds) : null,
+    comparatorExitCode: snapshot.comparatorStatus
+      ? Number(snapshot.comparatorStatus)
+      : null,
+    comparatorSeconds: snapshot.comparatorSeconds
+      ? Number(snapshot.comparatorSeconds)
+      : null,
+    zetaLog: snapshot.zetaLog,
+    comparatorLog: snapshot.comparatorLog,
+  };
+}
+
 export async function POST(request: Request): Promise<Response> {
   if (!authorized(request)) return noStore(401, { error: "unauthorized" });
   const url = new URL(request.url);
@@ -243,6 +424,44 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const key = apiKey();
+    if (action === "smoke-status") {
+      const sandboxId = url.searchParams.get("sandboxId");
+      if (!sandboxId || !identifierPattern.test(sandboxId)) {
+        return noStore(400, { error: "invalid_smoke_sandbox_id" });
+      }
+      const smoke = await inspectExtendedSmokeTemplate(sandboxId, key);
+      return noStore(smoke.status === "failed" ? 422 : 200, smoke);
+    }
+    if (action === "smoke-start") {
+      const templateId = url.searchParams.get("templateId");
+      const buildId = url.searchParams.get("buildId");
+      if (
+        !templateId ||
+        !buildId ||
+        !identifierPattern.test(templateId) ||
+        !identifierPattern.test(buildId)
+      ) {
+        return noStore(400, { error: "invalid_template_build_coordinates" });
+      }
+      const { Template } = await import("e2b");
+      const build = await Template.getBuildStatus(
+        { templateId, buildId },
+        { apiKey: key },
+      );
+      if (build.status !== "ready") {
+        return noStore(409, { error: "template_build_not_ready" });
+      }
+      const templateReference = `${TEMPLATE_BUILD_NAME}:${buildId}`;
+      const smoke = await startExtendedSmokeTemplate(templateReference, key);
+      return noStore(202, {
+        status: "running",
+        stage: "zeta-runtime-import",
+        templateId,
+        buildId,
+        templateReference,
+        ...smoke,
+      });
+    }
     if (action === "smoke") {
       const templateId = url.searchParams.get("templateId");
       const buildId = url.searchParams.get("buildId");
