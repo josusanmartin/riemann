@@ -69,9 +69,14 @@ theorem norm_tsum_mul_le_of_sq_tsum_le
           ≤ ∑ n ∈ u, (x n ^ 2 + y n ^ 2) / 2 := by
             exact Finset.sum_le_sum fun n _ =>
               abs_mul_le_sq_average (x n) (y n)
+      _ = (1 / 2 : ℝ) *
+            ∑ n ∈ u, (x n ^ 2 + y n ^ 2) := by
+            rw [Finset.mul_sum]
+            apply Finset.sum_congr rfl
+            intro n _
+            ring
       _ = ((∑ n ∈ u, x n ^ 2) + (∑ n ∈ u, y n ^ 2)) / 2 := by
-            simp only [div_eq_mul_inv, Finset.sum_add_distrib,
-              Finset.sum_mul]
+            rw [Finset.sum_add_distrib]
             ring
       _ ≤ ((∑' n, x n ^ 2) + (∑' n, y n ^ 2)) / 2 := by
             gcongr
