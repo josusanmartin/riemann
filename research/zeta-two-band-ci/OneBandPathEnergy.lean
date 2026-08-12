@@ -48,10 +48,21 @@ theorem pathWeight_wordFrom_succ
       simp [wordFrom, pathWeight]
   | succ count ih =>
       rw [Finset.sum_range_succ']
+      simp only [wordFrom, pathWeight]
       have htail := ih (start + 1)
+      have hshift :
+          (∑ j ∈ Finset.range count,
+              startWeight U shortWeight longWeight (start + 1 + j))
+            = ∑ j ∈ Finset.range count,
+                startWeight U shortWeight longWeight (start + (j + 1)) := by
+        apply Finset.sum_congr rfl
+        intro j hj
+        congr 1
+        omega
+      rw [htail, hshift]
       cases h0 : U start <;> cases h1 : U (start + 1) <;>
-        simp [wordFrom, pathWeight, datumAt, stateOf, startWeight,
-          h0, h1, htail, Nat.add_assoc]
+        simp [datumAt, stateOf, startWeight, h0, h1,
+          Nat.add_assoc] <;> ring
 
 /-- Full-word version. -/
 theorem pathWeight_word_succ
@@ -73,6 +84,12 @@ def edgeAtNat (V : OrderedCentralVerticesD Z P T) (i : ℕ) : ℝ :=
     edgeEnergy (canonicalPathData V) ⟨i, hi⟩
   else 0
 
+@[simp] theorem edgeAtNat_fin
+    (V : OrderedCentralVerticesD Z P T) (i : Fin V.n) :
+    edgeAtNat V i = edgeEnergy (canonicalPathData V) i := by
+  simp only [edgeAtNat, dif_pos i.isLt]
+  congr
+
 /-- On a genuine candidate start, the word contribution is exactly the
 candidate edge energy; otherwise it vanishes. -/
 theorem startWeight_edgeAtNat
@@ -83,7 +100,7 @@ theorem startWeight_edgeAtNat
           edgeEnergy (canonicalPathData V) i
         else 0 := by
   cases h0 : badFlag V i <;> cases h1 : badFlag V (i + 1) <;>
-    simp [startWeight, edgeAtNat, Active, shortFlag, h0, h1, i.isLt]
+    simp [startWeight, Active, shortFlag, h0, h1]
 
 /-- The recursive path weight is exactly the total active candidate energy. -/
 theorem pathWeight_eq_candidateEnergy
@@ -94,13 +111,12 @@ theorem pathWeight_eq_candidateEnergy
           (V.n + 1))
       = candidateEnergy (canonicalPathData V) := by
   rw [pathWeight_word_succ]
+  rw [Finset.sum_range]
   unfold candidateEnergy activeEdges
-  rw [Fin.sum_univ_eq_sum_range]
+  rw [Finset.sum_filter]
   apply Finset.sum_congr rfl
   intro i hi
-  rw [startWeight_edgeAtNat V ⟨i, Finset.mem_range.mp hi⟩]
-  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-  split <;> simp_all
+  exact startWeight_edgeAtNat V i
 
 /-- The full finite-state candidate weight differs from the candidate energy
 by at most the sole omitted final short edge. -/
