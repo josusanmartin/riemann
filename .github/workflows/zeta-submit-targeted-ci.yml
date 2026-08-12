@@ -59,6 +59,7 @@ jobs:
           cp research/zeta-join-ci/OneBandGapWord.lean "$GAP/OneBandGapWord.lean"
           cp research/zeta-join-ci/CanonicalOneBandPathD.lean "$GAP/CanonicalOneBandPathD.lean"
           cp research/zeta-two-band-ci/OneBandPathEnergy.lean "$GAP/OneBandPathEnergy.lean"
+          cp research/zeta-two-band-ci/OneBandCanonicalQuery.lean "$GAP/OneBandCanonicalQuery.lean"
           base64 -d research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64 | gzip -d > "$GAP/OneBandSharpProfile.lean"
           python3 research/zeta-two-band-ci/patch_ci_sources.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_ci_sources_v2.py "$RUNNER_TEMP/zeta23"
@@ -75,4 +76,5 @@ jobs:
           lake build \
             Zeta23.GapMatching.OneBandBaselineLower \
             Zeta23.GapMatching.OneBandPathEnergy \
+            Zeta23.GapMatching.OneBandCanonicalQuery \
             2>&1 | tee "$RUNNER_TEMP/zeta-submit-targeted.log"
