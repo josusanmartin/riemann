@@ -7,7 +7,11 @@ import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 // Admission and scheduling deliberately live outside the frozen verifier
 // module. Queue changes therefore cannot change the attested proof checker or
 // invalidate an already smoke-tested immutable E2B template.
-const E2B_JOB_TIMEOUT_MS = 55 * 60 * 1_000;
+// E2B's `timeoutMs` is the sandbox lifetime, including on `connect`; it is not
+// a client connection timeout. Keep it comfortably beyond the verifier's
+// 54-minute hard limit so the result finalizer always has time to write its
+// durable receipt.
+const E2B_JOB_TIMEOUT_MS = 65 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
 

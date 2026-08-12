@@ -8,8 +8,10 @@ import {
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 
-const E2B_JOB_TIMEOUT_MS = 55 * 60 * 1_000;
-const E2B_CONNECT_TIMEOUT_MS = 5 * 60 * 1_000;
+// E2B's `timeoutMs` is the sandbox lifetime, including on `connect`; it is not
+// a client connection timeout. Keep every create/read/finalize connection
+// comfortably beyond the verifier's 54-minute hard limit.
+const E2B_JOB_TIMEOUT_MS = 65 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
 
@@ -178,7 +180,7 @@ export async function readE2BVerification(
   const { FileNotFoundError, Sandbox } = await import("e2b");
   const sandbox = await Sandbox.connect(sandboxId, {
     apiKey,
-    timeoutMs: E2B_CONNECT_TIMEOUT_MS,
+    timeoutMs: E2B_JOB_TIMEOUT_MS,
     requestTimeoutMs: 30_000,
   });
   try {
@@ -202,7 +204,7 @@ export async function readE2BSubmissionBundle(
   const { Sandbox } = await import("e2b");
   const sandbox = await Sandbox.connect(sandboxId, {
     apiKey,
-    timeoutMs: E2B_CONNECT_TIMEOUT_MS,
+    timeoutMs: E2B_JOB_TIMEOUT_MS,
     requestTimeoutMs: 30_000,
   });
   const submissionRoot = `${E2B_UPLOAD_ROOT}/${parsedJobId}/submission`;
