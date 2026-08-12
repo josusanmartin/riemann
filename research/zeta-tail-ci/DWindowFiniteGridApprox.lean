@@ -109,9 +109,10 @@ theorem finiteNormalizedOverlap_close
     simpa [yLeft, q, rawTailMajorant] using
       (tsum_vHatR_sq_le hW hD hh _ hyLeftArg)
   have hleftRaw :
-      norm (∑' n, scale * (xLeft n * yLeft n)) ≤ scale * q :=
-    norm_tsum_const_mul_mul_le_same scale hscale
-      xLeft yLeft hxLeft hyLeft hxLeftQ hyLeftQ
+      |∑' n, scale * (xLeft n * yLeft n)| ≤ scale * q := by
+    simpa only [Real.norm_eq_abs] using
+      (norm_tsum_const_mul_mul_le_same scale hscale
+        xLeft yLeft hxLeft hyLeft hxLeftQ hyLeftQ)
 
   let xRight : ℕ → ℝ := fun n =>
     vHatR v (tau - (T + (d + n) * h))
@@ -134,18 +135,19 @@ theorem finiteNormalizedOverlap_close
     simpa [yRight, q, rawTailMajorant] using
       (tsum_vHatR_sq_le hW hD hh _ hyRightArg)
   have hrightRaw :
-      norm (∑' n, scale * (xRight n * yRight n)) ≤ scale * q :=
-    norm_tsum_const_mul_mul_le_same scale hscale
-      xRight yRight hxRight hyRight hxRightQ hyRightQ
+      |∑' n, scale * (xRight n * yRight n)| ≤ scale * q := by
+    simpa only [Real.norm_eq_abs] using
+      (norm_tsum_const_mul_mul_le_same scale hscale
+        xRight yRight hxRight hyRight hxRightQ hyRightQ)
 
   let f : ℤ → ℝ := normalizedTerm v L T tau tau'
   have hfull : HasSum f (normalizedFullOverlap v L tau tau') :=
     hasSum_normalizedTerm hW T tau tau'
   have hleft :
-      norm (∑' n : ℕ, f (-((n : ℤ) + 1))) ≤ scale * q := by
+      |∑' n : ℕ, f (-((n : ℤ) + 1))| ≤ scale * q := by
     simpa [f, normalizedTerm, scale, xLeft, yLeft, h] using hleftRaw
   have hright :
-      norm (∑' n : ℕ, f ((n + d : ℕ) : ℤ)) ≤ scale * q := by
+      |∑' n : ℕ, f ((n + d : ℕ) : ℤ)| ≤ scale * q := by
     simpa [f, normalizedTerm, scale, xRight, yRight, h,
       Nat.cast_add, Nat.cast_ofNat] using hrightRaw
 
