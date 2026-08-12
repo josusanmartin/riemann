@@ -95,7 +95,7 @@ theorem valid_wordFrom
   | succ count ih =>
       simp only [wordFrom, ValidPath]
       refine ⟨hlocal start, ?_⟩
-      simpa using ih (start + 1)
+      simpa [datumAt] using ih (start + 1)
 
 /-- Pointwise local certificates imply validity of the full word. -/
 theorem valid_word
@@ -155,12 +155,27 @@ theorem candidateWeight_wordFrom
   | succ count ih =>
       rw [Finset.sum_range_succ']
       simp only [wordFrom, candidateWeight]
-      rw [stepWeight_datumAt, ih (start + 1)]
-      apply congrArg (fun x : ℝ => localWeight U shortWeight longWeight start + x)
-      apply Finset.sum_congr rfl
-      intro j hj
-      congr 1
-      omega
+      rw [stepWeight_datumAt]
+      have htail :
+          candidateWeight State.good
+              (datumAt U length shortWeight longWeight start).state
+              (wordFrom U length shortWeight longWeight (start + 1) count)
+            = ∑ j ∈ Finset.range count,
+                localWeight U shortWeight longWeight (start + 1 + j) := by
+        simpa [datumAt] using ih (start + 1)
+      rw [htail]
+      have hshift :
+          (∑ j ∈ Finset.range count,
+              localWeight U shortWeight longWeight (start + 1 + j))
+            = ∑ j ∈ Finset.range count,
+                localWeight U shortWeight longWeight (start + (j + 1)) := by
+        apply Finset.sum_congr rfl
+        intro j hj
+        congr 1
+        omega
+      rw [hshift]
+      simp only [Nat.add_zero]
+      ring
 
 /-- Candidate weight of the full word. -/
 theorem candidateWeight_word
@@ -188,11 +203,20 @@ theorem totalLength_wordFrom
       rw [Finset.sum_range_succ']
       simp only [wordFrom, totalLength]
       rw [ih (start + 1)]
-      apply congrArg (fun x : ℝ => length start + x)
-      apply Finset.sum_congr rfl
-      intro j hj
-      congr 1
-      omega
+      change length start +
+          (∑ j ∈ Finset.range count, length (start + 1 + j))
+        = (∑ j ∈ Finset.range count, length (start + (j + 1)))
+          + length (start + 0)
+      have hshift :
+          (∑ j ∈ Finset.range count, length (start + 1 + j))
+            = ∑ j ∈ Finset.range count, length (start + (j + 1)) := by
+        apply Finset.sum_congr rfl
+        intro j hj
+        congr 1
+        omega
+      rw [hshift]
+      simp only [Nat.add_zero]
+      ring
 
 /-- Total length of the full word. -/
 theorem totalLength_word

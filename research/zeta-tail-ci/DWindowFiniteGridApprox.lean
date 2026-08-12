@@ -60,8 +60,13 @@ theorem hasSum_normalizedTerm
         ((av v L * L ^ 2)⁻¹ •
           (L * VPhiR v (tau - tau'))) :=
     HasSum.const_smul (av v L * L ^ 2)⁻¹ hraw
-  simpa only [normalizedTerm, normalizedFullOverlap, smul_eq_mul]
-    using hscaled
+  change HasSum
+    (fun k : ℤ =>
+      (av v L * L ^ 2)⁻¹ *
+        (vHatR v (tau - (T + k * (2 * Real.pi / L)))
+          * vHatR v (tau' - (T + k * (2 * Real.pi / L)))))
+    ((av v L * L ^ 2)⁻¹ * (L * VPhiR v (tau - tau')))
+  simpa only [smul_eq_mul] using hscaled
 
 /-- A finite normalized overlap is close to the full Poisson overlap whenever
 both evaluation points are at least `D` from each omitted side of the grid. -/
@@ -81,6 +86,7 @@ theorem finiteNormalizedOverlap_close
   let h : ℝ := 2 * Real.pi / L
   have hh : 0 < h := by
     dsimp [h]
+    have hL := hW.L_pos
     positivity
   let scale : ℝ := (av v L * L ^ 2)⁻¹
   have hscale : 0 ≤ scale := by
@@ -92,10 +98,10 @@ theorem finiteNormalizedOverlap_close
     vHatR v (tau - (T - (n + 1) * h))
   let yLeft : ℕ → ℝ := fun n =>
     vHatR v (tau' - (T - (n + 1) * h))
-  have hxLeftArg : ∀ n, D + n * h ≤
+  have hxLeftArg : ∀ n : ℕ, D + n * h ≤
       |tau - (T - (n + 1) * h)| :=
     left_argument_lower hD.le hh.le hleftTau
-  have hyLeftArg : ∀ n, D + n * h ≤
+  have hyLeftArg : ∀ n : ℕ, D + n * h ≤
       |tau' - (T - (n + 1) * h)| :=
     left_argument_lower hD.le hh.le hleftTau'
   have hxLeft : Summable (fun n => xLeft n ^ 2) :=
@@ -118,10 +124,10 @@ theorem finiteNormalizedOverlap_close
     vHatR v (tau - (T + (d + n) * h))
   let yRight : ℕ → ℝ := fun n =>
     vHatR v (tau' - (T + (d + n) * h))
-  have hxRightArg : ∀ n, D + n * h ≤
+  have hxRightArg : ∀ n : ℕ, D + n * h ≤
       |tau - (T + (d + n) * h)| :=
     right_argument_lower hD.le hh.le hrightTau
-  have hyRightArg : ∀ n, D + n * h ≤
+  have hyRightArg : ∀ n : ℕ, D + n * h ≤
       |tau' - (T + (d + n) * h)| :=
     right_argument_lower hD.le hh.le hrightTau'
   have hxRight : Summable (fun n => xRight n ^ 2) :=
@@ -145,11 +151,24 @@ theorem finiteNormalizedOverlap_close
     hasSum_normalizedTerm hW T tau tau'
   have hleft :
       |∑' n : ℕ, f (-((n : ℤ) + 1))| ≤ scale * q := by
-    simpa [f, normalizedTerm, scale, xLeft, yLeft, h] using hleftRaw
+    have hleftTerms :
+        (fun n : ℕ => f (-((n : ℤ) + 1))) =
+          (fun n : ℕ => scale * (xLeft n * yLeft n)) := by
+      funext n
+      dsimp [f, normalizedTerm, scale, xLeft, yLeft, h]
+      congr 3 <;> push_cast <;> ring
+    rw [hleftTerms]
+    exact hleftRaw
   have hright :
       |∑' n : ℕ, f ((n + d : ℕ) : ℤ)| ≤ scale * q := by
-    simpa [f, normalizedTerm, scale, xRight, yRight, h,
-      Nat.cast_add, Nat.cast_ofNat] using hrightRaw
+    have hrightTerms :
+        (fun n : ℕ => f ((n + d : ℕ) : ℤ)) =
+          (fun n : ℕ => scale * (xRight n * yRight n)) := by
+      funext n
+      dsimp [f, normalizedTerm, scale, xRight, yRight, h]
+      congr 3 <;> push_cast <;> ring
+    rw [hrightTerms]
+    exact hrightRaw
 
   have hfinite := abs_finiteBlock_sub_le_same hfull d hleft hright
   simpa [finiteNormalizedOverlap, f, scale, q, h,
