@@ -50,6 +50,43 @@ theorem abs_mul_le_sq_average (x y : ℝ) :
   rw [abs_mul]
   nlinarith [sq_nonneg (|x| - |y|), sq_abs x, sq_abs y]
 
+/-- Products of two square-summable real sequences are summable. -/
+theorem summable_mul_of_sq_summable
+    (x y : ℕ → ℝ)
+    (hx : Summable (fun n => x n ^ 2))
+    (hy : Summable (fun n => y n ^ 2)) :
+    Summable (fun n => x n * y n) := by
+  have hfin : ∀ u : Finset ℕ,
+      ∑ n ∈ u, |x n * y n|
+        ≤ ((∑' n, x n ^ 2) + (∑' n, y n ^ 2)) / 2 := by
+    intro u
+    calc
+      ∑ n ∈ u, |x n * y n|
+          ≤ ∑ n ∈ u, (x n ^ 2 + y n ^ 2) / 2 := by
+            exact Finset.sum_le_sum fun n _ =>
+              abs_mul_le_sq_average (x n) (y n)
+      _ = ((∑ n ∈ u, x n ^ 2) + (∑ n ∈ u, y n ^ 2)) / 2 := by
+            rw [show
+              ∑ n ∈ u, (x n ^ 2 + y n ^ 2) / 2
+                = (1 / 2 : ℝ) *
+                    ∑ n ∈ u, (x n ^ 2 + y n ^ 2) by
+                  rw [Finset.mul_sum]
+                  apply Finset.sum_congr rfl
+                  intro n _
+                  ring,
+              Finset.sum_add_distrib]
+            ring
+      _ ≤ ((∑' n, x n ^ 2) + (∑' n, y n ^ 2)) / 2 := by
+            gcongr
+            · exact Summable.sum_le_tsum u
+                (fun n _ => sq_nonneg (x n)) hx
+            · exact Summable.sum_le_tsum u
+                (fun n _ => sq_nonneg (y n)) hy
+  have habs : Summable (fun n => |x n * y n|) :=
+    summable_of_sum_le (fun n => abs_nonneg (x n * y n)) hfin
+  apply Summable.of_norm
+  simpa only [Real.norm_eq_abs] using habs
+
 /-- Square-tail control implies product-tail control.
 
 The hypotheses are deliberately phrased using `tsum` bounds, the natural
@@ -111,5 +148,27 @@ theorem norm_tsum_mul_le_of_sq_tsum_le_same
   have h := norm_tsum_mul_le_of_sq_tsum_le
     x y hx hy hxq hyq
   simpa using h
+
+/-- Scaling a product tail by a nonnegative constant scales its norm bound. -/
+theorem norm_tsum_const_mul_mul_le_same
+    (a : ℝ) (ha : 0 ≤ a)
+    (x y : ℕ → ℝ) {q : ℝ}
+    (hx : Summable (fun n => x n ^ 2))
+    (hy : Summable (fun n => y n ^ 2))
+    (hxq : ∑' n, x n ^ 2 ≤ q)
+    (hyq : ∑' n, y n ^ 2 ≤ q) :
+    ‖∑' n, a * (x n * y n)‖ ≤ a * q := by
+  have hprod := summable_mul_of_sq_summable x y hx hy
+  have hscaled :
+      HasSum (fun n => a • (x n * y n))
+        (a • ∑' n, x n * y n) :=
+    HasSum.const_smul a hprod.hasSum
+  have heq :
+      (∑' n, a * (x n * y n)) =
+        a * (∑' n, x n * y n) := by
+    simpa only [smul_eq_mul] using hscaled.tsum_eq
+  rw [heq, norm_mul, Real.norm_eq_abs, abs_of_nonneg ha]
+  exact mul_le_mul_of_nonneg_left
+    (norm_tsum_mul_le_of_sq_tsum_le_same x y hx hy hxq hyq) ha
 
 end Zeta23.GapMatching.FiniteGridTailAlgebra
