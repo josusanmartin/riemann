@@ -44,12 +44,12 @@ theorem tsum_int_eq_left_add_finite_add_right
   ring
 
 /-- The finite block differs from the full integer sum by at most the sum of
-the norms of its two omitted tails. -/
+the absolute values of its two omitted tails. -/
 theorem norm_finite_sub_tsum_le
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ) :
-    norm ((∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k))
-      ≤ norm (∑' n : ℕ, f (-((n : ℤ) + 1)))
-        + norm (∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
+    |(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)|
+      ≤ |∑' n : ℕ, f (-((n : ℤ) + 1))|
+        + |∑' n : ℕ, f ((n + d : ℕ) : ℤ)| := by
   rw [tsum_int_eq_left_add_finite_add_right hf d]
   have hid :
       (∑ n ∈ Finset.range d, f (n : ℤ))
@@ -59,16 +59,16 @@ theorem norm_finite_sub_tsum_le
         = -((∑' n : ℕ, f (-((n : ℤ) + 1)))
             + ∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
     ring
-  rw [hid, norm_neg]
-  exact norm_add_le _ _
+  rw [hid, abs_neg]
+  exact abs_add _ _
 
 /-- Quantitative wrapper for two separately controlled tails. -/
 theorem norm_finite_sub_tsum_le_of_tail_bounds
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ)
     {qLeft qRight : ℝ}
-    (hleft : norm (∑' n : ℕ, f (-((n : ℤ) + 1))) ≤ qLeft)
-    (hright : norm (∑' n : ℕ, f ((n + d : ℕ) : ℤ)) ≤ qRight) :
-    norm ((∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k))
+    (hleft : |∑' n : ℕ, f (-((n : ℤ) + 1))| ≤ qLeft)
+    (hright : |∑' n : ℕ, f ((n + d : ℕ) : ℤ)| ≤ qRight) :
+    |(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)|
       ≤ qLeft + qRight :=
   (norm_finite_sub_tsum_le hf d).trans (add_le_add hleft hright)
 
