@@ -33,7 +33,11 @@ theorem tsum_int_eq_left_add_finite_add_right
   have hneg : Summable (fun n : ℕ => f (-((n : ℤ) + 1))) := by
     apply hf.comp_injective
     intro a b hab
-    omega
+    have hcast : (a : ℤ) = (b : ℤ) := by
+      have hnegEq := congrArg (fun z : ℤ => -z) hab
+      simp only [neg_neg] at hnegEq
+      omega
+    exact_mod_cast hcast
   have hsplit := hnat.sum_add_tsum_nat_add d
   rw [tsum_of_nat_of_neg_add_one hnat hneg]
   rw [← hsplit]
@@ -43,9 +47,9 @@ theorem tsum_int_eq_left_add_finite_add_right
 the norms of its two omitted tails. -/
 theorem norm_finite_sub_tsum_le
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ) :
-    ‖(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)‖
-      ≤ ‖(∑' n : ℕ, f (-((n : ℤ) + 1)))‖
-        + ‖(∑' n : ℕ, f ((n + d : ℕ) : ℤ))‖ := by
+    norm ((∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k))
+      ≤ norm (∑' n : ℕ, f (-((n : ℤ) + 1)))
+        + norm (∑' n : ℕ, f ((n + d : ℕ) : ℤ)) := by
   rw [tsum_int_eq_left_add_finite_add_right hf d]
   have hid :
       (∑ n ∈ Finset.range d, f (n : ℤ))
@@ -62,9 +66,9 @@ theorem norm_finite_sub_tsum_le
 theorem norm_finite_sub_tsum_le_of_tail_bounds
     {f : ℤ → ℝ} (hf : Summable f) (d : ℕ)
     {qLeft qRight : ℝ}
-    (hleft : ‖(∑' n : ℕ, f (-((n : ℤ) + 1)))‖ ≤ qLeft)
-    (hright : ‖(∑' n : ℕ, f ((n + d : ℕ) : ℤ))‖ ≤ qRight) :
-    ‖(∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k)‖
+    (hleft : norm (∑' n : ℕ, f (-((n : ℤ) + 1))) ≤ qLeft)
+    (hright : norm (∑' n : ℕ, f ((n + d : ℕ) : ℤ)) ≤ qRight) :
+    norm ((∑ n ∈ Finset.range d, f (n : ℤ)) - (∑' k : ℤ, f k))
       ≤ qLeft + qRight :=
   (norm_finite_sub_tsum_le hf d).trans (add_le_add hleft hright)
 
