@@ -140,6 +140,7 @@ export function createRiemannVerifierTemplate(
         "find /opt/riemann /home/riemann/.elan -type f -exec chmod a+r,a-w {} +",
         "chmod 0555 /opt/riemann/e2b/run-verification-job.sh /opt/riemann/scripts/*.sh /opt/riemann/tools/bin/*",
         "test -s /opt/riemann/.runtime/verify-submission.mjs && test -s /opt/riemann/.runtime/prepare-candidate.mjs && test -s /opt/riemann/.runtime/finalize-e2b-job.mjs",
+        "for entry in verify-submission prepare-candidate finalize-e2b-job; do runuser -u riemann -- env -i HOME=/home/riemann PATH=/usr/local/bin:/usr/bin:/bin /usr/local/bin/node /opt/riemann/.runtime/$entry.mjs 2>&1 | grep -q 'Usage:'; done",
         "install -d -o root -g root -m 0755 /var/lib/riemann/jobs",
         "install -d -o riemann -g riemann -m 0700 /home/riemann/jobs",
       ],
