@@ -10,6 +10,7 @@ import {
   inspectOwnerQueueState,
   inspectQueueState,
   MAX_DAILY_SUBMISSIONS,
+  replaceActiveQueueState,
   SubmissionAlreadyQueuedError,
 } from "@/lib/submission-queue";
 
@@ -254,6 +255,41 @@ describe("durable formal verification queue", () => {
     );
     expect(nextDay.result.dailyUsed).toBe(1);
     expect(nextDay.state.daily.day).toBe("2026-08-12");
+  });
+
+  it("recovers an active upload without changing its identity or rate limit", () => {
+    const admission = enqueueQueueState(
+      createEmptyQueueState("2026-08-11"),
+      input(1),
+      "recovering-solver",
+      ownerSecret,
+      firstDay,
+    );
+    const original = admission.result.job;
+    const recovered = replaceActiveQueueState(admission.state, original, {
+      sandboxId: input(99).sandboxId,
+      jobId: input(99).jobId,
+      proofDigest: original.proofDigest,
+    });
+
+    expect(recovered.result).toMatchObject({
+      sandboxId: input(99).sandboxId,
+      jobId: input(99).jobId,
+      proofDigest: original.proofDigest,
+      ownerKey: original.ownerKey,
+      submissionKey: original.submissionKey,
+      enqueuedAt: original.enqueuedAt,
+    });
+    expect(recovered.state.daily).toEqual(admission.state.daily);
+    expect(recovered.state.pending).toEqual([]);
+    expect(recovered.state.completed).toEqual([]);
+    expect(() =>
+      replaceActiveQueueState(admission.state, original, {
+        sandboxId: input(98).sandboxId,
+        jobId: input(98).jobId,
+        proofDigest: input(98).proofDigest,
+      }),
+    ).toThrow("preserve the proof digest");
   });
 
   it("initializes and mutates the GitHub ledger without publishing identity or source", async () => {

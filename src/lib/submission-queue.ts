@@ -117,6 +117,11 @@ export type QueueJobInput = {
   submissionId: string;
 };
 
+export type ActiveQueueJobReplacement = Pick<
+  QueueJobInput,
+  "sandboxId" | "jobId" | "proofDigest"
+>;
+
 export type QueueAdmission = {
   job: QueuedVerificationJob;
   position: number;
@@ -357,6 +362,39 @@ export function completeQueueState(
     state: updated,
     changed: true,
     result: { advanced: true, next, receipt },
+  };
+}
+
+export function replaceActiveQueueState(
+  state: SubmissionQueueState,
+  expected: QueuedVerificationJob,
+  replacement: ActiveQueueJobReplacement,
+): QueueMutation<QueuedVerificationJob> {
+  const parsed = submissionQueueStateSchema.parse(state);
+  if (
+    !parsed.active ||
+    parsed.active.sandboxId !== expected.sandboxId ||
+    parsed.active.jobId !== expected.jobId ||
+    parsed.active.proofDigest !== expected.proofDigest ||
+    parsed.active.ownerKey !== expected.ownerKey ||
+    parsed.active.submissionKey !== expected.submissionKey
+  ) {
+    throw new Error("The active verification job changed before recovery");
+  }
+  if (replacement.proofDigest !== expected.proofDigest) {
+    throw new Error("A recovered verification job must preserve the proof digest");
+  }
+
+  const recovered = queuedVerificationJobSchema.parse({
+    ...expected,
+    sandboxId: replacement.sandboxId,
+    jobId: replacement.jobId,
+    proofDigest: replacement.proofDigest,
+  });
+  return {
+    state: submissionQueueStateSchema.parse({ ...parsed, active: recovered }),
+    result: recovered,
+    changed: true,
   };
 }
 
@@ -689,6 +727,18 @@ export function completeVerificationJob(
     { ...options, now },
     "queue: complete and advance formal verification FIFO",
     (state) => completeQueueState(state, jobId, completion, now),
+  );
+}
+
+export function replaceActiveVerificationJob(
+  expected: QueuedVerificationJob,
+  replacement: ActiveQueueJobReplacement,
+  options: QueueOptions = {},
+): Promise<QueuedVerificationJob> {
+  return mutateQueue(
+    options,
+    "queue: recover active formal verification",
+    (state) => replaceActiveQueueState(state, expected, replacement),
   );
 }
 
