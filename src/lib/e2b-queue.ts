@@ -173,9 +173,23 @@ export async function launchQueuedE2BVerification(input: {
 
   const resultPath = `${jobDirectory}/result.json`;
   const lockPath = `${jobDirectory}/runner.lock`;
+  const packagedEsbuild =
+    "/opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild";
+  const executableEsbuild = "/usr/local/bin/riemann-esbuild";
+  const runtime = await sandbox.commands.run(
+    `if [[ ! -L ${packagedEsbuild} ]]; then ` +
+      `install -o root -g root -m 0555 ${packagedEsbuild} ${executableEsbuild} && ` +
+      `rm -f ${packagedEsbuild} && ln -s ${executableEsbuild} ${packagedEsbuild}; ` +
+      `fi && chmod 0555 ${executableEsbuild} && ` +
+      `runuser -u riemann -- ${executableEsbuild} --version`,
+    { user: "root", timeoutMs: 30_000 },
+  );
+  console.info("E2B verifier JavaScript runtime is executable", {
+    sandboxId,
+    esbuildVersion: runtime.stdout.trim(),
+  });
   await sandbox.commands.run(
-    `chmod 0555 /opt/riemann/node_modules/@esbuild/linux-x64/bin/esbuild && ` +
-      `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
+    `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
       `'if [[ ! -s ${resultPath} ]]; then exec ` +
       `/opt/riemann/e2b/run-verification-job.sh ${uploadDirectory} ` +
       `${jobDirectory} ${proofDigest}; fi'`,
