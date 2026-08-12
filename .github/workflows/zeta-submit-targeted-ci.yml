@@ -3,7 +3,10 @@ name: Zeta submission targeted CI
 on:
   push:
     branches: ["research/zeta-two-band-submit"]
-    paths: [".github/workflows/zeta-submit-targeted-ci.yml"]
+    paths:
+      - ".github/workflows/zeta-submit-targeted-ci.yml"
+      - "research/zeta-two-band-ci/**"
+      - "research/zeta-join-ci/**"
   workflow_dispatch:
 
 concurrency:
