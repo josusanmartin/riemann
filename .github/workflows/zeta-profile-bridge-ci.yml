@@ -1,0 +1,71 @@
+name: Zeta one-band sharp-profile bridge CI
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-profile-bridge-ci.yml"
+      - "research/zeta-two-band-ci/**"
+      - "research/zeta-join-ci/OneBandSharpProfileBridge.lean"
+  workflow_dispatch:
+
+concurrency:
+  group: zeta-one-band-sharp-profile-bridge
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare pinned workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean" "$GAP/TwoBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialOverlap.lean" "$GAP/TwoBandPotentialOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean" "$GAP/TwoBandPotentialAnalyticBridge.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingD.lean" "$GAP/TwoBandGapMatchingD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralPathConstructionD.lean" "$GAP/CentralPathConstructionD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/GuardedWindowCount.lean" "$GAP/GuardedWindowCount.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGuardCountD.lean" "$GAP/CentralGuardCountD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OrderedPointGaps.lean" "$GAP/OrderedPointGaps.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/DWindowLength.lean" "$GAP/DWindowLength.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGapGeometryD.lean" "$GAP/CentralGapGeometryD.lean"
+
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowOverlap.lean" "$GAP/DWindowOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowRampEstimate.lean" "$GAP/DWindowRampEstimate.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean" "$GAP/DWindowProfileAlgebra.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialOverlap.lean" "$GAP/OneBandPotentialOverlap.lean"
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api.py" "$GAP/OneBandSharpProfile.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfileAPI.lean" "$GAP/OneBandSharpProfileAPI.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandSharpProfileBridge.lean" "$GAP/OneBandSharpProfileBridge.lean"
+
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Compile profile bridge with concise diagnostics
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set +e
+          lake build Zeta23.GapMatching.OneBandSharpProfileBridge > /tmp/profile-bridge.log 2>&1
+          status=$?
+          grep -n -A28 -B6 'error:' /tmp/profile-bridge.log || true
+          tail -n 60 /tmp/profile-bridge.log
+          exit $status
