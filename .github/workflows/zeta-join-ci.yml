@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/zeta-join-ci.yml"
       - "research/zeta-join-ci/**"
+      - "research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean"
   workflow_dispatch:
 
 permissions:
@@ -30,55 +31,6 @@ jobs:
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandGapWord.lean" "$GAP/OneBandGapWord.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandPathWeightIdentity.lean" "$GAP/OneBandPathWeightIdentity.lean"
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-
-          p = Path(os.environ["RUNNER_TEMP"]) / "zeta23/Zeta23/GapMatching/OneBandPotentialSafeNumerics.lean"
-          s = p.read_text()
-          old = '''def transitionFloor (previous current : State) : ℝ :=
-            B * lengthFloor current
-              + shortFloor current
-              + longFloor previous current
-              + phi previous - phi current'''
-          new = '''def physicalFloor (previous current : State) : ℝ :=
-            B * lengthFloor current
-              + shortFloor current
-              + longFloor previous current
-
-          def transitionFloor (previous current : State) : ℝ :=
-            physicalFloor previous current + phi previous - phi current'''
-          assert old in s
-          s = s.replace(old, new, 1)
-          old = '''norm_num [A, B, p, j, badLeft, transitionFloor,
-                lengthFloor, shortFloor, longFloor, phi]'''
-          new = '''norm_num [A, B, p, j, badLeft, transitionFloor,
-                physicalFloor, lengthFloor, shortFloor, longFloor, phi]'''
-          assert old in s
-          s = s.replace(old, new, 1)
-          old = '''theorem localCertificate_of_dominates
-              (previous : State) (g : GapDatum State)
-              (h : transitionFloor previous g.state
-                ≤ stepCost B State.good previous g) :
-              LocalCertificate A B State.good phi previous g :=
-            (transition_certificate previous g.state).trans h'''
-          new = '''theorem localCertificate_of_dominates
-              (previous : State) (g : GapDatum State)
-              (h : physicalFloor previous g.state
-                ≤ stepCost B State.good previous g) :
-              LocalCertificate A B State.good phi previous g := by
-            unfold LocalCertificate
-            calc
-              A ≤ transitionFloor previous g.state :=
-                transition_certificate previous g.state
-              _ = physicalFloor previous g.state
-                    + phi previous - phi g.state := rfl
-              _ ≤ stepCost B State.good previous g
-                    + phi previous - phi g.state := by
-                nlinarith'''
-          assert old in s
-          p.write_text(s.replace(old, new, 1))
-          PY
       - name: Restore cache quietly
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
