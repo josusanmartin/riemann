@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
+  ensureQueuedJobRunning: vi.fn(),
+  reconcileQueuedJobPause: vi.fn(),
   inspectVerificationJob: vi.fn(),
   getActiveVerificationJob: vi.fn(),
   readE2BVerification: vi.fn(),
@@ -37,8 +39,8 @@ vi.mock("@/lib/submission-queue", () => ({
 vi.mock("@/lib/queue-orchestration", () => ({
   advanceVerificationQueue: vi.fn(),
   assertQueueJobMatches: vi.fn(),
-  ensureQueuedJobRunning: vi.fn(),
-  reconcileQueuedJobPause: vi.fn(),
+  ensureQueuedJobRunning: mocks.ensureQueuedJobRunning,
+  reconcileQueuedJobPause: mocks.reconcileQueuedJobPause,
   VerifierOccupiedByFlowTestError: class extends Error {},
 }));
 vi.mock("@/lib/github-promotion", () => ({
@@ -82,6 +84,7 @@ beforeEach(() => {
   mocks.verifyE2BWebhookSignature.mockReturnValue(true);
   mocks.inspectVerificationJob.mockResolvedValue({ status: "missing" });
   mocks.getActiveVerificationJob.mockResolvedValue(null);
+  mocks.ensureQueuedJobRunning.mockResolvedValue("running");
 });
 
 afterEach(() => {
@@ -92,6 +95,44 @@ afterEach(() => {
 });
 
 describe("durable queue finalization boundary", () => {
+  it("observes a waiting job without repeatedly pausing or launching it", async () => {
+    mocks.inspectVerificationJob.mockResolvedValue({
+      status: "queued",
+      position: 2,
+      job,
+    });
+
+    const response = await statusRequest(
+      new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      status: "queued",
+      queuePosition: 2,
+    });
+    expect(mocks.reconcileQueuedJobPause).not.toHaveBeenCalled();
+    expect(mocks.ensureQueuedJobRunning).not.toHaveBeenCalled();
+    expect(mocks.readE2BVerification).not.toHaveBeenCalled();
+  });
+
+  it("returns a running heartbeat without reopening a result file", async () => {
+    mocks.inspectVerificationJob.mockResolvedValue({
+      status: "active",
+      position: 0,
+      job,
+    });
+
+    const response = await statusRequest(
+      new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ status: "running" });
+    expect(mocks.ensureQueuedJobRunning).toHaveBeenCalledOnce();
+    expect(mocks.readE2BVerification).not.toHaveBeenCalled();
+  });
+
   it("does not let a signed but unadmitted status token reach E2B", async () => {
     const response = await statusRequest(
       new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),

@@ -176,7 +176,7 @@ export function DirectSubmissionForm({
         transientFailures = 0;
 
         if (payload.status === "queued") {
-          delayMs = 15_000;
+          delayMs = 120_000;
           setPhase("queued");
           setMessage(
             `Queued for linear verification · ${payload.queuePosition ?? 1} ${
@@ -186,7 +186,7 @@ export function DirectSubmissionForm({
           continue;
         }
         if (payload.status === "running") {
-          delayMs = 5_000;
+          delayMs = 10_000;
           setPhase("running");
           setMessage(
             "Lean and both kernels are checking the frozen theorem contract.",

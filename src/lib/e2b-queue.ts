@@ -52,6 +52,8 @@ export type StagedE2BVerification = {
   jobId: string;
 };
 
+export type QueuedE2BRunnerState = "running" | "result-ready";
+
 export type E2BQueuedJobMetadata = {
   sandboxId: string;
   jobId: string;
@@ -108,6 +110,22 @@ export function queuedVerificationRunnerCommand(
   );
 }
 
+export function queuedVerificationRunnerProbeCommand(
+  jobIdInput: string,
+): string {
+  const { jobDirectory } = paths(jobIdInput);
+  const resultPath = `${jobDirectory}/result.json`;
+  const lockPath = `${jobDirectory}/runner.lock`;
+  return (
+    `if [[ -s ${resultPath} ]]; then printf result-ready; ` +
+    `else if /usr/bin/flock -n -E 75 ${lockPath} -c true; ` +
+    `then lock_status=0; else lock_status=$?; fi; ` +
+    `if [[ $lock_status -eq 0 ]]; then printf recover; ` +
+    `elif [[ $lock_status -eq 75 ]]; then printf running; ` +
+    `else exit $lock_status; fi; fi`
+  );
+}
+
 export async function stageE2BVerification(
   input: StageVerificationInput,
 ): Promise<StagedE2BVerification> {
@@ -159,7 +177,10 @@ export async function stageE2BVerification(
     await sandbox.files.write(
       [
         { path: `${uploadDirectory}/submission.json`, data: input.manifest },
-        { path: `${uploadDirectory}/proof/Solution.lean`, data: input.solution },
+        {
+          path: `${uploadDirectory}/proof/Solution.lean`,
+          data: input.solution,
+        },
         {
           path: `${uploadDirectory}/trusted-records.json`,
           data: input.recordsSnapshot,
@@ -195,7 +216,7 @@ export async function launchQueuedE2BVerification(input: {
   sandboxId: string;
   jobId: string;
   proofDigest: string;
-}): Promise<void> {
+}): Promise<QueuedE2BRunnerState> {
   const sandboxId = sandboxIdSchema.parse(input.sandboxId);
   const jobId = jobIdSchema.parse(input.jobId);
   const proofDigest = digestSchema.parse(input.proofDigest);
@@ -211,6 +232,18 @@ export async function launchQueuedE2BVerification(input: {
     !info.network?.denyOut?.includes("0.0.0.0/0")
   ) {
     throw new Error("E2B did not confirm the deny-all outbound rule");
+  }
+
+  const existingRunner = await sandbox.commands.run(
+    queuedVerificationRunnerProbeCommand(jobId),
+    { user: "root", timeoutMs: 10_000 },
+  );
+  const existingState = existingRunner.stdout.trim();
+  if (existingState === "result-ready" || existingState === "running") {
+    return existingState;
+  }
+  if (existingState !== "recover") {
+    throw new Error("E2B returned an unexpected queued runner state");
   }
 
   await prepareE2BWorkspaceCopySource(sandbox);
@@ -277,6 +310,7 @@ export async function launchQueuedE2BVerification(input: {
     queuedVerificationRunnerCommand(jobId, proofDigest),
     { user: "root", background: true, timeoutMs: 30_000 },
   );
+  return "running";
 }
 
 export async function readQueuedE2BJobMetadata(

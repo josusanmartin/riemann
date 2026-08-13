@@ -1,8 +1,5 @@
 import { getSession } from "@/auth";
-import {
-  killE2BSandbox,
-  readE2BVerification,
-} from "@/lib/e2b-verifier";
+import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
 import {
   describePromotionError,
   isGitHubPromotionConfigured,
@@ -16,7 +13,6 @@ import {
   advanceVerificationQueue,
   assertQueueJobMatches,
   ensureQueuedJobRunning,
-  reconcileQueuedJobPause,
   VerifierOccupiedByFlowTestError,
 } from "@/lib/queue-orchestration";
 import { verifySubmissionJob } from "@/lib/submission-jobs";
@@ -42,7 +38,9 @@ function completedReceiptResponse(
   receipt: QueueCompletionReceipt,
 ): Response {
   if (receipt.proofDigest !== expectedDigest) {
-    throw new Error("The durable queue receipt does not match the verification job");
+    throw new Error(
+      "The durable queue receipt does not match the verification job",
+    );
   }
   if (receipt.outcome === "rejected") {
     const feedback =
@@ -120,32 +118,11 @@ export async function GET(request: Request): Promise<Response> {
     }
     if (queue.status === "queued") {
       assertQueueJobMatches(queue.job, job);
-      const latest = await reconcileQueuedJobPause(queue.job).catch((error) => {
-        console.error("Unable to reaffirm a queued E2B pause", error);
-        return queue;
-      });
-      if (latest.status === "active") {
-        assertQueueJobMatches(latest.job, job);
-        await ensureQueuedJobRunning(latest.job);
-        return noStore(200, {
-          status: "running",
-          submissionId: job.submissionId,
-          proofDigest: job.proofDigest,
-        });
-      }
-      if (latest.status === "completed") {
-        return completedReceiptResponse(
-          job.submissionId,
-          job.proofDigest,
-          latest.receipt,
-        );
-      }
       return noStore(200, {
         status: "queued",
         submissionId: job.submissionId,
         proofDigest: job.proofDigest,
-        queuePosition:
-          latest.status === "queued" ? latest.position : queue.position,
+        queuePosition: queue.position,
       });
     }
     if (queue.status === "missing") {
@@ -156,8 +133,9 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
     assertQueueJobMatches(queue.job, job);
+    let runnerState;
     try {
-      await ensureQueuedJobRunning(queue.job);
+      runnerState = await ensureQueuedJobRunning(queue.job);
     } catch (error) {
       if (error instanceof VerifierOccupiedByFlowTestError) {
         return noStore(200, {
@@ -170,6 +148,13 @@ export async function GET(request: Request): Promise<Response> {
         });
       }
       throw error;
+    }
+    if (runnerState === "running") {
+      return noStore(200, {
+        status: "running",
+        submissionId: job.submissionId,
+        proofDigest: job.proofDigest,
+      });
     }
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
@@ -202,7 +187,8 @@ export async function GET(request: Request): Promise<Response> {
         ...result,
         promotion: {
           status: "awaiting-configuration",
-          message: "The proof passed, but durable publication is not configured.",
+          message:
+            "The proof passed, but durable publication is not configured.",
         },
       });
     }
@@ -267,7 +253,8 @@ export async function GET(request: Request): Promise<Response> {
         feedback,
       });
     }
-    const message = error instanceof Error ? error.message : "Invalid verification job.";
+    const message =
+      error instanceof Error ? error.message : "Invalid verification job.";
     if (message.includes("token") || message.includes("signature")) {
       return noStore(400, { error: "invalid_job", message });
     }

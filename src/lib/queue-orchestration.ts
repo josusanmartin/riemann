@@ -1,6 +1,7 @@
 import {
   launchQueuedE2BVerification,
   pauseQueuedE2BVerification,
+  type QueuedE2BRunnerState,
 } from "@/lib/e2b-queue";
 import {
   completeVerificationJob,
@@ -35,13 +36,15 @@ export function assertQueueJobMatches(
     queued.jobId !== coordinates.jobId ||
     queued.proofDigest !== coordinates.proofDigest
   ) {
-    throw new Error("The durable queue entry does not match the verification job");
+    throw new Error(
+      "The durable queue entry does not match the verification job",
+    );
   }
 }
 
 export async function ensureQueuedJobRunning(
   job: QueuedVerificationJob,
-): Promise<void> {
+): Promise<QueuedE2BRunnerState> {
   const { hasActiveE2BFlowTest } = await import("@/lib/e2b-flow-test");
   if (await hasActiveE2BFlowTest()) {
     throw new VerifierOccupiedByFlowTestError();
@@ -49,7 +52,9 @@ export async function ensureQueuedJobRunning(
   return launchQueuedE2BVerification(job);
 }
 
-export function ensureQueuedJobPaused(job: QueuedVerificationJob): Promise<void> {
+export function ensureQueuedJobPaused(
+  job: QueuedVerificationJob,
+): Promise<void> {
   return pauseQueuedE2BVerification(job.sandboxId);
 }
 
@@ -66,7 +71,7 @@ export async function reconcileQueuedJobPause(
 }
 
 type InitialQueueTransitionDependencies = {
-  start: (job: QueuedVerificationJob) => Promise<void>;
+  start: (job: QueuedVerificationJob) => Promise<unknown>;
   reconcile: (job: QueuedVerificationJob) => Promise<QueueInspection>;
 };
 
@@ -97,7 +102,10 @@ export async function advanceVerificationQueue(
     } catch (error) {
       const { SandboxNotFoundError } = await import("e2b");
       if (!(error instanceof SandboxNotFoundError)) {
-        console.error("Unable to start the next durable verification job", error);
+        console.error(
+          "Unable to start the next durable verification job",
+          error,
+        );
         return { ...advance, next, nextStarted: false };
       }
       console.error("Skipping an expired queued verification sandbox", {

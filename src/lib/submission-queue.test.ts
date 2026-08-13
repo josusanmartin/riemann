@@ -34,6 +34,7 @@ function fakeQueueGitHub() {
   const main = "a".repeat(40);
   let queueHead: string | null = null;
   let sequence = 0;
+  let requestCount = 0;
   const blobs = new Map<string, string>();
   const trees = new Map<string, string>();
   const commits = new Map<string, { tree: string; parent: string | null }>([
@@ -48,6 +49,7 @@ function fakeQueueGitHub() {
     | undefined;
 
   const fetchImplementation: typeof fetch = async (request, init = {}) => {
+    requestCount += 1;
     const url = new URL(
       typeof request === "string" ? request : request.toString(),
     );
@@ -118,7 +120,8 @@ function fakeQueueGitHub() {
       return response({ object: { sha: queueHead } });
     }
     if (url.pathname.endsWith("/contents/runtime/submission-queue.json")) {
-      const commit = url.searchParams.get("ref") ?? "";
+      const ref = url.searchParams.get("ref") ?? "";
+      const commit = ref === "automation-queue" ? queueHead ?? "" : ref;
       const tree = commits.get(commit)?.tree ?? "";
       const content = blobs.get(trees.get(tree) ?? "") ?? "";
       return new Response(content, { status: 200 });
@@ -139,6 +142,7 @@ function fakeQueueGitHub() {
       const tree = commits.get(queueHead ?? "")?.tree ?? "";
       return blobs.get(trees.get(tree) ?? "") ?? "";
     },
+    requestCount: () => requestCount,
   };
 }
 
@@ -377,9 +381,11 @@ describe("durable formal verification queue", () => {
       options,
     );
     expect(admission).toMatchObject({ position: 0, dailyUsed: 1 });
+    const requestsBeforeUsage = github.requestCount();
     await expect(
       getDailySubmissionUsage("visible-solver", options),
     ).resolves.toMatchObject({ used: 1, limit: MAX_DAILY_SUBMISSIONS });
+    expect(github.requestCount() - requestsBeforeUsage).toBe(1);
 
     const ledger = github.latestState();
     expect(ledger).toContain(input(42).jobId);

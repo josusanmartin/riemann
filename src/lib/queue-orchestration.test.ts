@@ -46,9 +46,8 @@ function admission(shouldStart: boolean): QueueAdmission {
 describe("initial verification queue transition", () => {
   it("reports running only after the active sandbox launch succeeds", async () => {
     const start = vi.fn(async () => undefined);
-    const reconcile = vi.fn<
-      (queued: QueuedVerificationJob) => Promise<QueueInspection>
-    >();
+    const reconcile =
+      vi.fn<(queued: QueuedVerificationJob) => Promise<QueueInspection>>();
 
     await expect(
       applyInitialQueueTransition(admission(true), { start, reconcile }),
@@ -61,9 +60,8 @@ describe("initial verification queue transition", () => {
     const start = vi.fn(async () => {
       throw new Error("temporary E2B launch failure");
     });
-    const reconcile = vi.fn<
-      (queued: QueuedVerificationJob) => Promise<QueueInspection>
-    >();
+    const reconcile =
+      vi.fn<(queued: QueuedVerificationJob) => Promise<QueueInspection>>();
 
     await expect(
       applyInitialQueueTransition(admission(true), { start, reconcile }),
@@ -106,8 +104,8 @@ describe("initial verification queue transition", () => {
     expect(mocks.launch).not.toHaveBeenCalled();
 
     mocks.flowTestActive.mockResolvedValueOnce(false);
-    mocks.launch.mockResolvedValueOnce(undefined);
-    await expect(ensureQueuedJobRunning(job)).resolves.toBeUndefined();
+    mocks.launch.mockResolvedValueOnce("running");
+    await expect(ensureQueuedJobRunning(job)).resolves.toBe("running");
     expect(mocks.launch).toHaveBeenCalledWith(job);
   });
 });

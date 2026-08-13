@@ -56,7 +56,24 @@ export async function GET(request: Request): Promise<Response> {
     if (!activeQueueJob) return noStore(200, { status: "idle" });
     const job = await readQueuedE2BJobMetadata(activeQueueJob.sandboxId);
     assertQueueJobMatches(activeQueueJob, job);
-    await ensureQueuedJobRunning(activeQueueJob);
+    const runnerState = await ensureQueuedJobRunning(activeQueueJob);
+    if (runnerState === "running") {
+      const progress = await inspectE2BVerificationProgress(
+        job.sandboxId,
+        job.jobId,
+      );
+      console.info("E2B verification result not ready", {
+        jobId: job.jobId,
+        sandboxId: job.sandboxId,
+        ...progress,
+      });
+      return noStore(503, {
+        error: "result_not_ready",
+        submissionId: job.submissionId,
+        message:
+          "The verifier is still running and remains available for a later retry.",
+      });
+    }
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
       const progress = await inspectE2BVerificationProgress(

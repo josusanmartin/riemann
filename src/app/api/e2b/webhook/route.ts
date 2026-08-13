@@ -2,10 +2,7 @@ import {
   e2bWebhookEventSchema,
   verifyE2BWebhookSignature,
 } from "@/lib/e2b-webhooks";
-import {
-  killE2BSandbox,
-  readE2BVerification,
-} from "@/lib/e2b-verifier";
+import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
 import {
   describePromotionError,
   isGitHubPromotionConfigured,
@@ -106,13 +103,21 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
     assertQueueJobMatches(queue.job, job);
-    await ensureQueuedJobRunning(queue.job);
+    const runnerState = await ensureQueuedJobRunning(queue.job);
+    if (runnerState === "running") {
+      return noStore(503, {
+        error: "result_not_ready",
+        submissionId: job.submissionId,
+        message: "The verifier is still running; retry this event.",
+      });
+    }
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
       return noStore(503, {
         error: "result_not_ready",
         submissionId: job.submissionId,
-        message: "The paused sandbox result is not readable yet; retry this event.",
+        message:
+          "The paused sandbox result is not readable yet; retry this event.",
       });
     }
     assertE2BResultMatchesJob(job, result);

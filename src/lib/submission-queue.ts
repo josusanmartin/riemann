@@ -528,6 +528,21 @@ async function readState(
   return submissionQueueStateSchema.parse(JSON.parse(await response.text()));
 }
 
+async function readBranchState(
+  client: QueueGitHubClient,
+): Promise<SubmissionQueueState | null> {
+  const response = await client.request(
+    repositoryPath(
+      `contents/${SUBMISSION_QUEUE_PATH}?ref=${encodeURIComponent(SUBMISSION_QUEUE_BRANCH)}`,
+    ),
+    { headers: { Accept: "application/vnd.github.raw+json" } },
+    [404],
+  );
+  return response.status === 404
+    ? null
+    : submissionQueueStateSchema.parse(JSON.parse(await response.text()));
+}
+
 async function createBlob(client: QueueGitHubClient, content: string): Promise<string> {
   return objectShaSchema.parse(
     await client.json(repositoryPath("git/blobs"), {
@@ -693,11 +708,10 @@ export async function getDailySubmissionUsage(
     requiredToken(options),
     options.fetchImplementation ?? fetch,
   );
-  const head = await queueHead(client, now, false);
-  if (!head) {
+  const state = await readBranchState(client);
+  if (!state) {
     return { used: 0, limit: MAX_DAILY_SUBMISSIONS, retryAt: nextUtcDay(now) };
   }
-  const state = await readState(client, head);
   const ownerKey = hmacKey(
     "owner",
     githubLoginSchema.parse(github),
@@ -755,14 +769,13 @@ export async function inspectVerificationJob(
   options: QueueOptions = {},
 ): Promise<QueueInspection> {
   z.string().uuid().parse(jobId);
-  const now = options.now ?? new Date();
   const client = new QueueGitHubClient(
     requiredToken(options),
     options.fetchImplementation ?? fetch,
   );
-  const head = await queueHead(client, now, false);
-  return head
-    ? inspectQueueState(await readState(client, head), jobId)
+  const state = await readBranchState(client);
+  return state
+    ? inspectQueueState(state, jobId)
     : { status: "missing" };
 }
 
@@ -770,15 +783,14 @@ export async function inspectVerificationJobForOwner(
   github: string,
   options: QueueOptions = {},
 ): Promise<OwnerQueueInspection> {
-  const now = options.now ?? new Date();
   const client = new QueueGitHubClient(
     requiredToken(options),
     options.fetchImplementation ?? fetch,
   );
-  const head = await queueHead(client, now, false);
-  return head
+  const state = await readBranchState(client);
+  return state
     ? inspectOwnerQueueState(
-        await readState(client, head),
+        state,
         github,
         requiredOwnerSecret(options),
       )
@@ -788,11 +800,9 @@ export async function inspectVerificationJobForOwner(
 export async function getActiveVerificationJob(
   options: QueueOptions = {},
 ): Promise<QueuedVerificationJob | null> {
-  const now = options.now ?? new Date();
   const client = new QueueGitHubClient(
     requiredToken(options),
     options.fetchImplementation ?? fetch,
   );
-  const head = await queueHead(client, now, false);
-  return head ? (await readState(client, head)).active : null;
+  return (await readBranchState(client))?.active ?? null;
 }
