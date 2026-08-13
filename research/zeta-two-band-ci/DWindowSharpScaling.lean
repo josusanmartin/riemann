@@ -47,7 +47,7 @@ theorem sharpOverlap_scale
               (fun s : ℝ =>
                 vStar lam s * Real.cos ((r * L) * s)) (u / L) := by
               apply intervalIntegral.integral_congr
-              intro u
+              intro u hu
               dsimp
               congr 1
               have hr : (r * L) * (u / L) = r * u := by
@@ -63,7 +63,6 @@ theorem sharpOverlap_scale
                   (by norm_num : (-(1 : ℝ) / 2) ≤ 1 / 2)]
   rw [hnum]
   field_simp [hL.ne']
-  ring
 
 /-- The sharp overlap is even in physical frequency. -/
 theorem sharpOverlap_neg
@@ -71,8 +70,7 @@ theorem sharpOverlap_neg
     sharpOverlap lam L (-r) = sharpOverlap lam L r := by
   unfold sharpOverlap
   congr 2
-  apply MeasureTheory.setIntegral_congr_fun measurableSet_Icc
-  intro u hu
+  funext u
   rw [neg_mul, Real.cos_neg]
 
 end Zeta23.GapMatching.DWindowSharpScaling
