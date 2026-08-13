@@ -71,12 +71,13 @@ theorem gramSum_eq_finFourierOverlap
   intro k hk
   try rw [RCLike.inner_apply]
   simp_rw [dSimpleVector_apply hreal]
-  have hsqrt : Real.sqrt (dScale P T) ^ 2 = dScale P T :=
-    Real.sq_sqrt hc.le
-  simp only [map_div₀, Complex.conj_ofReal,
-    Complex.conj_div, Complex.ofReal_mul]
+  have hsqrtC :
+      ((Real.sqrt (dScale P T) : ℂ)) ^ 2 = (dScale P T : ℂ) := by
+    exact_mod_cast Real.sq_sqrt hc.le
+  simp only [map_div₀, Complex.conj_ofReal]
+  rw [div_mul_div_comm, ← sq, hsqrtC]
   push_cast
-  field_simp [hc.ne', Real.sqrt_pos.2 hc, hsqrt]
+  field_simp [hc.ne']
   ring
 
 end Zeta23.GapMatching.DWindowGramIdentity
