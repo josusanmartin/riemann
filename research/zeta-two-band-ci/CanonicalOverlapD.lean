@@ -58,9 +58,6 @@ theorem finFourierOverlap_eq_finiteOverlap
   rw [Finset.sum_range]
   unfold normalizedTerm
   rw [Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro x hx
-  ring_nf
 
 /-- The unit-weight Gram entry of two normalized canonical evaluation
 vectors is their real finite normalized overlap. -/
