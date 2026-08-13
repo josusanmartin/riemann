@@ -6,6 +6,7 @@ import {
   Download,
   FileCode2,
   Github,
+  LockKeyhole,
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
   isSubmissionQueueConfigured,
   MAX_DAILY_SUBMISSIONS,
 } from "@/lib/submission-queue";
+import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import {
   SUBMISSION_STARTER_PATH,
   submissionStarterSource,
@@ -46,6 +48,7 @@ export default async function SubmitPage() {
   const current = getCurrentRecord();
   const queueConfigured = isSubmissionQueueConfigured();
   const flowTestAllowed = github ? isFlowTestOperator(github) : false;
+  const archiveMaintainer = isSubmissionArchiveMaintainer(github);
   const verifierConfigured =
     isE2BConfigured() &&
     isE2BWebhookConfigured() &&
@@ -92,9 +95,15 @@ export default async function SubmitPage() {
             </strong>
             <p>
               The browser never receives an E2B or repository credential. Your
-              source enters a disposable, no-egress verifier with fixed tools;
-              queued sandboxes remain paused until their turn.
+              source enters a no-egress verifier with fixed tools. Once admitted,
+              its exact bytes are also retained in an encrypted maintainer-only
+              archive; queued sandboxes remain paused until their turn.
             </p>
+            {archiveMaintainer && (
+              <Link className="archive-admin-link" href="/admin/submissions">
+                <LockKeyhole size={15} /> Open private source archive
+              </Link>
+            )}
           </aside>
         </div>
       </section>
@@ -108,7 +117,7 @@ export default async function SubmitPage() {
           <p>The public number changes only after both kernels accept.</p>
         </div>
         <ol className="numbered-steps">
-          <li><span>01</span><div><h3>Upload source</h3><p>The server derives your author identity and a strict manifest from the signed GitHub session.</p></div></li>
+          <li><span>01</span><div><h3>Upload source</h3><p>The server derives your author identity and a strict manifest, then atomically archives the encrypted source when the queue admits it.</p></div></li>
           <li><span>02</span><div><h3>Verify in E2B</h3><p>A durable FIFO starts exactly one no-egress VM checker at a time, then checks statement equality, permitted axioms, Lean, and independent nanoda replay.</p></div></li>
           <li><span>03</span><div><h3>Publish evidence</h3><p>A passing result is bound to the exact source digest before it can enter the public record.</p></div></li>
         </ol>

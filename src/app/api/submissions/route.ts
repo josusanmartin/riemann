@@ -127,6 +127,7 @@ export async function POST(request: Request): Promise<Response> {
           submissionId: prepared.submission.id,
         },
         github,
+        { manifest: prepared.manifest, solution: prepared.solution },
       );
     } catch (error) {
       await killE2BSandbox(job.sandboxId).catch(() => undefined);

@@ -60,9 +60,9 @@ export default function MethodologyPage() {
           <p>Untrusted Lean and the credentialed publisher are separated so proof code can never read or use a write credential.</p>
         </div>
         <div className="trust-grid">
-          <article><UploadCloud size={23} /><h3>Candidate sandbox</h3><p>Checks one server-generated manifest and one Lean file in a private, no-egress E2B environment with no application credentials.</p><span className="permission-chip">no secrets</span></article>
+          <article><UploadCloud size={23} /><h3>Candidate sandbox</h3><p>Checks one server-generated manifest and one Lean file in a private, no-egress E2B environment with no application credentials. Queue admission separately seals the exact source in the maintainer archive.</p><span className="permission-chip">no secrets</span></article>
           <article><FileSearch size={23} /><h3>Comparator</h3><p>Reconstructs trusted declarations and rejects any proof whose statements differ, even if the names match.</p><span className="permission-chip">no secrets</span></article>
-          <article><KeyRound size={23} /><h3>Publisher</h3><p>Rehashes the sandbox source and attestation, then atomically archives evidence and updates the ledger without a pull request.</p><span className="permission-chip">write after pass</span></article>
+          <article><KeyRound size={23} /><h3>Publisher</h3><p>Rehashes the sandbox source and attestation, then atomically publishes accepted evidence and updates the ledger without a pull request.</p><span className="permission-chip">write after pass</span></article>
         </div>
       </section>
 

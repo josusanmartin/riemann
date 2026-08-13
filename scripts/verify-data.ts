@@ -118,6 +118,7 @@ const e2bComparator = await readFile(
 for (const requiredBoundary of [
   "E2B_API_KEY",
   "GITHUB_RECORDS_TOKEN",
+  "SUBMISSION_ARCHIVE_KEY",
   "socket.create_connection",
   "tls_data_reachable",
   "http_data_reachable",

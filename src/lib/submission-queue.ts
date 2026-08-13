@@ -1,7 +1,12 @@
 import { createHmac } from "node:crypto";
 import { z } from "zod";
-import { githubLoginSchema } from "@/lib/challenge";
+import { githubLoginSchema, submissionSchema } from "@/lib/challenge";
 import { RECORDS_BRANCH, RECORDS_REPOSITORY } from "@/lib/github-promotion";
+import {
+  isSubmissionArchiveConfigured,
+  sealSubmissionArchive,
+  submissionArchivePath,
+} from "@/lib/submission-archive";
 import { verifierFeedbackSchema } from "@/lib/verifier-feedback";
 
 const GITHUB_API = "https://api.github.com";
@@ -125,6 +130,11 @@ export type QueueJobInput = {
   submissionId: string;
 };
 
+export type QueueArchiveInput = {
+  manifest: string;
+  solution: string;
+};
+
 export type ActiveQueueJobReplacement = Pick<
   QueueJobInput,
   "sandboxId" | "jobId" | "proofDigest"
@@ -164,8 +174,14 @@ type FetchImplementation = typeof fetch;
 type QueueOptions = {
   token?: string;
   ownerSecret?: string;
+  archiveKey?: string;
   fetchImplementation?: FetchImplementation;
   now?: Date;
+};
+
+type CommitFile = {
+  path: string;
+  content: string;
 };
 
 type QueueMutation<T> = {
@@ -454,6 +470,12 @@ function requiredOwnerSecret(options: QueueOptions): string {
   return secret;
 }
 
+function requiredArchiveKey(options: QueueOptions): string {
+  const key = options.archiveKey ?? process.env.SUBMISSION_ARCHIVE_KEY;
+  if (!key) throw new Error("The encrypted submission archive is not configured");
+  return key;
+}
+
 class QueueGitHubClient {
   constructor(
     private readonly token: string,
@@ -555,21 +577,19 @@ async function createBlob(client: QueueGitHubClient, content: string): Promise<s
 async function createTree(
   client: QueueGitHubClient,
   baseTree: string,
-  blob: string,
+  files: Array<{ path: string; blob: string }>,
 ): Promise<string> {
   return objectShaSchema.parse(
     await client.json(repositoryPath("git/trees"), {
       method: "POST",
       body: JSON.stringify({
         base_tree: baseTree,
-        tree: [
-          {
-            path: SUBMISSION_QUEUE_PATH,
-            mode: "100644",
-            type: "blob",
-            sha: blob,
-          },
-        ],
+        tree: files.map((file) => ({
+          path: file.path,
+          mode: "100644",
+          type: "blob",
+          sha: file.blob,
+        })),
       }),
     }),
   ).sha;
@@ -607,10 +627,26 @@ async function writeStateCommit(
   state: SubmissionQueueState,
   message: string,
   now: Date,
+  additionalFiles: CommitFile[] = [],
 ): Promise<string> {
   const commit = await getCommit(client, head);
-  const blob = await createBlob(client, `${JSON.stringify(state, null, 2)}\n`);
-  const tree = await createTree(client, commit.tree.sha, blob);
+  const files = [
+    {
+      path: SUBMISSION_QUEUE_PATH,
+      content: `${JSON.stringify(state, null, 2)}\n`,
+    },
+    ...additionalFiles,
+  ];
+  if (new Set(files.map((file) => file.path)).size !== files.length) {
+    throw new Error("A queue commit cannot write the same path twice");
+  }
+  const blobs = await Promise.all(
+    files.map(async (file) => ({
+      path: file.path,
+      blob: await createBlob(client, file.content),
+    })),
+  );
+  const tree = await createTree(client, commit.tree.sha, blobs);
   return createCommit(client, tree, head, message, now);
 }
 
@@ -661,6 +697,7 @@ async function mutateQueue<T>(
   options: QueueOptions,
   message: string,
   mutate: (state: SubmissionQueueState) => QueueMutation<T>,
+  additionalFiles: CommitFile[] = [],
 ): Promise<T> {
   const now = options.now ?? new Date();
   const client = new QueueGitHubClient(
@@ -672,7 +709,14 @@ async function mutateQueue<T>(
     if (!head) throw new Error("The durable submission queue is unavailable");
     const mutation = mutate(await readState(client, head));
     if (!mutation.changed) return mutation.result;
-    const commit = await writeStateCommit(client, head, mutation.state, message, now);
+    const commit = await writeStateCommit(
+      client,
+      head,
+      mutation.state,
+      message,
+      now,
+      additionalFiles,
+    );
     try {
       await client.json(
         repositoryPath(`git/refs/heads/${SUBMISSION_QUEUE_BRANCH}`),
@@ -696,7 +740,11 @@ async function mutateQueue<T>(
 }
 
 export function isSubmissionQueueConfigured(): boolean {
-  return Boolean(process.env.GITHUB_RECORDS_TOKEN && process.env.AUTH_SECRET);
+  return Boolean(
+    process.env.GITHUB_RECORDS_TOKEN &&
+      process.env.AUTH_SECRET &&
+      isSubmissionArchiveConfigured(),
+  );
 }
 
 export async function getDailySubmissionUsage(
@@ -727,14 +775,44 @@ export async function getDailySubmissionUsage(
 export function enqueueVerificationJob(
   input: QueueJobInput,
   github: string,
+  archive: QueueArchiveInput,
   options: QueueOptions = {},
 ): Promise<QueueAdmission> {
   const now = options.now ?? new Date();
   const secret = requiredOwnerSecret(options);
+  const login = githubLoginSchema.parse(github).toLowerCase();
+  const submission = submissionSchema.parse(JSON.parse(archive.manifest));
+  if (
+    submission.id !== input.submissionId ||
+    submission.author.github.toLowerCase() !== login
+  ) {
+    throw new Error("The archived source does not match its queue identity");
+  }
+  const envelope = sealSubmissionArchive(
+    {
+      schemaVersion: 1,
+      jobId: input.jobId,
+      proofDigest: input.proofDigest,
+      submittedAt: now.toISOString(),
+      manifest: archive.manifest,
+      solution: archive.solution,
+    },
+    requiredArchiveKey(options),
+  );
   return mutateQueue(
     { ...options, now },
     "queue: enqueue formal verification",
     (state) => enqueueQueueState(state, input, github, secret, now),
+    [
+      {
+        path: submissionArchivePath(
+          input.jobId,
+          input.proofDigest,
+          now.toISOString(),
+        ),
+        content: `${JSON.stringify(envelope, null, 2)}\n`,
+      },
+    ],
   );
 }
 

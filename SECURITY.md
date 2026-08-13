@@ -24,10 +24,12 @@ Before promotion, the server downloads the exact manifest and `Solution.lean` fr
 
 The E2B sandbox receives no OAuth, session-signing, webhook, GitHub, Vercel, or E2B API credential. The browser receives only an HMAC-signed opaque job handle. The GitHub write credential is fine-grained to repository Contents and exists only in trusted promotion and queue-coordination functions.
 
-Queue coordination uses an automation-only Git branch and non-forced compare-and-swap updates, so only one proof job is active at a time. Its public control ledger contains HMAC-pseudonymous ownership counters, sandbox/job identifiers, digests, and bounded terminal receipts; it never stores GitHub usernames, Lean source, or rejected verifier logs. Waiting source remains inside paused, no-egress E2B filesystems.
+Queue coordination uses an automation-only Git branch and non-forced compare-and-swap updates, so only one proof job is active at a time. Its public control ledger contains HMAC-pseudonymous ownership counters, sandbox/job identifiers, digests, and bounded terminal receipts. Every admitted manifest and Lean source is additionally gzip-compressed and sealed with AES-256-GCM in the same compare-and-swap commit. The branch therefore contains encrypted source ciphertext but never GitHub usernames, rejected Lean source, or rejected verifier logs in plaintext. Waiting source also remains inside paused, no-egress E2B filesystems until verification.
+
+`SUBMISSION_ARCHIVE_KEY` is a dedicated 32-byte server-only key and must never be sent to E2B, the browser, GitHub Actions, or application logs. The maintainer archive route requires both a configured allowlisted GitHub identity and the deployment-held key, returns `no-store` responses, and rechecks the authenticated envelope, immutable path metadata, manifest, and proof digest before releasing source. Losing or rotating the key without migration makes prior ciphertext unrecoverable.
 
 `--mode=quick` deliberately omits the adversarial sandbox and must never be used on unknown Lean source.
 
 ## Web application
 
-GitHub authentication requests read-only identity scopes. OAuth credentials, `AUTH_SECRET`, `E2B_API_KEY`, `E2B_WEBHOOK_SECRET`, and `GITHUB_RECORDS_TOKEN` belong only in encrypted deployment variables. The site uses signed JWT sessions, accepts one bounded Lean source upload, and publishes its exact bytes plus the two-kernel attestation as immutable Git evidence.
+GitHub authentication requests read-only identity scopes. OAuth credentials, `AUTH_SECRET`, `E2B_API_KEY`, `E2B_WEBHOOK_SECRET`, `GITHUB_RECORDS_TOKEN`, and `SUBMISSION_ARCHIVE_KEY` belong only in encrypted deployment variables. The site uses signed JWT sessions, accepts one bounded Lean source upload, retains every admitted source under the disclosed encrypted policy, and publishes accepted exact bytes plus the two-kernel attestation as immutable Git evidence.

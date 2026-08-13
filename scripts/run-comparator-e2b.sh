@@ -13,7 +13,8 @@ if [[ "${E2B_SANDBOX:-}" != "true" ]] ||
   exit 96
 fi
 if [[ -n "${E2B_API_KEY:-}" ]] || [[ -n "${E2B:-}" ]] ||
-   [[ -n "${AUTH_SECRET:-}" ]] || [[ -n "${GITHUB_RECORDS_TOKEN:-}" ]]; then
+   [[ -n "${AUTH_SECRET:-}" ]] || [[ -n "${GITHUB_RECORDS_TOKEN:-}" ]] ||
+   [[ -n "${SUBMISSION_ARCHIVE_KEY:-}" ]]; then
   printf 'Refusing to run with an orchestrator secret in the sandbox environment.\n' >&2
   exit 96
 fi

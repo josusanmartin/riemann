@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import { computeDirectProofDigest } from "@/lib/direct-submission";
+import { openSubmissionArchive, submissionArchivePath } from "@/lib/submission-archive";
 import {
   completeQueueState,
   createEmptyQueueState,
@@ -15,6 +17,7 @@ import {
 } from "@/lib/submission-queue";
 
 const ownerSecret = "queue-test-secret";
+const archiveKey = Buffer.alloc(32, 9).toString("base64");
 const firstDay = new Date("2026-08-11T10:30:00.000Z");
 
 function input(index: number, submissionId = `record-${index}`) {
@@ -30,13 +33,52 @@ function sha(value: string): string {
   return createHash("sha1").update(value).digest("hex");
 }
 
+function archivedInput(
+  index: number,
+  github: string,
+  submissionId = `record-${index}`,
+) {
+  const solution = `import Challenge\n\n-- archive test ${index}\n`;
+  const manifest = `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      id: submissionId,
+      track: "critical-line",
+      author: { github, displayName: "Queue Tester" },
+      score: { numerator: "672500704", denominator: "1000000000" },
+      proof: {
+        solution: "proof/Solution.lean",
+        theorem: "candidate_critical_line_bound",
+        cumulativeTheorem: "candidate_critical_line_bound_cumulative",
+        improvementTheorem: "candidate_strict_improvement",
+      },
+      summary: "A complete formal queue archive integration test proof.",
+      method: "Queue archive integration test",
+      model: null,
+      harness: null,
+      license: "Apache-2.0",
+    },
+    null,
+    2,
+  )}\n`;
+  return {
+    input: {
+      ...input(index, submissionId),
+      proofDigest: computeDirectProofDigest(manifest, solution),
+    },
+    archive: { manifest, solution },
+  };
+}
+
 function fakeQueueGitHub() {
   const main = "a".repeat(40);
   let queueHead: string | null = null;
   let sequence = 0;
   let requestCount = 0;
   const blobs = new Map<string, string>();
-  const trees = new Map<string, string>();
+  const trees = new Map<string, Map<string, string>>([
+    ["b".repeat(40), new Map()],
+  ]);
   const commits = new Map<string, { tree: string; parent: string | null }>([
     [main, { tree: "b".repeat(40), parent: null }],
   ]);
@@ -83,9 +125,16 @@ function fakeQueueGitHub() {
       return response({ sha: blob }, 201);
     }
     if (url.pathname.endsWith("/git/trees") && method === "POST") {
-      const blob = (body as { tree: Array<{ sha: string }> }).tree[0].sha;
-      const tree = sha(`tree-${sequence += 1}-${blob}`);
-      trees.set(tree, blob);
+      const parsed = body as {
+        base_tree: string;
+        tree: Array<{ path: string; sha: string }>;
+      };
+      const files = new Map(trees.get(parsed.base_tree) ?? []);
+      for (const entry of parsed.tree) files.set(entry.path, entry.sha);
+      const tree = sha(
+        `tree-${sequence += 1}-${JSON.stringify([...files.entries()].sort())}`,
+      );
+      trees.set(tree, files);
       return response({ sha: tree }, 201);
     }
     if (url.pathname.endsWith("/git/commits") && method === "POST") {
@@ -119,12 +168,14 @@ function fakeQueueGitHub() {
       queueHead = candidate;
       return response({ object: { sha: queueHead } });
     }
-    if (url.pathname.endsWith("/contents/runtime/submission-queue.json")) {
+    if (url.pathname.includes("/contents/")) {
       const ref = url.searchParams.get("ref") ?? "";
       const commit = ref === "automation-queue" ? queueHead ?? "" : ref;
       const tree = commits.get(commit)?.tree ?? "";
-      const content = blobs.get(trees.get(tree) ?? "") ?? "";
-      return new Response(content, { status: 200 });
+      const path = decodeURIComponent(url.pathname.split("/contents/")[1] ?? "");
+      const blob = trees.get(tree)?.get(path);
+      if (!blob) return response({ message: "Not Found" }, 404);
+      return new Response(blobs.get(blob) ?? "", { status: 200 });
     }
     return response({ message: `Unhandled ${method} ${url.pathname}` }, 500);
   };
@@ -140,7 +191,13 @@ function fakeQueueGitHub() {
     },
     latestState: () => {
       const tree = commits.get(queueHead ?? "")?.tree ?? "";
-      return blobs.get(trees.get(tree) ?? "") ?? "";
+      const blob = trees.get(tree)?.get("runtime/submission-queue.json");
+      return blob ? blobs.get(blob) ?? "" : "";
+    },
+    latestPath: (path: string) => {
+      const tree = commits.get(queueHead ?? "")?.tree ?? "";
+      const blob = trees.get(tree)?.get(path);
+      return blob ? blobs.get(blob) ?? "" : "";
     },
     requestCount: () => requestCount,
   };
@@ -367,17 +424,20 @@ describe("durable formal verification queue", () => {
     ).toThrow("preserve the proof digest");
   });
 
-  it("initializes and mutates the GitHub ledger without publishing identity or source", async () => {
+  it("atomically archives encrypted source without publishing identity or plaintext", async () => {
     const github = fakeQueueGitHub();
     const options = {
       token: "test-token",
       ownerSecret,
+      archiveKey,
       fetchImplementation: github.fetchImplementation,
       now: firstDay,
     };
+    const archived = archivedInput(42, "Visible-Solver", "private-record-name");
     const admission = await enqueueVerificationJob(
-      input(42, "private-record-name"),
+      archived.input,
       "Visible-Solver",
+      archived.archive,
       options,
     );
     expect(admission).toMatchObject({ position: 0, dailyUsed: 1 });
@@ -393,6 +453,25 @@ describe("durable formal verification queue", () => {
     expect(ledger).not.toContain("visible-solver");
     expect(ledger).not.toContain("private-record-name");
     expect(ledger).not.toContain("Solution.lean");
+
+    const rawArchive = github.latestPath(
+      submissionArchivePath(
+        archived.input.jobId,
+        archived.input.proofDigest,
+        firstDay.toISOString(),
+      ),
+    );
+    expect(rawArchive).not.toContain("Visible-Solver");
+    expect(rawArchive).not.toContain("private-record-name");
+    expect(rawArchive).not.toContain(archived.archive.solution);
+    expect(
+      openSubmissionArchive(JSON.parse(rawArchive), archiveKey),
+    ).toMatchObject({
+      jobId: archived.input.jobId,
+      proofDigest: archived.input.proofDigest,
+      manifest: archived.archive.manifest,
+      solution: archived.archive.solution,
+    });
   });
 
   it("serializes concurrent admissions and enforces the daily limit once", async () => {
@@ -400,19 +479,30 @@ describe("durable formal verification queue", () => {
     const options = {
       token: "test-token",
       ownerSecret,
+      archiveKey,
       fetchImplementation: github.fetchImplementation,
       now: firstDay,
     };
+    const first = archivedInput(1, "concurrent-solver");
     await enqueueVerificationJob(
-      input(1),
+      first.input,
       "concurrent-solver",
+      first.archive,
       options,
     );
 
     github.synchronizeNextPatches(3);
+    const candidates = [2, 3, 4].map((index) =>
+      archivedInput(index, "CONCURRENT-SOLVER"),
+    );
     const results = await Promise.allSettled(
-      [2, 3, 4].map((index) =>
-        enqueueVerificationJob(input(index), "CONCURRENT-SOLVER", options),
+      candidates.map((candidate) =>
+        enqueueVerificationJob(
+          candidate.input,
+          "CONCURRENT-SOLVER",
+          candidate.archive,
+          options,
+        ),
       ),
     );
     const admitted = results.filter(
@@ -427,7 +517,7 @@ describe("durable formal verification queue", () => {
     expect(rejected).toHaveLength(1);
     expect(rejected[0].reason).toBeInstanceOf(DailySubmissionLimitError);
     const state = JSON.parse(github.latestState());
-    expect(state.active.jobId).toBe(input(1).jobId);
+    expect(state.active.jobId).toBe(first.input.jobId);
     expect(state.pending).toHaveLength(2);
     expect(new Set(state.pending.map((job: { jobId: string }) => job.jobId))).toEqual(
       new Set(admitted.map((result) => result.value.job.jobId)),
@@ -435,5 +525,16 @@ describe("durable formal verification queue", () => {
     await expect(
       getDailySubmissionUsage("concurrent-solver", options),
     ).resolves.toMatchObject({ used: MAX_DAILY_SUBMISSIONS });
+    for (const result of admitted) {
+      expect(
+        github.latestPath(
+          submissionArchivePath(
+            result.value.job.jobId,
+            result.value.job.proofDigest,
+            firstDay.toISOString(),
+          ),
+        ),
+      ).not.toBe("");
+    }
   });
 });

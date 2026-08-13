@@ -485,7 +485,7 @@ export function DirectSubmissionForm({
 
       <label className="license-consent">
         <input name="acceptLicense" type="checkbox" required disabled={busy} />
-        <span>I publish this proof source under Apache-2.0 for verification and permanent public evidence if accepted.</span>
+        <span>I agree that every admitted upload is retained indefinitely in the encrypted maintainer-only archive. If accepted, I also publish this proof source under Apache-2.0 as permanent public evidence.</span>
       </label>
 
       <div className={`verification-job-card ${phase}`} aria-live="polite">
