@@ -206,7 +206,11 @@ export function FlowTestPanel({
   }
 
   return (
-    <section className="shell flow-test-panel" aria-labelledby="flow-test-title">
+    <section
+      className="shell flow-test-panel"
+      id="verifier-flow-test"
+      aria-labelledby="flow-test-title"
+    >
       <div className="flow-test-copy">
         <span className="eyebrow">Operator flow test · noncompetitive</span>
         <h2 id="flow-test-title">A complete proof that can turn the verifier green.</h2>

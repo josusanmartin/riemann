@@ -3,6 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { PreparedDirectSubmission } from "@/lib/direct-submission";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
+import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
 
 const FLOW_TEST_TIMEOUT_MS = 20 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
@@ -48,7 +49,10 @@ export async function startE2BFlowTest(input: StartFlowTestInput): Promise<{
     timeoutMs: FLOW_TEST_TIMEOUT_MS,
     secure: true,
     allowInternetAccess: false,
-    network: { allowPublicTraffic: false },
+    network: {
+      allowPublicTraffic: false,
+      denyOut: ["0.0.0.0/0"],
+    },
     lifecycle: { onTimeout: { action: "kill" }, autoResume: false },
     metadata: {
       app: "riemann-fail",
@@ -65,9 +69,13 @@ export async function startE2BFlowTest(input: StartFlowTestInput): Promise<{
 
   try {
     const info = await sandbox.getInfo();
-    if (info.allowInternetAccess !== false) {
-      throw new Error("E2B did not confirm that internet access is disabled");
+    if (
+      info.allowInternetAccess !== false ||
+      !info.network?.denyOut?.includes("0.0.0.0/0")
+    ) {
+      throw new Error("E2B did not confirm the deny-all outbound rule");
     }
+    await prepareE2BWorkspaceCopySource(sandbox);
     await sandbox.commands.run(
       `install -d -o riemann -g riemann -m 0700 ${uploadDirectory}/proof && ` +
         `install -d -o root -g root -m 0755 ${jobDirectory}`,

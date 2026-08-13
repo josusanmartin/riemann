@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import type { Sandbox as E2BSandbox } from "e2b";
 import { getE2BApiKey } from "@/lib/e2b-config";
+import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -169,6 +170,7 @@ async function smokeTemplate(templateReference: string, key: string) {
     ) {
       throw new Error("E2B did not confirm the deny-all outbound rule");
     }
+    await prepareE2BWorkspaceCopySource(sandbox);
     const sandboxEnv = {
       HOME: "/home/riemann",
       PATH: "/opt/riemann/tools/bin:/home/riemann/.elan/bin:/usr/local/bin:/usr/bin:/bin",
@@ -312,6 +314,7 @@ async function startExtendedSmokeTemplate(
 
   try {
     await assertSmokeNetworkIsolation(sandbox);
+    await prepareE2BWorkspaceCopySource(sandbox);
     const diagnostics = await sandbox.commands.run(
       "set -euo pipefail; " +
         "printf 'mathlib_head='; git -C /opt/riemann/zeta23/.lake/packages/mathlib rev-parse HEAD; " +

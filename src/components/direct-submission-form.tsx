@@ -119,11 +119,15 @@ export function DirectSubmissionForm({
   defaultDisplayName,
   verifierConfigured,
   starterSource,
+  flowTestSource,
+  flowTestAvailable,
 }: {
   github: string;
   defaultDisplayName: string;
   verifierConfigured: boolean;
   starterSource: string;
+  flowTestSource: string;
+  flowTestAvailable: boolean;
 }) {
   const [solution, setSolution] = useState("");
   const [phase, setPhase] = useState<JobPhase>("idle");
@@ -288,6 +292,22 @@ export function DirectSubmissionForm({
     setFeedback(null);
     setDigest("");
     setEvidenceUrl("");
+    const normalizedSolution = solution.replace(/\r\n?/g, "\n").trim();
+    const normalizedFlowTest = flowTestSource.replace(/\r\n?/g, "\n").trim();
+    if (normalizedSolution === normalizedFlowTest) {
+      setPhase("error");
+      setMessage(
+        flowTestAvailable
+          ? "This is the official noncompetitive test proof. Use ‘Run full flow test’ above; nothing was submitted and no daily slot was used."
+          : "This is the official noncompetitive test proof, not a record improvement. Nothing was submitted and no daily slot was used.",
+      );
+      if (flowTestAvailable) {
+        document
+          .getElementById("verifier-flow-test")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
     if (!verifierConfigured) {
       setPhase("error");
       setMessage("The pinned E2B verifier template is still being configured.");
@@ -479,7 +499,7 @@ export function DirectSubmissionForm({
           {evidenceUrl && <a href={evidenceUrl} target="_blank" rel="noreferrer">Open immutable evidence</a>}
         </div>
         <button className="button button-dark" type="submit" disabled={busy || !solution}>
-          {phase === "queued" ? "Queued…" : busy ? "Checking…" : "Verify formal proof"}
+          {phase === "queued" ? "Queued…" : busy ? "Checking…" : "Submit competitive proof"}
         </button>
       </div>
 

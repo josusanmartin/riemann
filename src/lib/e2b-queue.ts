@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Submission } from "@/lib/challenge";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
+import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
 
 // Admission and scheduling deliberately live outside the frozen verifier
 // module. Queue changes therefore cannot change the attested proof checker or
@@ -182,6 +183,8 @@ export async function launchQueuedE2BVerification(input: {
   ) {
     throw new Error("E2B did not confirm the deny-all outbound rule");
   }
+
+  await prepareE2BWorkspaceCopySource(sandbox);
 
   const resultPath = `${jobDirectory}/result.json`;
   const lockPath = `${jobDirectory}/runner.lock`;

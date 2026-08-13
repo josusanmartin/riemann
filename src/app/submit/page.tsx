@@ -182,8 +182,13 @@ export default async function SubmitPage() {
       <section className="shell direct-submit-section">
         <div className="direct-submit-heading">
           <div>
-            <span className="eyebrow">Direct verifier</span>
-            <h2>An exact score and a Lean entry file</h2>
+            <span className="eyebrow">Competitive direct verifier</span>
+            <h2>Submit a real record improvement</h2>
+            <p>
+              This form consumes a daily slot after queue admission. The complete
+              <code> 1/3 → 2/3 </code> test proof belongs in the noncompetitive
+              flow-test lane above, not here.
+            </p>
           </div>
           <div className="current-record-chip">
             <span>Current formal record</span>
@@ -201,6 +206,8 @@ export default async function SubmitPage() {
             defaultDisplayName={session?.user.name ?? github}
             verifierConfigured={verifierConfigured}
             starterSource={submissionStarterSource}
+            flowTestSource={flowTestSolutionSource}
+            flowTestAvailable={flowTestAllowed}
           />
         ) : (
           <div className="submission-locked-card">
