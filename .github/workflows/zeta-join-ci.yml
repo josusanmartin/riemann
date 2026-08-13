@@ -31,6 +31,7 @@ jobs:
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandGapWord.lean" "$GAP/OneBandGapWord.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandPathWeightIdentity.lean" "$GAP/OneBandPathWeightIdentity.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandFixedHeightBonus.lean" "$GAP/OneBandFixedHeightBonus.lean"
       - name: Restore cache quietly
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
@@ -38,10 +39,10 @@ jobs:
         working-directory: ${{ runner.temp }}/zeta23
         run: |
           set +e
-          lake build Zeta23.GapMatching.OneBandPathWeightIdentity > /tmp/join.log 2>&1
+          lake build Zeta23.GapMatching.OneBandFixedHeightBonus > /tmp/join.log 2>&1
           status=$?
           echo '=== JOIN ERRORS ==='
-          grep -n -A18 -B4 'error:' /tmp/join.log || true
+          grep -n -A20 -B5 'error:' /tmp/join.log || true
           echo '=== JOIN LOG TAIL ==='
-          tail -n 40 /tmp/join.log
+          tail -n 50 /tmp/join.log
           exit $status
