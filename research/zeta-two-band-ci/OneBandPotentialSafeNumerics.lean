@@ -59,17 +59,21 @@ def longFloor : State → State → ℝ
   | .bad, .bad => j
   | _, _ => 0
 
-def transitionFloor (previous current : State) : ℝ :=
+/-- The actual length/edge charge, before adding the telescoping potential. -/
+def physicalFloor (previous current : State) : ℝ :=
   B * lengthFloor current
     + shortFloor current
     + longFloor previous current
-    + phi previous - phi current
+
+/-- Physical charge plus the potential difference. -/
+def transitionFloor (previous current : State) : ℝ :=
+  physicalFloor previous current + phi previous - phi current
 
 /-- All four state transitions satisfy the exact local certificate. -/
 theorem transition_certificate (previous current : State) :
     A ≤ transitionFloor previous current := by
   cases previous <;> cases current <;>
-    norm_num [A, B, p, j, badLeft, transitionFloor,
+    norm_num [A, B, p, j, badLeft, transitionFloor, physicalFloor,
       lengthFloor, shortFloor, longFloor, phi]
 
 theorem parameter_ranges :
@@ -99,14 +103,22 @@ theorem floor_arithmetic :
   norm_num [overlapTolerance, sharpAbsFloor, sharpSqFloor,
     finiteSqFloor, p, j]
 
-/-- A step whose physical cost dominates the exact transition floor gives the
-abstract local certificate. -/
+/-- A step whose physical cost dominates the exact physical floor gives the
+abstract local certificate after adding the telescoping potential once. -/
 theorem localCertificate_of_dominates
     (previous : State) (g : GapDatum State)
-    (h : transitionFloor previous g.state
+    (h : physicalFloor previous g.state
       ≤ stepCost B State.good previous g) :
-    LocalCertificate A B State.good phi previous g :=
-  (transition_certificate previous g.state).trans h
+    LocalCertificate A B State.good phi previous g := by
+  unfold LocalCertificate
+  calc
+    A ≤ transitionFloor previous g.state :=
+      transition_certificate previous g.state
+    _ = physicalFloor previous g.state
+          + phi previous - phi g.state := rfl
+    _ ≤ stepCost B State.good previous g
+          + phi previous - phi g.state := by
+      nlinarith
 
 /-- A safe lower bound for the fixed-window baseline. -/
 def deltaLower : ℝ := 0.67250069
