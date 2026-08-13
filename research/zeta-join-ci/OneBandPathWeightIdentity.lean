@@ -61,12 +61,24 @@ theorem pathWeight_wordFrom
       rw [Finset.sum_range_succ']
       simp only [wordFrom, pathWeight]
       rw [local_path_contribution]
+      change startWeight U edge start +
+          pathWeight State.good
+            (wordFrom U length edge edge (start + 1) (count + 1))
+        = (∑ k ∈ Finset.range count,
+            startWeight U edge (start + (k + 1)))
+          + startWeight U edge (start + 0)
       rw [ih (start + 1)]
-      apply congrArg (fun x : ℝ => startWeight U edge start + x)
-      apply Finset.sum_congr rfl
-      intro j hj
-      congr 1
-      omega
+      have hshift :
+          (∑ j ∈ Finset.range count,
+              startWeight U edge ((start + 1) + j))
+            = ∑ k ∈ Finset.range count,
+                startWeight U edge (start + (k + 1)) := by
+        apply Finset.sum_congr rfl
+        intro k hk
+        congr 1
+        omega
+      rw [hshift]
+      ring
 
 /-- Full-word specialization. -/
 theorem pathWeight_word
