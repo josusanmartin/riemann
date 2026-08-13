@@ -1,0 +1,96 @@
+name: Zeta pinned exact-hole autofix v3
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-exact-autofix-v3.yml"
+      - "research/autofix/**"
+      - "research/zeta-join-ci/**"
+  workflow_dispatch:
+
+concurrency:
+  group: zeta-exact-autofix-v3
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  autofix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare complete workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23" && git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          copy(){ cp "$GITHUB_WORKSPACE/$1" "$GAP/$2"; }
+          copy research/zeta-two-band-ci/FiniteStateGapPotential.lean FiniteStateGapPotential.lean
+          copy research/zeta-two-band-ci/FiniteStatePathWeight.lean FiniteStatePathWeight.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean TwoBandPotentialSafeNumerics.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialOverlap.lean TwoBandPotentialOverlap.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean TwoBandPotentialAnalyticBridge.lean
+          copy research/zeta-two-band-ci/CandidateStrictImprovement.lean CandidateStrictImprovement.lean
+          copy research/zeta-two-band-ci/CandidateStrictImprovementTight.lean CandidateStrictImprovementTight.lean
+          copy research/zeta-two-band-ci/v7/DNormalizedMoments.lean DNormalizedMoments.lean
+          copy research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean ScalarBonusCertificate.lean
+          copy research/zeta-two-band-ci/TwoBandGapMatchingD.lean TwoBandGapMatchingD.lean
+          copy research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean TwoBandGapMatchingDPath.lean
+          copy research/zeta-two-band-ci/CentralPathConstructionD.lean CentralPathConstructionD.lean
+          copy research/zeta-two-band-ci/GuardedWindowCount.lean GuardedWindowCount.lean
+          copy research/zeta-two-band-ci/CentralGuardCountD.lean CentralGuardCountD.lean
+          copy research/zeta-two-band-ci/OrderedPointGaps.lean OrderedPointGaps.lean
+          copy research/zeta-two-band-ci/DWindowLength.lean DWindowLength.lean
+          copy research/zeta-two-band-ci/CentralGapGeometryD.lean CentralGapGeometryD.lean
+          copy research/zeta-two-band-ci/v7/DWindowOverlap.lean DWindowOverlap.lean
+          copy research/zeta-two-band-ci/v7/DWindowRampEstimate.lean DWindowRampEstimate.lean
+          copy research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean DWindowProfileAlgebra.lean
+          copy research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean OneBandPotentialSafeNumerics.lean
+          copy research/zeta-two-band-ci/OneBandPotentialOverlap.lean OneBandPotentialOverlap.lean
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api.py" "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api_extra.py" "$GAP/OneBandSharpProfile.lean"
+          copy research/zeta-two-band-ci/OneBandSharpProfileAPI.lean OneBandSharpProfileAPI.lean
+          copy research/zeta-two-band-ci/OneBandSharpProfileExtraAPI.lean OneBandSharpProfileExtraAPI.lean
+          copy research/zeta-two-band-ci/OneBandLiveFixedSimpleNumerics.lean OneBandLiveFixedSimpleNumerics.lean
+          copy research/zeta-tail-ci/FiniteGridTailAlgebra.lean FiniteGridTailAlgebra.lean
+          copy research/zeta-tail-ci/DWindowFourierTail.lean DWindowFourierTail.lean
+          copy research/zeta-tail-ci/IntegerGridSplit.lean IntegerGridSplit.lean
+          copy research/zeta-tail-ci/FiniteBlockApproximation.lean FiniteBlockApproximation.lean
+          copy research/zeta-tail-ci/DWindowFiniteGridApprox.lean DWindowFiniteGridApprox.lean
+          for f in OneBandGapWord OneBandGapWordBounded CanonicalOneBandPathD OneBandSharpProfileBridge DWindowGramIdentity DWindowCandidateEnergyIdentity OverlapBoundsD OneBandActualWordDCore PathDataDCoreAdapter OneBandWordEnergyD ConstantOverCount ActualWordLengthD GramToFinitePoisson; do
+            copy "research/zeta-join-ci/$f.lean" "$f.lean"
+          done
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Apply suggestions
+        run: |
+          mkdir -p ci-results/autofix-v3
+          modules=(OneBandSharpProfileBridge PathDataDCoreAdapter OverlapBoundsD OneBandWordEnergyD ConstantOverCount ActualWordLengthD GramToFinitePoisson)
+          for module in "${modules[@]}"; do
+            python3 research/autofix/lean_exact_autofix.py "$RUNNER_TEMP/zeta23" \
+              "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/$module.lean" \
+              --report "ci-results/autofix-v3/$module.txt"
+            cp "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/$module.lean" "research/zeta-join-ci/$module.lean"
+          done
+      - name: Commit fixes
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add research/zeta-join-ci ci-results/autofix-v3
+          git commit -m 'ci: resolve remaining pinned Lean theorem-discovery holes' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
