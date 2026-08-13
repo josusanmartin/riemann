@@ -15,6 +15,7 @@ multiplied by the squared ramp taper.  The resulting numerator error is at
 most `2w`, uniformly in the real frequency `r`.
 -/
 import Zeta23.ThmD.Window
+import Zeta23.ThmD.WindowCore
 
 open Real Set MeasureTheory
 
@@ -117,6 +118,7 @@ theorem edge_estimate_public
           _ = 1 := mul_one 1
       have hone : 1 ≤ majorant u := by
         rw [hmajorant]
+        dsimp only
         rcases le_or_gt u 0 with hneg | hpos
         · have hu1 :
               u ∈ Set.Icc (-(L / 2)) (-(L / 2) + w) := by
@@ -126,6 +128,11 @@ theorem edge_estimate_public
             linarith
           have hother :=
             hindicator_nonneg (Set.Icc (L / 2 - w) (L / 2)) u
+          change 1 ≤
+            (Set.Icc (-(L / 2)) (-(L / 2) + w)).indicator
+                (1 : ℝ → ℝ) u
+              + (Set.Icc (L / 2 - w) (L / 2)).indicator
+                (1 : ℝ → ℝ) u
           rw [Set.indicator_of_mem hu1, Pi.one_apply]
           linarith
         · have hu1 :
@@ -137,6 +144,11 @@ theorem edge_estimate_public
           have hother :=
             hindicator_nonneg
               (Set.Icc (-(L / 2)) (-(L / 2) + w)) u
+          change 1 ≤
+            (Set.Icc (-(L / 2)) (-(L / 2) + w)).indicator
+                (1 : ℝ → ℝ) u
+              + (Set.Icc (L / 2 - w) (L / 2)).indicator
+                (1 : ℝ → ℝ) u
           rw [Set.indicator_of_mem hu1, Pi.one_apply]
           linarith
       linarith
@@ -148,9 +160,16 @@ theorem edge_estimate_public
             |h u * p u - h u| :=
           MeasureTheory.abs_integral_le_integral_abs
     _ ≤ ∫ u in Set.Icc (-(L / 2)) (L / 2), majorant u := by
-          apply MeasureTheory.setIntegral_mono_on
-            (((hhc.mul hpc).sub hhc).abs.continuousOn
-              .integrableOn_compact isCompact_Icc)
+          have hIabs :
+              MeasureTheory.IntegrableOn
+                (fun u => |h u * p u - h u|)
+                (Set.Icc (-(L / 2)) (L / 2)) := by
+            change MeasureTheory.Integrable
+              (fun u => |h u * p u - h u|)
+              (MeasureTheory.volume.restrict
+                (Set.Icc (-(L / 2)) (L / 2)))
+            simpa only [Pi.sub_apply] using (hIhp.sub hIh).abs
+          exact MeasureTheory.setIntegral_mono_on hIabs
             hImajorant.integrableOn measurableSet_Icc hpointwise
     _ ≤ ∫ u, majorant u :=
           MeasureTheory.setIntegral_le_integral hImajorant
@@ -178,7 +197,6 @@ theorem edge_estimate_public
             ENNReal.toReal_ofReal (by linarith)]
           ring
 
-
 /-- Real Fourier transform of the squared admissible window is its cosine
 integral.  Evenness is not needed for this real-part identity. -/
 theorem VPhiR_eq_cos_integral
@@ -186,23 +204,31 @@ theorem VPhiR_eq_cos_integral
     (hW : AdmWindow v L w c) :
     AdmWindow.VPhiR v r
       = ∫ u, v u ^ 2 * Real.cos (r * u) := by
+  have hexp : Continuous
+      (fun u : ℝ => Complex.exp
+        (Complex.I * (r : ℂ) * (u : ℂ))) := by
+    fun_prop
+  have hcont : Continuous
+      (fun u : ℝ => (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))) :=
+    hW.vSqC_continuous.mul hexp
   have hint : Integrable
       (fun u : ℝ => (((v u) ^ 2 : ℝ) : ℂ)
         * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))) :=
-    (hW.vSqC_continuous.mul (by fun_prop))
-      .integrable_of_hasCompactSupport
-        hW.vSqC_hasCompactSupport.mul_right
+    hcont.integrable_of_hasCompactSupport
+      hW.vSqC_hasCompactSupport.mul_right
   unfold AdmWindow.VPhiR AdmWindow.VPhi
-  rw [paperFT_def, integral_re_C hint]
-  apply integral_congr_ae
-  filter_upwards with u
-  have hexponent :
-      Complex.I * (r : ℂ) * (u : ℂ)
-        = ((r * u : ℝ) : ℂ) * Complex.I := by
-    push_cast
-    ring
-  rw [hexponent, Complex.exp_mul_I]
-  simp [Complex.mul_re]
+  rw [paperFT_def]
+  calc
+    (∫ u, (((v u) ^ 2 : ℝ) : ℂ)
+        * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))).re
+        = ∫ u, ((((v u) ^ 2 : ℝ) : ℂ)
+          * Complex.exp (Complex.I * (r : ℂ) * (u : ℂ))).re := by
+            exact (integral_re hint).symm
+    _ = ∫ u, v u ^ 2 * Real.cos (r * u) := by
+      refine integral_congr_ae ?_
+      filter_upwards with u
+      simp [Complex.mul_re, Complex.exp_re]
 
 /-- Frequency-uniform two-ramp comparison for the squared D-window. -/
 theorem ramp_cos_integral_close
