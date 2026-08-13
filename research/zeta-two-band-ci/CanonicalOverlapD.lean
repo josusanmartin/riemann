@@ -81,29 +81,43 @@ theorem gramEntry_eq_finiteOverlap
   have hsqrtC :
       ((Real.sqrt (dScale P T) : ℂ)) ^ 2 = (dScale P T : ℂ) := by
     exact_mod_cast Real.sq_sqrt hc.le
-  unfold finiteOverlap finiteNormalizedOverlap finiteBlock normalizedTerm
-  rw [← Finset.sum_range]
-  apply Finset.sum_congr rfl
-  intro k hk
-  simp only [dSimpleVector, simpleVhat, ZeroBlockData.vhat,
-    blockData, mkData_v, evalVec]
-  rw [vertex_gamma V i, vertex_gamma V j]
-  rw [GzGp.phiHat_ofReal, GzGp.phiHat_ofReal]
-  rw [atD_phiHatR hP, atD_phiHatR hP]
-  rw [atD_tau_eq, atD_tau_eq]
-  rw [map_div₀, Complex.conj_ofReal]
-  change
-    ((vHatR (P.phiD T)
-          (ordinate V i - (T + (k : ℤ) * (2 * Real.pi / P.L T))) : ℂ)
-        / (Real.sqrt (dScale P T) : ℂ)) *
-      ((vHatR (P.phiD T)
-          (ordinate V j - (T + (k : ℤ) * (2 * Real.pi / P.L T))) : ℂ)
-        / (Real.sqrt (dScale P T) : ℂ))
-      = _
-  rw [div_mul_div_comm, ← sq, hsqrtC]
-  rw [dScale, atD_a_eq_av hP, Params.atD_L]
+  unfold finiteOverlap finiteNormalizedOverlap finiteBlock
   push_cast
-  ring
+  calc
+    (∑ k : Fin ((P.atD T).d T),
+        starRingEnd ℂ (dSimpleVector Z P T (V.vertices i) k) *
+          dSimpleVector Z P T (V.vertices j) k)
+      = ∑ k : Fin ((P.atD T).d T),
+          (normalizedTerm (P.phiD T) (P.L T) T
+            (ordinate V i) (ordinate V j) k : ℂ) := by
+          apply Finset.sum_congr rfl
+          intro k hk
+          simp only [dSimpleVector, simpleVhat, ZeroBlockData.vhat,
+            blockData, mkData_v, evalVec]
+          rw [vertex_gamma V i, vertex_gamma V j]
+          rw [GzGp.phiHat_ofReal, GzGp.phiHat_ofReal]
+          rw [atD_phiHatR hP, atD_phiHatR hP]
+          rw [atD_tau_eq, atD_tau_eq]
+          rw [map_div₀, Complex.conj_ofReal]
+          unfold normalizedTerm
+          change
+            ((vHatR (P.phiD T)
+                  (ordinate V i - (T + (k : ℤ) *
+                    (2 * Real.pi / P.L T))) : ℂ)
+                / (Real.sqrt (dScale P T) : ℂ)) *
+              ((vHatR (P.phiD T)
+                  (ordinate V j - (T + (k : ℤ) *
+                    (2 * Real.pi / P.L T))) : ℂ)
+                / (Real.sqrt (dScale P T) : ℂ))
+              = _
+          rw [div_mul_div_comm, ← sq, hsqrtC]
+          rw [dScale, atD_a_eq_av hP, Params.atD_L]
+          push_cast
+          ring
+    _ = ∑ n ∈ Finset.range ((P.atD T).d T),
+          (normalizedTerm (P.phiD T) (P.L T) T
+            (ordinate V i) (ordinate V j) n : ℂ) := by
+          rw [Fin.sum_univ_eq_sum_range]
 
 /-- Squared form consumed by the path energy. -/
 theorem edgeEnergy_eq_finiteOverlap_sq
