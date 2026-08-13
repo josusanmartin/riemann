@@ -1,0 +1,1 @@
+Replay DWindowRampEstimate after the explicit real-square identity fix.
