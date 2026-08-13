@@ -22,10 +22,13 @@ open Zeta23.ZeroSide.RankTraceMult
 open Zeta23.ThmD
 open Zeta23.AdmWindow
 open Zeta23.GapMatching.CentralPathConstructionD
+open Zeta23.GapMatching.CentralGapGeometryD
 open Zeta23.GapMatching.CanonicalOneBandPathD
 open Zeta23.GapMatching.DWindowFiniteGridApprox
 open Zeta23.GapMatching.DWindowGramIdentity
+open Zeta23.GapMatching.FiniteBlockApproximation
 open Zeta23.GapMatching.PathForestMatching
+open Zeta23.GapMatching.DistinctGapMatchingPipeline
 open Zeta23.GapMatching.TwoBandGapMatchingDPath
 
 variable {Z : ZeroConfig} {P : Params} {T : ℝ}
