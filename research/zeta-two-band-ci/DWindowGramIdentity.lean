@@ -78,6 +78,5 @@ theorem gramSum_eq_finFourierOverlap
   rw [div_mul_div_comm, ← sq, hsqrtC]
   push_cast
   field_simp [hc.ne']
-  ring
 
 end Zeta23.GapMatching.DWindowGramIdentity
