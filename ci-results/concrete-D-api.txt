@@ -1,0 +1,1 @@
+{'zero': (47, 'ThmD.concreteDataD', 'Concrete'), 'params': (50, 'ThmD.LocalHypsCoreDEventually', 'Concrete'), 'fixed': (58, 'ThmD.thmD_lam_abstract', 'Final')}
