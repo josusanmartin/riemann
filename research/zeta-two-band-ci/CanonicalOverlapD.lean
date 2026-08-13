@@ -18,6 +18,7 @@ namespace Zeta23.GapMatching.CanonicalOverlapD
 
 open Zeta23
 open Zeta23.ZeroSide
+open Zeta23.ZeroSide.RankTraceMult
 open Zeta23.ThmD
 open Zeta23.AdmWindow
 open Zeta23.GapMatching.CentralPathConstructionD
@@ -50,8 +51,8 @@ theorem finFourierOverlap_eq_finiteOverlap
       = finiteOverlap V i j := by
   unfold finFourierOverlap finiteOverlap finiteNormalizedOverlap finiteBlock
   rw [dScale, atD_a_eq_av hP, Params.atD_L]
-  simp_rw [atD_phiHatR hP, atD_tau_eq]
-  rw [Fin.sum_univ_eq_sum_range]
+  simp_rw [atomOrdinate_vertex, atD_phiHatR hP, atD_tau_eq]
+  rw [Finset.sum_range]
   unfold normalizedTerm
   ring
 
