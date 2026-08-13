@@ -64,7 +64,6 @@ theorem gramSum_eq_finFourierOverlap
       starRingEnd ℂ (dSimpleVector Z P T z k) *
         dSimpleVector Z P T z' k)
       = (finFourierOverlap z z' : ℂ) := by
-  rw [PiLp.inner_apply]
   unfold finFourierOverlap
   rw [← Complex.ofReal_sum, Complex.ofReal_mul]
   apply Finset.sum_congr rfl
