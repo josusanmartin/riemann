@@ -32,10 +32,10 @@ jobs:
           test -n "$CRON_SECRET"
 
           response="$({
-            npx --yes vercel@54.7.1 curl /api/e2b/sweep \
+            npx --yes vercel@54.7.1 --token "$VERCEL_TOKEN" \
+              curl /api/e2b/sweep \
               --deployment https://riemann-fail.vercel.app \
               --yes \
-              --token "$VERCEL_TOKEN" \
               -- \
               --silent \
               --show-error \
