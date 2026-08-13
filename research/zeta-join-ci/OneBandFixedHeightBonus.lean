@@ -3,7 +3,7 @@ Copyright (c) 2026.
 SPDX-License-Identifier: Apache-2.0
 
 Finite one-band theorem: local gap certificates imply a lower bound for the
-full active candidate-edge energy, with the sole endpoint loss made explicit.
+full active candidate-edge energy, with the exact padded endpoint loss.
 -/
 import Zeta23.GapMatching.OneBandGapWord
 import Zeta23.GapMatching.OneBandPathWeightIdentity
@@ -21,8 +21,7 @@ open Zeta23.GapMatching.OneBandPotentialSafeNumerics
 open Zeta23.GapMatching.PathForestMatching
 
 /-- Extend the `n` genuine candidate energies by the harmless endpoint short
-weight `p`.  Values after the endpoint are also `p`; they are never read by
-the finite word but make the global recursive certificate convenient. -/
+weight `p`. -/
 def edgeExtension {n : ℕ} (edge : Fin n → ℝ) (i : ℕ) : ℝ :=
   if hi : i < n then edge ⟨i, hi⟩ else p
 
@@ -68,12 +67,14 @@ theorem pathWeight_gapWord_eq_activeEnergy
       word U (lengthExtension n length)
         (edgeExtension edge) (edgeExtension edge) (n + 1) by rfl]
   rw [pathWeight_word]
+  unfold activeEnergy
   rw [sum_activeEdges_eq]
   apply Finset.sum_congr rfl
   intro i hi
   have hin : i < n := Finset.mem_range.mp hi
-  unfold startWeight
-  split <;> simp [edgeExtension, hin]
+  by_cases hactive : Active U (shortOf U) i
+  · simp [startWeight, hactive, edgeExtension, hin]
+  · simp [startWeight, hactive]
 
 /-- Total word length is the sum of the `n+1` genuine normalized gaps. -/
 theorem totalLength_gapWord
@@ -89,6 +90,29 @@ theorem totalLength_gapWord
   intro i hi
   have hin : i < n + 1 := Finset.mem_range.mp hi
   simp [lengthExtension, hin]
+
+/-- The only endpoint correction is the padded final short edge of weight
+exactly `p`. -/
+theorem finalShort_gapWord_le_p
+    {n : ℕ} (U : ℕ → Bool)
+    (length : ℕ → ℝ) (edge : Fin n → ℝ) :
+    finalShort State.good (gapWord U length edge) ≤ p := by
+  rw [show gapWord U length edge =
+      word U (lengthExtension n length)
+        (edgeExtension edge) (edgeExtension edge) (n + 1) by rfl]
+  rw [finalShort_word]
+  simp only [edgeExtension_endpoint]
+  split <;> norm_num [p]
+
+/-- Endpoint comparison with the exact padded weight. -/
+theorem candidateWeight_gapWord_le_path_add_p
+    {n : ℕ} (U : ℕ → Bool)
+    (length : ℕ → ℝ) (edge : Fin n → ℝ) :
+    candidateWeight State.good State.good (gapWord U length edge)
+      ≤ pathWeight State.good (gapWord U length edge) + p := by
+  rw [candidateWeight_eq_path_add_final]
+  have hfinal := finalShort_gapWord_le_p U length edge
+  linarith
 
 /-- A convenient global local-certificate extension.  The substantive local
 input is needed only on the genuine `n+1` gaps; after that the word is padded
@@ -109,67 +133,20 @@ theorem valid_gapWord
   intro i
   by_cases hi : i < n + 1
   · exact hlocal i hi
-  · have hcur : U i = false := hUtail i (not_lt.mp hi)
-    have hprev : previousState U i = State.good := by
-      rcases i with _ | i
-      · simp [previousState]
-      · have hle : n + 1 ≤ i + 1 := not_lt.mp hi
-        have hprevFalse : U i = false := by
-          apply hUtail i
-          omega
-        simp [previousState, stateOf, hprevFalse]
-    have hstate : stateOf U i = State.good := by
-      simp [stateOf, hcur]
+  · have hle : n + 1 ≤ i := not_lt.mp hi
+    have hcur : U i = false := hUtail i hle
+    have hien : ¬ i < n := by omega
+    have hi0 : i ≠ 0 := by omega
     apply localCertificate_of_dominates
-    simp [datumAt, lengthExtension, edgeExtension, hi,
-      hcur, hprev, hstate, physicalFloor, lengthFloor,
-      shortFloor, longFloor, stepCost, stepWeight]
-    norm_num [B, p, lengthThreshold]
-
-/-- Every short weight in the padded finite word is at most one. -/
-theorem gapWord_shortWeight_le_one
-    {n : ℕ} (U : ℕ → Bool)
-    (length : ℕ → ℝ) (edge : Fin n → ℝ)
-    (hedge : ∀ i, edge i ≤ 1) :
-    ∀ g ∈ gapWord U length edge, g.shortWeight ≤ 1 := by
-  intro g hg
-  rw [show gapWord U length edge =
-      word U (lengthExtension n length)
-        (edgeExtension edge) (edgeExtension edge) (n + 1) by rfl] at hg
-  simp only [word, List.mem_ofFn] at hg
-  -- `wordFrom` is recursive rather than `ofFn`; recover the originating
-  -- index by induction over the finite word.
-  induction n with
-  | zero =>
-      simp [word, wordFrom, datumAt, edgeExtension] at hg ⊢
-      rcases hg with rfl
-      norm_num [p]
-  | succ n ih =>
-      simp only [word, wordFrom, List.mem_cons] at hg
-      rcases hg with rfl | hg
-      · simp [datumAt, edgeExtension]
-        split
-        · exact hedge _
-        · norm_num [p]
-      · -- The tail consists of the same bounded extension starting at one.
-        -- A direct membership induction avoids changing the extension origin.
-        clear ih
-        generalize hcount : n + 1 = count at hg
-        generalize hstart : 1 = start at hg
-        induction count generalizing start with
-        | zero => simp [wordFrom] at hg
-        | succ count iht =>
-            simp only [wordFrom, List.mem_cons] at hg
-            rcases hg with rfl | hg
-            · simp [datumAt, edgeExtension]
-              split
-              · exact hedge _
-              · norm_num [p]
-            · exact iht (start + 1) hg
+    cases hprev : previousState U i <;>
+      simp [datumAt, stateOf, hcur, lengthExtension, hi,
+        edgeExtension, hien, hi0, hprev, physicalFloor,
+        lengthFloor, shortFloor, longFloor, stepCost, stepWeight]
+    all_goals norm_num [B, p, lengthThreshold]
 
 /-- **Finite one-band bonus.**  Once each genuine gap has its local
 certificate, the active candidate energy receives the full potential reward,
-up to the exact endpoint constant `boundary + 1`. -/
+up to the exact endpoint constant `boundary + p`. -/
 theorem activeEnergy_lower
     {n : ℕ} (U : ℕ → Bool)
     (length : ℕ → ℝ) (edge : Fin n → ℝ)
@@ -178,19 +155,17 @@ theorem activeEnergy_lower
       LocalCertificate A B State.good phi
         (previousState U i)
         (datumAt U (lengthExtension n length)
-          (edgeExtension edge) (edgeExtension edge) i))
-    (hedge : ∀ i, edge i ≤ 1) :
+          (edgeExtension edge) (edgeExtension edge) i)) :
     A * ((n + 1 : ℕ) : ℝ) - boundary
-        - B * (∑ i ∈ Finset.range (n + 1), length i) - 1
+        - B * (∑ i ∈ Finset.range (n + 1), length i) - p
       ≤ activeEnergy n U edge := by
-  let gaps := gapWord U length edge
   have hvalid := valid_gapWord U length edge hUtail hlocal
   have hword := candidateWeight_lower
-    State.good phi rfl potential_boundary gaps hvalid
-  have hendpoint := candidateWeight_le_path_add_one
-    State.good gaps (gapWord_shortWeight_le_one U length edge hedge)
-  rw [gapWord_length, totalLength_gapWord,
-    pathWeight_gapWord_eq_activeEnergy] at hword hendpoint
+    State.good phi rfl potential_boundary
+      (gapWord U length edge) hvalid
+  rw [gapWord_length, totalLength_gapWord] at hword
+  have hendpoint := candidateWeight_gapWord_le_path_add_p U length edge
+  rw [pathWeight_gapWord_eq_activeEnergy] at hendpoint
   nlinarith
 
 end Zeta23.GapMatching.OneBandFixedHeightBonus
