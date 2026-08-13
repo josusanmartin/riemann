@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/zeta-gram-ci.yml"
       - "research/zeta-join-ci/DWindowGramIdentity.lean"
+      - "research/zeta-two-band-ci/patch_fixed_point_result.py"
   workflow_dispatch:
 
 permissions:
@@ -40,6 +41,7 @@ jobs:
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteBlockApproximation.lean" "$GAP/FiniteBlockApproximation.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFiniteGridApprox.lean" "$GAP/DWindowFiniteGridApprox.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/DWindowGramIdentity.lean" "$GAP/DWindowGramIdentity.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
       - name: Restore cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
