@@ -36,9 +36,11 @@ theorem dSimpleVector_apply
       ((P.atD T).phiHatR T
           (atomOrdinate z - (P.atD T).tau T k) : ℂ)
         / (Real.sqrt (dScale P T) : ℂ) := by
+  have hzfixed : (dBlock Z P T).σ z.1.1 = z.1.1 :=
+    ((dBlock Z P T).mem_onLine).mp z.1.2
   have hz' :
       (((z.1.1 : ZeroSide.ZI Z T) : ℂ)).re = 1 / 2 := by
-    exact (mkData_σ_eq_iff Z T _ _ z.1.1).mp z.1.2
+    exact (mkData_σ_eq_iff Z T _ _ z.1.1).mp hzfixed
   simp only [dSimpleVector, simpleVhat, ZeroBlockData.vhat,
     dBlock, blockData, mkData_v, evalVec, atomOrdinate]
   rw [gammaOf_of_re_eq_half hz', ← Complex.ofReal_sub, hreal]
