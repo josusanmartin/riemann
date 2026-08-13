@@ -24,12 +24,7 @@ def main() -> None:
   simp [Complex.mul_re]"""
     new = """      refine integral_congr_ae ?_
       filter_upwards with u
-      have hre : (((v u : ℂ) ^ 2).re) = v u ^ 2 := by
-        norm_num
-      have him : (((v u : ℂ) ^ 2).im) = 0 := by
-        norm_num
-      rw [Complex.mul_re, Complex.exp_re, hre, him]
-      ring"""
+      simp [Complex.mul_re, Complex.exp_re]"""
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")
