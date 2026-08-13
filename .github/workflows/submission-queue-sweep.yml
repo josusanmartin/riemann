@@ -1,0 +1,61 @@
+name: Submission queue recovery
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+concurrency:
+  group: submission-queue-recovery
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Reconcile the durable verification FIFO
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$VERCEL_TOKEN"
+          test -n "$VERCEL_ORG_ID"
+          test -n "$VERCEL_PROJECT_ID"
+          test -n "$CRON_SECRET"
+
+          response="$({
+            npx --yes vercel@54.7.1 curl /api/e2b/sweep \
+              --deployment https://riemann-fail.vercel.app \
+              --yes \
+              --token "$VERCEL_TOKEN" \
+              -- \
+              --silent \
+              --show-error \
+              --header "Authorization: Bearer $CRON_SECRET"
+          })"
+          SWEEP_RESPONSE="$response" node <<'NODE'
+          const response = JSON.parse(process.env.SWEEP_RESPONSE ?? "null");
+          const terminalStatuses = new Set([
+            "idle",
+            "promoted",
+            "rejected-cleaned",
+            "superseded",
+            "expired-advanced",
+          ]);
+          if (
+            !response ||
+            (!terminalStatuses.has(response.status) &&
+              response.error !== "result_not_ready")
+          ) {
+            throw new Error(`Queue sweep failed: ${JSON.stringify(response)}`);
+          }
+          console.log(JSON.stringify(response));
+          NODE

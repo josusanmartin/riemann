@@ -17,6 +17,7 @@ import {
   assertQueueJobMatches,
   ensureQueuedJobRunning,
   reconcileQueuedJobPause,
+  VerifierOccupiedByFlowTestError,
 } from "@/lib/queue-orchestration";
 import { verifySubmissionJob } from "@/lib/submission-jobs";
 import {
@@ -147,10 +148,28 @@ export async function GET(request: Request): Promise<Response> {
           latest.status === "queued" ? latest.position : queue.position,
       });
     }
-    const queueManaged = queue.status === "active";
-    if (queue.status === "active") {
-      assertQueueJobMatches(queue.job, job);
+    if (queue.status === "missing") {
+      return noStore(410, {
+        error: "job_not_admitted",
+        message:
+          "This signed verifier job is not present in the durable admission queue.",
+      });
+    }
+    assertQueueJobMatches(queue.job, job);
+    try {
       await ensureQueuedJobRunning(queue.job);
+    } catch (error) {
+      if (error instanceof VerifierOccupiedByFlowTestError) {
+        return noStore(200, {
+          status: "queued",
+          submissionId: job.submissionId,
+          proofDigest: job.proofDigest,
+          queuePosition: 0,
+          message:
+            "An operator smoke replay is finishing before this proof starts.",
+        });
+      }
+      throw error;
     }
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
@@ -163,16 +182,14 @@ export async function GET(request: Request): Promise<Response> {
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
       const feedback = describeVerifierRejection(result.log, result.message);
-      if (queueManaged) {
-        await advanceVerificationQueue(job.jobId, {
-          outcome: "rejected",
-          promotionStatus: null,
-          message: feedback.detail,
-          feedback,
-          evidenceUrl: null,
-          completedAt: result.completedAt,
-        });
-      }
+      await advanceVerificationQueue(job.jobId, {
+        outcome: "rejected",
+        promotionStatus: null,
+        message: feedback.detail,
+        feedback,
+        evidenceUrl: null,
+        completedAt: result.completedAt,
+      });
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, {
         ...result,
@@ -191,29 +208,25 @@ export async function GET(request: Request): Promise<Response> {
     }
     try {
       const promotion = await promoteE2BResult(job, result);
-      if (queueManaged) {
-        await advanceVerificationQueue(job.jobId, {
-          outcome: "promoted",
-          promotionStatus: promotion.status,
-          message: null,
-          evidenceUrl: promotion.evidenceUrl,
-          completedAt: result.completedAt,
-        });
-      }
+      await advanceVerificationQueue(job.jobId, {
+        outcome: "promoted",
+        promotionStatus: promotion.status,
+        message: null,
+        evidenceUrl: promotion.evidenceUrl,
+        completedAt: result.completedAt,
+      });
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { ...result, promotion });
     } catch (error) {
       if (error instanceof PromotionRaceError) {
         const message = describePromotionError(error);
-        if (queueManaged) {
-          await advanceVerificationQueue(job.jobId, {
-            outcome: "superseded",
-            promotionStatus: null,
-            message,
-            evidenceUrl: null,
-            completedAt: result.completedAt,
-          });
-        }
+        await advanceVerificationQueue(job.jobId, {
+          outcome: "superseded",
+          promotionStatus: null,
+          message,
+          evidenceUrl: null,
+          completedAt: result.completedAt,
+        });
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
         return noStore(200, {
           ...result,

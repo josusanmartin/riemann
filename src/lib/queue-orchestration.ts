@@ -8,6 +8,7 @@ import {
   type QueueAdvance,
   type QueueCompletionInput,
   type QueueInspection,
+  type QueueAdmission,
   type QueuedVerificationJob,
 } from "@/lib/submission-queue";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
@@ -17,6 +18,13 @@ type QueueCoordinates = {
   jobId: string;
   proofDigest: string;
 };
+
+export class VerifierOccupiedByFlowTestError extends Error {
+  constructor() {
+    super("The operator flow test currently owns the linear verifier");
+    this.name = "VerifierOccupiedByFlowTestError";
+  }
+}
 
 export function assertQueueJobMatches(
   queued: QueuedVerificationJob,
@@ -31,7 +39,13 @@ export function assertQueueJobMatches(
   }
 }
 
-export function ensureQueuedJobRunning(job: QueuedVerificationJob): Promise<void> {
+export async function ensureQueuedJobRunning(
+  job: QueuedVerificationJob,
+): Promise<void> {
+  const { hasActiveE2BFlowTest } = await import("@/lib/e2b-flow-test");
+  if (await hasActiveE2BFlowTest()) {
+    throw new VerifierOccupiedByFlowTestError();
+  }
   return launchQueuedE2BVerification(job);
 }
 
@@ -49,6 +63,25 @@ export async function reconcileQueuedJobPause(
     await ensureQueuedJobRunning(latest.job);
   }
   return latest;
+}
+
+type InitialQueueTransitionDependencies = {
+  start: (job: QueuedVerificationJob) => Promise<void>;
+  reconcile: (job: QueuedVerificationJob) => Promise<QueueInspection>;
+};
+
+export async function applyInitialQueueTransition(
+  admission: QueueAdmission,
+  dependencies: InitialQueueTransitionDependencies = {
+    start: ensureQueuedJobRunning,
+    reconcile: reconcileQueuedJobPause,
+  },
+): Promise<boolean> {
+  if (admission.shouldStart) {
+    await dependencies.start(admission.job);
+    return true;
+  }
+  return (await dependencies.reconcile(admission.job)).status === "active";
 }
 
 export async function advanceVerificationQueue(

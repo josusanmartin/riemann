@@ -93,11 +93,20 @@ export async function POST(request: Request): Promise<Response> {
         submissionId: job.submissionId,
       });
     }
-    const queueManaged = queue.status === "active";
-    if (queue.status === "active") {
-      assertQueueJobMatches(queue.job, job);
-      await ensureQueuedJobRunning(queue.job);
+    if (queue.status === "missing") {
+      console.warn("Ignoring an E2B verifier event without durable admission", {
+        eventId: event.id,
+        jobId: job.jobId,
+        sandboxId: job.sandboxId,
+      });
+      return noStore(202, {
+        status: "untracked",
+        eventId: event.id,
+        submissionId: job.submissionId,
+      });
     }
+    assertQueueJobMatches(queue.job, job);
+    await ensureQueuedJobRunning(queue.job);
     const result = await readE2BVerification(job.sandboxId, job.jobId);
     if (!result) {
       return noStore(503, {
@@ -109,16 +118,14 @@ export async function POST(request: Request): Promise<Response> {
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
       const feedback = describeVerifierRejection(result.log, result.message);
-      if (queueManaged) {
-        await advanceVerificationQueue(job.jobId, {
-          outcome: "rejected",
-          promotionStatus: null,
-          message: feedback.detail,
-          feedback,
-          evidenceUrl: null,
-          completedAt: result.completedAt,
-        });
-      }
+      await advanceVerificationQueue(job.jobId, {
+        outcome: "rejected",
+        promotionStatus: null,
+        message: feedback.detail,
+        feedback,
+        evidenceUrl: null,
+        completedAt: result.completedAt,
+      });
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, {
         status: "rejected-cleaned",
@@ -131,29 +138,25 @@ export async function POST(request: Request): Promise<Response> {
     }
     try {
       const promotion = await promoteE2BResult(job, result);
-      if (queueManaged) {
-        await advanceVerificationQueue(job.jobId, {
-          outcome: "promoted",
-          promotionStatus: promotion.status,
-          message: null,
-          evidenceUrl: promotion.evidenceUrl,
-          completedAt: result.completedAt,
-        });
-      }
+      await advanceVerificationQueue(job.jobId, {
+        outcome: "promoted",
+        promotionStatus: promotion.status,
+        message: null,
+        evidenceUrl: promotion.evidenceUrl,
+        completedAt: result.completedAt,
+      });
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { status: "promoted", promotion });
     } catch (error) {
       if (error instanceof PromotionRaceError) {
         const message = describePromotionError(error);
-        if (queueManaged) {
-          await advanceVerificationQueue(job.jobId, {
-            outcome: "superseded",
-            promotionStatus: null,
-            message,
-            evidenceUrl: null,
-            completedAt: result.completedAt,
-          });
-        }
+        await advanceVerificationQueue(job.jobId, {
+          outcome: "superseded",
+          promotionStatus: null,
+          message,
+          evidenceUrl: null,
+          completedAt: result.completedAt,
+        });
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
         return noStore(200, {
           status: "superseded",

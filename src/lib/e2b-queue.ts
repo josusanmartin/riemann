@@ -78,6 +78,36 @@ function paths(jobId: string) {
   };
 }
 
+export function queuedVerificationRunnerCommand(
+  jobIdInput: string,
+  proofDigestInput: string,
+): string {
+  const jobId = jobIdSchema.parse(jobIdInput);
+  const proofDigest = digestSchema.parse(proofDigestInput);
+  const { uploadDirectory, jobDirectory } = paths(jobId);
+  const resultPath = `${jobDirectory}/result.json`;
+  const temporaryResultPath = `${resultPath}.tmp`;
+  const artifactPath = `${E2B_UPLOAD_ROOT}/${jobId}/output/attestation.json`;
+  const logPath = `${jobDirectory}/verifier.log`;
+  const lockPath = `${jobDirectory}/runner.lock`;
+  return (
+    `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
+    `'set -e; ` +
+    `if [[ -s ${resultPath} ]]; then exit 0; fi; ` +
+    `if [[ -s ${artifactPath} ]]; then ` +
+    `if [[ -e ${temporaryResultPath} ]]; then ` +
+    `mv ${temporaryResultPath} ${temporaryResultPath}.stranded.$(date +%s%N); fi; ` +
+    `if /usr/local/bin/node /opt/riemann/.runtime/finalize-e2b-job.mjs ` +
+    `${uploadDirectory} ${artifactPath} ${logPath} ${resultPath} ` +
+    `${proofDigest} 0; then exit 0; fi; ` +
+    `if [[ -e ${temporaryResultPath} ]]; then ` +
+    `mv ${temporaryResultPath} ${temporaryResultPath}.stranded.$(date +%s%N); fi; ` +
+    `mv ${artifactPath} ${artifactPath}.stranded.$(date +%s%N); fi; ` +
+    `exec /opt/riemann/e2b/run-verification-job.sh ${uploadDirectory} ` +
+    `${jobDirectory} ${proofDigest}'`
+  );
+}
+
 export async function stageE2BVerification(
   input: StageVerificationInput,
 ): Promise<StagedE2BVerification> {
@@ -169,7 +199,6 @@ export async function launchQueuedE2BVerification(input: {
   const sandboxId = sandboxIdSchema.parse(input.sandboxId);
   const jobId = jobIdSchema.parse(input.jobId);
   const proofDigest = digestSchema.parse(input.proofDigest);
-  const { uploadDirectory, jobDirectory } = paths(jobId);
   const { Sandbox } = await import("e2b");
   const sandbox = await Sandbox.connect(sandboxId, {
     apiKey: requireApiKey(),
@@ -186,8 +215,6 @@ export async function launchQueuedE2BVerification(input: {
 
   await prepareE2BWorkspaceCopySource(sandbox);
 
-  const resultPath = `${jobDirectory}/result.json`;
-  const lockPath = `${jobDirectory}/runner.lock`;
   const precompiledRuntime = await sandbox.commands.run(
     `if grep -Fq '/opt/riemann/.runtime/verify-submission.mjs' ` +
       `/opt/riemann/e2b/run-verification-job.sh && ` +
@@ -247,10 +274,7 @@ export async function launchQueuedE2BVerification(input: {
     );
   }
   await sandbox.commands.run(
-    `/usr/bin/flock -n ${lockPath} /bin/bash -c ` +
-      `'if [[ ! -s ${resultPath} ]]; then exec ` +
-      `/opt/riemann/e2b/run-verification-job.sh ${uploadDirectory} ` +
-      `${jobDirectory} ${proofDigest}; fi'`,
+    queuedVerificationRunnerCommand(jobId, proofDigest),
     { user: "root", background: true, timeoutMs: 30_000 },
   );
 }

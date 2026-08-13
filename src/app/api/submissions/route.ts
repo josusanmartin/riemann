@@ -11,8 +11,7 @@ import {
 } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
-  ensureQueuedJobRunning,
-  reconcileQueuedJobPause,
+  applyInitialQueueTransition,
 } from "@/lib/queue-orchestration";
 import { getCurrentRecord } from "@/lib/records";
 import { signSubmissionJob } from "@/lib/submission-jobs";
@@ -134,14 +133,9 @@ export async function POST(request: Request): Promise<Response> {
       throw error;
     }
 
-    let verificationRunning = admission.shouldStart;
+    let verificationRunning = false;
     try {
-      if (admission.shouldStart) {
-        await ensureQueuedJobRunning(admission.job);
-      } else {
-        verificationRunning =
-          (await reconcileQueuedJobPause(admission.job)).status === "active";
-      }
+      verificationRunning = await applyInitialQueueTransition(admission);
     } catch (error) {
       // Admission is already durable. Status polling and the cron backstop can
       // safely retry this idempotent transition without losing the upload.

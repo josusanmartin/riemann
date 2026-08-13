@@ -5,7 +5,7 @@ import {
   startE2BFlowTest,
 } from "@/lib/e2b-flow-test";
 import { isE2BConfigured } from "@/lib/e2b-config";
-import { hasActiveE2BJob } from "@/lib/e2b-verifier";
+import { hasActiveE2BJob, killE2BSandbox } from "@/lib/e2b-verifier";
 import {
   FLOW_TEST_BASELINE_ID,
   flowTestRecord,
@@ -54,6 +54,7 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
+  let startedSandboxId: string | undefined;
   try {
     const [competitiveJob, flowTestActive, ownerJobActive] = await Promise.all([
       getActiveVerificationJob(),
@@ -98,6 +99,17 @@ export async function POST(request: Request): Promise<Response> {
       previousRecordId: FLOW_TEST_BASELINE_ID,
       issuedAt,
     });
+    startedSandboxId = job.sandboxId;
+    const competitiveJobAfterStart = await getActiveVerificationJob();
+    if (competitiveJobAfterStart) {
+      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      startedSandboxId = undefined;
+      return noStore(409, {
+        error: "verifier_busy",
+        message:
+          "A competitive proof entered the durable queue first, so the operator flow test was stopped.",
+      });
+    }
     const jobToken = signSubmissionJob(
       {
         schemaVersion: 1,
@@ -123,6 +135,9 @@ export async function POST(request: Request): Promise<Response> {
         "The noncompetitive Anthropic replay is running in the production verifier image.",
     });
   } catch (error) {
+    if (startedSandboxId) {
+      await killE2BSandbox(startedSandboxId).catch(() => undefined);
+    }
     if (error instanceof ZodError || error instanceof SyntaxError) {
       return noStore(400, {
         error: "invalid_flow_test",
