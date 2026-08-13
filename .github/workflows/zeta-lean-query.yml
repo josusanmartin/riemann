@@ -32,16 +32,19 @@ jobs:
           set -o pipefail
           cat > Query.lean <<'LEAN'
           import Mathlib
-          open Finset Filter MeasureTheory
-          #check abs_add
-          #check abs_add_le
-          #check norm_add_le
-          #check abs_sub_comm
-          #check abs_neg
-          #check HasSum.const_smul
-          #check Summable.sum_add_tsum_nat_add
-          #check tsum_of_nat_of_neg_add_one
-          #check integral_congr_ae
-          #check Filter.Eventually.of_forall
+          open Finset Filter MeasureTheory RCLike
+          #check Pi.inner_apply
+          #check inner_apply
+          #check RCLike.inner_apply
+          #check Complex.inner_apply
+          #check inner_conj_symm
+          #check real_inner_comm
+          #check Finset.univ_eq_attach
+          #check Finset.sum_attach
+          #check Finset.sum_subtype
+          #check Complex.div_re
+          #check Complex.ofReal_div
+          #check Complex.norm_real
+          #check Real.sq_sqrt
           LEAN
           lake env lean Query.lean 2>&1 | tee "$RUNNER_TEMP/query.log"
