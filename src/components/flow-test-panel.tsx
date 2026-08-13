@@ -63,7 +63,7 @@ export function FlowTestPanel({
     const generation = ++pollGeneration.current;
     let transientFailures = 0;
     for (;;) {
-      await new Promise((resolve) => window.setTimeout(resolve, 5_000));
+      await new Promise((resolve) => window.setTimeout(resolve, 10_000));
       if (pollGeneration.current !== generation) return;
       try {
         const response = await fetch(
@@ -219,7 +219,9 @@ export function FlowTestPanel({
           the candidate at <code>2/3</code>, then replays Anthropic&apos;s checked
           dyadic and cumulative theorems. It uses the production E2B image,
           Comparator, Lean, and nanoda, but never promotes a record and does not
-          consume the three-per-day competitive allowance.
+          consume the three-per-day competitive allowance. A complete two-kernel
+          replay can take up to about 55 minutes; the runner reports its live
+          stage while it works.
         </p>
         <div className="flow-test-links">
           <a className="button button-dark" href={downloadPath} download="Solution.lean">

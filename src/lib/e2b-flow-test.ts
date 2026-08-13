@@ -5,7 +5,10 @@ import type { PreparedDirectSubmission } from "@/lib/direct-submission";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
 
-const FLOW_TEST_TIMEOUT_MS = 20 * 60 * 1_000;
+// The sealed verifier itself permits 54 minutes. Leave a small window for
+// result finalization; the status route separately enforces a wall-clock
+// deadline that cannot be extended by repeated E2B reconnects.
+const FLOW_TEST_TIMEOUT_MS = 60 * 60 * 1_000;
 const E2B_JOB_ROOT = "/var/lib/riemann/jobs";
 const E2B_UPLOAD_ROOT = "/home/riemann/jobs";
 
