@@ -65,7 +65,7 @@ theorem gramSum_eq_finFourierOverlap
         dSimpleVector Z P T z' k)
       = (finFourierOverlap z z' : ℂ) := by
   unfold finFourierOverlap
-  rw [← Complex.ofReal_sum, Complex.ofReal_mul]
+  push_cast
   apply Finset.sum_congr rfl
   intro k hk
   try rw [RCLike.inner_apply]
