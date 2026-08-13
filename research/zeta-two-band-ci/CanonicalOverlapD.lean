@@ -82,7 +82,7 @@ theorem gramEntry_eq_finiteOverlap
       ((Real.sqrt (dScale P T) : ℂ)) ^ 2 = (dScale P T : ℂ) := by
     exact_mod_cast Real.sq_sqrt hc.le
   unfold finiteOverlap finiteNormalizedOverlap finiteBlock normalizedTerm
-  rw [Fin.sum_univ_eq_sum_range]
+  rw [← Finset.sum_range]
   apply Finset.sum_congr rfl
   intro k hk
   simp only [dSimpleVector, simpleVhat, ZeroBlockData.vhat,
