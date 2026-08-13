@@ -5,6 +5,8 @@ import Zeta23.GapMatching.OneBandSharpProfile
 import Zeta23.GapMatching.DWindowFiniteGridApprox
 import Zeta23.GapMatching.DWindowProfileAlgebra
 import Zeta23.GapMatching.DWindowSharpScaling
+import Zeta23.GapMatching.DWindowGridGeometry
+import Zeta23.GapMatching.DWindowFullOverlapIdentity
 import Zeta23.GapMatching.CentralGuardCountD
 import Zeta23.GapMatching.CentralGapGeometryD
 import Zeta23.GapMatching.TwoBandGapMatchingDPath
@@ -25,6 +27,11 @@ import Zeta23.GapMatching.OneBandGapMatchingD
 #check Zeta23.GapMatching.DWindowProfileAlgebra.fullGridOverlapD_close_sharp_canonical
 #check Zeta23.GapMatching.DWindowSharpScaling.sharpOverlap_scale
 #check Zeta23.GapMatching.DWindowSharpScaling.sharpOverlap_neg
+#check Zeta23.GapMatching.DWindowGridGeometry.grid_floor_lower
+#check Zeta23.GapMatching.DWindowGridGeometry.eventually_central_unit_guards
+#check Zeta23.GapMatching.DWindowFullOverlapIdentity.normalizedFullOverlap_eq_fullGridOverlap
+#check Zeta23.GapMatching.DWindowFullOverlapIdentity.finiteNormalizedOverlap_close_fullGrid
+#check Zeta23.GapMatching.DWindowFullOverlapIdentity.sharpOverlap_vertices_eq_profile
 #check Zeta23.Assembly.calE_tendsto_zero
 #check Zeta23.GapMatching.OneBandPotentialOverlap.localCertificate_of_profile_close
 #check Zeta23.GapMatching.OneBandSharpProfile.good_short_floor
