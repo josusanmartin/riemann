@@ -47,8 +47,13 @@ def main() -> None:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-    scaling_source = Path(__file__).with_name("DWindowSharpScaling.lean")
-    shutil.copyfile(scaling_source, gap / scaling_source.name)
+    for name in (
+        "DWindowSharpScaling.lean",
+        "DWindowGridGeometry.lean",
+        "DWindowFullOverlapIdentity.lean",
+    ):
+        source = Path(__file__).with_name(name)
+        shutil.copyfile(source, gap / name)
 
 
 if __name__ == "__main__":
