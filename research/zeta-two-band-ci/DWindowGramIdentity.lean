@@ -66,6 +66,7 @@ theorem gramSum_eq_finFourierOverlap
       = (finFourierOverlap z z' : ℂ) := by
   unfold finFourierOverlap
   push_cast
+  rw [Finset.mul_sum]
   apply Finset.sum_congr rfl
   intro k hk
   try rw [RCLike.inner_apply]
