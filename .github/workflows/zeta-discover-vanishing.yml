@@ -1,0 +1,43 @@
+name: Discover existing D-window vanishing theorems
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-discover-vanishing.yml"
+      - "research/zeta-two-band-ci/discover_vanishing_api.py"
+      - "research/zeta-two-band-ci/v7/**"
+      - "research/zeta-tail-ci/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Generate API source
+        run: |
+          python3 research/zeta-two-band-ci/discover_vanishing_api.py \
+            research/zeta-two-band-ci/DiscoveredVanishingAPI.lean \
+            research/zeta-two-band-ci/v7/DWindowOverlap.lean \
+            research/zeta-two-band-ci/v7/DWindowRampEstimate.lean \
+            research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean \
+            research/zeta-tail-ci/DWindowFourierTail.lean \
+            research/zeta-tail-ci/DWindowFiniteGridApprox.lean \
+            > ci-results/discovered-vanishing.txt
+      - name: Commit generated API and report
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add research/zeta-two-band-ci/DiscoveredVanishingAPI.lean \
+            ci-results/discovered-vanishing.txt
+          git commit -m 'research: record discovered D-window vanishing API' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
