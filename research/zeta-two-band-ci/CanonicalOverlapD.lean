@@ -62,10 +62,11 @@ theorem gramEntry_eq_finiteOverlap
     (Wᴴ * W) (V.vertices i) (V.vertices j)
       = (finiteOverlap V i j : ℂ) := by
   classical
-  dsimp
-  rw [Matrix.mul_apply]
-  simp only [Matrix.conjTranspose_apply, Wmat, Real.sqrt_one,
-    RCLike.ofReal_one, one_mul, RCLike.star_def]
+  change
+    (∑ k : Fin ((P.atD T).d T),
+      starRingEnd ℂ (dSimpleVector Z P T (V.vertices i) k) *
+        dSimpleVector Z P T (V.vertices j) k)
+      = (finiteOverlap V i j : ℂ)
   have hL : 0 < P.L T := by
     linarith [hP.one_le_w]
   have ha : 0 < (P.atD T).a T := by
@@ -73,8 +74,9 @@ theorem gramEntry_eq_finiteOverlap
   have hc : 0 < dScale P T := by
     unfold dScale
     exact mul_pos ha (pow_pos hL 2)
-  have hsqrt : Real.sqrt (dScale P T) ^ 2 = dScale P T :=
-    Real.sq_sqrt hc.le
+  have hsqrtC :
+      ((Real.sqrt (dScale P T) : ℂ)) ^ 2 = (dScale P T : ℂ) := by
+    exact_mod_cast Real.sq_sqrt hc.le
   unfold finiteOverlap finiteNormalizedOverlap finiteBlock normalizedTerm
   rw [Fin.sum_univ_eq_sum_range]
   apply Finset.sum_congr rfl
@@ -94,7 +96,7 @@ theorem gramEntry_eq_finiteOverlap
           (ordinate V j - (T + (k : ℤ) * (2 * Real.pi / P.L T))) : ℂ)
         / (Real.sqrt (dScale P T) : ℂ))
       = _
-  rw [div_mul_div_comm, ← sq, hsqrt]
+  rw [div_mul_div_comm, ← sq, hsqrtC]
   rw [dScale, atD_a_eq_av hP, Params.atD_L]
   push_cast
   ring
@@ -109,8 +111,16 @@ theorem edgeEnergy_eq_finiteOverlap_sq
     edgeEnergy (canonicalPathData V) i
       = finiteOverlap V (leftVertex i)
           (rightVertex (shortFlag V) i) ^ 2 := by
-  unfold edgeEnergy embeddedCandidateEdgeEnergy
+  change
+    ‖((Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))ᴴ *
+      Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))
+      (V.vertices (leftVertex i))
+      (V.vertices (rightVertex (shortFlag V) i))‖ ^ 2
+      = finiteOverlap V (leftVertex i)
+          (rightVertex (shortFlag V) i) ^ 2
   rw [gramEntry_eq_finiteOverlap hP h8 h4pi V]
-  simp
+  simp [sq_abs]
 
 end Zeta23.GapMatching.CanonicalOverlapD
