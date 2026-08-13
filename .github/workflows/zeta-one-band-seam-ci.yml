@@ -31,7 +31,6 @@ jobs:
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DNormalizedMoments.lean" "$GAP/DNormalizedMoments.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean" "$GAP/ScalarBonusCertificate.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandGapMatchingD.lean" "$GAP/OneBandGapMatchingD.lean"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
       - name: Restore cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
