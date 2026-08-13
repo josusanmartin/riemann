@@ -1,0 +1,54 @@
+name: Zeta D-window Gram identity CI
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-gram-ci.yml"
+      - "research/zeta-join-ci/DWindowGramIdentity.lean"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare pinned workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStatePathWeight.lean" "$GAP/FiniteStatePathWeight.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean" "$GAP/TwoBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialOverlap.lean" "$GAP/TwoBandPotentialOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean" "$GAP/TwoBandPotentialAnalyticBridge.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DNormalizedMoments.lean" "$GAP/DNormalizedMoments.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean" "$GAP/ScalarBonusCertificate.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingD.lean" "$GAP/TwoBandGapMatchingD.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean" "$GAP/TwoBandGapMatchingDPath.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteGridTailAlgebra.lean" "$GAP/FiniteGridTailAlgebra.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFourierTail.lean" "$GAP/DWindowFourierTail.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/IntegerGridSplit.lean" "$GAP/IntegerGridSplit.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteBlockApproximation.lean" "$GAP/FiniteBlockApproximation.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFiniteGridApprox.lean" "$GAP/DWindowFiniteGridApprox.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-join-ci/DWindowGramIdentity.lean" "$GAP/DWindowGramIdentity.lean"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Compile Gram identity with concise diagnostics
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set +e
+          lake build Zeta23.GapMatching.DWindowGramIdentity > /tmp/gram.log 2>&1
+          status=$?
+          grep -n -A22 -B5 'error:' /tmp/gram.log || true
+          tail -n 50 /tmp/gram.log
+          exit $status
