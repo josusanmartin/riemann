@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import type { DefaultSession, Session } from "next-auth";
+import { siteUrl } from "@/lib/site";
 
 declare module "next-auth" {
   interface Session {
@@ -35,6 +36,9 @@ const providers = isGitHubAuthConfigured
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   trustHost: true,
+  redirectProxyUrl: siteUrl.startsWith("https://")
+    ? `${siteUrl}/api/auth`
+    : undefined,
   session: { strategy: "jwt" },
   callbacks: {
     jwt({ token, profile }) {
