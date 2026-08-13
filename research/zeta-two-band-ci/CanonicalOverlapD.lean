@@ -62,6 +62,10 @@ theorem gramEntry_eq_finiteOverlap
     (Wᴴ * W) (V.vertices i) (V.vertices j)
       = (finiteOverlap V i j : ℂ) := by
   classical
+  dsimp only
+  rw [Matrix.mul_apply]
+  simp only [Matrix.conjTranspose_apply, Wmat, Real.sqrt_one,
+    RCLike.ofReal_one, one_mul, RCLike.star_def]
   change
     (∑ k : Fin ((P.atD T).d T),
       starRingEnd ℂ (dSimpleVector Z P T (V.vertices i) k) *
