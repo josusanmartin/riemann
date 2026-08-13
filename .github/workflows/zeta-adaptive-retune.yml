@@ -1,0 +1,65 @@
+name: Zeta adaptive live retuning
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-adaptive-retune.yml"
+      - "research/zeta-two-band-ci/adaptive_retune_one_band.py"
+      - "research/zeta-two-band-ci/OneBandLiveFixedSimpleNumerics.lean"
+  workflow_dispatch:
+
+concurrency:
+  group: zeta-adaptive-live-retuning
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  search:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialOverlap.lean" "$GAP/OneBandPotentialOverlap.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowRampEstimate.lean" "$GAP/DWindowRampEstimate.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean" "$GAP/DWindowProfileAlgebra.lean"
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandLiveFixedSimpleNumerics.lean" "$GAP/OneBandLiveFixedSimpleNumerics.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Search exact retunings
+        run: |
+          python3 research/zeta-two-band-ci/adaptive_retune_one_band.py \
+            "$RUNNER_TEMP/zeta23" \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/OneBandPotentialSafeNumerics.lean" \
+            ci-results/adaptive-retune.txt
+      - name: Commit selected constants
+        run: |
+          cp "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/OneBandPotentialSafeNumerics.lean" \
+            research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean \
+            ci-results/adaptive-retune.txt
+          git commit -m 'research: select strongest pinned live-valid one-band floors' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
