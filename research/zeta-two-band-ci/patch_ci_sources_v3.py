@@ -28,15 +28,7 @@ def main() -> None:
         ((↑(v u ^ 2) *
             Complex.exp (Complex.I * ↑r * ↑u)).re)
           = v u ^ 2 * Real.cos (r * u)
-      have hexponent :
-          Complex.I * (r : ℂ) * (u : ℂ)
-            = ((r * u : ℝ) : ℂ) * Complex.I := by
-        push_cast
-        ring
-      rw [hexponent, Complex.exp_mul_I]
-      simp [Complex.mul_re, Complex.cos_ofReal_re,
-        Complex.cos_ofReal_im, Complex.sin_ofReal_re,
-        Complex.sin_ofReal_im]"""
+      simp [Complex.mul_re, Complex.exp_re]"""
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")
