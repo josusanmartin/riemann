@@ -59,6 +59,7 @@ jobs:
           cp research/zeta-join-ci/OneBandGapWord.lean "$GAP/OneBandGapWord.lean"
           cp research/zeta-join-ci/CanonicalOneBandPathD.lean "$GAP/CanonicalOneBandPathD.lean"
           cp research/zeta-two-band-ci/OneBandPathEnergy.lean "$GAP/OneBandPathEnergy.lean"
+          cp research/zeta-two-band-ci/CanonicalOverlapD.lean "$GAP/CanonicalOverlapD.lean"
           cp research/zeta-two-band-ci/OneBandCanonicalQuery.lean "$GAP/OneBandCanonicalQuery.lean"
           cp research/zeta-tail-ci/FiniteGridTailAlgebra.lean "$GAP/FiniteGridTailAlgebra.lean"
           cp research/zeta-tail-ci/DWindowFourierTail.lean "$GAP/DWindowFourierTail.lean"
@@ -81,5 +82,6 @@ jobs:
           lake build \
             Zeta23.GapMatching.OneBandBaselineLower \
             Zeta23.GapMatching.OneBandPathEnergy \
+            Zeta23.GapMatching.CanonicalOverlapD \
             Zeta23.GapMatching.OneBandCanonicalQuery \
             2>&1 | tee "$RUNNER_TEMP/zeta-submit-targeted.log"
