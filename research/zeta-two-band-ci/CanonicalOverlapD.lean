@@ -107,7 +107,15 @@ theorem edgeEnergy_eq_finiteOverlap_sq
     edgeEnergy (canonicalPathData V) i
       = finiteOverlap V (leftVertex i)
           (rightVertex (shortFlag V) i) ^ 2 := by
-  unfold edgeEnergy embeddedCandidateEdgeEnergy
+  change
+    ‖((Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))ᴴ *
+      Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))
+      (V.vertices (leftVertex i))
+      (V.vertices (rightVertex (shortFlag V) i))‖ ^ 2
+      = finiteOverlap V (leftVertex i)
+          (rightVertex (shortFlag V) i) ^ 2
   rw [gramEntry_eq_finiteOverlap hP h8 h4pi V]
   simp [sq_abs]
 
