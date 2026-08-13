@@ -6,6 +6,7 @@ A recursive one-band gap word.  This is the finite combinatorial bridge
 between Boolean bad-gap flags and the generic finite-state potential theorem.
 -/
 import Zeta23.GapMatching.FiniteStateGapPotential
+import Zeta23.GapMatching.FiniteStatePathWeight
 import Zeta23.GapMatching.OneBandPotentialSafeNumerics
 
 noncomputable section
@@ -13,6 +14,7 @@ noncomputable section
 namespace Zeta23.GapMatching.OneBandGapWord
 
 open Zeta23.GapMatching.FiniteStateGapPotential
+open Zeta23.GapMatching.FiniteStatePathWeight
 open Zeta23.GapMatching.OneBandPotentialSafeNumerics
 
 /-- Interpret a Boolean bad-gap flag as a one-band state. -/
@@ -112,6 +114,41 @@ theorem valid_word
       (word U length shortWeight longWeight count) := by
   simpa [word] using
     valid_wordFrom U length shortWeight longWeight phi hlocal 0 count
+
+/-- The sole endpoint term omitted by `pathWeight` is the short weight of the
+last gap in a nonempty consecutive word. -/
+theorem finalShort_wordFrom
+    (U : ℕ → Bool)
+    (length shortWeight longWeight : ℕ → ℝ) :
+    ∀ start count,
+      finalShort State.good
+          (wordFrom U length shortWeight longWeight start (count + 1))
+        = if stateOf U (start + count) = State.good then
+            shortWeight (start + count) else 0 := by
+  intro start count
+  induction count generalizing start with
+  | zero =>
+      simp [wordFrom, finalShort, datumAt]
+  | succ count ih =>
+      simp only [wordFrom, finalShort]
+      change finalShort State.good
+          (wordFrom U length shortWeight longWeight
+            (start + 1) (count + 1))
+        = if stateOf U (start + (count + 1)) = State.good then
+            shortWeight (start + (count + 1)) else 0
+      simpa only [Nat.add_assoc, Nat.add_left_comm, Nat.add_comm]
+        using ih (start + 1)
+
+/-- Full-word endpoint specialization. -/
+theorem finalShort_word
+    (U : ℕ → Bool)
+    (length shortWeight longWeight : ℕ → ℝ)
+    (count : ℕ) :
+    finalShort State.good
+        (word U length shortWeight longWeight (count + 1))
+      = if stateOf U count = State.good then shortWeight count else 0 := by
+  simpa [word] using
+    finalShort_wordFrom U length shortWeight longWeight 0 count
 
 /-- Local candidate contribution read directly from the Boolean word. -/
 def localWeight
