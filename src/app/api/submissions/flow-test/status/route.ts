@@ -9,6 +9,7 @@ import {
   FLOW_TEST_BASELINE_ID,
   FLOW_TEST_SCORE,
 } from "@/lib/flow-test";
+import { finalizeStrandedE2BFlowTest } from "@/lib/e2b-flow-test";
 import { assertE2BResultMatchesJob } from "@/lib/submission-finalization";
 import { verifySubmissionJob } from "@/lib/submission-jobs";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
@@ -135,6 +136,34 @@ export async function GET(request: Request): Promise<Response> {
         console.warn("Unable to inspect flow-test verifier progress", error);
         return null;
       });
+      const logAgeSeconds = progress?.logModifiedAtUnix
+        ? Math.max(0, Math.floor(Date.now() / 1_000) - progress.logModifiedAtUnix)
+        : 0;
+      const strandedFinalizer =
+        progress !== null &&
+        progress.resultBytes === 0 &&
+        progress.artifactBytes > 0 &&
+        progress.runnerElapsedSeconds === 0 &&
+        progress.finalizerProcesses === 0 &&
+        progress.verifierProcesses === 0 &&
+        progress.leanProcesses === 0 &&
+        progress.nanodaProcesses === 0 &&
+        logAgeSeconds >= 60;
+      if (strandedFinalizer) {
+        console.warn("Recovering a stranded flow-test finalizer", {
+          proofDigest: job.proofDigest,
+          elapsedSeconds,
+          artifactBytes: progress.artifactBytes,
+          temporaryResultBytes: progress.temporaryResultBytes,
+          logAgeSeconds,
+        });
+        await finalizeStrandedE2BFlowTest({
+          sandboxId: job.sandboxId,
+          jobId: job.jobId,
+          proofDigest: job.proofDigest,
+        });
+        return GET(request);
+      }
       const summary = progress
         ? progressMessage(progress, elapsedSeconds)
         : {
@@ -148,6 +177,9 @@ export async function GET(request: Request): Promise<Response> {
           stage: summary.stage,
           elapsedSeconds,
           runnerElapsedSeconds: progress.runnerElapsedSeconds,
+          resultBytes: progress.resultBytes,
+          temporaryResultBytes: progress.temporaryResultBytes,
+          artifactBytes: progress.artifactBytes,
           logBytes: progress.logBytes,
           logModifiedAtUnix: progress.logModifiedAtUnix,
           runnerLockHeld: progress.runnerLockHeld,
@@ -167,6 +199,9 @@ export async function GET(request: Request): Promise<Response> {
               stage: summary.stage,
               elapsedSeconds,
               runnerElapsedSeconds: progress.runnerElapsedSeconds,
+              resultBytes: progress.resultBytes,
+              temporaryResultBytes: progress.temporaryResultBytes,
+              artifactBytes: progress.artifactBytes,
               logBytes: progress.logBytes,
               logModifiedAtUnix: progress.logModifiedAtUnix,
             }
