@@ -56,26 +56,40 @@ theorem finFourierOverlap_eq_finiteOverlap
   unfold normalizedTerm
   ring
 
-/-- The Gram inner product of two canonical vertices is their real finite
-normalized overlap. -/
-theorem inner_eq_finiteOverlap
+/-- The unit-weight Gram entry of two normalized canonical evaluation
+vectors is their real finite normalized overlap. -/
+theorem gramEntry_eq_finiteOverlap
     (hP : P.Valid)
     (h8 : 8 * P.w ≤ P.L T)
     (h4pi : 4 * Real.pi * P.w ≤ P.L T)
     (V : OrderedCentralVerticesD Z P T)
     (i j : Fin (V.n + 2)) :
-    inner (dSimpleVector Z P T (V.vertices i))
-        (dSimpleVector Z P T (V.vertices j))
+    ((Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))ᴴ *
+      Wmat (fun _ : dSimpleOnLine Z P T => (1 : ℝ))
+        (dSimpleVector Z P T))
+      (V.vertices i) (V.vertices j)
       = (finiteOverlap V i j : ℂ) := by
+  classical
+  rw [Matrix.mul_apply]
+  simp only [Matrix.conjTranspose_apply, Wmat, Real.sqrt_one,
+    RCLike.ofReal_one, one_mul, RCLike.star_def]
   have ha : 0 < (P.atD T).a T := by
     linarith [(aD_range_of hP h8 h4pi).1]
   have hL : 0 < P.L T := by linarith [hP.one_le_w]
   have hc : 0 < dScale P T := by
     unfold dScale
     exact mul_pos ha (pow_pos hL 2)
-  rw [inner_eq_finFourierOverlap
-    (fun r => GzGp.phiHat_ofReal _ T r) hc]
-  exact_mod_cast finFourierOverlap_eq_finiteOverlap hP V i j
+  calc
+    (∑ k : Fin ((P.atD T).d T),
+        starRingEnd ℂ (dSimpleVector Z P T (V.vertices i) k) *
+          dSimpleVector Z P T (V.vertices j) k)
+      = (finFourierOverlap (V.vertices i) (V.vertices j) : ℂ) :=
+        gramSum_eq_finFourierOverlap
+          (fun r => GzGp.phiHat_ofReal (P.atD T) T r)
+          hc (V.vertices i) (V.vertices j)
+    _ = (finiteOverlap V i j : ℂ) := by
+      exact_mod_cast finFourierOverlap_eq_finiteOverlap hP V i j
 
 /-- Squared form consumed by the path energy. -/
 theorem edgeEnergy_eq_finiteOverlap_sq
@@ -88,7 +102,7 @@ theorem edgeEnergy_eq_finiteOverlap_sq
       = finiteOverlap V (leftVertex i)
           (rightVertex (shortFlag V) i) ^ 2 := by
   unfold edgeEnergy embeddedCandidateEdgeEnergy
-  rw [inner_eq_finiteOverlap hP h8 h4pi V]
+  rw [gramEntry_eq_finiteOverlap hP h8 h4pi V]
   simp [sq_abs]
 
 end Zeta23.GapMatching.CanonicalOverlapD
