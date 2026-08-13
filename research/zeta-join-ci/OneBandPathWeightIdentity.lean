@@ -6,6 +6,7 @@ Exact identification of the recursive one-band word weight with the finite
 candidate-start energy used by the path-forest matching theorem.
 -/
 import Zeta23.GapMatching.OneBandGapWord
+import Zeta23.GapMatching.FiniteStatePathWeight
 import Zeta23.GapMatching.PathForestMatching
 
 noncomputable section
