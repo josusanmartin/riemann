@@ -6,7 +6,7 @@ on:
     paths:
       - ".github/workflows/zeta-gram-ci.yml"
       - "research/zeta-join-ci/DWindowGramIdentity.lean"
-      - "research/zeta-two-band-ci/patch_fixed_point_result.py"
+      - "research/zeta-tail-ci/**"
   workflow_dispatch:
 
 permissions:
@@ -26,22 +26,12 @@ jobs:
           cd "$RUNNER_TEMP/zeta23"
           git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
           GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStatePathWeight.lean" "$GAP/FiniteStatePathWeight.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean" "$GAP/TwoBandPotentialSafeNumerics.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialOverlap.lean" "$GAP/TwoBandPotentialOverlap.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean" "$GAP/TwoBandPotentialAnalyticBridge.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DNormalizedMoments.lean" "$GAP/DNormalizedMoments.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean" "$GAP/ScalarBonusCertificate.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingD.lean" "$GAP/TwoBandGapMatchingD.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean" "$GAP/TwoBandGapMatchingDPath.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteGridTailAlgebra.lean" "$GAP/FiniteGridTailAlgebra.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFourierTail.lean" "$GAP/DWindowFourierTail.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/IntegerGridSplit.lean" "$GAP/IntegerGridSplit.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/FiniteBlockApproximation.lean" "$GAP/FiniteBlockApproximation.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-tail-ci/DWindowFiniteGridApprox.lean" "$GAP/DWindowFiniteGridApprox.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/DWindowGramIdentity.lean" "$GAP/DWindowGramIdentity.lean"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
       - name: Restore cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
