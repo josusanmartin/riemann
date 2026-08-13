@@ -68,7 +68,7 @@ theorem gramSum_eq_finFourierOverlap
   rw [← Complex.ofReal_sum, Complex.ofReal_mul]
   apply Finset.sum_congr rfl
   intro k hk
-  rw [RCLike.inner_apply]
+  try rw [RCLike.inner_apply]
   simp_rw [dSimpleVector_apply hreal]
   have hsqrt : Real.sqrt (dScale P T) ^ 2 = dScale P T :=
     Real.sq_sqrt hc.le
