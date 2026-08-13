@@ -1,0 +1,146 @@
+name: Zeta full frontier report
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-frontier-report.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare all frontier modules
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23"
+          git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          copy() { cp "$GITHUB_WORKSPACE/$1" "$GAP/$2"; }
+
+          copy research/zeta-two-band-ci/FiniteStateGapPotential.lean FiniteStateGapPotential.lean
+          copy research/zeta-two-band-ci/FiniteStatePathWeight.lean FiniteStatePathWeight.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean TwoBandPotentialSafeNumerics.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialOverlap.lean TwoBandPotentialOverlap.lean
+          copy research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean TwoBandPotentialAnalyticBridge.lean
+          copy research/zeta-two-band-ci/CandidateStrictImprovement.lean CandidateStrictImprovement.lean
+          copy research/zeta-two-band-ci/CandidateStrictImprovementTight.lean CandidateStrictImprovementTight.lean
+          copy research/zeta-two-band-ci/v7/DNormalizedMoments.lean DNormalizedMoments.lean
+          copy research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean ScalarBonusCertificate.lean
+          copy research/zeta-two-band-ci/TwoBandGapMatchingD.lean TwoBandGapMatchingD.lean
+          copy research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean TwoBandGapMatchingDPath.lean
+          copy research/zeta-two-band-ci/CentralPathConstructionD.lean CentralPathConstructionD.lean
+          copy research/zeta-two-band-ci/GuardedWindowCount.lean GuardedWindowCount.lean
+          copy research/zeta-two-band-ci/CentralGuardCountD.lean CentralGuardCountD.lean
+          copy research/zeta-two-band-ci/OrderedPointGaps.lean OrderedPointGaps.lean
+          copy research/zeta-two-band-ci/DWindowLength.lean DWindowLength.lean
+          copy research/zeta-two-band-ci/CentralGapGeometryD.lean CentralGapGeometryD.lean
+          copy research/zeta-two-band-ci/v7/DWindowOverlap.lean DWindowOverlap.lean
+          copy research/zeta-two-band-ci/v7/DWindowRampEstimate.lean DWindowRampEstimate.lean
+          copy research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean DWindowProfileAlgebra.lean
+          copy research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean OneBandPotentialSafeNumerics.lean
+          copy research/zeta-two-band-ci/OneBandPotentialOverlap.lean OneBandPotentialOverlap.lean
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api.py" "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api_extra.py" "$GAP/OneBandSharpProfile.lean"
+          copy research/zeta-two-band-ci/OneBandSharpProfileAPI.lean OneBandSharpProfileAPI.lean
+          copy research/zeta-two-band-ci/OneBandSharpProfileExtraAPI.lean OneBandSharpProfileExtraAPI.lean
+
+          copy research/zeta-tail-ci/FiniteGridTailAlgebra.lean FiniteGridTailAlgebra.lean
+          copy research/zeta-tail-ci/DWindowFourierTail.lean DWindowFourierTail.lean
+          copy research/zeta-tail-ci/IntegerGridSplit.lean IntegerGridSplit.lean
+          copy research/zeta-tail-ci/FiniteBlockApproximation.lean FiniteBlockApproximation.lean
+          copy research/zeta-tail-ci/DWindowFiniteGridApprox.lean DWindowFiniteGridApprox.lean
+
+          copy research/zeta-join-ci/OneBandGapWord.lean OneBandGapWord.lean
+          copy research/zeta-join-ci/OneBandGapWordBounded.lean OneBandGapWordBounded.lean
+          copy research/zeta-join-ci/CanonicalOneBandPathD.lean CanonicalOneBandPathD.lean
+          copy research/zeta-join-ci/OneBandSharpProfileBridge.lean OneBandSharpProfileBridge.lean
+          copy research/zeta-join-ci/DWindowGramIdentity.lean DWindowGramIdentity.lean
+          copy research/zeta-join-ci/DWindowCandidateEnergyIdentity.lean DWindowCandidateEnergyIdentity.lean
+          copy research/zeta-join-ci/OverlapBoundsD.lean OverlapBoundsD.lean
+          copy research/zeta-join-ci/OneBandActualWordDCore.lean OneBandActualWordDCore.lean
+          copy research/zeta-join-ci/PathDataDCoreAdapter.lean PathDataDCoreAdapter.lean
+          copy research/zeta-join-ci/OneBandWordEnergyD.lean OneBandWordEnergyD.lean
+          copy research/zeta-join-ci/OneBandPotentialAnalyticBridge.lean OneBandPotentialAnalyticBridge.lean
+          copy research/zeta-join-ci/OneBandPackageAtD.lean OneBandPackageAtD.lean
+          copy research/zeta-join-ci/OneBandDensityResult.lean OneBandDensityResult.lean
+
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Compile tracks and collect status
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set +e
+          modules=(
+            DWindowRampEstimate
+            OneBandSharpProfileAPI
+            OneBandSharpProfileExtraAPI
+            OneBandSharpProfileBridge
+            DWindowFiniteGridApprox
+            DWindowGramIdentity
+            DWindowCandidateEnergyIdentity
+            OverlapBoundsD
+            CanonicalOneBandPathD
+            OneBandGapWord
+            OneBandGapWordBounded
+            OneBandActualWordDCore
+            PathDataDCoreAdapter
+            OneBandWordEnergyD
+            OneBandPotentialAnalyticBridge
+            OneBandPackageAtD
+            OneBandDensityResult
+          )
+          : > /tmp/status.tsv
+          for m in "${modules[@]}"; do
+            lake build "Zeta23.GapMatching.$m" > "/tmp/$m.log" 2>&1
+            status=$?
+            printf '%s\t%s\n' "$m" "$status" >> /tmp/status.tsv
+          done
+          exit 0
+      - name: Write deterministic report
+        run: |
+          mkdir -p ci-results
+          {
+            echo '# Full zeta frontier compiler report'
+            echo
+            echo "Source commit: $GITHUB_SHA"
+            echo "Generated: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            while IFS=$'\t' read -r module status; do
+              echo "## $module — status $status"
+              if [ "$status" = 0 ]; then
+                echo 'PASS'
+              else
+                grep -n -A24 -B5 'error:' "/tmp/$module.log" || true
+              fi
+              echo
+            done < /tmp/status.tsv
+          } > ci-results/zeta-frontier-status.txt
+      - name: Commit report
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ci-results/zeta-frontier-status.txt
+          git commit -m 'ci: update full zeta frontier report' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
+      - name: Fail unless every track passes
+        run: |
+          awk -F '\t' '$2 != 0 { bad=1 } END { exit bad }' /tmp/status.tsv
