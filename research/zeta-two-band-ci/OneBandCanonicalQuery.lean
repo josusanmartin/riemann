@@ -15,7 +15,7 @@ import Zeta23.GapMatching.OneBandGapMatchingD
 #check Zeta23.GapMatching.TwoBandGapMatchingDPath.candidateEnergy_le_two_selectedEnergy
 #check Zeta23.GapMatching.OneBandPathEnergy.candidateWeight_le_candidateEnergy_add_one
 #check Zeta23.GapMatching.OneBandGapWord.valid_word
-#check Zeta23.GapMatching.OneBandGapWord.candidateWeight_word
+#check Zeta23.GapMatching.FiniteStatePathWeight.candidateWeight_eq_path_add_final
 #check Zeta23.GapMatching.CentralGuardCountD.eventually_nonempty_orderedCentralVertices
 #check Zeta23.GapMatching.CentralGuardCountD.N0s_sub_innerGuard_le_central
 #check Zeta23.GapMatching.GuardedWindowCount.innerGuard_isLittleO_count
@@ -32,3 +32,10 @@ import Zeta23.GapMatching.OneBandGapMatchingD
 #check Zeta23.ThmD.thmD₀_simple_mult
 #check Zeta23.cumulative_of_dyadic
 #check Zeta23.trivial_chain₀
+
+#print Zeta23.GapMatching.OneBandSharpProfile.profile
+#print Zeta23.GapMatching.DWindowProfileAlgebra.sharpOverlap
+#print Zeta23.GapMatching.DWindowFiniteGridApprox.finiteNormalizedOverlap
+#print Zeta23.GapMatching.TwoBandGapMatchingDPath.edgeEnergy
+#print Zeta23.GapMatching.GapMatchingBlockSpecialization.simpleVhat
+#print Zeta23.ZeroSide.ZeroBlockData.vhat
