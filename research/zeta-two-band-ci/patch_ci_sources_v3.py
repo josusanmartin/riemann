@@ -24,10 +24,9 @@ def main() -> None:
   simp [Complex.mul_re]"""
     new = """      refine integral_congr_ae ?_
       filter_upwards with u
-      change
-        ((↑(v u ^ 2) *
-            Complex.exp (Complex.I * ↑r * ↑u)).re)
-          = v u ^ 2 * Real.cos (r * u)
+      have hsq : ((↑(v u) : ℂ) ^ 2) = ↑(v u ^ 2) := by
+        push_cast
+      rw [hsq]
       simp [Complex.mul_re, Complex.exp_re]"""
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
