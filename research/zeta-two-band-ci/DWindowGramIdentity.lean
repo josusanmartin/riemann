@@ -4,7 +4,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Exact real Fourier representation of the normalized D-window Gram entry.
 -/
-import Zeta23.GapMatching.GapMatchingBlockSpecialization
+import Zeta23.GapMatching.TwoBandGapMatchingDPath
 import Zeta23.ThmD.ZeroSideD
 
 noncomputable section
@@ -19,6 +19,7 @@ open Zeta23.ZeroSide
 open Zeta23.ZeroSide.RankTraceMult
 open Zeta23.ThmD
 open Zeta23.GapMatching.GapMatchingBlockSpecialization
+open Zeta23.GapMatching.TwoBandGapMatchingDPath
 
 variable {Z : ZeroConfig} {P : Params} {T : ℝ}
 
