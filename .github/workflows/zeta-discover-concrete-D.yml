@@ -1,0 +1,38 @@
+name: Discover concrete Theorem-D API
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-discover-concrete-D.yml"
+      - "research/zeta-two-band-ci/export_concrete_D_api.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Clone pinned source and generate API
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23" && git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_concrete_D_api.py" \
+            "$GITHUB_WORKSPACE/research/zeta-two-band-ci/ConcreteDAPI.lean" \
+            Zeta23/ThmD/Concrete.lean Zeta23/ThmD/AssemblyD.lean \
+            Zeta23/ThmD/Final.lean Zeta23/ThmD/ParamsD.lean \
+            > "$GITHUB_WORKSPACE/ci-results/concrete-D-api.txt"
+      - name: Commit API
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add research/zeta-two-band-ci/ConcreteDAPI.lean ci-results/concrete-D-api.txt
+          git commit -m 'research: record concrete Theorem-D API' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
