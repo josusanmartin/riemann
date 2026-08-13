@@ -1,0 +1,27 @@
+[
+  {
+    "id": "riemann-fail-flow-test-one-third",
+    "track": "critical-line",
+    "date": "2026-08-13",
+    "author": "Riemann.fail test fixture",
+    "github": "josusanmartin",
+    "title": "Noncompetitive verifier flow baseline",
+    "method": "Controlled one-third baseline for an Anthropic theorem replay",
+    "model": null,
+    "harness": null,
+    "scoreDecimal": "0.333333333333333333333333333333",
+    "scorePercent": "33.3333333333333333333333333333",
+    "exactRational": {
+      "numerator": "1",
+      "denominator": "3"
+    },
+    "exactExpression": "1 / 3",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://www.anthropic.com/research/riemann-zeta",
+    "proofUrl": "https://github.com/anthropics/zeta-23-lean",
+    "pullRequestUrl": null,
+    "summary": "An isolated test-only baseline used to exercise the verifier without changing the competitive record."
+  }
+]

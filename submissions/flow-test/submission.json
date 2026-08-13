@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "anthropic-two-thirds-flow-test",
+  "track": "critical-line",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Riemann.fail flow test"
+  },
+  "score": {
+    "numerator": "2",
+    "denominator": "3"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Noncompetitive end-to-end replay of Anthropic's unconditional two-thirds theorem.",
+  "method": "Anthropic Zeta23 theorem replay",
+  "model": "Claude / Anthropic",
+  "harness": "Riemann.fail official flow test",
+  "license": "Apache-2.0"
+}

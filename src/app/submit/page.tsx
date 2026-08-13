@@ -12,11 +12,18 @@ import {
 import { getSession, isGitHubAuthConfigured } from "@/auth";
 import { CodeBlock } from "@/components/code-block";
 import { DirectSubmissionForm } from "@/components/direct-submission-form";
+import { FlowTestPanel } from "@/components/flow-test-panel";
 import { signInWithGitHub } from "@/lib/auth-actions";
 import { getCurrentRecord } from "@/lib/records";
 import { isE2BConfigured } from "@/lib/e2b-config";
 import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
+import {
+  FLOW_TEST_DOWNLOAD_PATH,
+  FLOW_TEST_GIST_URL,
+  flowTestSolutionSource,
+  isFlowTestOperator,
+} from "@/lib/flow-test";
 import {
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
@@ -38,6 +45,7 @@ export default async function SubmitPage() {
   const github = session?.user.githubLogin;
   const current = getCurrentRecord();
   const queueConfigured = isSubmissionQueueConfigured();
+  const flowTestAllowed = github ? isFlowTestOperator(github) : false;
   const verifierConfigured =
     isE2BConfigured() &&
     isE2BWebhookConfigured() &&
@@ -161,6 +169,15 @@ export default async function SubmitPage() {
           <div><dt>Queue</dt><dd>1 verifier at a time</dd></div>
         </dl>
       </section>
+
+      {flowTestAllowed && (
+        <FlowTestPanel
+          officialSource={flowTestSolutionSource}
+          downloadPath={FLOW_TEST_DOWNLOAD_PATH}
+          gistUrl={FLOW_TEST_GIST_URL}
+          verifierConfigured={isE2BConfigured()}
+        />
+      )}
 
       <section className="shell direct-submit-section">
         <div className="direct-submit-heading">
