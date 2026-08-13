@@ -1,0 +1,112 @@
+name: Zeta corrected live frontier report
+
+on:
+  push:
+    branches: ["research/zeta-two-band-ci"]
+    paths:
+      - ".github/workflows/zeta-live-frontier-report.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: research/zeta-two-band-ci
+          fetch-depth: 0
+      - name: Install pinned Lean
+        run: ./scripts/install-lean-toolchain.sh >/dev/null
+      - name: Prepare full corrected workspace
+        run: |
+          git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
+          cd "$RUNNER_TEMP/zeta23" && git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
+          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
+          copy(){ test -f "$GITHUB_WORKSPACE/$1" && cp "$GITHUB_WORKSPACE/$1" "$GAP/$2" || true; }
+          for f in FiniteStateGapPotential FiniteStatePathWeight TwoBandPotentialSafeNumerics TwoBandPotentialOverlap TwoBandPotentialAnalyticBridge CandidateStrictImprovement CandidateStrictImprovementTight TwoBandGapMatchingD TwoBandGapMatchingDPath CentralPathConstructionD GuardedWindowCount CentralGuardCountD OrderedPointGaps DWindowLength CentralGapGeometryD OneBandPotentialSafeNumerics OneBandPotentialOverlap OneBandLiveFixedSimpleNumerics; do copy "research/zeta-two-band-ci/$f.lean" "$f.lean"; done
+          copy research/zeta-two-band-ci/v7/DNormalizedMoments.lean DNormalizedMoments.lean
+          copy research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean ScalarBonusCertificate.lean
+          copy research/zeta-two-band-ci/v7/DWindowOverlap.lean DWindowOverlap.lean
+          copy research/zeta-two-band-ci/v7/DWindowRampEstimate.lean DWindowRampEstimate.lean
+          copy research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean DWindowProfileAlgebra.lean
+          base64 -d "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandSharpProfile.lean.gz.b64" | gzip -d > "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api.py" "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_one_band_profile_api_extra.py" "$GAP/OneBandSharpProfile.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_ramp_api.py" "$GAP/DWindowRampEstimate.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_profile_algebra_api.py" "$GAP/DWindowProfileAlgebra.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_paramsD_api.py" "$RUNNER_TEMP/zeta23/Zeta23/ThmD/ParamsD.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_paramsD_span_api.py" "$RUNNER_TEMP/zeta23/Zeta23/ThmD/ParamsD.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_all_paramsD_defs.py" "$RUNNER_TEMP/zeta23/Zeta23/ThmD/ParamsD.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_gap_D_seam_api.py" "$GAP/TwoBandGapMatchingD.lean"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/export_guard_api.py" "$GAP/CentralGuardCountD.lean"
+          for f in OneBandSharpProfileAPI OneBandSharpProfileExtraAPI DWindowRampAPI DWindowProfileAPI ParamsDStableAPI ParamsDSpanAPI ParamsDConcreteDefsAPI GapDSeamAPI CentralGuardAPI DiscoveredVanishingAPI ConcreteDAPI; do copy "research/zeta-two-band-ci/$f.lean" "$f.lean"; done
+          for src in "$GITHUB_WORKSPACE"/research/zeta-tail-ci/*.lean; do cp "$src" "$GAP/$(basename "$src")"; done
+          for src in "$GITHUB_WORKSPACE"/research/zeta-join-ci/*.lean; do cp "$src" "$GAP/$(basename "$src")"; done
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
+          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+      - name: Restore cache
+        working-directory: ${{ runner.temp }}/zeta23
+        run: lake exe cache get >/dev/null
+      - name: Compile corrected proof graph
+        working-directory: ${{ runner.temp }}/zeta23
+        run: |
+          set +e
+          modules=(
+            DWindowRampEstimate OneBandPotentialSafeNumerics OneBandSharpProfile
+            OneBandLiveFixedSimpleNumerics OneBandSharpProfileAPI
+            OneBandSharpProfileExtraAPI OneBandSharpProfileBridge
+            FiniteGridTailAlgebra DWindowFourierTail IntegerGridSplit
+            FiniteBlockApproximation DWindowFiniteGridApprox
+            DWindowGramIdentity DWindowCandidateEnergyIdentity OverlapBoundsD
+            OneBandGapWord OneBandGapWordBounded CanonicalOneBandPathD
+            OneBandActualWordDCore ActualWordLengthD PathDataDCoreAdapter
+            OneBandWordEnergyD OneBandCentralWordD OneBandCentralPackageAtD
+            ConstantGainMatchingInput FixedSimpleBaselineToConstantGain
+            AdditiveDistinctDensityResult OneBandCentralFamilyD
+            EventualCentralFamilyD3 OneBandAnalyticConstructionD2
+            OneBandCompleteFamilyD2 CentralSimpleLowerAlgebra ConstantOverCount
+            DWindowConcreteIdentification GramToFinitePoisson GramFiniteFullBound
+            DWindowRampProfileBridge DWindowActualComponentsD
+            OneBandUniformCloseFromBounds DWindowStrongPackageFamily
+            StrongPackageFromVanishingBudget ConcreteVanishingPackageD
+            OneBandStrongAnalyticInputsD2 ConcreteStrongCentralPathD2
+            FixedLambdaBaselineD OneBandDSeamResult ZetaCentralPathInputsD
+            ZetaOneBandLiveD
+          )
+          : > /tmp/live-status.tsv
+          for m in "${modules[@]}"; do
+            lake build "Zeta23.GapMatching.$m" > "/tmp/$m.log" 2>&1
+            printf '%s\t%s\n' "$m" "$?" >> /tmp/live-status.tsv
+          done
+          exit 0
+      - name: Write report
+        run: |
+          mkdir -p ci-results
+          {
+            echo '# Corrected live proof compiler report'
+            echo
+            echo "Source: $GITHUB_SHA"
+            echo "Generated: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            while IFS=$'\t' read -r module status; do
+              echo "## $module — $status"
+              if [ "$status" = 0 ]; then echo PASS; else grep -n -A22 -B5 'error:' "/tmp/$module.log" || tail -n 50 "/tmp/$module.log"; fi
+              echo
+            done < /tmp/live-status.tsv
+          } > ci-results/zeta-live-frontier-status.txt
+      - name: Commit report
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ci-results/zeta-live-frontier-status.txt
+          git commit -m 'ci: update corrected live proof report' || exit 0
+          git pull --rebase origin research/zeta-two-band-ci
+          git push origin HEAD:research/zeta-two-band-ci
+      - name: Preserve aggregate status
+        run: awk -F '\t' '$2 != 0 {bad=1} END {exit bad}' /tmp/live-status.tsv
