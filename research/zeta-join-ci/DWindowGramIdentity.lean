@@ -25,28 +25,26 @@ open Zeta23.GapMatching.DWindowFiniteGridApprox
 
 variable {Z : ZeroConfig} {P : Params} {T : ℝ}
 
-/-- Conjugation invariance of the D-window zero block. -/
-def gramConj (Z : ZeroConfig) (T : ℝ) : IsConjInvariant Z T := by
-  intro z hz
-  exact ZeroSide.ZI_conj_mem z
+/-- Canonical Fourier-conjugation proof for the D-window at height `T`. -/
+def gramConj (P : Params) (T : ℝ) : PhiHatConj T (P.atD T) :=
+  fun z => GzGp.phiHat_conj (P.atD T) T z
 
 /-- The actual D-window block, independent of any matching construction. -/
-def gramBlock (Z : ZeroConfig) (P : Params) (T : ℝ) :
-    ZeroBlockData Z T (P.atD T) :=
-  blockData Z T (P.atD T) (gramConj Z T)
+abbrev gramBlock (Z : ZeroConfig) (P : Params) (T : ℝ) :=
+  blockData Z T (P.atD T) (gramConj P T)
 
 /-- Simple critical-line atoms in the D-window block. -/
 abbrev gramSimpleOnLine (Z : ZeroConfig) (P : Params) (T : ℝ) :=
-  (gramBlock Z P T).SimpleOnLine
+  SimpleOnLine (gramBlock Z P T)
+
+/-- D-window Gram normalization `a_D(T) L(T)^2`. -/
+def gramScale (P : Params) (T : ℝ) : ℝ :=
+  (P.atD T).a T * (P.atD T).L T ^ 2
 
 /-- Their normalized evaluation vectors. -/
 def gramSimpleVector (Z : ZeroConfig) (P : Params) (T : ℝ) :
     gramSimpleOnLine Z P T → Fin ((P.atD T).d T) → ℂ :=
-  fun z => simpleVhat (gramBlock Z P T) z
-
-/-- D-window Gram normalization. -/
-def gramScale (P : Params) (T : ℝ) : ℝ :=
-  (P.atD T).a T * (P.atD T).L T
+  simpleVhat (gramBlock Z P T) (gramScale P T)
 
 /-- Ordinate of a simple on-line atom in the D-window block. -/
 def atomOrdinate (z : gramSimpleOnLine Z P T) : ℝ :=
