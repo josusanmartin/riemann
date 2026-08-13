@@ -7,6 +7,7 @@ on:
       - ".github/workflows/zeta-submit-targeted-ci.yml"
       - "research/zeta-two-band-ci/**"
       - "research/zeta-join-ci/**"
+      - "research/zeta-tail-ci/**"
   workflow_dispatch:
 
 concurrency:
@@ -59,6 +60,7 @@ jobs:
           cp research/zeta-join-ci/OneBandGapWord.lean "$GAP/OneBandGapWord.lean"
           cp research/zeta-join-ci/CanonicalOneBandPathD.lean "$GAP/CanonicalOneBandPathD.lean"
           cp research/zeta-two-band-ci/OneBandPathEnergy.lean "$GAP/OneBandPathEnergy.lean"
+          cp research/zeta-two-band-ci/DWindowGramIdentity.lean "$GAP/DWindowGramIdentity.lean"
           cp research/zeta-two-band-ci/CanonicalOverlapD.lean "$GAP/CanonicalOverlapD.lean"
           cp research/zeta-two-band-ci/OneBandCanonicalQuery.lean "$GAP/OneBandCanonicalQuery.lean"
           cp research/zeta-tail-ci/FiniteGridTailAlgebra.lean "$GAP/FiniteGridTailAlgebra.lean"
@@ -72,6 +74,15 @@ jobs:
           python3 research/zeta-two-band-ci/patch_ci_sources_v3.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/patch_fixed_point_result.py "$RUNNER_TEMP/zeta23"
           python3 research/zeta-two-band-ci/generate_one_band_d.py "$RUNNER_TEMP/zeta23"
+      - name: Restore compiled Lean tree
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ${{ runner.temp }}/zeta23/.lake/build
+            ${{ runner.temp }}/zeta23/.lake/packages/*/.lake/build
+          key: zeta-submit-v2-${{ runner.os }}-${{ hashFiles('research/zeta-two-band-ci/**', 'research/zeta-join-ci/**', 'research/zeta-tail-ci/**') }}
+          restore-keys: |
+            zeta-submit-v2-${{ runner.os }}-
       - name: Restore Mathlib cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get
@@ -82,6 +93,7 @@ jobs:
           lake build \
             Zeta23.GapMatching.OneBandBaselineLower \
             Zeta23.GapMatching.OneBandPathEnergy \
+            Zeta23.GapMatching.DWindowGramIdentity \
             Zeta23.GapMatching.CanonicalOverlapD \
             Zeta23.GapMatching.OneBandCanonicalQuery \
             2>&1 | tee "$RUNNER_TEMP/zeta-submit-targeted.log"
