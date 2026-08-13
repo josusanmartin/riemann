@@ -5,10 +5,6 @@ on:
     branches: ["research/zeta-two-band-ci"]
     paths:
       - ".github/workflows/zeta-ramp-ci.yml"
-      - "research/zeta-two-band-ci/patch_ci_sources.py"
-      - "research/zeta-two-band-ci/patch_ci_sources_compat.py"
-      - "research/zeta-two-band-ci/patch_ci_sources_v2.py"
-      - "research/zeta-two-band-ci/patch_ci_sources_v3.py"
       - "research/zeta-two-band-ci/v7/DWindowRampEstimate.lean"
   workflow_dispatch:
 
@@ -28,31 +24,8 @@ jobs:
           git clone -q https://github.com/m0at/zeta-23-lean.git "$RUNNER_TEMP/zeta23"
           cd "$RUNNER_TEMP/zeta23"
           git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
-          GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStatePathWeight.lean" "$GAP/FiniteStatePathWeight.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialSafeNumerics.lean" "$GAP/TwoBandPotentialSafeNumerics.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialOverlap.lean" "$GAP/TwoBandPotentialOverlap.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandPotentialAnalyticBridge.lean" "$GAP/TwoBandPotentialAnalyticBridge.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DNormalizedMoments.lean" "$GAP/DNormalizedMoments.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/ScalarBonusCertificate.lean" "$GAP/ScalarBonusCertificate.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingD.lean" "$GAP/TwoBandGapMatchingD.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/TwoBandGapMatchingDPath.lean" "$GAP/TwoBandGapMatchingDPath.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralPathConstructionD.lean" "$GAP/CentralPathConstructionD.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/GuardedWindowCount.lean" "$GAP/GuardedWindowCount.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGuardCountD.lean" "$GAP/CentralGuardCountD.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OrderedPointGaps.lean" "$GAP/OrderedPointGaps.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/DWindowLength.lean" "$GAP/DWindowLength.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/CentralGapGeometryD.lean" "$GAP/CentralGapGeometryD.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowOverlap.lean" "$GAP/DWindowOverlap.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowRampEstimate.lean" "$GAP/DWindowRampEstimate.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowProfileAlgebra.lean" "$GAP/DWindowProfileAlgebra.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
-          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialOverlap.lean" "$GAP/OneBandPotentialOverlap.lean"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_compat.py" "$RUNNER_TEMP/zeta23"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v2.py" "$RUNNER_TEMP/zeta23"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_ci_sources_v3.py" "$RUNNER_TEMP/zeta23"
-          python3 "$GITHUB_WORKSPACE/research/zeta-two-band-ci/patch_fixed_point_result.py" "$RUNNER_TEMP/zeta23"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/v7/DWindowRampEstimate.lean" \
+            "$RUNNER_TEMP/zeta23/Zeta23/GapMatching/DWindowRampEstimate.lean"
       - name: Restore cache
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
