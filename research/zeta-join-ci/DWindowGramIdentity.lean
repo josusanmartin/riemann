@@ -71,17 +71,15 @@ theorem gramOverlap_eq_finFourierOverlap
     (z z' : dSimpleOnLine Z P T) :
     gramOverlap z z' = finFourierOverlap z z' := by
   unfold gramOverlap finFourierOverlap
-  rw [Pi.inner_apply]
+  rw [PiLp.inner_apply, map_sum]
+  apply Finset.sum_congr rfl
+  intro k hk
+  rw [RCLike.inner_apply]
   simp_rw [dSimpleVector_apply hreal]
   have hsqrt : Real.sqrt (dScale P T) ^ 2 = dScale P T :=
     Real.sq_sqrt hc.le
-  rw [map_sum]
-  apply Finset.sum_congr rfl
-  intro k hk
-  rw [map_mul]
-  simp only [RCLike.re_to_real, Complex.inner_apply,
-    map_div₀, Complex.conj_ofReal, Complex.conj_div,
-    Complex.conj_ofReal, Complex.ofReal_mul, Complex.ofReal_re]
+  simp only [map_div₀, Complex.conj_ofReal,
+    Complex.conj_div, Complex.ofReal_mul, Complex.ofReal_re]
   push_cast
   field_simp [hc.ne', Real.sqrt_pos.2 hc, hsqrt]
   ring
