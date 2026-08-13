@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -11,7 +12,9 @@ def main() -> None:
     if len(sys.argv) != 2:
         raise SystemExit("usage: patch_ci_sources_v3.py <zeta23-workspace>")
 
-    path = Path(sys.argv[1]) / "Zeta23" / "GapMatching" / "DWindowRampEstimate.lean"
+    workspace = Path(sys.argv[1])
+    gap = workspace / "Zeta23" / "GapMatching"
+    path = gap / "DWindowRampEstimate.lean"
     text = path.read_text(encoding="utf-8")
     old = """      apply integral_congr_ae
   filter_upwards with u
@@ -43,6 +46,9 @@ def main() -> None:
     if old not in text:
         raise RuntimeError(f"expected ramp proof fragment not found in {path}")
     path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+    scaling_source = Path(__file__).with_name("DWindowSharpScaling.lean")
+    shutil.copyfile(scaling_source, gap / scaling_source.name)
 
 
 if __name__ == "__main__":
