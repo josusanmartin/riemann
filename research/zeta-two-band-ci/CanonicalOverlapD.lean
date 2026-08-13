@@ -18,6 +18,7 @@ namespace Zeta23.GapMatching.CanonicalOverlapD
 
 open Zeta23
 open Zeta23.ZeroSide
+open Zeta23.ZeroSide.RankTraceMult
 open Zeta23.ThmD
 open Zeta23.AdmWindow
 open Zeta23.GapMatching.CentralPathConstructionD
