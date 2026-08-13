@@ -55,12 +55,14 @@ def finFourierOverlap
         * (P.atD T).phiHatR T
           (atomOrdinate z' - (P.atD T).tau T k)
 
-/-- The complex inner product is the real finite Fourier overlap. -/
-theorem inner_eq_finFourierOverlap
+/-- The finite Gram sum is the real finite Fourier overlap. -/
+theorem gramSum_eq_finFourierOverlap
     (hreal : PhiHatReal T (P.atD T))
     (hc : 0 < dScale P T)
     (z z' : dSimpleOnLine Z P T) :
-    inner (dSimpleVector Z P T z) (dSimpleVector Z P T z')
+    (∑ k : Fin ((P.atD T).d T),
+      starRingEnd ℂ (dSimpleVector Z P T z k) *
+        dSimpleVector Z P T z' k)
       = (finFourierOverlap z z' : ℂ) := by
   rw [PiLp.inner_apply]
   unfold finFourierOverlap
