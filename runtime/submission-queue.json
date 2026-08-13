@@ -1,15 +1,25 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "iu7pss1xf3s6anwedhs86",
-    "jobId": "bf0b7089-744d-4d90-b81c-ad14c389bf97",
-    "proofDigest": "d11ab92c330f18d8b92791168b285260d8e28426234327fb59750840854f77b4",
-    "ownerKey": "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e",
-    "submissionKey": "2498b9e64c686441e57f4ff05d50a481df6190808d8c1dccbc4bedd5c5f8bff5",
-    "enqueuedAt": "2026-08-13T10:15:51.420Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "bf0b7089-744d-4d90-b81c-ad14c389bf97",
+      "proofDigest": "d11ab92c330f18d8b92791168b285260d8e28426234327fb59750840854f77b4",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The trusted checker environment failed before it could produce a mathematical verdict. This does not show that the submitted proof is wrong.",
+      "feedback": {
+        "code": "verifier-infrastructure",
+        "stage": "infrastructure",
+        "title": "Verifier infrastructure failed",
+        "detail": "The trusted checker environment failed before it could produce a mathematical verdict. This does not show that the submitted proof is wrong.",
+        "action": "Retry later. If the same digest fails again, send the digest to the maintainers so they can inspect the private operational logs.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-08-13T10:15:56.694Z"
+    },
     {
       "jobId": "dc46e536-abfa-4fe5-ac79-98108d3d05b6",
       "proofDigest": "3d0b3380dc9e8c747a0646410ffcc1ea411c0474f36a8c6a4cfaafe832462f94",
