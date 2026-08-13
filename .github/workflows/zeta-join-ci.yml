@@ -26,8 +26,10 @@ jobs:
           git checkout -q a6bcd8a58fc9c95615fde8594c06c543fd979641
           GAP="$RUNNER_TEMP/zeta23/Zeta23/GapMatching"
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStateGapPotential.lean" "$GAP/FiniteStateGapPotential.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/FiniteStatePathWeight.lean" "$GAP/FiniteStatePathWeight.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-two-band-ci/OneBandPotentialSafeNumerics.lean" "$GAP/OneBandPotentialSafeNumerics.lean"
           cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandGapWord.lean" "$GAP/OneBandGapWord.lean"
+          cp "$GITHUB_WORKSPACE/research/zeta-join-ci/OneBandPathWeightIdentity.lean" "$GAP/OneBandPathWeightIdentity.lean"
           python3 - <<'PY'
           import os
           from pathlib import Path
@@ -80,14 +82,14 @@ jobs:
       - name: Restore cache quietly
         working-directory: ${{ runner.temp }}/zeta23
         run: lake exe cache get >/dev/null
-      - name: Compile join module with concise diagnostics
+      - name: Compile join modules with concise diagnostics
         working-directory: ${{ runner.temp }}/zeta23
         run: |
           set +e
-          lake build Zeta23.GapMatching.OneBandGapWord > /tmp/join.log 2>&1
+          lake build Zeta23.GapMatching.OneBandPathWeightIdentity > /tmp/join.log 2>&1
           status=$?
           echo '=== JOIN ERRORS ==='
           grep -n -A18 -B4 'error:' /tmp/join.log || true
           echo '=== JOIN LOG TAIL ==='
-          tail -n 30 /tmp/join.log
+          tail -n 40 /tmp/join.log
           exit $status
