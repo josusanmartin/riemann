@@ -11,7 +11,9 @@ const identitySchema = z.object({
 /** Authenticate CLI requests with GitHub itself. Never persist or log tokens. */
 export async function githubApiIdentity(request: Request, fetcher = fetch) {
   const authorization = request.headers.get("authorization");
-  if (!authorization || !/^Bearer [A-Za-z0-9_]{20,255}$/.test(authorization)) return null;
+  // Do not forward unrelated bearer credentials (cron/admin/job secrets) to
+  // GitHub. Only its documented modern user-token formats are accepted here.
+  if (!authorization || !/^Bearer (?:gh[pou]_|github_pat_)[A-Za-z0-9_]{15,240}$/.test(authorization)) return null;
   try {
     const response = await fetcher("https://api.github.com/user", {
       headers: {

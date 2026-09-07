@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { githubApiIdentity } from "./github-api-identity";
 
 const request = new Request("https://www.riemannzeta.fun/api/submissions", {
-  headers: { Authorization: `Bearer ${"x".repeat(30)}` },
+  headers: { Authorization: `Bearer ghp_${"x".repeat(30)}` },
 });
 describe("GitHub CLI identity", () => {
   it("uses only GitHub's authenticated identity with no caching or redirects", async () => {
@@ -17,6 +17,9 @@ describe("GitHub CLI identity", () => {
     expect(await githubApiIdentity(request, vi.fn().mockRejectedValue(new Error("network")))).toBeNull();
     const fetcher = vi.fn();
     expect(await githubApiIdentity(new Request(request.url), fetcher)).toBeNull();
+    expect(await githubApiIdentity(new Request(request.url, {
+      headers: { Authorization: `Bearer ${"unrelated-admin-secret".repeat(3)}` },
+    }), fetcher)).toBeNull();
     expect(fetcher).not.toHaveBeenCalled();
   });
 });

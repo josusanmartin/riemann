@@ -98,17 +98,19 @@ function noStore(status: number, body: object): Response {
 }
 
 async function authorized(request: Request): Promise<boolean> {
+  const secret = process.env.E2B_TEMPLATE_ADMIN_SECRET;
+  const supplied = request.headers.get("authorization");
+  if (secret && secret.length >= 32 && supplied) {
+    const expected = Buffer.from(`Bearer ${secret}`, "utf8");
+    const actual = Buffer.from(supplied, "utf8");
+    if (expected.length === actual.length && timingSafeEqual(expected, actual)) return true;
+  }
   const adminId = process.env.E2B_TEMPLATE_ADMIN_GITHUB_ID;
   if (adminId && /^[1-9][0-9]*$/.test(adminId)) {
     const identity = await githubApiIdentity(request);
     if (identity && String(identity.id) === adminId) return true;
   }
-  const secret = process.env.E2B_TEMPLATE_ADMIN_SECRET;
-  const supplied = request.headers.get("authorization");
-  if (!secret || secret.length < 32 || !supplied) return false;
-  const expected = Buffer.from(`Bearer ${secret}`, "utf8");
-  const actual = Buffer.from(supplied, "utf8");
-  return expected.length === actual.length && timingSafeEqual(expected, actual);
+  return false;
 }
 
 function apiKey(): string {
