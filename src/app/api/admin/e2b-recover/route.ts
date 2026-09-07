@@ -13,11 +13,12 @@ import { ensureQueuedJobRunning } from "@/lib/queue-orchestration";
 import { getCurrentRecord, records } from "@/lib/records";
 import {
   getActiveVerificationJob,
+  QueueCommitUncertainError,
   replaceActiveVerificationJob,
 } from "@/lib/submission-queue";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 function authorized(request: Request): boolean {
   const secret = process.env.E2B_TEMPLATE_ADMIN_SECRET;
@@ -59,7 +60,8 @@ export async function POST(request: Request): Promise<Response> {
     if (proofDigest !== active.proofDigest) {
       throw new Error("The recovered source does not match its immutable digest");
     }
-    const baseCommitSha = process.env.VERCEL_GIT_COMMIT_SHA;
+    const baseCommitSha =
+      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA;
     if (!baseCommitSha || !/^[0-9a-f]{40}$/.test(baseCommitSha)) {
       throw new Error("The recovery deployment has no immutable Git identity");
     }
@@ -100,6 +102,14 @@ export async function POST(request: Request): Promise<Response> {
       sandboxId: recovered.sandboxId,
     });
   } catch (error) {
+    if (error instanceof QueueCommitUncertainError) {
+      // The replacement may already own the durable queue head. Neither the
+      // old nor the replacement worker is safe to delete until reconciliation.
+      return noStore(503, {
+        error: "recovery_commit_uncertain",
+        message: "The recovery update could not be confirmed. Inspect the active queue before retrying; both workers have been preserved.",
+      });
+    }
     if (replacementSandboxId && !queueReplaced) {
       await killE2BSandbox(replacementSandboxId).catch(() => undefined);
     }
