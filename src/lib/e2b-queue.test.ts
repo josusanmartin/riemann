@@ -1,4 +1,7 @@
 import { spawnSync } from "node:child_process";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   queuedVerificationRunnerCommand,
@@ -9,6 +12,27 @@ const jobId = "4d664a5f-65f8-40c9-a641-6bb9eb77ef6b";
 const proofDigest = "a".repeat(64);
 
 describe("queued E2B runner recovery", () => {
+  it("bounds recovery by first launch and never discards a ready result", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "riemann-runner-deadline-"));
+    try {
+      const command = queuedVerificationRunnerProbeCommand(jobId)
+        .replaceAll(`/var/lib/riemann/jobs/${jobId}`, directory);
+      const probe = () => spawnSync("bash", ["-c", command], { encoding: "utf8" });
+      const initial = probe();
+      expect(initial.status).toBe(0);
+      expect(initial.stdout).toBe("recover");
+      const started = await readFile(join(directory, "started-at"), "utf8");
+      expect(probe().stdout).toBe("recover");
+      expect(await readFile(join(directory, "started-at"), "utf8")).toBe(started);
+      await writeFile(join(directory, "started-at"), "1\n");
+      expect(probe().stdout).toBe("expired");
+      await writeFile(join(directory, "result.json"), "{}\n");
+      expect(probe().stdout).toBe("result-ready");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it("uses one lock and finalizes an existing proof artifact before rerunning", () => {
     const command = queuedVerificationRunnerCommand(jobId, proofDigest);
 

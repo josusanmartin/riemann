@@ -11,6 +11,16 @@ import { join } from "node:path";
 const site = "https://www.riemannzeta.fun";
 const source = await readFile(new URL("../submissions/flow-test/proof/Solution.lean", import.meta.url), "utf8");
 const negative = process.argv.includes("--negative-control");
+const deployment = process.argv.find(arg => arg.startsWith("--deployment="))?.slice("--deployment=".length);
+if (deployment) {
+  const url = new URL(deployment);
+  if (url.protocol !== "https:" || url.username || url.password || url.port ||
+      !/^riemann-fail-[a-z0-9]+-josus-projects-42b794d2\.vercel\.app$/.test(url.hostname) ||
+      url.pathname !== "/" || url.search || url.hash) {
+    throw new Error("Only this project's explicit HTTPS deployment URL is accepted");
+  }
+  console.log("Testing the production backend via authenticated Vercel deployment access; this does not test the public-domain firewall or browser OAuth.");
+}
 const token = process.env.RIEMANN_TEST_GITHUB_TOKEN ?? (() => {
   try {
     const credentials = execFileSync("gh", ["auth", "git-credential", "get"], {
@@ -21,17 +31,41 @@ const token = process.env.RIEMANN_TEST_GITHUB_TOKEN ?? (() => {
 })();
 if (!token) throw new Error("Sign in to gh or set RIEMANN_TEST_GITHUB_TOKEN (never commit it)");
 
-async function request(path: string, body?: unknown): Promise<Record<string, unknown>> {
+async function rawRequest(path: string, body?: unknown): Promise<{ status: number; text: string }> {
+  if (deployment) {
+    const config = [
+      `header = ${JSON.stringify(`Authorization: Bearer ${token}`)}`,
+      'header = "Content-Type: application/json"',
+      `request = "${body === undefined ? "GET" : "POST"}"`,
+      ...(body === undefined ? [] : [`data-binary = ${JSON.stringify(JSON.stringify(body))}`]),
+    ].join("\n") + "\n";
+    let out: string;
+    try {
+      out = execFileSync("vercel", ["curl", path, "--deployment", deployment, "--",
+        "--silent", "--show-error", "--max-time", "315", "--config", "-", "--write-out", "\n%{http_code}"], {
+        input: config, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], maxBuffer: 5_000_000,
+      });
+    } catch {
+      throw new Error("Authenticated Vercel request failed; no verdict inferred");
+    }
+    const separator = out.lastIndexOf("\n");
+    return { status: Number(out.slice(separator + 1)), text: out.slice(0, separator) };
+  }
   const response = await fetch(`${site}${path}`, {
     method: body === undefined ? "GET" : "POST", redirect: "error",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(body === undefined ? 90_000 : 315_000),
   });
-  if (!response.headers.get("content-type")?.includes("application/json")) {
+  return { status: response.status, text: await response.text() };
+}
+
+async function request(path: string, body?: unknown): Promise<Record<string, unknown>> {
+  const response = await rawRequest(path, body);
+  let data: Record<string, unknown>;
+  try { data = JSON.parse(response.text) as Record<string, unknown>; } catch {
     throw new Error(`HTTP ${response.status}: non-JSON response (possibly the Vercel security checkpoint). No verdict inferred.`);
   }
-  const data = await response.json() as Record<string, unknown>;
-  if (!response.ok) throw new Error(`HTTP ${response.status}: ${String(data.error)} — ${String(data.message ?? "")}`);
+  if (response.status < 200 || response.status >= 300) throw new Error(`HTTP ${response.status}: ${String(data.error)} — ${String(data.message ?? "")}`);
   return data;
 }
 
@@ -75,10 +109,8 @@ async function run(kind: "negative" | "positive") {
         throw new Error("Negative control did not receive a mathematical rejection");
       }
       const job = JSON.parse(Buffer.from(started.jobToken.split(".")[0], "base64url").toString()) as { jobId: string };
-      const archived = await fetch(`${site}/api/admin/submission-archive/${job.jobId}`, {
-        headers: { Authorization: `Bearer ${token}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
-      });
-      if (!archived.ok || await archived.text() !== source) throw new Error("Encrypted archive did not round-trip the exact source");
+      const archived = await rawRequest(`/api/admin/submission-archive/${job.jobId}`);
+      if (archived.status !== 200 || archived.text !== source) throw new Error("Encrypted archive did not round-trip the exact source");
     }
     return;
   }

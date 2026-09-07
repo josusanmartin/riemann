@@ -641,7 +641,7 @@ export async function GET(request: Request): Promise<Response> {
       { apiKey: key, logsOffset },
     );
     const buildLogs =
-      build.status === "error" && logsOffset === undefined
+      (build.status === "error" || url.searchParams.get("tail") === "1") && logsOffset === undefined
         ? await e2bApi<TemplateBuildLogs>(
             `/templates/${encodeURIComponent(templateId)}/builds/${encodeURIComponent(buildId)}/logs?limit=100&direction=backward`,
             key,

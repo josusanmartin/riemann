@@ -117,9 +117,18 @@ export function queuedVerificationRunnerProbeCommand(
   const { jobDirectory } = paths(jobIdInput);
   const resultPath = `${jobDirectory}/result.json`;
   const lockPath = `${jobDirectory}/runner.lock`;
+  const startedPath = `${jobDirectory}/started-at`;
   return (
     `if [[ -s ${resultPath} ]]; then printf result-ready; ` +
-    `else if /usr/bin/flock -n -E 75 ${lockPath} -c true; ` +
+    // Persist the first active launch, not enqueue time: waiting jobs may
+    // legitimately sit in the FIFO for hours. Reconnects/restarts cannot reset
+    // this deadline and keep a crash-looping queue head alive indefinitely.
+    `else if [[ ! -e ${startedPath} ]]; then ` +
+    `(set -C; date +%s > ${startedPath}) 2>/dev/null || true; fi; ` +
+    `started=$(cat ${startedPath}); ` +
+    `[[ "$started" =~ ^[0-9]{1,12}$ ]] || exit 99; ` +
+    `if (( $(date +%s) - started >= 3480 )); then printf expired; exit 0; ` +
+    `elif /usr/bin/flock -n -E 75 ${lockPath} -c true; ` +
     `then lock_status=0; else lock_status=$?; fi; ` +
     `if [[ $lock_status -eq 0 ]]; then printf recover; ` +
     `elif [[ $lock_status -eq 75 ]]; then printf running; ` +
@@ -222,7 +231,7 @@ export async function launchQueuedE2BVerification(input: {
   const sandboxId = sandboxIdSchema.parse(input.sandboxId);
   const jobId = jobIdSchema.parse(input.jobId);
   const proofDigest = digestSchema.parse(input.proofDigest);
-  const { Sandbox } = await import("e2b");
+  const { Sandbox, SandboxNotFoundError } = await import("e2b");
   const sandbox = await Sandbox.connect(sandboxId, {
     apiKey: requireApiKey(),
     timeoutMs: E2B_JOB_TIMEOUT_MS,
@@ -243,6 +252,10 @@ export async function launchQueuedE2BVerification(input: {
   const existingState = existingRunner.stdout.trim();
   if (existingState === "result-ready" || existingState === "running") {
     return existingState;
+  }
+  if (existingState === "expired") {
+    await sandbox.kill();
+    throw new SandboxNotFoundError("The verifier exceeded its first-launch operational deadline");
   }
   if (existingState !== "recover") {
     throw new Error("E2B returned an unexpected queued runner state");
