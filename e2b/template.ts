@@ -51,8 +51,6 @@ export function createRiemannVerifierTemplate(
       },
       { src: "tsconfig.json", dest: "/opt/riemann/tsconfig.json" },
       { src: "challenge", dest: "/opt/riemann/challenge" },
-      { src: "data", dest: "/opt/riemann/data" },
-      { src: ".github", dest: "/opt/riemann/.github" },
       {
         src: "e2b/mathlib-cache-bounded-disk.patch",
         dest: "/opt/riemann/e2b/mathlib-cache-bounded-disk.patch",
@@ -93,7 +91,6 @@ export function createRiemannVerifierTemplate(
         src: "scripts/run-lake-build-bounded-disk.sh",
         dest: "/opt/riemann/scripts/run-lake-build-bounded-disk.sh",
       },
-      { src: "src/lib", dest: "/opt/riemann/src/lib" },
     ])
     .runCmd("chown -R riemann:riemann /opt/riemann", { user: "root" })
     .runCmd(
@@ -114,6 +111,9 @@ export function createRiemannVerifierTemplate(
       // the website, not substitute e2b/runtime/package*.json under those names.
       { src: "package.json", dest: "/opt/riemann/package.json" },
       { src: "package-lock.json", dest: "/opt/riemann/package-lock.json" },
+      { src: "data", dest: "/opt/riemann/data" },
+      { src: ".github", dest: "/opt/riemann/.github" },
+      { src: "src/lib", dest: "/opt/riemann/src/lib" },
       { src: "scripts", dest: "/opt/riemann/scripts" },
       {
         src: "e2b/build-template.ts",
