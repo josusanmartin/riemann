@@ -145,15 +145,18 @@ export async function GET(request: Request): Promise<Response> {
         "",
         "The isolated verifier expired before producing a result.",
       );
-      await advanceVerificationQueue(activeQueueJob.jobId, {
-        outcome: "rejected",
-        promotionStatus: null,
-        message: feedback.detail,
-        feedback,
-        evidenceUrl: null,
-      }).catch((queueError) => {
+      try {
+        await advanceVerificationQueue(activeQueueJob.jobId, {
+          outcome: "rejected",
+          promotionStatus: null,
+          message: feedback.detail,
+          feedback,
+          evidenceUrl: null,
+        });
+      } catch (queueError) {
         console.error("Unable to advance an expired queue job", queueError);
-      });
+        return noStore(503, { error: "expired_queue_advance_failed" });
+      }
       return noStore(200, { status: "expired-advanced" });
     }
     console.error("Unable to sweep a paused E2B verification", error);

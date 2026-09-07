@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { SandboxNotFoundError } from "e2b";
+
+vi.mock("e2b", () => ({ SandboxNotFoundError: class extends Error {} }));
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -95,6 +98,23 @@ afterEach(() => {
 });
 
 describe("durable queue finalization boundary", () => {
+  it("returns the durable verdict when another poll already removed the sandbox", async () => {
+    mocks.inspectVerificationJob
+      .mockResolvedValueOnce({ status: "active", position: 0, job })
+      .mockResolvedValueOnce({
+        status: "completed",
+        receipt: {
+          jobId: job.jobId, proofDigest: job.proofDigest,
+          outcome: "promoted", promotionStatus: "promoted", message: null,
+          evidenceUrl: "https://github.com/josusanmartin/riemann", completedAt: "2026-08-13T12:30:00Z",
+        },
+      });
+    mocks.ensureQueuedJobRunning.mockRejectedValueOnce(new SandboxNotFoundError("Already finalized"));
+    const response = await statusRequest(new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ status: "verified", promotion: { status: "promoted" } });
+  });
+
   it("observes a waiting job without repeatedly pausing or launching it", async () => {
     mocks.inspectVerificationJob.mockResolvedValue({
       status: "queued",

@@ -18,7 +18,7 @@ import { signSubmissionJob } from "@/lib/submission-jobs";
 import { getActiveVerificationJob } from "@/lib/submission-queue";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 function noStore(status: number, body: object): Response {
   return Response.json(body, {

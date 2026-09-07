@@ -2777,13 +2777,14 @@ h3 {
 
 .participate-paths {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   align-items: start;
 }
 
 .participate-card {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 16px;
   padding: 30px;

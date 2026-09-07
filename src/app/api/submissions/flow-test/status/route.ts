@@ -226,7 +226,19 @@ export async function GET(request: Request): Promise<Response> {
     ) {
       throw new Error("The verifier returned an attestation for a different contract");
     }
-    await validateFlowTestAttestation(result, await readE2BSubmissionBundle(job.sandboxId, job.jobId));
+    try {
+      await validateFlowTestAttestation(result, await readE2BSubmissionBundle(job.sandboxId, job.jobId));
+    } catch (error) {
+      console.error("Flow-test publication gate failed", { jobId: job.jobId, error });
+      // A terminal publication mismatch must not become endless 502 polling
+      // that keeps reconnecting and extending the sandbox's lifetime.
+      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      return noStore(409, {
+        error: "flow_test_attestation_failed",
+        proofDigest: job.proofDigest,
+        message: "The proof replay finished, but its attestation did not match this deployment. This is an infrastructure failure, not a mathematical rejection. Send the digest to the maintainers. Nothing was promoted.",
+      });
+    }
     await killE2BSandbox(job.sandboxId).catch(() => undefined);
     return noStore(200, {
       ...result,

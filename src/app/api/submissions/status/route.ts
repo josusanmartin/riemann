@@ -231,21 +231,33 @@ export async function GET(request: Request): Promise<Response> {
         "",
         "The isolated verifier expired before producing a result.",
       );
-      let jobId: string | null = null;
       try {
-        jobId = verifySubmissionJob(token, secret).jobId;
-        const queue = await inspectVerificationJob(jobId);
+        const job = verifySubmissionJob(token, secret);
+        const queue = await inspectVerificationJob(job.jobId);
+        // A concurrent poll/webhook may have finalized and removed E2B
+        // between our initial queue read and sandbox connection. The durable
+        // verdict wins; do not tell a successfully judged user it expired.
+        if (queue.status === "completed") {
+          return completedReceiptResponse(job.submissionId, job.proofDigest, queue.receipt);
+        }
         if (queue.status === "active") {
-          await advanceVerificationQueue(jobId, {
+          const completion = await advanceVerificationQueue(job.jobId, {
             outcome: "rejected",
             promotionStatus: null,
             message: feedback.detail,
             feedback,
             evidenceUrl: null,
           });
+          if (completion.receipt) {
+            return completedReceiptResponse(job.submissionId, job.proofDigest, completion.receipt);
+          }
         }
       } catch (queueError) {
         console.error("Unable to advance an expired queue job", queueError);
+        return noStore(503, {
+          error: "queue_reconciliation_unavailable",
+          message: "The durable verdict is temporarily unavailable. Keep this job handle and retry shortly.",
+        });
       }
       return noStore(410, {
         error: "job_expired",

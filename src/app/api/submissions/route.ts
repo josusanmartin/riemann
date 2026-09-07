@@ -28,7 +28,9 @@ import {
 } from "@/lib/submission-queue";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Staging may itself spend 60s uploading a maximum-size source, followed by
+// several durable Git API writes. Do not terminate admission halfway through.
+export const maxDuration = 300;
 
 function noStore(status: number, body: object): Response {
   return Response.json(body, {

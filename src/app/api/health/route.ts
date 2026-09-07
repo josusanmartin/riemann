@@ -27,8 +27,16 @@ export async function GET(): Promise<NextResponse> {
   )
     .then(() => true)
     .catch(() => false);
+  const deploymentIdentityConfigured = /^[0-9a-f]{40}$/.test(
+    process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA ?? "",
+  );
+  const directSubmissionsConfigured = Boolean(
+    e2bConfigured && e2bWebhookConfigured && promotionConfigured &&
+    submissionQueueConfigured && trustedMaterialAvailable &&
+    verifierTemplateIdentityConfigured && deploymentIdentityConfigured && process.env.AUTH_SECRET,
+  );
   return NextResponse.json({
-    status: "ok",
+    status: directSubmissionsConfigured ? "ok" : "degraded",
     checkScope: "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
     recordId: current.id,
@@ -47,15 +55,8 @@ export async function GET(): Promise<NextResponse> {
     submissionQueueConfigured,
     submissionArchiveConfigured,
     cronBackstopConfigured: Boolean(process.env.CRON_SECRET),
-    directSubmissionsConfigured:
-      e2bConfigured &&
-      e2bWebhookConfigured &&
-      promotionConfigured &&
-      submissionQueueConfigured &&
-      trustedMaterialAvailable,
+    directSubmissionsConfigured,
     trustedMaterialAvailable,
-    deploymentIdentityConfigured: Boolean(
-      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA,
-    ),
+    deploymentIdentityConfigured,
   });
 }
