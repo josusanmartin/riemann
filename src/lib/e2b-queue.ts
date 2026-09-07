@@ -4,6 +4,7 @@ import type { Submission } from "@/lib/challenge";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { e2bJobMetadataSchema } from "@/lib/submission-jobs";
 import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
+import { assertVerifierReady } from "@/lib/verifier-readiness";
 
 // Admission and scheduling deliberately live outside the frozen verifier
 // module. Queue changes therefore cannot change the attested proof checker or
@@ -169,6 +170,7 @@ export async function stageE2BVerification(
     ) {
       throw new Error("E2B did not confirm the deny-all outbound rule");
     }
+    await assertVerifierReady(sandbox);
     await sandbox.commands.run(
       `install -d -o riemann -g riemann -m 0700 ${uploadDirectory}/proof && ` +
         `install -d -o root -g root -m 0755 ${jobDirectory}`,

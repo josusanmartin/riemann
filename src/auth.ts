@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import type { DefaultSession, Session } from "next-auth";
 import { siteUrl } from "@/lib/site";
+import { githubApiIdentity } from "@/lib/github-api-identity";
 
 declare module "next-auth" {
   interface Session {
@@ -57,7 +58,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/signin", error: "/signin" },
 });
 
-export async function getSession(): Promise<Session | null> {
+export async function getSession(request?: Request): Promise<Session | null> {
+  if (request?.headers.has("authorization")) {
+    const identity = await githubApiIdentity(request);
+    if (!identity) return null;
+    return {
+      user: { githubLogin: identity.login, name: identity.name ?? identity.login },
+      expires: new Date(Date.now() + 60_000).toISOString(),
+    };
+  }
   if (!isGitHubAuthConfigured) return null;
   return auth();
 }

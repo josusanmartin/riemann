@@ -21,7 +21,7 @@ export async function GET(
   request: Request,
   { params }: RouteContext,
 ): Promise<Response> {
-  const session = await getSession();
+  const session = await getSession(request);
   if (!isSubmissionArchiveMaintainer(session?.user.githubLogin)) {
     return json(404, { error: "not_found" });
   }

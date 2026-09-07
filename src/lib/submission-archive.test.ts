@@ -143,4 +143,21 @@ describe("encrypted submission archive", () => {
       ),
     ).toThrow("exactly 32 bytes");
   });
+
+  it("rejects truncated GCM authentication tags and noncanonical encodings", () => {
+    const envelope = sealSubmissionArchive(
+      { schemaVersion: 1, jobId, proofDigest, submittedAt, manifest, solution },
+      archiveKey,
+    );
+    for (const length of [4, 8, 12, 13, 14, 15]) {
+      expect(() => openSubmissionArchive({
+        ...envelope,
+        authenticationTag: Buffer.from(envelope.authenticationTag, "base64")
+          .subarray(0, length).toString("base64"),
+      }, archiveKey)).toThrow();
+    }
+    expect(() => openSubmissionArchive({
+      ...envelope, nonce: `${envelope.nonce}=`,
+    }, archiveKey)).toThrow();
+  });
 });

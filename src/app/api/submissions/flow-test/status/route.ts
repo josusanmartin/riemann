@@ -4,6 +4,7 @@ import {
   inspectE2BVerificationProgress,
   killE2BSandbox,
   readE2BVerification,
+  readE2BSubmissionBundle,
 } from "@/lib/e2b-verifier";
 import {
   FLOW_TEST_BASELINE_ID,
@@ -13,6 +14,7 @@ import { finalizeStrandedE2BFlowTest } from "@/lib/e2b-flow-test";
 import { assertE2BResultMatchesJob } from "@/lib/submission-finalization";
 import { verifySubmissionJob } from "@/lib/submission-jobs";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
+import { validateFlowTestAttestation } from "@/lib/flow-test-attestation";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -70,7 +72,7 @@ function progressMessage(
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const session = await getSession();
+  const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {
@@ -224,11 +226,12 @@ export async function GET(request: Request): Promise<Response> {
     ) {
       throw new Error("The verifier returned an attestation for a different contract");
     }
+    await validateFlowTestAttestation(result, await readE2BSubmissionBundle(job.sandboxId, job.jobId));
     await killE2BSandbox(job.sandboxId).catch(() => undefined);
     return noStore(200, {
       ...result,
       message:
-        "Flow test passed: Comparator matched all three statements, and Lean plus nanoda accepted the proof. Nothing was promoted.",
+        "Flow test passed: Comparator matched all three statements, Lean plus nanoda accepted the proof, and the publication attestation checks passed. Nothing was promoted.",
       promotion: { status: "test-only" },
     });
   } catch (error) {

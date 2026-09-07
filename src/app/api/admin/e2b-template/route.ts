@@ -1,7 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
 import type { Sandbox as E2BSandbox } from "e2b";
-import { getE2BApiKey } from "@/lib/e2b-config";
+import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
+import { githubApiIdentity } from "@/lib/github-api-identity";
+import { inspectVerifierReadiness } from "@/lib/verifier-readiness";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -95,7 +97,12 @@ function noStore(status: number, body: object): Response {
   });
 }
 
-function authorized(request: Request): boolean {
+async function authorized(request: Request): Promise<boolean> {
+  const adminId = process.env.E2B_TEMPLATE_ADMIN_GITHUB_ID;
+  if (adminId && /^[1-9][0-9]*$/.test(adminId)) {
+    const identity = await githubApiIdentity(request);
+    if (identity && String(identity.id) === adminId) return true;
+  }
   const secret = process.env.E2B_TEMPLATE_ADMIN_SECRET;
   const supplied = request.headers.get("authorization");
   if (!secret || secret.length < 32 || !supplied) return false;
@@ -454,12 +461,30 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  if (!authorized(request)) return noStore(401, { error: "unauthorized" });
+  if (!(await authorized(request))) return noStore(401, { error: "unauthorized" });
   const url = new URL(request.url);
   const action = url.searchParams.get("action");
 
   try {
     const key = apiKey();
+    if (action === "identity") {
+      const { Sandbox } = await import("e2b");
+      const reference = url.searchParams.get("template") ?? getE2BTemplate();
+      if (!/^[A-Za-z0-9_-]+:[A-Za-z0-9-]+$/.test(reference)) {
+        return noStore(400, { error: "immutable_template_required" });
+      }
+      const sandbox = await Sandbox.create({
+        apiKey: key, template: reference, timeoutMs: 60_000,
+        secure: true, allowInternetAccess: false,
+        network: { allowPublicTraffic: false, denyOut: ["0.0.0.0/0"] },
+        metadata: { app: "riemann-fail", kind: "identity-probe" },
+      });
+      try {
+        return noStore(200, { template: reference, ...await inspectVerifierReadiness(sandbox) });
+      } finally {
+        await sandbox.kill();
+      }
+    }
     if (action === "smoke-status") {
       const sandboxId = url.searchParams.get("sandboxId");
       if (!sandboxId || !identifierPattern.test(sandboxId)) {
@@ -572,7 +597,7 @@ export async function POST(request: Request): Promise<Response> {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  if (!authorized(request)) return noStore(401, { error: "unauthorized" });
+  if (!(await authorized(request))) return noStore(401, { error: "unauthorized" });
 
   try {
     const key = apiKey();

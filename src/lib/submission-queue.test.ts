@@ -12,6 +12,7 @@ import {
   inspectOwnerQueueState,
   inspectQueueState,
   MAX_DAILY_SUBMISSIONS,
+  QueueCommitUncertainError,
   replaceActiveQueueState,
   SubmissionAlreadyQueuedError,
 } from "@/lib/submission-queue";
@@ -204,6 +205,57 @@ function fakeQueueGitHub() {
 }
 
 describe("durable formal verification queue", () => {
+  it("reconciles an admission whose successful PATCH acknowledgement was lost", async () => {
+    const github = fakeQueueGitHub();
+    const candidate = archivedInput(91, "solver");
+    let loseAcknowledgement = true;
+    const fetchImplementation: typeof fetch = async (request, init) => {
+      const response = await github.fetchImplementation(request, init);
+      if (init?.method === "PATCH" && loseAcknowledgement) {
+        loseAcknowledgement = false;
+        throw new TypeError("Connection reset after commit");
+      }
+      return response;
+    };
+    const admission = await enqueueVerificationJob(candidate.input, "solver", candidate.archive, {
+      token: "test-token", ownerSecret, archiveKey, now: firstDay, fetchImplementation,
+    });
+    expect(admission.job.proofDigest).toBe(candidate.input.proofDigest);
+    expect(admission.dailyUsed).toBe(1);
+    expect(JSON.parse(github.latestState()).active.jobId).toBe(candidate.input.jobId);
+  });
+
+  it("reports an uncertain admission if both the acknowledgement and reconciliation fail", async () => {
+    const github = fakeQueueGitHub();
+    const candidate = archivedInput(92, "solver");
+    let disconnected = false;
+    const fetchImplementation: typeof fetch = async (request, init) => {
+      if (disconnected) throw new TypeError("Offline");
+      const response = await github.fetchImplementation(request, init);
+      if (init?.method === "PATCH") {
+        disconnected = true;
+        throw new TypeError("Connection reset after commit");
+      }
+      return response;
+    };
+    await expect(enqueueVerificationJob(candidate.input, "solver", candidate.archive, {
+      token: "test-token", ownerSecret, archiveKey, now: firstDay, fetchImplementation,
+    })).rejects.toBeInstanceOf(QueueCommitUncertainError);
+    expect(JSON.parse(github.latestState()).active.jobId).toBe(candidate.input.jobId);
+  });
+
+  it("rejects idempotent retries with a different sandbox, digest, record name, or owner", () => {
+    const state = enqueueQueueState(createEmptyQueueState("2026-08-11"), input(1), "solver", ownerSecret, firstDay).state;
+    for (const retry of [
+      { ...input(1), sandboxId: input(2).sandboxId },
+      { ...input(1), proofDigest: input(2).proofDigest },
+      { ...input(1), submissionId: "different-record" },
+    ]) {
+      expect(() => enqueueQueueState(state, retry, "solver", ownerSecret, firstDay)).toThrow("identity");
+    }
+    expect(() => enqueueQueueState(state, input(1), "other-solver", ownerSecret, firstDay)).toThrow("identity");
+  });
+
   it("admits one active job and preserves FIFO order", () => {
     let state = createEmptyQueueState("2026-08-11");
     const first = enqueueQueueState(

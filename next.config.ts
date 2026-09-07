@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   turbopack: { root: process.cwd() },
   outputFileTracingIncludes: {
+    "/api/submissions": trustedPromotionRuntimeFiles,
+    "/api/submissions/flow-test": trustedPromotionRuntimeFiles,
+    "/api/submissions/flow-test/status": trustedPromotionRuntimeFiles,
     "/api/submissions/status": trustedPromotionRuntimeFiles,
     "/api/e2b/webhook": trustedPromotionRuntimeFiles,
     "/api/e2b/sweep": trustedPromotionRuntimeFiles,

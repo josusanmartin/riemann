@@ -1,4 +1,6 @@
 import { ZodError } from "zod";
+import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
+import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import { getSession } from "@/auth";
 import {
   hasActiveE2BFlowTest,
@@ -26,7 +28,7 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const session = await getSession();
+  const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {
@@ -44,13 +46,6 @@ export async function POST(request: Request): Promise<Response> {
     return noStore(503, {
       error: "verifier_unavailable",
       message: "The E2B verifier is not configured for this deployment.",
-    });
-  }
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > 2_100_000) {
-    return noStore(413, {
-      error: "submission_too_large",
-      message: "The flow-test source exceeds the 2 MB limit.",
     });
   }
 
@@ -87,7 +82,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const issuedAt = Date.now();
     const prepared = prepareFlowTestSubmission(
-      await request.json(),
+      await readBoundedJson(request),
       github,
       session.user.name ?? github,
       issuedAt,
@@ -137,6 +132,12 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     if (startedSandboxId) {
       await killE2BSandbox(startedSandboxId).catch(() => undefined);
+    }
+    if (error instanceof VerifierTemplateMismatchError) {
+      return noStore(503, { error: "verifier_template_stale", message: error.message });
+    }
+    if (error instanceof RequestBodyTooLargeError) {
+      return noStore(413, { error: "submission_too_large", message: error.message });
     }
     if (error instanceof ZodError || error instanceof SyntaxError) {
       return noStore(400, {

@@ -213,6 +213,15 @@ export class SubmissionAlreadyQueuedError extends Error {
   }
 }
 
+// A lost PATCH acknowledgement does not prove that queue admission failed.
+// Callers must preserve the sandbox until durable state can be reconciled.
+export class QueueCommitUncertainError extends Error {
+  constructor() {
+    super("Queue admission could not be confirmed. Check your active submissions before retrying.");
+    this.name = "QueueCommitUncertainError";
+  }
+}
+
 class QueueGitHubError extends Error {
   constructor(
     message: string,
@@ -289,6 +298,14 @@ export function enqueueQueueState(
   const existing = existingJobs.find((job) => job.jobId === input.jobId);
   const used = next.daily.attempts[ownerKey] ?? 0;
   if (existing) {
+    if (
+      existing.sandboxId !== input.sandboxId ||
+      existing.proofDigest !== input.proofDigest ||
+      existing.ownerKey !== ownerKey ||
+      existing.submissionKey !== submissionKey
+    ) {
+      throw new Error("Queue retry does not match the admitted job identity");
+    }
     const active = next.active?.jobId === existing.jobId;
     return {
       state: next,
@@ -733,7 +750,20 @@ async function mutateQueue<T>(
       ) {
         continue;
       }
-      throw error;
+      // Reconcile the exact commit, including a newer head descended from it.
+      try {
+        const latest = await getRef(client, SUBMISSION_QUEUE_BRANCH);
+        if (latest === commit) return mutation.result;
+        if (latest) {
+          const comparison = z.object({
+            merge_base_commit: objectShaSchema,
+          }).parse(await client.json(repositoryPath(`compare/${commit}...${latest}`)));
+          if (comparison.merge_base_commit.sha === commit) return mutation.result;
+        }
+      } catch {
+        // An unavailable reconciliation read must not turn into data loss.
+      }
+      throw new QueueCommitUncertainError();
     }
   }
   throw new Error("The durable submission queue changed too many times; retry shortly");

@@ -18,6 +18,12 @@ const MAX_ARCHIVE_PAYLOAD_BYTES = MAX_DIRECT_SOLUTION_BYTES * 6 + 250_000;
 
 const sha256Schema = z.string().regex(/^[0-9a-f]{64}$/);
 const base64Schema = z.string().regex(/^[A-Za-z0-9+/]*={0,2}$/);
+function fixedBase64(bytes: number) {
+  return base64Schema.length(4 * Math.ceil(bytes / 3)).refine((value) => {
+    const decoded = Buffer.from(value, "base64");
+    return decoded.length === bytes && decoded.toString("base64") === value;
+  }, "Invalid canonical base64 length");
+}
 
 export const submissionArchiveEnvelopeSchema = z
   .object({
@@ -28,8 +34,8 @@ export const submissionArchiveEnvelopeSchema = z
     jobId: z.string().uuid(),
     proofDigest: sha256Schema,
     createdAt: z.string().datetime({ offset: true }),
-    nonce: base64Schema.max(24),
-    authenticationTag: base64Schema.max(24),
+    nonce: fixedBase64(12),
+    authenticationTag: fixedBase64(16),
     ciphertext: base64Schema.max(20_000_000),
   })
   .strict();
@@ -190,6 +196,7 @@ export function openSubmissionArchive(
     "aes-256-gcm",
     key,
     Buffer.from(envelope.nonce, "base64"),
+    { authTagLength: 16 },
   );
   decipher.setAAD(archiveAad(envelope.jobId, envelope.proofDigest));
   decipher.setAuthTag(Buffer.from(envelope.authenticationTag, "base64"));

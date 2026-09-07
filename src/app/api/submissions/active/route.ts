@@ -16,8 +16,8 @@ function noStore(status: number, body: object): Response {
   });
 }
 
-export async function GET(): Promise<Response> {
-  const session = await getSession();
+export async function GET(request: Request): Promise<Response> {
+  const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {

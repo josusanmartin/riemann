@@ -109,6 +109,11 @@ export function createRiemannVerifierTemplate(
     .copyItems([
       // Runtime-only scripts are copied after the expensive pinned formal
       // build so verifier-wrapper fixes can reuse that deterministic layer.
+      // npm ci above intentionally uses the lean runtime dependency set;
+      // attestations must nevertheless hash the same repository manifests as
+      // the website, not substitute e2b/runtime/package*.json under those names.
+      { src: "package.json", dest: "/opt/riemann/package.json" },
+      { src: "package-lock.json", dest: "/opt/riemann/package-lock.json" },
       { src: "scripts", dest: "/opt/riemann/scripts" },
       {
         src: "e2b/build-template.ts",

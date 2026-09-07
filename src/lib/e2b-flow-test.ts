@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { PreparedDirectSubmission } from "@/lib/direct-submission";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
 import { prepareE2BWorkspaceCopySource } from "@/lib/e2b-workspace-compat";
+import { assertVerifierReady } from "@/lib/verifier-readiness";
 
 // The sealed verifier itself permits 54 minutes. Leave a small window for
 // result finalization; the status route separately enforces a wall-clock
@@ -86,6 +87,7 @@ export async function startE2BFlowTest(input: StartFlowTestInput): Promise<{
     ) {
       throw new Error("E2B did not confirm the deny-all outbound rule");
     }
+    await assertVerifierReady(sandbox);
     await prepareE2BWorkspaceCopySource(sandbox);
     await sandbox.commands.run(
       `install -d -o riemann -g riemann -m 0700 ${uploadDirectory}/proof && ` +

@@ -79,7 +79,7 @@ function completedReceiptResponse(
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const session = await getSession();
+  const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {

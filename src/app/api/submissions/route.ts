@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { getSession } from "@/auth";
 import { records } from "@/lib/records";
 import { prepareDirectSubmission } from "@/lib/direct-submission";
@@ -15,11 +16,13 @@ import {
 } from "@/lib/queue-orchestration";
 import { getCurrentRecord } from "@/lib/records";
 import { signSubmissionJob } from "@/lib/submission-jobs";
+import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import {
   DailySubmissionLimitError,
   enqueueVerificationJob,
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
+  QueueCommitUncertainError,
   SubmissionAlreadyQueuedError,
   SubmissionQueueFullError,
 } from "@/lib/submission-queue";
@@ -35,7 +38,7 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const session = await getSession();
+  const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {
@@ -61,18 +64,10 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > 2_100_000) {
-    return noStore(413, {
-      error: "submission_too_large",
-      message: "The direct submission exceeds the 2 MB source limit.",
-    });
-  }
-
   try {
     const currentRecord = getCurrentRecord();
     const prepared = prepareDirectSubmission(
-      await request.json(),
+      await readBoundedJson(request),
       github,
       currentRecord,
     );
@@ -130,7 +125,9 @@ export async function POST(request: Request): Promise<Response> {
         { manifest: prepared.manifest, solution: prepared.solution },
       );
     } catch (error) {
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      if (!(error instanceof QueueCommitUncertainError)) {
+        await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      }
       throw error;
     }
 
@@ -168,6 +165,15 @@ export async function POST(request: Request): Promise<Response> {
       dailyLimit: admission.dailyLimit,
     });
   } catch (error) {
+    if (error instanceof VerifierTemplateMismatchError) {
+      return noStore(503, { error: "verifier_template_stale", message: error.message });
+    }
+    if (error instanceof RequestBodyTooLargeError) {
+      return noStore(413, { error: "submission_too_large", message: error.message });
+    }
+    if (error instanceof QueueCommitUncertainError) {
+      return noStore(503, { error: "queue_admission_uncertain", message: error.message });
+    }
     if (error instanceof DailySubmissionLimitError) {
       return noStore(429, {
         error: "daily_submission_limit",
