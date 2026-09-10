@@ -35,7 +35,7 @@
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": "^22.13.0"
