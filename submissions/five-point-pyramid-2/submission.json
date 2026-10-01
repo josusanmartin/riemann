@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "five-point-pyramid-2",
+  "track": "critical-line",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "score": {
+    "numerator": "67291431",
+    "denominator": "100000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Five-point simple-zero refinement of Theorem D of the pinned Zeta23 development (n = 5, p = 1300, m = 196, c = 13/2500) with the window-count bookkeeping of attempt-002, extending five-point-pyramid to a tighter certificate. The certificate c <= F(5, p, g) on the nonnegative orthant is a kernel-evaluated bisection over 4-D boxes (45 mirror-symmetric roots, 85195 leaves, checked in 280 independently walked subtrees) whose leaf test reads lower bounds for w from a pyramid table of dyadic cells (41878 finest cells, each verified by an integer recomputation of attempt-002's cell test proved exact against it). Proved constant (398125*H - 1200)/396097 = 0.672914313..., H enclosed to 1.1e-8; candidate 67291431/100000000 = 0.67291431.",
+  "method": "Five-point simple-zero refinement of the Montgomery-Taylor rank-trace certificate; pyramid table of interval bounds checked by verified integer checkers (decide +kernel)",
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
