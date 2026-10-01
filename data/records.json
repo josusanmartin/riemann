@@ -136,5 +136,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/b57e53906576a17f87f812b2a86268c2de16246c/submissions/five-point-pyramid/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Five-point simple-zero refinement of Theorem D of the pinned Zeta23 development (n = 5, p = 1300, m = 197, c = 129/25000) with the window-count bookkeeping of attempt-002. The certificate c <= F(5, p, g) on the nonnegative orthant is a kernel-evaluated bisection over 4-D boxes (45 mirror-symmetric roots, 39780 leaves) whose leaf test reads lower bounds for w from a pyramid table of dyadic cells (41115 finest cells, each verified by an integer recomputation of attempt-002's cell test proved exact against it). Proved constant (64025000*H - 193000)/63701339 = 0.6728878..., H enclosed to 1.1e-8; candidate 13457757/20000000 = 0.67288785."
+  },
+  {
+    "id": "attempt-005",
+    "track": "critical-line",
+    "date": "2026-10-01",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.672912000000000000000000000000",
+    "method": "Six-point weighted simple-zero refinement of the Montgomery–Taylor rank-trace certificate (symmetric pair weights, half-space by reflection); finite certificate checked by a verified integer checker.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.672912000000000000000000000000",
+    "scorePercent": "67.2912000000000000000000000000",
+    "exactRational": {
+      "numerator": "42057",
+      "denominator": "62500"
+    },
+    "exactExpression": "(42057 : ℝ) / 62500",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/166dd32a9480d4b99d3757a973fb948188e2daa7/submissions/attempt-005/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/166dd32a9480d4b99d3757a973fb948188e2daa7/submissions/attempt-005/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at\nn = 6 with pair weights a_{ij} (symmetrised under gap reversal) and per-gap pressures b_r, made unconditional by a\nfinite certificate (6,814 table cells, 108 bisection trees with 18,058 leaves on the half-space g₀ ≤ g₄, the rest by\nthe reflection symmetry of the functional) verified inside Lean by a generic soundness theorem for an integer interval\nchecker (Taylor enclosures of cos/sin at scale 10¹⁵); the certificate is data evaluated by the kernel. No new axioms."
   }
 ]
