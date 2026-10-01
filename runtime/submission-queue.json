@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ikryd0fwarm7rtzlfye7q",
-    "jobId": "947130d0-68a2-4bb6-9cf2-502be2a8be41",
-    "proofDigest": "f00f69524d47bbb65d1efd041cf1270a7567585552ab6154d045e556569f18d3",
-    "ownerKey": "2045b3b27143012b83291aa410ccb9ed2f29a35ee4a751a18e5982f60a660bf6",
-    "submissionKey": "d8b4cff544d92f72d3e6067d4cc3d3e8be782d1ee4cb04469bd16991091b5fec",
-    "enqueuedAt": "2026-10-01T22:45:57.432Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "947130d0-68a2-4bb6-9cf2-502be2a8be41",
+      "proofDigest": "f00f69524d47bbb65d1efd041cf1270a7567585552ab6154d045e556569f18d3",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/64a401595b74814b3ca0722de5e690da0203027c/submissions/five-point-pyramid-2",
+      "completedAt": "2026-10-01T23:26:44.179Z"
+    },
     {
       "jobId": "e1878974-4dd0-4a3a-84ed-810253eab8fe",
       "proofDigest": "344bdcf541c9a855c2d6d023f7d592df0268c00ae025df1ce2c1128dd508ab7b",
