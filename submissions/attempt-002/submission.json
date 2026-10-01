@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-002",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "269141",
+    "denominator": "400000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at n = 4, with\nwindow-count pressure bookkeeping, made unconditional by a finite certificate (983 table cells, 64 bisection trees,\n3713 leaves) verified inside Lean by a generic soundness theorem for a rational interval checker; the certificate\nitself is data checked by kernel evaluation. Constant (906250·H − 1080)/904171 = 0.67285254… with\nH = 3/2 − (1/√2)cot(1/√2); H is enclosed to 1.1e-8 by a twelve-term Taylor argument, which places 269141/400000\nstrictly between the record and the proved constant. No new axioms.",
+  "method": "Four-point simple-zero refinement of the Montgomery–Taylor rank-trace certificate; finite certificate checked by a verified rational checker (decide +kernel)",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
