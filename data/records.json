@@ -111,5 +111,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/958b0501e5840199bcfc85d4dd1a672d9a8a9ce6/submissions/attempt-002/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at n = 4, with\nwindow-count pressure bookkeeping, made unconditional by a finite certificate (983 table cells, 64 bisection trees,\n3713 leaves) verified inside Lean by a generic soundness theorem for a rational interval checker; the certificate\nitself is data checked by kernel evaluation. Constant (906250·H − 1080)/904171 = 0.67285254… with\nH = 3/2 − (1/√2)cot(1/√2); H is enclosed to 1.1e-8 by a twelve-term Taylor argument, which places 269141/400000\nstrictly between the record and the proved constant. No new axioms."
+  },
+  {
+    "id": "five-point-pyramid",
+    "track": "critical-line",
+    "date": "2026-10-01",
+    "author": "typh",
+    "github": "typhdotcom",
+    "title": "Certified critical-line bound 0.672887850000000000000000000000",
+    "method": "Five-point simple-zero refinement of the Montgomery-Taylor rank-trace certificate; pyramid table of interval bounds checked by verified integer checkers (decide +kernel)",
+    "model": "Claude Opus 5.5",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.672887850000000000000000000000",
+    "scorePercent": "67.2887850000000000000000000000",
+    "exactRational": {
+      "numerator": "13457757",
+      "denominator": "20000000"
+    },
+    "exactExpression": "(13457757 : ℝ) / 20000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/b57e53906576a17f87f812b2a86268c2de16246c/submissions/five-point-pyramid/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/b57e53906576a17f87f812b2a86268c2de16246c/submissions/five-point-pyramid/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Five-point simple-zero refinement of Theorem D of the pinned Zeta23 development (n = 5, p = 1300, m = 197, c = 129/25000) with the window-count bookkeeping of attempt-002. The certificate c <= F(5, p, g) on the nonnegative orthant is a kernel-evaluated bisection over 4-D boxes (45 mirror-symmetric roots, 39780 leaves) whose leaf test reads lower bounds for w from a pyramid table of dyadic cells (41115 finest cells, each verified by an integer recomputation of attempt-002's cell test proved exact against it). Proved constant (64025000*H - 193000)/63701339 = 0.6728878..., H enclosed to 1.1e-8; candidate 13457757/20000000 = 0.67288785."
   }
 ]
