@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "six-point-convex-basins",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "16827533",
+    "denominator": "25000000"
+  },
+  "scoreDecimal": "0.673101320000000000000000000000",
+  "previousRecordId": "attempt-009",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-02T07:31:55.388Z",
+  "challengeDigest": "4cd511f892d7e8087e233b20c30d60c17db999aa8efc5c7ec1fc0816a107c3c4",
+  "verifierTemplateDigest": "8172793f8b56e443912a7dccbeb5c6cce828c4cdb096e832081fe9d3bd26975d",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
