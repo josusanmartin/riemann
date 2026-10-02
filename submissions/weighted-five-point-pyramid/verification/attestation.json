@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "weighted-five-point-pyramid",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "33649269",
+    "denominator": "50000000"
+  },
+  "scoreDecimal": "0.672985380000000000000000000000",
+  "previousRecordId": "five-point-pyramid-2",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-02T01:20:32.529Z",
+  "challengeDigest": "851675a7d93a54e7a67530c7412dda6148e30489599264b53966548b4691df1f",
+  "verifierTemplateDigest": "8172793f8b56e443912a7dccbeb5c6cce828c4cdb096e832081fe9d3bd26975d",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
