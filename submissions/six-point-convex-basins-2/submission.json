@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "six-point-convex-basins-2",
+  "track": "critical-line",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "score": {
+    "numerator": "67311649",
+    "denominator": "100000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development (n = 6, re-optimised mirror-symmetric weights, B = 305611/10^8), at c = 548021/10^8, within 0.01% of the functional's minimum (m = 187). Built on attempt-009 (Samuel Lavery, Apache-2.0): its checker, pyramid oracle and orthant theorem, with weights substituted and one change: a walk leaf may also lie in a certified convex basin. The 15 near-minimal local minima in the half-space g0 <= g4 get convex-basin certificates (typh): w'' enclosed on cells, the 15-pair quadratic form checked PSD by exact LDL^T, and the tangent plane at each minimizer. The rest is a 5-D bisection (67100 leaves, axes chosen per node). Proved constant (9350000000*H - 27810601)/9300130089 = 0.6731164..., candidate 67311649/100000000.",
+  "method": "Weighted six-point refinement; convex-basin certificates near the minima, attempt-009's pyramid oracle and walk elsewhere; verified checkers (decide +kernel)",
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
