@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-010",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6731541",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at n = 7 (six gaps), with\nLP-optimised mirror-symmetric pair weights and pressures (B = 0.004), made unconditional by a kernel-checked certificate\non the half-space g₀ ≤ g₅ (the rest by the reflection symmetry): 39,046 leaves, each decided by one of three verified\ntests: zero-order (a pyramid of lower bounds for w), a slope test (tangents on certified convex regions of w and\nmean-value charges from an enclosed derivative pyramid for w′ = 2πNM/D³), or membership in one of 16 certified boxes around\nthe near-minimal local minima. Pyramid table adapted from five-point-pyramid-2 by typh, and basin boxes after\nsix-point-convex-basins-2 by typh (Apache-2.0). Constant (14900000000·H − 57200286)/14800563663 = 0.67315410…, H enclosed\nto 1.1e-8. No new axioms.",
+  "method": "Weighted seven-point refinement of the Montgomery–Taylor rank-trace certificate; mean-value (slope) leaf test with certified w′ bounds, convex basins at the minima, pyramid oracle elsewhere.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
