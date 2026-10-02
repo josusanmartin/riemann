@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-009",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6730423",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at n = 6, with pair\nweights a_ij (symmetric under gap reversal) and per-gap pressures b_r, made unconditional by a finite certificate: a\nfive-dimensional bisection with 167,720 leaves on the half-space g₀ ≤ g₄ (the other half by reflection), each leaf\ndecided by a dyadic pyramid of lower bounds for w (495 blocks, 7,374 finest cells certified by the integer cell test;\npyramid adapted from five-point-pyramid-2 by typh, Apache-2.0).",
+  "method": "Six-point weighted simple-zero refinement of the Montgomery–Taylor rank-trace certificate (symmetric pair weights, half-space by reflection); dyadic pyramid of lower bounds for w checked by a verified",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
