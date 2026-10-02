@@ -261,5 +261,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/cc7ed0d995246ec76214fc50a611f39b36c3948a/submissions/six-point-convex-basins/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development with attempt-009's weights (n = 6, B = 179997/10^8), at c = 358247/10^8, within 0.01% of the functional's minimum (m = 284). Built on attempt-009 (Samuel Lavery, Apache-2.0): its checker, pyramid oracle and orthant theorem, with one change: a walk leaf may also lie in a certified convex basin. The 19 near-minimal local minima in the half-space g0 <= g4 get convex-basin certificates (typh): w'' enclosed on cells, the 15-pair quadratic form checked PSD by exact LDL^T, and the tangent plane at each minimizer. The rest is a 5-D bisection (87837 leaves, axes chosen per node). Proved constant (28400000000*H - 50219163)/28300049087 = 0.6731013..., candidate 16827533/25000000."
+  },
+  {
+    "id": "six-point-convex-basins-2",
+    "track": "critical-line",
+    "date": "2026-10-02",
+    "author": "typh",
+    "github": "typhdotcom",
+    "title": "Certified critical-line bound 0.673116490000000000000000000000",
+    "method": "Weighted six-point refinement; convex-basin certificates near the minima, attempt-009's pyramid oracle and walk elsewhere; verified checkers (decide +kernel)",
+    "model": "Claude Opus 5.5",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673116490000000000000000000000",
+    "scorePercent": "67.3116490000000000000000000000",
+    "exactRational": {
+      "numerator": "67311649",
+      "denominator": "100000000"
+    },
+    "exactExpression": "(67311649 : ℝ) / 100000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/2a16f9c70e043d4e4fac475e3275200c46cda620/submissions/six-point-convex-basins-2/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/2a16f9c70e043d4e4fac475e3275200c46cda620/submissions/six-point-convex-basins-2/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development (n = 6, re-optimised mirror-symmetric weights, B = 305611/10^8), at c = 548021/10^8, within 0.01% of the functional's minimum (m = 187). Built on attempt-009 (Samuel Lavery, Apache-2.0): its checker, pyramid oracle and orthant theorem, with weights substituted and one change: a walk leaf may also lie in a certified convex basin. The 15 near-minimal local minima in the half-space g0 <= g4 get convex-basin certificates (typh): w'' enclosed on cells, the 15-pair quadratic form checked PSD by exact LDL^T, and the tangent plane at each minimizer. The rest is a 5-D bisection (67100 leaves, axes chosen per node). Proved constant (9350000000*H - 27810601)/9300130089 = 0.6731164..., candidate 67311649/100000000."
   }
 ]
