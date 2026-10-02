@@ -286,5 +286,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/2a16f9c70e043d4e4fac475e3275200c46cda620/submissions/six-point-convex-basins-2/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development (n = 6, re-optimised mirror-symmetric weights, B = 305611/10^8), at c = 548021/10^8, within 0.01% of the functional's minimum (m = 187). Built on attempt-009 (Samuel Lavery, Apache-2.0): its checker, pyramid oracle and orthant theorem, with weights substituted and one change: a walk leaf may also lie in a certified convex basin. The 15 near-minimal local minima in the half-space g0 <= g4 get convex-basin certificates (typh): w'' enclosed on cells, the 15-pair quadratic form checked PSD by exact LDL^T, and the tangent plane at each minimizer. The rest is a 5-D bisection (67100 leaves, axes chosen per node). Proved constant (9350000000*H - 27810601)/9300130089 = 0.6731164..., candidate 67311649/100000000."
+  },
+  {
+    "id": "attempt-010",
+    "track": "critical-line",
+    "date": "2026-10-02",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673154100000000000000000000000",
+    "method": "Weighted seven-point refinement of the Montgomery–Taylor rank-trace certificate; mean-value (slope) leaf test with certified w′ bounds, convex basins at the minima, pyramid oracle elsewhere.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673154100000000000000000000000",
+    "scorePercent": "67.3154100000000000000000000000",
+    "exactRational": {
+      "numerator": "6731541",
+      "denominator": "10000000"
+    },
+    "exactExpression": "(6731541 : ℝ) / 10000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/0c1467afafd511d089870d57d68e241b497b0ded/submissions/attempt-010/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/0c1467afafd511d089870d57d68e241b497b0ded/submissions/attempt-010/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Ainta's n-point simple-zero refinement of Theorem D of the pinned Zeta23 development at n = 7 (six gaps), with\nLP-optimised mirror-symmetric pair weights and pressures (B = 0.004), made unconditional by a kernel-checked certificate\non the half-space g₀ ≤ g₅ (the rest by the reflection symmetry): 39,046 leaves, each decided by one of three verified\ntests: zero-order (a pyramid of lower bounds for w), a slope test (tangents on certified convex regions of w and\nmean-value charges from an enclosed derivative pyramid for w′ = 2πNM/D³), or membership in one of 16 certified boxes around\nthe near-minimal local minima. Pyramid table adapted from five-point-pyramid-2 by typh, and basin boxes after\nsix-point-convex-basins-2 by typh (Apache-2.0). Constant (14900000000·H − 57200286)/14800563663 = 0.67315410…, H enclosed\nto 1.1e-8. No new axioms."
   }
 ]
