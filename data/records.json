@@ -186,5 +186,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/64a401595b74814b3ca0722de5e690da0203027c/submissions/five-point-pyramid-2/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Five-point simple-zero refinement of Theorem D of the pinned Zeta23 development (n = 5, p = 1300, m = 196, c = 13/2500) with the window-count bookkeeping of attempt-002, extending five-point-pyramid to a tighter certificate. The certificate c <= F(5, p, g) on the nonnegative orthant is a kernel-evaluated bisection over 4-D boxes (45 mirror-symmetric roots, 85195 leaves, checked in 280 independently walked subtrees) whose leaf test reads lower bounds for w from a pyramid table of dyadic cells (41878 finest cells, each verified by an integer recomputation of attempt-002's cell test proved exact against it). Proved constant (398125*H - 1200)/396097 = 0.672914313..., H enclosed to 1.1e-8; candidate 67291431/100000000 = 0.67291431."
+  },
+  {
+    "id": "weighted-five-point-pyramid",
+    "track": "critical-line",
+    "date": "2026-10-02",
+    "author": "typh",
+    "github": "typhdotcom",
+    "title": "Certified critical-line bound 0.672985380000000000000000000000",
+    "method": "Weighted five-point simple-zero refinement of the Montgomery-Taylor rank-trace certificate; pyramid table of interval bounds checked by verified integer checkers (decide +kernel)",
+    "model": "Claude Opus 5.5",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.672985380000000000000000000000",
+    "scorePercent": "67.2985380000000000000000000000",
+    "exactRational": {
+      "numerator": "33649269",
+      "denominator": "50000000"
+    },
+    "exactExpression": "(33649269 : ℝ) / 50000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/613ceb9699058477e8072180adf2b10ffdebe96b/submissions/weighted-five-point-pyramid/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/613ceb9699058477e8072180adf2b10ffdebe96b/submissions/weighted-five-point-pyramid/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Weighted five-point simple-zero refinement of Theorem D of the pinned Zeta23 development (n = 5, gap pressures b = (59, 106, 106, 59)/100000, pair weights saturating every span capacity: 1/2 on span 1, (1/2, 1, 1/2) on span 2, 1 on span 3, 2 on span 4; c = 141/25000, m = 181), through attempt-002's weighted n-point bound. The certificate c <= Fw(W, g) on the nonnegative orthant is a kernel-evaluated bisection over 4-D boxes (10 mirror-symmetric roots, 73912 leaves, checked in 240 independently walked subtrees) whose integer leaf test reads lower bounds for w from the pyramid table of five-point-pyramid (48737 finest cells, each verified by an integer recomputation of attempt-002's cell test proved exact against it). Proved constant (9050000*H - 29205)/9000086 = 0.672985382..., H enclosed to 1.1e-8; candidate 33649269/50000000 = 0.67298538."
   }
 ]
