@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ix8rlbulvzihiqz58xee0",
-    "jobId": "32ae8651-584e-4c07-83df-0b4d67b81f08",
-    "proofDigest": "a0c55c4ed35083b50fab2c37d1642e5a70442d5947b820818c9903a51795819e",
-    "ownerKey": "2045b3b27143012b83291aa410ccb9ed2f29a35ee4a751a18e5982f60a660bf6",
-    "submissionKey": "e2876f5de240c75c346127edd06b25490023e277088a0115a33831e0c8298a61",
-    "enqueuedAt": "2026-10-02T08:20:25.458Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "32ae8651-584e-4c07-83df-0b4d67b81f08",
+      "proofDigest": "a0c55c4ed35083b50fab2c37d1642e5a70442d5947b820818c9903a51795819e",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/2a16f9c70e043d4e4fac475e3275200c46cda620/submissions/six-point-convex-basins-2",
+      "completedAt": "2026-10-02T08:52:31.539Z"
+    },
     {
       "jobId": "c06267ad-8186-43ef-8be0-c30e4814851b",
       "proofDigest": "25a54128eff53cee56618f1921a1051fb892d81bcb81fb400c84b9c6869e1667",
