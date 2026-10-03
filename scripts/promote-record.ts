@@ -4,11 +4,14 @@ import contractJson from "../challenge/contract.json";
 import {
   compareRationals,
   contractSchema,
-  rationalToDecimal,
   recordsSchema,
   submissionSchema,
   verificationAttestationSchema,
 } from "../src/lib/challenge";
+import {
+  assertCurrentRecord,
+  buildRecordEntry,
+} from "../src/lib/github-promotion";
 import {
   computeTrustedMaterialDigest,
   computeVerifierTemplateDigest,
@@ -57,54 +60,11 @@ assertValidAttestation(
 const records = recordsSchema.parse(
   JSON.parse(await readFile(recordsPath, "utf8")),
 );
-if (records.some((record) => record.id === submission.id)) {
-  throw new Error(`Record already exists: ${submission.id}`);
-}
-const current = records
-  .filter((record) => record.status === "kernel-verified")
-  .at(-1);
-if (!current || current.id !== attestation.previousRecordId) {
-  throw new Error("The formal record changed after verification; re-run the verifier");
-}
-if (
-  current.exactRational &&
-  compareRationals(submission.score, current.exactRational) <= 0
-) {
-  throw new Error("The submitted rational does not strictly exceed the current exact record");
-}
-
-const scoreDecimal = rationalToDecimal(
-  submission.score.numerator,
-  submission.score.denominator,
-  30,
-);
-const scorePercent = rationalToDecimal(
-  (BigInt(submission.score.numerator) * 100n).toString(),
-  submission.score.denominator,
-  28,
-);
-records.push({
-  id: submission.id,
-  track: submission.track,
-  date: attestation.verifiedAt.slice(0, 10),
-  author: submission.author.displayName,
-  github: submission.author.github,
-  title: `Certified critical-line bound ${scoreDecimal}`,
-  method: submission.method,
-  model: submission.model,
-  harness: submission.harness,
-  scoreDecimal,
-  scorePercent,
-  exactRational: submission.score,
-  exactExpression: `(${submission.score.numerator} : ℝ) / ${submission.score.denominator}`,
-  status: "kernel-verified",
-  formalVerification: true,
-  independentReview: null,
-  sourceUrl,
-  proofUrl,
-  pullRequestUrl: null,
-  summary: submission.summary,
-});
+// Same record shape and current-record checks as automatic promotion, so the
+// manual and automatic paths cannot drift apart.
+assertCurrentRecord(records, submission, attestation.previousRecordId);
+const record = buildRecordEntry(submission, attestation, { sourceUrl, proofUrl });
+records.push(record);
 
 await writeFile(recordsPath, `${JSON.stringify(records, null, 2)}\n`);
-console.log(`Promoted ${submission.id} to ${scoreDecimal}.`);
+console.log(`Promoted ${submission.id} to ${record.scoreDecimal}.`);
