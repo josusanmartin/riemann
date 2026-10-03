@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-012",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6733166",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Ainta's weighted n-point simple-zero refinement at n = 6, with the Montgomery–Taylor window of the pinned Zeta23\nTheorem D replaced by AMTOPA's window (first 13 cosine terms of zeta-exact-pressure, scaled by 4/5). Theorem D's\nwindow-dependent parts are re-proved in-file for this window:\n- admissibility (a certified positive-variation bound);\n- zero side and prime side (ported from Zeta23's XiPrime/ThmD, Apache-2.0);\n- the a/b/J limits (incl. an exact integral-swap identity);\n- the exact constant H_AM = H_MT − Σ c_j²(½ − 1/(4π²j²))/(2 sin²(1/√2)) ≥ 0.6721883;\n- the retargeted Zeta Lab bridge (MIT).\nFinite certificate: 14,872 leaves on the half-space g₀ ≤ g₄ (pyramid/slope tests with 200 expansion centres; pyramid\ntable adapted from five-point-pyramid-2 by typh, centres after six-point-convex-basins-2 by typh, Apache-2.0), with a\nnew integer enclosure of the AM pair kernel. κ = 6733143/10⁷ ≤ (H_AM − B(m−5)/m)/(1 − c(m−5)/m) at m = 146. No new axioms. δ 0.002 % and Φ ≥ 0.67",
+  "method": "Weighted six-point refinement with the AMTOPA window (Theorem D re-proved in-file for it); pyramid/slope/basin certificate checked by a verified integer pipeline (decide +kernel).",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
