@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "six-point-window",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "67316747",
+    "denominator": "100000000"
+  },
+  "scoreDecimal": "0.673167470000000000000000000000",
+  "previousRecordId": "attempt-010",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-03T00:39:32.317Z",
+  "challengeDigest": "e7e046192297c85eb8070272b80c492b7fdd6c18d127d52dd678fa77165a6361",
+  "verifierTemplateDigest": "8172793f8b56e443912a7dccbeb5c6cce828c4cdb096e832081fe9d3bd26975d",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

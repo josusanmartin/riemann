@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "six-point-window",
+  "track": "critical-line",
+  "author": {
+    "github": "typhdotcom",
+    "displayName": "typh"
+  },
+  "score": {
+    "numerator": "67316747",
+    "denominator": "100000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development with the analytic window cos(3s/2) in place of cos(sqrt(2) s): H drops only quadratically (H = 0.6723988626, enclosed to 5e-10) while the defect kernel improves linearly. The bridge is retargeted through Zeta23's profile-generic window machinery (ModFactor/AdmWindow, moments, ThmD-concrete prime side, XiPrime zero side and cRatio limit) at lambda = 1; the kernel becomes (cos pi x - (16/9) gamma pi x sin pi x)/(1 - (16/9)(pi x)^2), gamma = (3/4)cot(3/4). Re-optimised six-point weights (B = 360551/10^8), c = 653514/10^8 within 0.01% of the minimum (m = 158), on attempt-009's checker (Samuel Lavery, Apache-2.0) with a regenerated pyramid table and convex-basin leaves (typh): 18 basins, 77684 walk leaves. Proved constant (15800000000*H - 55164303)/15700012358 = 0.6731674..., candidate 67316747/10^8.",
+  "method": "Weighted six-point refinement with the window cos(3s/2); convex-basin certificates near the minima, attempt-009's pyramid oracle and walk elsewhere; decide +kernel",
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
