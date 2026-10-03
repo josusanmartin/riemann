@@ -15,10 +15,15 @@ import {
   ensureQueuedJobRunning,
   VerifierOccupiedByFlowTestError,
 } from "@/lib/queue-orchestration";
-import { verifySubmissionJob } from "@/lib/submission-jobs";
+import { readQueuedE2BJobMetadata } from "@/lib/e2b-queue";
+import {
+  verifySubmissionJob,
+  type SubmissionJobToken,
+} from "@/lib/submission-jobs";
 import {
   inspectVerificationJob,
   type QueueCompletionReceipt,
+  type QueuedVerificationJob,
 } from "@/lib/submission-queue";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
@@ -78,6 +83,32 @@ function completedReceiptResponse(
   });
 }
 
+// Admin recovery restages a proof under a new job and sandbox, keeping the old
+// job ID as an alias. Follow the alias only when the new sandbox's metadata
+// proves it is the same submitter's same proof.
+async function recoveredJobCoordinates(
+  job: SubmissionJobToken,
+  queued: QueuedVerificationJob,
+): Promise<SubmissionJobToken> {
+  const metadata = await readQueuedE2BJobMetadata(queued.sandboxId);
+  assertQueueJobMatches(queued, metadata);
+  if (
+    metadata.github.toLowerCase() !== job.github.toLowerCase() ||
+    metadata.submissionId !== job.submissionId ||
+    metadata.proofDigest !== job.proofDigest
+  ) {
+    throw new Error("The recovered verification job does not match this handle");
+  }
+  return {
+    ...job,
+    sandboxId: metadata.sandboxId,
+    jobId: metadata.jobId,
+    baseCommitSha: metadata.baseCommitSha,
+    previousRecordId: metadata.previousRecordId,
+    issuedAt: metadata.issuedAt,
+  };
+}
+
 export async function GET(request: Request): Promise<Response> {
   const session = await getSession(request);
   const github = session?.user.githubLogin;
@@ -101,7 +132,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const job = verifySubmissionJob(token, secret);
+    let job = verifySubmissionJob(token, secret);
     if (job.github.toLowerCase() !== github.toLowerCase()) {
       return noStore(403, {
         error: "job_owner_mismatch",
@@ -109,6 +140,12 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
     const queue = await inspectVerificationJob(job.jobId);
+    if (
+      (queue.status === "active" || queue.status === "queued") &&
+      queue.job.jobId !== job.jobId
+    ) {
+      job = await recoveredJobCoordinates(job, queue.job);
+    }
     if (queue.status === "completed") {
       return completedReceiptResponse(
         job.submissionId,
@@ -241,7 +278,8 @@ export async function GET(request: Request): Promise<Response> {
           return completedReceiptResponse(job.submissionId, job.proofDigest, queue.receipt);
         }
         if (queue.status === "active") {
-          const completion = await advanceVerificationQueue(job.jobId, {
+          // queue.job.jobId differs from the handle's after admin recovery.
+          const completion = await advanceVerificationQueue(queue.job.jobId, {
             outcome: "rejected",
             promotionStatus: null,
             message: feedback.detail,

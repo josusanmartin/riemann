@@ -1,6 +1,10 @@
 import { createHmac } from "node:crypto";
 import { z } from "zod";
-import { githubLoginSchema, submissionSchema } from "@/lib/challenge";
+import {
+  githubLoginSchema,
+  recordsSchema,
+  submissionSchema,
+} from "@/lib/challenge";
 import { RECORDS_BRANCH, RECORDS_REPOSITORY } from "@/lib/github-promotion";
 import {
   isSubmissionArchiveConfigured,
@@ -26,6 +30,14 @@ const sandboxIdSchema = z
   .max(160)
   .regex(/^[A-Za-z0-9-]+$/);
 const utcDaySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const MAX_RECOVERED_JOB_IDS = 8;
+// Admin recovery restages the active proof under a new job ID. Earlier IDs are
+// kept as aliases so the submitter's signed handle still resolves to the job
+// and, after completion, to its receipt.
+const recoveredJobIdsSchema = z
+  .array(z.string().uuid())
+  .max(MAX_RECOVERED_JOB_IDS)
+  .optional();
 
 export const queuedVerificationJobSchema = z
   .object({
@@ -35,6 +47,7 @@ export const queuedVerificationJobSchema = z
     ownerKey: digestSchema,
     submissionKey: digestSchema,
     enqueuedAt: z.string().datetime({ offset: true }),
+    recoveredJobIds: recoveredJobIdsSchema,
   })
   .strict();
 
@@ -48,6 +61,7 @@ export const queueCompletionReceiptSchema = z
     feedback: verifierFeedbackSchema.optional(),
     evidenceUrl: z.url().max(1_000).nullable(),
     completedAt: z.string().datetime({ offset: true }),
+    recoveredJobIds: recoveredJobIdsSchema,
   })
   .strict()
   .superRefine((receipt, context) => {
@@ -390,6 +404,9 @@ export function completeQueueState(
     jobId,
     proofDigest: parsed.active.proofDigest,
     completedAt: completion.completedAt ?? now.toISOString(),
+    ...(parsed.active.recoveredJobIds
+      ? { recoveredJobIds: parsed.active.recoveredJobIds }
+      : {}),
   });
   const pending = [...parsed.pending];
   const next = pending.shift() ?? null;
@@ -431,6 +448,9 @@ export function replaceActiveQueueState(
     sandboxId: replacement.sandboxId,
     jobId: replacement.jobId,
     proofDigest: replacement.proofDigest,
+    recoveredJobIds: [...(expected.recoveredJobIds ?? []), expected.jobId].slice(
+      -MAX_RECOVERED_JOB_IDS,
+    ),
   });
   return {
     state: submissionQueueStateSchema.parse({ ...parsed, active: recovered }),
@@ -444,14 +464,16 @@ export function inspectQueueState(
   jobId: string,
 ): QueueInspection {
   const parsed = submissionQueueStateSchema.parse(state);
-  if (parsed.active?.jobId === jobId) {
+  const matches = (candidate: { jobId: string; recoveredJobIds?: string[] }) =>
+    candidate.jobId === jobId || Boolean(candidate.recoveredJobIds?.includes(jobId));
+  if (parsed.active && matches(parsed.active)) {
     return { status: "active", position: 0, job: parsed.active };
   }
-  const index = parsed.pending.findIndex((job) => job.jobId === jobId);
+  const index = parsed.pending.findIndex(matches);
   if (index >= 0) {
     return { status: "queued", position: index + 1, job: parsed.pending[index] };
   }
-  const receipt = parsed.completed.find((item) => item.jobId === jobId);
+  const receipt = parsed.completed.find(matches);
   return receipt ? { status: "completed", receipt } : { status: "missing" };
 }
 
@@ -903,6 +925,31 @@ export async function inspectVerificationJobForOwner(
         requiredOwnerSecret(options),
       )
     : { status: "missing" };
+}
+
+/**
+ * The current kernel-verified record on the published branch. This is read
+ * from GitHub rather than the bundled data because a deployment still serves
+ * the previous record for a minute or so after a promotion.
+ */
+export async function readPublishedRecordId(
+  options: QueueOptions = {},
+): Promise<string | null> {
+  const client = new QueueGitHubClient(
+    requiredToken(options),
+    options.fetchImplementation ?? fetch,
+  );
+  const response = await client.request(
+    repositoryPath(
+      `contents/data/records.json?ref=${encodeURIComponent(RECORDS_BRANCH)}`,
+    ),
+    { headers: { Accept: "application/vnd.github.raw+json" } },
+  );
+  const records = recordsSchema.parse(JSON.parse(await response.text()));
+  return (
+    records.filter((record) => record.status === "kernel-verified").at(-1)?.id ??
+    null
+  );
 }
 
 export async function getActiveVerificationJob(

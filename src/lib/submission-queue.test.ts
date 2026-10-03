@@ -476,6 +476,50 @@ describe("durable formal verification queue", () => {
     ).toThrow("preserve the proof digest");
   });
 
+  it("keeps the submitter's original job handle resolvable through recovery and completion", () => {
+    const admission = enqueueQueueState(
+      createEmptyQueueState("2026-08-11"),
+      input(1),
+      "recovering-solver",
+      ownerSecret,
+      firstDay,
+    );
+    const original = admission.result.job;
+    const first = replaceActiveQueueState(admission.state, original, {
+      ...input(99),
+      proofDigest: original.proofDigest,
+    });
+    const second = replaceActiveQueueState(first.state, first.result, {
+      ...input(98),
+      proofDigest: original.proofDigest,
+    });
+    expect(second.result.recoveredJobIds).toEqual([input(1).jobId, input(99).jobId]);
+
+    for (const handle of [input(1).jobId, input(99).jobId, input(98).jobId]) {
+      expect(inspectQueueState(second.state, handle)).toMatchObject({
+        status: "active",
+        job: { jobId: input(98).jobId },
+      });
+    }
+
+    const completed = completeQueueState(
+      second.state,
+      input(98).jobId,
+      {
+        outcome: "promoted",
+        promotionStatus: "promoted",
+        message: null,
+        evidenceUrl: "https://github.com/josusanmartin/riemann/tree/abc/submissions/record-1",
+      },
+      firstDay,
+    );
+    const receipt = inspectQueueState(completed.state, input(1).jobId);
+    expect(receipt).toMatchObject({
+      status: "completed",
+      receipt: { jobId: input(98).jobId, outcome: "promoted" },
+    });
+  });
+
   it("atomically archives encrypted source without publishing identity or plaintext", async () => {
     const github = fakeQueueGitHub();
     const options = {
