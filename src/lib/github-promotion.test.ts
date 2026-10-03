@@ -11,6 +11,7 @@ import type { E2BVerificationResult } from "@/lib/e2b-verifier";
 import {
   promoteVerifiedSubmission,
   PromotionRaceError,
+  UnpublishableResultError,
 } from "@/lib/github-promotion";
 import {
   computeTrustedMaterialDigest,
@@ -35,11 +36,22 @@ const candidateScore = currentRational
     }
   : { numerator: "672500704", denominator: "1000000000" };
 
+type Comparison = {
+  status: "ahead" | "behind" | "identical" | "diverged";
+  files?: Array<{ filename: string; previous_filename?: string }>;
+};
+
 function fakeGitHub(
   initialHead: string,
   baseRecordsSnapshot = canonicalRecordsSnapshot,
+  options: {
+    comparison?: Comparison;
+    // Simulate an unrelated push landing between our read and our ref update.
+    concurrentPushTo?: string;
+  } = {},
 ) {
   let head = initialHead;
+  let concurrentPush = options.concurrentPushTo;
   const requests: RequestLog[] = [];
   const blobs = new Map<string, string>();
   let sequence = 0;
@@ -64,6 +76,9 @@ function fakeGitHub(
         tree: { sha: sha("base-tree") },
       });
     }
+    if (url.pathname.includes("/compare/") && method === "GET") {
+      return response(options.comparison ?? { status: "ahead", files: [{ filename: "README.md" }] });
+    }
     if (url.pathname.endsWith("/contents/data/records.json")) {
       return response(baseRecordsSnapshot);
     }
@@ -82,6 +97,11 @@ function fakeGitHub(
       return response({ sha: sha(`commit-${sequence}-${JSON.stringify(body)}`) }, 201);
     }
     if (url.pathname.endsWith("/git/refs/heads/main") && method === "PATCH") {
+      if (concurrentPush) {
+        head = concurrentPush;
+        concurrentPush = undefined;
+        return response({ message: "Update is not a fast forward" }, 422);
+      }
       head = String((body as { sha: string }).sha);
       return response({ object: { sha: head } });
     }
@@ -201,23 +221,77 @@ describe("automatic GitHub record promotion", () => {
     expect(promoted.harness).toBe("Test Harness");
   });
 
-  it("fails closed when main no longer matches the verified deployment", async () => {
+  async function promoteAgainst(
+    github: ReturnType<typeof fakeGitHub>,
+    baseCommitSha = "a".repeat(40),
+  ) {
     const { prepared, result } = await fixture();
-    const github = fakeGitHub("b".repeat(40));
-    await expect(
-      promoteVerifiedSubmission(
-        {
-          baseCommitSha: "a".repeat(40),
-          previousRecordId: getCurrentRecord().id,
-          proofDigest: prepared.proofDigest,
-          issuedAt: Date.now() - 1_000,
-          manifest: prepared.manifest,
-          solution: prepared.solution,
-          result,
-        },
-        { token: "test-token", fetchImplementation: github.fetchImplementation },
-      ),
-    ).rejects.toBeInstanceOf(PromotionRaceError);
+    return promoteVerifiedSubmission(
+      {
+        baseCommitSha,
+        previousRecordId: getCurrentRecord().id,
+        proofDigest: prepared.proofDigest,
+        issuedAt: Date.now() - 1_000,
+        manifest: prepared.manifest,
+        solution: prepared.solution,
+        result,
+      },
+      { token: "test-token", fetchImplementation: github.fetchImplementation },
+    );
+  }
+
+  it("publishes on top of an unrelated commit that landed during verification", async () => {
+    const movedHead = "b".repeat(40);
+    const github = fakeGitHub(movedHead);
+    const promotion = await promoteAgainst(github);
+
+    expect(promotion.status).toBe("promoted");
+    const commits = github.requests.filter(
+      (request) => request.method === "POST" && request.url.pathname.endsWith("/git/commits"),
+    );
+    expect((commits[0].body as { parents: string[] }).parents).toEqual([movedHead]);
+    expect(github.getHead()).toBe(promotion.promotionCommitSha);
+  });
+
+  it("rebuilds on main when an unrelated push wins the ref update", async () => {
+    const github = fakeGitHub("a".repeat(40), canonicalRecordsSnapshot, {
+      concurrentPushTo: "f".repeat(40),
+    });
+    const promotion = await promoteAgainst(github);
+
+    expect(promotion.status).toBe("promoted");
+    const commits = github.requests.filter(
+      (request) => request.method === "POST" && request.url.pathname.endsWith("/git/commits"),
+    );
+    expect(commits).toHaveLength(4);
+    expect((commits[2].body as { parents: string[] }).parents).toEqual(["f".repeat(40)]);
+    expect(github.getHead()).toBe(promotion.promotionCommitSha);
+  });
+
+  it.each([
+    ["a new record", { status: "ahead", files: [{ filename: "data/records.json" }] }, "The public record changed"],
+    ["a trusted verifier file", { status: "ahead", files: [{ filename: "src/lib/challenge.ts" }] }, "challenge files changed"],
+    ["a file renamed out of a trusted directory", {
+      status: "ahead",
+      files: [{ filename: "notes/smoke.lean", previous_filename: "challenge/smoke/Smoke.lean" }],
+    }, "challenge files changed"],
+    ["this submission's evidence directory", {
+      status: "ahead",
+      files: [{ filename: "submissions/direct-record-test/notes.md" }],
+    }, "challenge files changed"],
+    ["a rewritten main", { status: "diverged", files: [] }, "no longer descends"],
+    ["an unbounded diff", {
+      status: "ahead",
+      files: Array.from({ length: 300 }, (_, index) => ({ filename: `docs/${index}.md` })),
+    }, "Too many files"],
+  ] as const)("treats %s on main as a race and writes nothing", async (_label, comparison, message) => {
+    const github = fakeGitHub("b".repeat(40), canonicalRecordsSnapshot, {
+      comparison: comparison as Comparison,
+    });
+    const promotion = promoteAgainst(github);
+
+    await expect(promotion).rejects.toBeInstanceOf(PromotionRaceError);
+    await expect(promotion).rejects.toThrow(message);
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });
 
@@ -268,7 +342,11 @@ describe("automatic GitHub record promotion", () => {
         },
         { token: "test-token", fetchImplementation: github.fetchImplementation },
       ),
-    ).rejects.toThrow("Verifier template is stale");
+    ).rejects.toSatisfy(
+      (error) =>
+        error instanceof UnpublishableResultError &&
+        error.message.includes("Verifier template is stale"),
+    );
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });
 
