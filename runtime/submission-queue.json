@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ibgfwomrawwf96x4cur2v",
-    "jobId": "c05a76b7-b6a8-4022-8cc0-d214ec54cee8",
-    "proofDigest": "1321761536004fb2c9f363784afddf4eb6b2bebfb89093bef18969fae3d5d2d7",
-    "ownerKey": "2045b3b27143012b83291aa410ccb9ed2f29a35ee4a751a18e5982f60a660bf6",
-    "submissionKey": "b2a3c1b82b1da18f521b7164f164da6ce1441ce9e1b33348382fa759a57cf8c4",
-    "enqueuedAt": "2026-10-03T00:09:52.135Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "c05a76b7-b6a8-4022-8cc0-d214ec54cee8",
+      "proofDigest": "1321761536004fb2c9f363784afddf4eb6b2bebfb89093bef18969fae3d5d2d7",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/8e267642a9b1a619fdb84c496af86f773732661d/submissions/six-point-window",
+      "completedAt": "2026-10-03T00:39:32.904Z"
+    },
     {
       "jobId": "27ced8d7-8b9c-44bd-8c0f-a41c8d698b4b",
       "proofDigest": "9e948e03712bfcca0e967cd6aeffb7d58f80c7650df229b8f1db0ff86eac5487",
