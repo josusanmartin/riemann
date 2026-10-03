@@ -28,6 +28,19 @@ import {
 } from "@/lib/submission-queue";
 
 export const runtime = "nodejs";
+
+// ensureE2BWebhook lists and re-PATCHes the project-wide webhook (secret
+// included). Doing that on every upload adds two E2B calls to admission and
+// races concurrent uploads, so repeat it at most every half hour per warm
+// instance. Failures are not remembered, so the next upload retries.
+const WEBHOOK_REFRESH_MS = 30 * 60 * 1_000;
+let webhookEnsuredAt = 0;
+
+async function ensureE2BWebhookRecently(): Promise<void> {
+  if (Date.now() - webhookEnsuredAt < WEBHOOK_REFRESH_MS) return;
+  await ensureE2BWebhook();
+  webhookEnsuredAt = Date.now();
+}
 // Staging may itself spend 60s uploading a maximum-size source, followed by
 // several durable Git API writes. Do not terminate admission halfway through.
 export const maxDuration = 300;
@@ -106,7 +119,7 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
-    await ensureE2BWebhook();
+    await ensureE2BWebhookRecently();
     const issuedAt = Date.now();
     const job = await stageE2BVerification({
       ...prepared,
