@@ -70,6 +70,16 @@ async function request(path: string, body?: unknown): Promise<Record<string, unk
 }
 
 const before = await request("/api/leaderboard");
+// Admission rejects any score that does not strictly beat the live record, and
+// records keep advancing, so claim one just above whatever is current now.
+const currentRational = (before.current as { exactRational?: { numerator: string; denominator: string } | null })
+  .exactRational;
+const negativeControlScore = currentRational
+  ? {
+    numerator: (BigInt(currentRational.numerator) * 10n + 1n).toString(),
+    denominator: (BigInt(currentRational.denominator) * 10n).toString(),
+  }
+  : { numerator: "672500704", denominator: "1000000000" };
 const health = await request("/api/health");
 if (!health.verifierTemplateIdentityConfigured) {
   throw new Error("The matching verifier image has not been pinned; do not consume a submission slot");
@@ -82,7 +92,7 @@ async function run(kind: "negative" | "positive") {
   const path = flow ? "/api/submissions/flow-test" : "/api/submissions";
   const input = flow ? { solution: source } : {
     id: `e2e-negative-${Date.now()}`, displayName: "Riemann.fail E2E audit",
-    score: { numerator: "672500704", denominator: "1000000000" },
+    score: negativeControlScore,
     summary: "Explicit negative control: the two-thirds proof does not prove a new record. Expected mathematical rejection.",
     method: "Negative-control audit, not a claimed improvement", model: null, harness: "Production E2E test",
     solution: source, acceptLicense: true,
