@@ -37,6 +37,17 @@ describe("human-readable verifier feedback", () => {
       message: "The formal verifier exceeded its runtime limit.",
     },
     {
+      // Exact message written by scripts/finalize-e2b-job.ts on exit 124/137.
+      expected: "verification-timeout",
+      log: "",
+      message: "The verifier exceeded its isolated runtime limit.",
+    },
+    {
+      // Inner comparator timeout surfaced by scripts/verify-submission.ts.
+      expected: "verification-timeout",
+      log: "Running comparator\nbash exited with 124",
+    },
+    {
       expected: "sandbox-expired",
       log: "",
       message: "The isolated verifier expired before producing a result.",

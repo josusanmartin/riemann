@@ -13,6 +13,7 @@ export const verifierFeedbackSchema = z
       "lean-kernel-rejected",
       "verification-timeout",
       "sandbox-expired",
+      "record-superseded",
       "verifier-infrastructure",
       "unclassified-rejection",
     ]),
@@ -69,6 +70,24 @@ function candidateLocation(log: string): VerifierFeedback["location"] {
 }
 
 /**
+ * Feedback for a queued proof that was never run because another record was
+ * accepted first: its attestation would be bound to the old record, so the
+ * result could not be published.
+ */
+export function recordSupersededFeedback(): VerifierFeedback {
+  return feedback({
+    code: "record-superseded",
+    stage: "submission",
+    title: "A new record was accepted first",
+    detail:
+      "Another proof became the record while this one was waiting in the queue. It was not run, because a result checked against the old record could not be published.",
+    action:
+      "Check the new record. If your score still beats it, submit the same source again.",
+    retryable: true,
+  });
+}
+
+/**
  * Turn an untrusted verifier log into a fixed, safe diagnosis.
  *
  * Queue receipts are public, so this function must never copy source text,
@@ -99,11 +118,12 @@ export function describeVerifierRejection(
   }
 
   if (
-    diagnostic.includes("exceeded the verifier runtime limit") ||
-    diagnostic.includes("exceeded its runtime limit") ||
+    // finalize-e2b-job.ts reports "exceeded its isolated runtime limit" and
+    // verify-submission.ts reports "<command> exited with <code>", so match
+    // both shapes rather than one exact sentence.
+    /exceeded (?:the verifier|its(?: isolated)?) runtime limit/.test(diagnostic) ||
     diagnostic.includes("verification timed out") ||
-    diagnostic.includes("exited with status 124") ||
-    diagnostic.includes("exited with status 137")
+    /exited with (?:status )?(?:124|137)\b/.test(diagnostic)
   ) {
     return feedback({
       code: "verification-timeout",
