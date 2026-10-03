@@ -336,5 +336,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/8e267642a9b1a619fdb84c496af86f773732661d/submissions/six-point-window/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Weighted six-point refinement of Theorem D of the pinned Zeta23 development with the analytic window cos(3s/2) in place of cos(sqrt(2) s): H drops only quadratically (H = 0.6723988626, enclosed to 5e-10) while the defect kernel improves linearly. The bridge is retargeted through Zeta23's profile-generic window machinery (ModFactor/AdmWindow, moments, ThmD-concrete prime side, XiPrime zero side and cRatio limit) at lambda = 1; the kernel becomes (cos pi x - (16/9) gamma pi x sin pi x)/(1 - (16/9)(pi x)^2), gamma = (3/4)cot(3/4). Re-optimised six-point weights (B = 360551/10^8), c = 653514/10^8 within 0.01% of the minimum (m = 158), on attempt-009's checker (Samuel Lavery, Apache-2.0) with a regenerated pyramid table and convex-basin leaves (typh): 18 basins, 77684 walk leaves. Proved constant (15800000000*H - 55164303)/15700012358 = 0.6731674..., candidate 67316747/10^8."
+  },
+  {
+    "id": "attempt-012",
+    "track": "critical-line",
+    "date": "2026-10-03",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673316600000000000000000000000",
+    "method": "Weighted six-point refinement with the AMTOPA window (Theorem D re-proved in-file for it); pyramid/slope/basin certificate checked by a verified integer pipeline (decide +kernel).",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673316600000000000000000000000",
+    "scorePercent": "67.3316600000000000000000000000",
+    "exactRational": {
+      "numerator": "6733166",
+      "denominator": "10000000"
+    },
+    "exactExpression": "(6733166 : ℝ) / 10000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6463c3b69998cc489576267ea21b09ac416a4007/submissions/attempt-012/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6463c3b69998cc489576267ea21b09ac416a4007/submissions/attempt-012/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Ainta's weighted n-point simple-zero refinement at n = 6, with the Montgomery–Taylor window of the pinned Zeta23\nTheorem D replaced by AMTOPA's window (first 13 cosine terms of zeta-exact-pressure, scaled by 4/5). Theorem D's\nwindow-dependent parts are re-proved in-file for this window:\n- admissibility (a certified positive-variation bound);\n- zero side and prime side (ported from Zeta23's XiPrime/ThmD, Apache-2.0);\n- the a/b/J limits (incl. an exact integral-swap identity);\n- the exact constant H_AM = H_MT − Σ c_j²(½ − 1/(4π²j²))/(2 sin²(1/√2)) ≥ 0.6721883;\n- the retargeted Zeta Lab bridge (MIT).\nFinite certificate: 14,872 leaves on the half-space g₀ ≤ g₄ (pyramid/slope tests with 200 expansion centres; pyramid\ntable adapted from five-point-pyramid-2 by typh, centres after six-point-convex-basins-2 by typh, Apache-2.0), with a\nnew integer enclosure of the AM pair kernel. κ = 6733143/10⁷ ≤ (H_AM − B(m−5)/m)/(1 − c(m−5)/m) at m = 146. No new axioms. δ 0.002 % and Φ ≥ 0.67"
   }
 ]
