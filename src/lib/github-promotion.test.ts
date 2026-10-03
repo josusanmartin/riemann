@@ -25,6 +25,16 @@ function sha(value: string): string {
 
 const canonicalRecordsSnapshot = `${JSON.stringify(records, null, 2)}\n`;
 
+// Production promotions append to data/records.json, so derive a candidate
+// that strictly beats whatever the current record is instead of hardcoding one.
+const currentRational = getCurrentRecord().exactRational;
+const candidateScore = currentRational
+  ? {
+      numerator: (BigInt(currentRational.numerator) * 10n + 1n).toString(),
+      denominator: (BigInt(currentRational.denominator) * 10n).toString(),
+    }
+  : { numerator: "672500704", denominator: "1000000000" };
+
 function fakeGitHub(
   initialHead: string,
   baseRecordsSnapshot = canonicalRecordsSnapshot,
@@ -85,7 +95,7 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
     {
       id: "direct-record-test",
       displayName: "Direct Solver",
-      score: { numerator: "672500704", denominator: "1000000000" },
+      score: candidateScore,
       summary: "A complete direct candidate used to test atomic publication.",
       method: "A formally checked refinement",
       model: "Test Model",
@@ -104,7 +114,7 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
     model: prepared.submission.model,
     harness: prepared.submission.harness,
     score: prepared.submission.score,
-    scoreDecimal: rationalToDecimal("672500704", "1000000000", 30),
+    scoreDecimal: rationalToDecimal(candidateScore.numerator, candidateScore.denominator, 30),
     previousRecordId: getCurrentRecord().id,
     upstreamCommit: contract.trustedUpstream.commit,
     theoremNames: [

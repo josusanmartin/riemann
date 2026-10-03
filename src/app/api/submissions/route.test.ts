@@ -18,10 +18,20 @@ vi.mock("@/lib/submission-queue", async (original) => ({
 import { POST } from "./route";
 import { QueueCommitUncertainError, DailySubmissionLimitError } from "@/lib/submission-queue";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
+import { getCurrentRecord } from "@/lib/records";
 
 const job = { jobId: "00000000-0000-4000-8000-000000000001", sandboxId: "sandbox-1234567890" };
+// Production promotions append to data/records.json, so derive a score that
+// strictly beats the current record instead of hardcoding one that goes stale.
+const currentRational = getCurrentRecord().exactRational;
+const score = currentRational
+  ? {
+    numerator: (BigInt(currentRational.numerator) * 10n + 1n).toString(),
+    denominator: (BigInt(currentRational.denominator) * 10n).toString(),
+  }
+  : { numerator: "672500704", denominator: "1000000000" };
 const input = {
-  id: "audit-proof", displayName: "Audit Solver", score: { numerator: "672500704", denominator: "1000000000" },
+  id: "audit-proof", displayName: "Audit Solver", score,
   summary: "An explicitly noncompetitive audit fixture.", method: "Audit fixture", solution: "-- source", acceptLicense: true,
 };
 function request(body: unknown = input) {
