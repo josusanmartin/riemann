@@ -13,12 +13,19 @@ const mocks = vi.hoisted(() => ({
   readQueuedE2BJobMetadata: vi.fn(),
   verifySubmissionJob: vi.fn(),
   verifyE2BWebhookSignature: vi.fn(),
+  advanceVerificationQueue: vi.fn(),
+  promoteE2BResult: vi.fn(),
 }));
+const promotionErrors = vi.hoisted(() => {
+  class UnpublishableResultError extends Error {}
+  class PromotionRaceError extends UnpublishableResultError {}
+  return { UnpublishableResultError, PromotionRaceError };
+});
 
 vi.mock("@/auth", () => ({ getSession: mocks.getSession }));
 vi.mock("@/lib/e2b-verifier", () => ({
   inspectE2BVerificationProgress: vi.fn(),
-  killE2BSandbox: vi.fn(),
+  killE2BSandbox: vi.fn(async () => undefined),
   readE2BVerification: mocks.readE2BVerification,
 }));
 vi.mock("@/lib/e2b-queue", () => ({
@@ -40,20 +47,20 @@ vi.mock("@/lib/submission-queue", () => ({
   inspectVerificationJob: mocks.inspectVerificationJob,
 }));
 vi.mock("@/lib/queue-orchestration", () => ({
-  advanceVerificationQueue: vi.fn(),
+  advanceVerificationQueue: mocks.advanceVerificationQueue,
   assertQueueJobMatches: vi.fn(),
   ensureQueuedJobRunning: mocks.ensureQueuedJobRunning,
   reconcileQueuedJobPause: mocks.reconcileQueuedJobPause,
   VerifierOccupiedByFlowTestError: class extends Error {},
 }));
 vi.mock("@/lib/github-promotion", () => ({
-  describePromotionError: vi.fn(),
+  ...promotionErrors,
+  describePromotionError: vi.fn((error: Error) => error.message),
   isGitHubPromotionConfigured: vi.fn(() => true),
-  PromotionRaceError: class extends Error {},
 }));
 vi.mock("@/lib/submission-finalization", () => ({
   assertE2BResultMatchesJob: vi.fn(),
-  promoteE2BResult: vi.fn(),
+  promoteE2BResult: mocks.promoteE2BResult,
 }));
 
 import { GET as statusRequest } from "@/app/api/submissions/status/route";
@@ -113,6 +120,33 @@ describe("durable queue finalization boundary", () => {
     const response = await statusRequest(new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"));
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ status: "verified", promotion: { status: "promoted" } });
+  });
+
+  it("closes the job when a verified result can never be published", async () => {
+    mocks.inspectVerificationJob.mockResolvedValue({ status: "active", position: 0, job });
+    mocks.ensureQueuedJobRunning.mockResolvedValue("paused");
+    mocks.readE2BVerification.mockResolvedValue({
+      status: "verified",
+      submissionId: job.submissionId,
+      proofDigest: job.proofDigest,
+      completedAt: "2026-08-13T12:30:00Z",
+    });
+    mocks.promoteE2BResult.mockRejectedValue(
+      new promotionErrors.UnpublishableResultError("Verifier template is stale"),
+    );
+
+    const response = await statusRequest(
+      new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      promotion: { status: "superseded", message: "Verifier template is stale" },
+    });
+    expect(mocks.advanceVerificationQueue).toHaveBeenCalledWith(
+      job.jobId,
+      expect.objectContaining({ outcome: "superseded" }),
+    );
   });
 
   it("follows an admin recovery alias only to the same submitter's same proof", async () => {
