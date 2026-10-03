@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "izp0xlb8x6y7zfh4eu663",
-    "jobId": "24df0173-a5fc-4e24-9949-a17d61460957",
-    "proofDigest": "da27d95896123d6629eecc579f40dec7994bb5f6d5125954233c3d5fe3021229",
-    "ownerKey": "2045b3b27143012b83291aa410ccb9ed2f29a35ee4a751a18e5982f60a660bf6",
-    "submissionKey": "70452d5da4c8453fc3ce79ef11a93d792f67ee271654cc7b124c52fa2d4467d2",
-    "enqueuedAt": "2026-10-03T09:59:18.356Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "24df0173-a5fc-4e24-9949-a17d61460957",
+      "proofDigest": "da27d95896123d6629eecc579f40dec7994bb5f6d5125954233c3d5fe3021229",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/dc788ef833400b4f24901ae0c6d654082e066c5c/submissions/seven-point-optimised-window",
+      "completedAt": "2026-10-03T10:38:04.734Z"
+    },
     {
       "jobId": "a3c697df-4deb-4a87-ad25-dfa5450481df",
       "proofDigest": "6c13fd6bb5bc0a4e638754dd342f9c1bba104361021798058ae7d64e4934e902",
