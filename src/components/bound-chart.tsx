@@ -28,7 +28,7 @@ const COMPACT: Geometry = {
   xTicks: [1974, 2000, 2026],
 };
 
-type ChartPoint = { record: RecordEntry; year: number; score: number };
+type ChartPoint = { record: RecordEntry; year: number; score: number; recordsThatYear: number };
 
 function pointLabel(point: ChartPoint, isCurrent: boolean): string {
   return `at least ${truncateDecimalString(point.record.scorePercent, isCurrent ? 2 : 1)}%`;
@@ -92,7 +92,9 @@ function ChartSvg({
         const isCurrent = index === points.length - 1;
         return (
           <g key={record.id}>
-            <title>{`${year} · ${record.author} · ${pointLabel(point, isCurrent)} · ${record.method}`}</title>
+            <title>{`${year} · ${record.author} · ${pointLabel(point, isCurrent)} · ${record.method}${
+              point.recordsThatYear > 1 ? ` · best of ${point.recordsThatYear} records in ${year}` : ""
+            }`}</title>
             <circle
               cx={x(year)}
               cy={y(score)}
@@ -115,11 +117,20 @@ function ChartSvg({
 }
 
 export function BoundChart({ records }: { records: RecordEntry[] }) {
-  const points = records.map((record) => ({
-    record,
-    year: Number(record.date.slice(0, 4)),
-    score: Number(record.scoreDecimal),
-  }));
+  // Plot one point per year: several records in the same year would otherwise
+  // stack on one x position and overprint their labels. Records are ordered and
+  // strictly increasing, so the last record of a year is that year's best.
+  const byYear = new Map<number, ChartPoint>();
+  for (const record of records) {
+    const year = Number(record.date.slice(0, 4));
+    byYear.set(year, {
+      record,
+      year,
+      score: Number(record.scoreDecimal),
+      recordsThatYear: (byYear.get(year)?.recordsThatYear ?? 0) + 1,
+    });
+  }
+  const points = [...byYear.values()];
 
   return (
     <figure className="chart-card" aria-labelledby="history-title">
