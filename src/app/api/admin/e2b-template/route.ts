@@ -11,6 +11,7 @@ export const maxDuration = 300;
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,299}$/;
 const TEMPLATE_BUILD_NAME = "riemann-fail-verifier";
 const EXTENDED_SMOKE_ROOT = "/home/riemann/tmp/extended-smoke";
+const EXTENDED_SMOKE_METADATA = { app: "riemann-fail", kind: "extended-smoke" } as const;
 const EXTENDED_SMOKE_SCRIPT = `#!/usr/bin/env bash
 set -uo pipefail
 
@@ -157,6 +158,12 @@ async function latestBuildCoordinates(
   return { templateId: template.templateID, buildId: build.buildID };
 }
 
+// The deny-all rule is confirmed from E2B's sandbox config, but the probes show
+// whether traffic actually leaves. Either probe reaching the internet fails it.
+function egressBlocked(diagnostics: string): boolean {
+  return !/^(?:tls|http)_egress=reachable$/m.test(diagnostics);
+}
+
 async function smokeTemplate(templateReference: string, key: string) {
   const { Sandbox } = await import("e2b");
   const sandbox = await Sandbox.create({
@@ -206,6 +213,7 @@ async function smokeTemplate(templateReference: string, key: string) {
         "printf 'manifest_url='; jq -r '.packages[] | select(.name == \"mathlib\") | .url' /opt/riemann/zeta23/lake-manifest.json",
       { user: "root", timeoutMs: 30_000 },
     );
+    const networkIsolated = egressBlocked(diagnosticsResult.stdout);
     await sandbox.commands.run(
       "set -euo pipefail; " +
         "install -d -o riemann -g riemann -m 0700 /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && " +
@@ -240,7 +248,7 @@ async function smokeTemplate(templateReference: string, key: string) {
         stderr: failure.stderr,
         diagnostics: diagnosticsResult.stdout.slice(-4_000),
         failedStage: "zeta-runtime-import" as const,
-        networkIsolated: true,
+        networkIsolated,
       };
     }
     let result;
@@ -264,7 +272,7 @@ async function smokeTemplate(templateReference: string, key: string) {
         stderr: failure.stderr,
         diagnostics: diagnosticsResult.stdout.slice(-4_000),
         failedStage: "comparator-nanoda" as const,
-        networkIsolated: true,
+        networkIsolated,
       };
     }
     return {
@@ -275,7 +283,7 @@ async function smokeTemplate(templateReference: string, key: string) {
       stderr: result.stderr.slice(-4_000),
       diagnostics: diagnosticsResult.stdout.slice(-4_000),
       failedStage: null,
-      networkIsolated: true,
+      networkIsolated,
     };
   } finally {
     await sandbox.kill().catch(() => undefined);
@@ -319,6 +327,7 @@ async function startExtendedSmokeTemplate(
       allowPublicTraffic: false,
       denyOut: ["0.0.0.0/0"],
     },
+    metadata: EXTENDED_SMOKE_METADATA,
   });
 
   try {
@@ -332,6 +341,9 @@ async function startExtendedSmokeTemplate(
         "printf 'http_egress='; python3 -c 'import socket; stream = socket.create_connection((\"1.1.1.1\", 80), 3); stream.sendall(b\"HEAD / HTTP/1.0\\r\\nHost: one.one.one.one\\r\\n\\r\\n\"); stream.settimeout(3); assert stream.recv(1)' >/dev/null 2>&1 && echo reachable || echo blocked",
       { user: "root", timeoutMs: 30_000 },
     );
+    if (!egressBlocked(diagnostics.stdout)) {
+      throw new Error("The smoke sandbox reached the internet despite the deny-all rule");
+    }
     await sandbox.commands.run(
       "set -euo pipefail; " +
         `rm -rf ${EXTENDED_SMOKE_ROOT} /home/riemann/tmp/zeta-smoke /home/riemann/tmp/bootstrap-smoke && ` +
@@ -386,6 +398,19 @@ async function startExtendedSmokeTemplate(
 
 async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
   const { Sandbox } = await import("e2b");
+  // Connecting extends a sandbox's lifetime and an abandoned smoke is killed
+  // below, so never touch a sandbox this route did not start (for example a
+  // live verification whose ID was pasted by mistake).
+  const info = await Sandbox.getInfo(sandboxId, {
+    apiKey: key,
+    requestTimeoutMs: 30_000,
+  });
+  if (
+    info.metadata?.app !== EXTENDED_SMOKE_METADATA.app ||
+    info.metadata?.kind !== EXTENDED_SMOKE_METADATA.kind
+  ) {
+    return null;
+  }
   const sandbox = await Sandbox.connect(sandboxId, {
     apiKey: key,
     timeoutMs: 20 * 60 * 1_000,
@@ -493,6 +518,7 @@ export async function POST(request: Request): Promise<Response> {
         return noStore(400, { error: "invalid_smoke_sandbox_id" });
       }
       const smoke = await inspectExtendedSmokeTemplate(sandboxId, key);
+      if (!smoke) return noStore(409, { error: "not_an_extended_smoke_sandbox" });
       return noStore(smoke.status === "failed" ? 422 : 200, smoke);
     }
     if (action === "smoke-start") {
@@ -547,7 +573,9 @@ export async function POST(request: Request): Promise<Response> {
       const templateReference = `${TEMPLATE_BUILD_NAME}:${buildId}`;
       const smoke = await smokeTemplate(templateReference, key);
       const passed =
-        smoke.exitCode === 0 && smoke.zetaElaborationExitCode === 0;
+        smoke.networkIsolated &&
+        smoke.exitCode === 0 &&
+        smoke.zetaElaborationExitCode === 0;
       return noStore(passed ? 200 : 422, {
         status: passed ? "passed" : "failed",
         templateId,
