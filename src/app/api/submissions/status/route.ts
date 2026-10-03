@@ -3,7 +3,7 @@ import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
 import {
   describePromotionError,
   isGitHubPromotionConfigured,
-  PromotionRaceError,
+  UnpublishableResultError,
 } from "@/lib/github-promotion";
 import {
   assertE2BResultMatchesJob,
@@ -241,7 +241,7 @@ export async function GET(request: Request): Promise<Response> {
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { ...result, promotion });
     } catch (error) {
-      if (error instanceof PromotionRaceError) {
+      if (error instanceof UnpublishableResultError) {
         const message = describePromotionError(error);
         await advanceVerificationQueue(job.jobId, {
           outcome: "superseded",
