@@ -115,6 +115,37 @@ describe("durable queue finalization boundary", () => {
     expect(await response.json()).toMatchObject({ status: "verified", promotion: { status: "promoted" } });
   });
 
+  it("follows an admin recovery alias only to the same submitter's same proof", async () => {
+    const recovered = {
+      ...job,
+      sandboxId: "sandbox-recovered-01",
+      jobId: "7d664a5f-65f8-40c9-a641-6bb9eb77ef6b",
+    };
+    mocks.inspectVerificationJob.mockResolvedValue({
+      status: "active",
+      position: 0,
+      job: recovered,
+    });
+    mocks.readQueuedE2BJobMetadata.mockResolvedValue({ ...recovered, state: "running" });
+
+    const response = await statusRequest(
+      new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ status: "running" });
+    expect(mocks.readQueuedE2BJobMetadata).toHaveBeenCalledWith(recovered.sandboxId);
+
+    mocks.readQueuedE2BJobMetadata.mockResolvedValue({
+      ...recovered,
+      proofDigest: "f".repeat(64),
+      state: "running",
+    });
+    const mismatch = await statusRequest(
+      new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"),
+    );
+    expect(mismatch.status).not.toBe(200);
+  });
+
   it("observes a waiting job without repeatedly pausing or launching it", async () => {
     mocks.inspectVerificationJob.mockResolvedValue({
       status: "queued",
