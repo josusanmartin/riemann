@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   flowTestActive: vi.fn(),
   launch: vi.fn(),
+  metadata: vi.fn(),
+  kill: vi.fn(),
+  complete: vi.fn(),
+  publishedRecordId: vi.fn(),
 }));
 
 vi.mock("@/lib/e2b-flow-test", () => ({
@@ -11,9 +15,17 @@ vi.mock("@/lib/e2b-flow-test", () => ({
 vi.mock("@/lib/e2b-queue", () => ({
   launchQueuedE2BVerification: mocks.launch,
   pauseQueuedE2BVerification: vi.fn(),
+  readQueuedE2BJobMetadata: mocks.metadata,
+}));
+vi.mock("@/lib/e2b-verifier", () => ({ killE2BSandbox: mocks.kill }));
+vi.mock("@/lib/submission-queue", () => ({
+  completeVerificationJob: mocks.complete,
+  inspectVerificationJob: vi.fn(),
+  readPublishedRecordId: mocks.publishedRecordId,
 }));
 
 import {
+  advanceVerificationQueue,
   applyInitialQueueTransition,
   ensureQueuedJobRunning,
   VerifierOccupiedByFlowTestError,
@@ -107,5 +119,70 @@ describe("initial verification queue transition", () => {
     mocks.launch.mockResolvedValueOnce("running");
     await expect(ensureQueuedJobRunning(job)).resolves.toBe("running");
     expect(mocks.launch).toHaveBeenCalledWith(job);
+  });
+});
+
+describe("advancing the verification queue", () => {
+  const stale: QueuedVerificationJob = {
+    ...job,
+    sandboxId: "sandbox-stale-000001",
+    jobId: "5d664a5f-65f8-40c9-a641-6bb9eb77ef6b",
+  };
+  const fresh: QueuedVerificationJob = {
+    ...job,
+    sandboxId: "sandbox-fresh-000001",
+    jobId: "6d664a5f-65f8-40c9-a641-6bb9eb77ef6b",
+  };
+  const completion = {
+    outcome: "promoted" as const,
+    promotionStatus: "promoted" as const,
+    message: null,
+    evidenceUrl: "https://github.com/josusanmartin/riemann/tree/abc/submissions/new-record",
+  };
+  beforeEach(() => vi.clearAllMocks());
+
+  it("retires a queued proof attested against a record that has since been replaced", async () => {
+    mocks.flowTestActive.mockResolvedValue(false);
+    mocks.launch.mockResolvedValue("running");
+    mocks.kill.mockResolvedValue(undefined);
+    mocks.publishedRecordId.mockResolvedValue("new-record");
+    mocks.metadata.mockImplementation(async (sandboxId: string) => ({
+      sandboxId,
+      jobId: sandboxId === stale.sandboxId ? stale.jobId : fresh.jobId,
+      previousRecordId: sandboxId === stale.sandboxId ? "old-record" : "new-record",
+    }));
+    mocks.complete
+      .mockResolvedValueOnce({ advanced: true, next: stale, receipt: null })
+      .mockResolvedValueOnce({ advanced: true, next: fresh, receipt: null });
+
+    const result = await advanceVerificationQueue(job.jobId, completion);
+
+    expect(mocks.complete).toHaveBeenNthCalledWith(
+      2,
+      stale.jobId,
+      expect.objectContaining({
+        outcome: "rejected",
+        feedback: expect.objectContaining({ code: "record-superseded", retryable: true }),
+      }),
+    );
+    expect(mocks.kill).toHaveBeenCalledWith(stale.sandboxId);
+    expect(mocks.launch).toHaveBeenCalledTimes(1);
+    expect(mocks.launch).toHaveBeenCalledWith(fresh);
+    expect(result).toMatchObject({ next: fresh, nextStarted: true });
+  });
+
+  it("starts the next proof normally when the published record cannot be read", async () => {
+    mocks.flowTestActive.mockResolvedValue(false);
+    mocks.launch.mockResolvedValue("running");
+    mocks.publishedRecordId.mockRejectedValue(new Error("GitHub unavailable"));
+    mocks.complete.mockResolvedValueOnce({ advanced: true, next: stale, receipt: null });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(advanceVerificationQueue(job.jobId, completion)).resolves.toMatchObject({
+      next: stale,
+      nextStarted: true,
+    });
+    expect(mocks.launch).toHaveBeenCalledWith(stale);
+    expect(mocks.kill).not.toHaveBeenCalled();
   });
 });

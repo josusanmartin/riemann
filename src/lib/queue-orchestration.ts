@@ -1,18 +1,24 @@
 import {
   launchQueuedE2BVerification,
   pauseQueuedE2BVerification,
+  readQueuedE2BJobMetadata,
   type QueuedE2BRunnerState,
 } from "@/lib/e2b-queue";
+import { killE2BSandbox } from "@/lib/e2b-verifier";
 import {
   completeVerificationJob,
   inspectVerificationJob,
+  readPublishedRecordId,
   type QueueAdvance,
   type QueueCompletionInput,
   type QueueInspection,
   type QueueAdmission,
   type QueuedVerificationJob,
 } from "@/lib/submission-queue";
-import { describeVerifierRejection } from "@/lib/verifier-feedback";
+import {
+  describeVerifierRejection,
+  recordSupersededFeedback,
+} from "@/lib/verifier-feedback";
 
 type QueueCoordinates = {
   sandboxId: string;
@@ -89,13 +95,56 @@ export async function applyInitialQueueTransition(
   return (await dependencies.reconcile(admission.job)).status === "active";
 }
 
+// A queued proof is attested against the record that was current when it was
+// admitted. Once another record lands, promotion is certain to fail, so running
+// it would only hold the single verifier lane for up to an hour. Any lookup
+// failure answers "not stale" so the job runs exactly as it would have before.
+async function isSupersededBeforeStart(
+  job: QueuedVerificationJob,
+  publishedRecordId: string | null,
+): Promise<boolean> {
+  if (!publishedRecordId) return false;
+  try {
+    const metadata = await readQueuedE2BJobMetadata(job.sandboxId);
+    if (metadata.jobId !== job.jobId) return false;
+    return metadata.previousRecordId !== publishedRecordId;
+  } catch {
+    return false;
+  }
+}
+
 export async function advanceVerificationQueue(
   jobId: string,
   completion: QueueCompletionInput,
 ): Promise<QueueAdvance & { nextStarted: boolean }> {
   const advance = await completeVerificationJob(jobId, completion);
   let next = advance.next;
-  for (let expiredJobs = 0; next && expiredJobs < 10; expiredJobs += 1) {
+  let publishedRecordId: string | null | undefined;
+  for (let skippedJobs = 0; next && skippedJobs < 10; skippedJobs += 1) {
+    if (publishedRecordId === undefined) {
+      publishedRecordId = await readPublishedRecordId().catch((error) => {
+        console.error("Unable to read the published record before starting a job", error);
+        return null;
+      });
+    }
+    if (await isSupersededBeforeStart(next, publishedRecordId)) {
+      console.warn("Skipping a queued verification superseded by a new record", {
+        jobId: next.jobId,
+      });
+      const stale = next;
+      const feedback = recordSupersededFeedback();
+      next = (
+        await completeVerificationJob(stale.jobId, {
+          outcome: "rejected",
+          promotionStatus: null,
+          message: feedback.detail,
+          feedback,
+          evidenceUrl: null,
+        })
+      ).next;
+      await killE2BSandbox(stale.sandboxId).catch(() => undefined);
+      continue;
+    }
     try {
       await ensureQueuedJobRunning(next);
       return { ...advance, next, nextStarted: true };
