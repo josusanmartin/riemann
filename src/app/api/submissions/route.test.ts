@@ -55,6 +55,18 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("official submission admission", () => {
+  it("refuses uploads while an operator has paused submissions", async () => {
+    vi.stubEnv("SUBMISSIONS_PAUSED", "1");
+    vi.stubEnv("SITE_NOTICE", "Verifier upgrade in progress.");
+    const response = await POST(request());
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      error: "submissions_paused",
+      message: "Verifier upgrade in progress.",
+    });
+    expect(mocks.usage).not.toHaveBeenCalled();
+    expect(mocks.stage).not.toHaveBeenCalled();
+  });
   it("requires authentication before allocating any worker", async () => {
     mocks.session.mockResolvedValue(null);
     expect((await POST(request())).status).toBe(401);

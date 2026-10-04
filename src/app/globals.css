@@ -147,6 +147,20 @@ h3 {
   transform: translateY(0);
 }
 
+.site-notice {
+  padding: 12px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--lime);
+  color: var(--ink);
+  text-align: center;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.site-notice p {
+  max-width: 72ch;
+  margin: 0 auto;
+}
+
 :focus-visible {
   outline: 3px solid var(--forest);
   outline-offset: 3px;

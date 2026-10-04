@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteNotice } from "@/components/site-notice";
 import { truncateDecimalString } from "@/components/format";
 import { getCurrentRecord } from "@/lib/records";
 import { siteUrl } from "@/lib/site";
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={inter.variable}>
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
+        <SiteNotice />
         <SiteHeader />
         {children}
         <SiteFooter />

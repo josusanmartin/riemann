@@ -53,6 +53,16 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // Operator switch for verifier upgrades: refuse new uploads before any
+  // worker or daily slot is touched. In-flight proofs are unaffected.
+  if (process.env.SUBMISSIONS_PAUSED === "1") {
+    return noStore(503, {
+      error: "submissions_paused",
+      message:
+        process.env.SITE_NOTICE?.trim() ||
+        "Submissions are briefly paused for verifier maintenance. No daily slot was used; please try again shortly.",
+    });
+  }
   const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
