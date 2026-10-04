@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "attempt-014",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "6734812",
+    "denominator": "10000000"
+  },
+  "scoreDecimal": "0.673481200000000000000000000000",
+  "previousRecordId": "attempt-013",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-04T05:32:51.021Z",
+  "challengeDigest": "170074cbf861995d202a34ffa553eef96443f7efed5e705f4d2677669bfa9ac1",
+  "verifierTemplateDigest": "8172793f8b56e443912a7dccbeb5c6cce828c4cdb096e832081fe9d3bd26975d",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

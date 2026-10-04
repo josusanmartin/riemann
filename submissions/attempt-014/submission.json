@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-014",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6734812",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Ainta's weighted n-point simple-zero refinement at n = 8 (seven gaps) on the AM-form window v(s) = cos(√2 s) + Σ_{j=1}^{12} c_j cos(2πjs) of AMTOPA's 13-term family (zeta-exact-pressure), with the twelve corrections re-optimised for the eight-point bound and the 28 pair weights and 7 pressures re-solved by LP (B = 404350/10⁸). Theorem D's window-dependent parts are re-proved in-file (admissibility, zero and prime sides, the a/b/J limits, the exact constant H ≥ 0.67216841). The block bound uses the band profile min((q+1)/q, E_band) ≤ defect (AMTOPA, MIT; as presented in Gebendorfer, \"Zeta Geometry and Class Cap\", Lemma 3.3), proved in-file for any Hermitian G and injective rank labelling, so at q = 7 the condition c(m−7) ≤ 1 relaxes to c(m−7) ≤ 8/7 and m = 148. The finite certificate PC8CL proves c = 805003/10⁸ ≤ F_w on g₀ ≤ g₆ (the rest by reflection) with 5,651 leaves over 32 root walks. Its cells are pair-distance polytopes: each split adds a difference constraint on the prefix sums",
+  "method": "Eight-point weighted refinement: pair-distance polytope cells, exact difference-constraint closure, zero-order (Z) tangent extension; τ = 8/7 band profile (AMTOPA, via Gebendorfer 2026 Lemma 3.3).",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
