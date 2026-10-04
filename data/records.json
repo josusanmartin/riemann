@@ -436,5 +436,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/b7ed35c1ca99922b3682147ff524ee80b62f1691/submissions/attempt-013/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Ainta's weighted n-point simple-zero refinement at n = 7 on the AM-form window v(s) = cos(√2 s) + Σ_{j=1}^{12} c_j cos(2πjs), with typh's seven-point-optimised-window coefficients (Apache-2.0) and the seven-point weights re-solved by LP (B = 398386/10⁸). Theorem D's window-dependent parts are re-proved in-file (attempt-012's layer: admissibility, zero and prime sides, the a/b/J limits with an exact integral-swap identity, the exact constant H ≥ 0.67217109258). The finite certificate (25,452 leaves on g₀ ≤ g₅, the rest by reflection) uses zero-order pyramid leaves and a per-term minorant test: each pair term is bounded below by an LP-chosen convex combination of tangents at grid points of certified convex regions of w, extended by certified derivative bounds. It sits at the m-step of the bound (m = 133, c just below 1/127). Credits: the window coefficients and the GCell/GBase/GFar evaluator modules from typh's seven-point-optimised-window; the pyramid table from typh's five-point-pyrami"
+  },
+  {
+    "id": "attempt-014",
+    "track": "critical-line",
+    "date": "2026-10-04",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673481200000000000000000000000",
+    "method": "Eight-point weighted refinement: pair-distance polytope cells, exact difference-constraint closure, zero-order (Z) tangent extension; τ = 8/7 band profile (AMTOPA, via Gebendorfer 2026 Lemma 3.3).",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673481200000000000000000000000",
+    "scorePercent": "67.3481200000000000000000000000",
+    "exactRational": {
+      "numerator": "6734812",
+      "denominator": "10000000"
+    },
+    "exactExpression": "(6734812 : ℝ) / 10000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/50e80c1fd273d50a5d65d8d62db0452395a884d2/submissions/attempt-014/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/50e80c1fd273d50a5d65d8d62db0452395a884d2/submissions/attempt-014/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Ainta's weighted n-point simple-zero refinement at n = 8 (seven gaps) on the AM-form window v(s) = cos(√2 s) + Σ_{j=1}^{12} c_j cos(2πjs) of AMTOPA's 13-term family (zeta-exact-pressure), with the twelve corrections re-optimised for the eight-point bound and the 28 pair weights and 7 pressures re-solved by LP (B = 404350/10⁸). Theorem D's window-dependent parts are re-proved in-file (admissibility, zero and prime sides, the a/b/J limits, the exact constant H ≥ 0.67216841). The block bound uses the band profile min((q+1)/q, E_band) ≤ defect (AMTOPA, MIT; as presented in Gebendorfer, \"Zeta Geometry and Class Cap\", Lemma 3.3), proved in-file for any Hermitian G and injective rank labelling, so at q = 7 the condition c(m−7) ≤ 1 relaxes to c(m−7) ≤ 8/7 and m = 148. The finite certificate PC8CL proves c = 805003/10⁸ ≤ F_w on g₀ ≤ g₆ (the rest by reflection) with 5,651 leaves over 32 root walks. Its cells are pair-distance polytopes: each split adds a difference constraint on the prefix sums"
   }
 ]
