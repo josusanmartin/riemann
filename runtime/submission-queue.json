@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ijb7aniteejzesnkse8bb",
-    "jobId": "d2090735-a9df-4efa-a6e8-024b0116e6a0",
-    "proofDigest": "c9bf866e5629cd146033754433fb99be7eae3005ff60ddb0883e1e4eecb49914",
-    "ownerKey": "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d",
-    "submissionKey": "83dd9e889ae128a2bb37a46123d430d915ca610e8726f9a725483a0815515c43",
-    "enqueuedAt": "2026-10-04T04:43:47.138Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "d2090735-a9df-4efa-a6e8-024b0116e6a0",
+      "proofDigest": "c9bf866e5629cd146033754433fb99be7eae3005ff60ddb0883e1e4eecb49914",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/50e80c1fd273d50a5d65d8d62db0452395a884d2/submissions/attempt-014",
+      "completedAt": "2026-10-04T05:32:51.436Z"
+    },
     {
       "jobId": "13ad524f-2d71-4511-a4e9-192b9bc403c9",
       "proofDigest": "1236efdeedb76adb468956d0470a9808de6af69754f4cc611468829a9b7446b5",
