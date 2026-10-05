@@ -38,7 +38,8 @@ export default async function SubmissionPage({ params }: PageProps) {
                   </a>
                 )}
               </div>
-              <h1>{record.title}</h1>
+              {/* Titles carry a 30-digit decimal; trailing zeros add width, not precision. */}
+              <h1>{record.title.replace(/(\.\d*?[1-9])0+$/, "$1")}</h1>
               <p>{record.summary}</p>
             </div>
             <div className="record-big-score"><span>Certified lower bound</span><strong>{truncateDecimalString(record.scorePercent, record.formalVerification ? 10 : 4)}<sup>%</sup></strong><code>κ = {record.exactExpression}</code></div>

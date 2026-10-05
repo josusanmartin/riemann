@@ -2407,7 +2407,8 @@ h3 {
 
 .record-hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  /* minmax(0, …) so a long unbroken score cannot widen the columns */
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 75px;
   align-items: center;
 }
@@ -2450,6 +2451,7 @@ h3 {
 .record-hero h1 {
   margin-bottom: 20px;
   font-size: clamp(2.9rem, 5vw, 4.7rem);
+  overflow-wrap: anywhere;
 }
 
 .record-hero-grid > div:first-child > p {
@@ -3739,7 +3741,7 @@ h3 {
   }
 
   .record-hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 45px;
   }
 
