@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, BadgeCheck, BookOpen, UserCheck } from "lucide-react";
 import type { RecordEntry } from "@/lib/challenge";
 import { truncateDecimalString } from "@/components/format";
+import { displayRecordTitle, formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 
 export function Leaderboard({ records }: { records: RecordEntry[] }) {
   const ranked = [...records].reverse();
@@ -30,7 +31,16 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
                     {index === 0 && <span className="record-chip">Current</span>}
                   </Link>
                 </td>
-                <td><strong>{record.author}</strong><small>{record.date.slice(0, 4)} · {record.title}</small></td>
+                <td>
+                  <strong>{record.author}</strong>
+                  <small>
+                    <time dateTime={recordVerifiedAt(record) ?? record.date}>
+                      {formatRecordTime(record, recordVerifiedAt(record))}
+                    </time>
+                    {" · "}
+                    {displayRecordTitle(record)}
+                  </small>
+                </td>
                 <td>
                   <span className="method-cell">
                     {record.method}

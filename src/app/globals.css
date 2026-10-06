@@ -695,6 +695,25 @@ h3 {
   font-size: clamp(1.85rem, 3.3vw, 2.7rem);
 }
 
+.race-heading {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.race-heading h3 {
+  margin-bottom: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+/* Invisible, larger hover target so small race points are easy to inspect. */
+.chart-hit {
+  fill: transparent;
+}
+
 .chart-unit,
 .legend {
   color: #5c6a64;
