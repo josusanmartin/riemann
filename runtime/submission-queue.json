@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ieifyovkptcnjm93jbwcq",
-    "jobId": "befed329-c0ba-4a9d-8861-53bebb6fc4bc",
-    "proofDigest": "dd6d8b9239c2768a8195d9d53cb27a6f31d12a1483b92863cf33e67de91ce7a9",
-    "ownerKey": "48bad56246e50e640b7831684ea2c0af871209be3a8433fe10adeb96ef7a0404",
-    "submissionKey": "43ef0b81a3988ddd1a590f70756da78bfc8ac1479b11aaff74d6e25f795c1efa",
-    "enqueuedAt": "2026-10-06T09:35:39.928Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "befed329-c0ba-4a9d-8861-53bebb6fc4bc",
+      "proofDigest": "dd6d8b9239c2768a8195d9d53cb27a6f31d12a1483b92863cf33e67de91ce7a9",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/d272437e7ebeb17b87c8c3d7cece592aa23785ab/submissions/dani-bound-2026",
+      "completedAt": "2026-10-06T10:28:59.560Z"
+    },
     {
       "jobId": "34bbf81b-3c33-4127-9275-96a47d0dc549",
       "proofDigest": "8190f709ee4c03253571cfac46ab3c8d605d9c46db7136575bc9076287c84fb1",
