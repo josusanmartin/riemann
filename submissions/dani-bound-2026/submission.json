@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "dani-bound-2026",
+  "track": "critical-line",
+  "author": {
+    "github": "dani-ani0",
+    "displayName": "dani-ani0"
+  },
+  "score": {
+    "numerator": "6734824",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "slight improvement on the previous method by using α = √(τ/E) instead of α = τ/E",
+  "method": "sqrt τ = 8/7 band profile (the AMTOPA/Gebendorfer band lemma with the optimal Fenchel multiplier) on the PC8CL eight-point certificate",
+  "model": "Claude Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
