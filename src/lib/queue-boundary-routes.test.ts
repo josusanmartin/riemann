@@ -15,7 +15,9 @@ const mocks = vi.hoisted(() => ({
   verifyE2BWebhookSignature: vi.fn(),
   advanceVerificationQueue: vi.fn(),
   promoteE2BResult: vi.fn(),
+  readVerifierLog: vi.fn(),
 }));
+vi.mock("@/lib/submission-archive-store", () => ({ readVerifierLog: mocks.readVerifierLog }));
 const promotionErrors = vi.hoisted(() => {
   class UnpublishableResultError extends Error {}
   class PromotionRaceError extends UnpublishableResultError {}
@@ -122,6 +124,33 @@ describe("durable queue finalization boundary", () => {
     expect(await response.json()).toMatchObject({ status: "verified", promotion: { status: "promoted" } });
   });
 
+  it("returns the retained log with a finished job's verdict", async () => {
+    mocks.inspectVerificationJob.mockResolvedValue({
+      status: "completed",
+      receipt: {
+        jobId: job.jobId, proofDigest: job.proofDigest,
+        outcome: "rejected", promotionStatus: null, message: "Lean could not elaborate",
+        evidenceUrl: null, completedAt: "2026-08-13T12:30:00Z", logArchived: true,
+      },
+    });
+    mocks.readVerifierLog.mockResolvedValue({ jobId: job.jobId, proofDigest: job.proofDigest, omittedBytes: 0, log: "error: boom\n" });
+
+    const response = await statusRequest(new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ status: "rejected", log: "error: boom\n" });
+    expect(mocks.readVerifierLog).toHaveBeenCalledWith(job.jobId, job.proofDigest);
+
+    // An unreadable log never hides the verdict.
+    mocks.readVerifierLog.mockRejectedValue(new Error("GitHub unavailable"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const degraded = await statusRequest(new Request("https://www.riemannzeta.fun/api/submissions/status?job=token"));
+    expect(degraded.status).toBe(200);
+    const body = await degraded.json();
+    expect(body).toMatchObject({ status: "rejected" });
+    expect(body.log).toBeUndefined();
+  });
+
   it("closes the job when a verified result can never be published", async () => {
     mocks.inspectVerificationJob.mockResolvedValue({ status: "active", position: 0, job });
     mocks.ensureQueuedJobRunning.mockResolvedValue("paused");
@@ -130,6 +159,7 @@ describe("durable queue finalization boundary", () => {
       submissionId: job.submissionId,
       proofDigest: job.proofDigest,
       completedAt: "2026-08-13T12:30:00Z",
+      log: "Lean and nanoda accepted the solution\n",
     });
     mocks.promoteE2BResult.mockRejectedValue(
       new promotionErrors.UnpublishableResultError("Verifier template is stale"),
@@ -146,6 +176,7 @@ describe("durable queue finalization boundary", () => {
     expect(mocks.advanceVerificationQueue).toHaveBeenCalledWith(
       job.jobId,
       expect.objectContaining({ outcome: "superseded" }),
+      "Lean and nanoda accepted the solution\n",
     );
   });
 

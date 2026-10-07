@@ -3,6 +3,9 @@ import { githubLoginSchema } from "@/lib/challenge";
 import { RECORDS_REPOSITORY } from "@/lib/github-promotion";
 import {
   openSubmissionArchive,
+  openVerifierLog,
+  verifierLogPath,
+  type VerifierLogPayload,
   parseSubmissionArchivePath,
   requireSubmissionArchiveKey,
   submissionArchiveEnvelopeSchema,
@@ -218,4 +221,26 @@ export async function readSubmissionArchive(
     options.archiveKey ?? requireSubmissionArchiveKey(),
   );
   return { entry, payload, summary: summarizeSubmissionArchive(payload) };
+}
+
+/** The retained, decrypted verifier log for a job, or null if none was kept. */
+export async function readVerifierLog(
+  jobId: string,
+  proofDigest: string | null,
+  options: SubmissionArchiveStoreOptions = {},
+): Promise<VerifierLogPayload | null> {
+  const path = verifierLogPath(jobId);
+  const { client, tree } = await archiveClientAndTree(options);
+  const entry = tree.tree.find((candidate) => candidate.type === "blob" && candidate.path === path);
+  if (!entry) return null;
+  const blob = blobSchema.parse(await client.json(repositoryPath(`git/blobs/${entry.sha}`)));
+  const envelope = JSON.parse(
+    Buffer.from(blob.content.replace(/\s+/g, ""), "base64").toString("utf8"),
+  ) as unknown;
+  const payload = openVerifierLog(envelope, options.archiveKey ?? requireSubmissionArchiveKey());
+  // The digest is bound into the ciphertext; also bind it to the caller's job.
+  if (payload.jobId !== jobId || (proofDigest !== null && payload.proofDigest !== proofDigest)) {
+    throw new Error("The retained verifier log belongs to a different job");
+  }
+  return payload;
 }

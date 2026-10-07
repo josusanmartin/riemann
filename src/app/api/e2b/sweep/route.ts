@@ -101,7 +101,7 @@ export async function GET(request: Request): Promise<Response> {
         feedback,
         evidenceUrl: null,
         completedAt: result.completedAt,
-      });
+      }, result.log);
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, {
         status: "rejected-cleaned",
@@ -117,7 +117,7 @@ export async function GET(request: Request): Promise<Response> {
         message: null,
         evidenceUrl: promotion.evidenceUrl,
         completedAt: result.completedAt,
-      });
+      }, result.log);
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { status: "promoted", promotion });
     } catch (error) {
@@ -129,7 +129,7 @@ export async function GET(request: Request): Promise<Response> {
           message,
           evidenceUrl: null,
           completedAt: result.completedAt,
-        });
+        }, result.log);
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
         return noStore(200, {
           status: "superseded",

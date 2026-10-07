@@ -116,8 +116,9 @@ async function isSupersededBeforeStart(
 export async function advanceVerificationQueue(
   jobId: string,
   completion: QueueCompletionInput,
+  verifierLog?: string,
 ): Promise<QueueAdvance & { nextStarted: boolean }> {
-  const advance = await completeVerificationJob(jobId, completion);
+  const advance = await completeVerificationJob(jobId, completion, {}, verifierLog);
   let next = advance.next;
   let publishedRecordId: string | null | undefined;
   for (let skippedJobs = 0; next && skippedJobs < 10; skippedJobs += 1) {

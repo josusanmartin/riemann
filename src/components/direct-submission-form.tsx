@@ -150,10 +150,10 @@ export function DirectSubmissionForm({
     setEvidenceUrl("");
   }
 
-  const poll = useCallback(async (jobToken: string) => {
+  const poll = useCallback(async (jobToken: string, initialDelayMs = 5_000) => {
     const generation = ++pollGeneration.current;
     let transientFailures = 0;
-    let delayMs = 5_000;
+    let delayMs = initialDelayMs;
     for (;;) {
       await new Promise((resolve) => window.setTimeout(resolve, delayMs));
       if (pollGeneration.current !== generation) return;
@@ -197,7 +197,8 @@ export function DirectSubmissionForm({
         setDigest(payload.proofDigest ?? "");
         setLog(payload.log ?? "");
         setFeedback(payload.feedback ?? null);
-        clearActiveJob(storageKey);
+        // Keep the finished job's handle: a refresh then reloads this verdict
+        // and its retained log instead of losing both. A new upload replaces it.
         if (payload.status === "verified") {
           if (payload.promotion?.status === "superseded") {
             setPhase("superseded");
@@ -239,24 +240,23 @@ export function DirectSubmissionForm({
   useEffect(() => {
     let cancelled = false;
     const restore = async () => {
+      // A queued or running job (possibly started on another device) wins
+      // over the remembered handle, which may belong to a finished job.
       let storedJob = readStoredActiveJob(storageKey);
-      let recoveredStatus: "queued" | "running" = "running";
+      let recoveredStatus: "queued" | "running" | "latest" = "latest";
       let queuePosition: number | undefined;
-      if (!storedJob) {
-        try {
-          const response = await fetch("/api/submissions/active", {
-            cache: "no-store",
-          });
-          const payload = (await response.json()) as RecoveryPayload;
-          if (
-            !response.ok ||
-            payload.status === "none" ||
-            !payload.jobToken ||
-            !payload.proofDigest ||
-            !/^[0-9a-f]{64}$/.test(payload.proofDigest)
-          ) {
-            return;
-          }
+      try {
+        const response = await fetch("/api/submissions/active", {
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as RecoveryPayload;
+        if (
+          response.ok &&
+          payload.status !== "none" &&
+          payload.jobToken &&
+          payload.proofDigest &&
+          /^[0-9a-f]{64}$/.test(payload.proofDigest)
+        ) {
           storedJob = {
             jobToken: payload.jobToken,
             proofDigest: payload.proofDigest,
@@ -264,19 +264,21 @@ export function DirectSubmissionForm({
           recoveredStatus = payload.status === "queued" ? "queued" : "running";
           queuePosition = payload.queuePosition;
           storeActiveJob(storageKey, storedJob);
-        } catch {
-          return;
         }
+      } catch {
+        // Fall back to the remembered handle below.
       }
-      if (cancelled) return;
+      if (cancelled || !storedJob) return;
       setDigest(storedJob.proofDigest);
-      setPhase(recoveredStatus);
+      setPhase(recoveredStatus === "queued" ? "queued" : "running");
       setMessage(
         recoveredStatus === "queued"
           ? `Recovered queued verification · position ${queuePosition ?? 1}.`
-          : "Recovered the active verification job. Reconnecting now.",
+          : recoveredStatus === "running"
+            ? "Recovered the active verification job. Reconnecting now."
+            : "Loading your latest verification result.",
       );
-      void poll(storedJob.jobToken);
+      void poll(storedJob.jobToken, 0);
     };
     const restoreTimer = window.setTimeout(() => void restore(), 0);
     return () => {

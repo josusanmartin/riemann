@@ -243,3 +243,110 @@ export function requireSubmissionArchiveKey(): string {
   decodeArchiveKey(value);
   return value;
 }
+
+// Verifier logs live only inside the E2B sandbox, which is deleted once a
+// verdict is recorded. Keep an encrypted copy beside the queue receipt so the
+// submitter (and maintainers) can read it later. Logs can echo the submitter's
+// own source and identifiers, so they are never public.
+export const VERIFIER_LOG_DIRECTORY = "runtime/verifier-logs";
+const VERIFIER_LOG_CONTEXT = "riemann-fail-verifier-log-v1";
+// The first error and the final tail are what matter; cap what is retained.
+export const MAX_RETAINED_LOG_BYTES = 256 * 1024;
+
+export const verifierLogPayloadSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    jobId: z.string().uuid(),
+    proofDigest: sha256Schema,
+    completedAt: z.string().datetime({ offset: true }),
+    omittedBytes: z.number().int().nonnegative(),
+    log: z.string().max(MAX_RETAINED_LOG_BYTES),
+  })
+  .strict();
+
+export type VerifierLogPayload = z.infer<typeof verifierLogPayloadSchema>;
+
+function verifierLogAad(jobId: string, proofDigest: string): Buffer {
+  return Buffer.from(`${VERIFIER_LOG_CONTEXT}\0${jobId}\0${proofDigest}`, "utf8");
+}
+
+export function verifierLogPath(jobId: string): string {
+  return `${VERIFIER_LOG_DIRECTORY}/${z.string().uuid().parse(jobId)}.json`;
+}
+
+/** Keep the last MAX_RETAINED_LOG_BYTES bytes, never splitting a character. */
+export function tailVerifierLog(log: string): { log: string; omittedBytes: number } {
+  const bytes = Buffer.from(log, "utf8");
+  if (bytes.length <= MAX_RETAINED_LOG_BYTES) return { log, omittedBytes: 0 };
+  let start = bytes.length - MAX_RETAINED_LOG_BYTES;
+  // Skip UTF-8 continuation bytes so the kept tail starts on a character.
+  while (start < bytes.length && (bytes[start] & 0xc0) === 0x80) start += 1;
+  return { log: bytes.subarray(start).toString("utf8"), omittedBytes: start };
+}
+
+export function sealVerifierLog(
+  input: { jobId: string; proofDigest: string; completedAt: string; log: string },
+  encodedKey: string,
+  nonce = randomBytes(12),
+): SubmissionArchiveEnvelope {
+  const payload = verifierLogPayloadSchema.parse({
+    schemaVersion: 1,
+    jobId: input.jobId,
+    proofDigest: input.proofDigest,
+    completedAt: input.completedAt,
+    ...tailVerifierLog(input.log),
+  });
+  if (nonce.length !== 12) {
+    throw new Error("Verifier log nonces must be exactly 12 bytes");
+  }
+  const key = decodeArchiveKey(encodedKey);
+  const cipher = createCipheriv("aes-256-gcm", key, nonce);
+  cipher.setAAD(verifierLogAad(payload.jobId, payload.proofDigest));
+  const compressed = gzipSync(Buffer.from(JSON.stringify(payload), "utf8"), { level: 9 });
+  const ciphertext = Buffer.concat([cipher.update(compressed), cipher.final()]);
+  return submissionArchiveEnvelopeSchema.parse({
+    schemaVersion: 1,
+    algorithm: "aes-256-gcm",
+    compression: "gzip",
+    keyId: archiveKeyId(key),
+    jobId: payload.jobId,
+    proofDigest: payload.proofDigest,
+    createdAt: payload.completedAt,
+    nonce: nonce.toString("base64"),
+    authenticationTag: cipher.getAuthTag().toString("base64"),
+    ciphertext: ciphertext.toString("base64"),
+  });
+}
+
+export function openVerifierLog(rawEnvelope: unknown, encodedKey: string): VerifierLogPayload {
+  const envelope = submissionArchiveEnvelopeSchema.parse(rawEnvelope);
+  const key = decodeArchiveKey(encodedKey);
+  if (archiveKeyId(key) !== envelope.keyId) {
+    throw new Error("The verifier log was encrypted with another key");
+  }
+  const decipher = createDecipheriv(
+    "aes-256-gcm",
+    key,
+    Buffer.from(envelope.nonce, "base64"),
+    { authTagLength: 16 },
+  );
+  decipher.setAAD(verifierLogAad(envelope.jobId, envelope.proofDigest));
+  decipher.setAuthTag(Buffer.from(envelope.authenticationTag, "base64"));
+  const compressed = Buffer.concat([
+    decipher.update(Buffer.from(envelope.ciphertext, "base64")),
+    decipher.final(),
+  ]);
+  const payload = verifierLogPayloadSchema.parse(
+    JSON.parse(
+      gunzipSync(compressed, { maxOutputLength: MAX_RETAINED_LOG_BYTES * 8 + 10_000 }).toString("utf8"),
+    ),
+  );
+  if (
+    payload.jobId !== envelope.jobId ||
+    payload.proofDigest !== envelope.proofDigest ||
+    payload.completedAt !== envelope.createdAt
+  ) {
+    throw new Error("The verifier log envelope does not match its payload");
+  }
+  return payload;
+}

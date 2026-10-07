@@ -9,7 +9,9 @@ import { RECORDS_BRANCH, RECORDS_REPOSITORY } from "@/lib/github-promotion";
 import {
   isSubmissionArchiveConfigured,
   sealSubmissionArchive,
+  sealVerifierLog,
   submissionArchivePath,
+  verifierLogPath,
 } from "@/lib/submission-archive";
 import { verifierFeedbackSchema } from "@/lib/verifier-feedback";
 
@@ -62,6 +64,8 @@ export const queueCompletionReceiptSchema = z
     evidenceUrl: z.url().max(1_000).nullable(),
     completedAt: z.string().datetime({ offset: true }),
     recoveredJobIds: recoveredJobIdsSchema,
+    // An encrypted verifier log for this job exists at verifierLogPath(jobId).
+    logArchived: z.literal(true).optional(),
   })
   .strict()
   .superRefine((receipt, context) => {
@@ -202,6 +206,9 @@ type QueueMutation<T> = {
   state: SubmissionQueueState;
   result: T;
   changed: boolean;
+  // Extra files written, and paths removed, in the same commit as the state.
+  files?: CommitFile[];
+  deletePaths?: string[];
 };
 
 export class DailySubmissionLimitError extends Error {
@@ -382,6 +389,7 @@ export function completeQueueState(
   jobId: string,
   completion: QueueCompletionInput,
   now = new Date(),
+  logArchived = false,
 ): QueueMutation<QueueAdvance> {
   const parsed = submissionQueueStateSchema.parse(state);
   const existingReceipt = parsed.completed.find((receipt) => receipt.jobId === jobId);
@@ -407,6 +415,7 @@ export function completeQueueState(
     ...(parsed.active.recoveredJobIds
       ? { recoveredJobIds: parsed.active.recoveredJobIds }
       : {}),
+    ...(logArchived ? { logArchived: true } : {}),
   });
   const pending = [...parsed.pending];
   const next = pending.shift() ?? null;
@@ -416,10 +425,16 @@ export function completeQueueState(
     pending,
     completed: [receipt, ...parsed.completed].slice(0, MAX_COMPLETED_RECEIPTS),
   });
+  // Logs are retained only while their receipt is: prune those that rotate out.
+  const deletePaths = [receipt, ...parsed.completed]
+    .slice(MAX_COMPLETED_RECEIPTS)
+    .filter((dropped) => dropped.logArchived)
+    .map((dropped) => verifierLogPath(dropped.jobId));
   return {
     state: updated,
     changed: true,
     result: { advanced: true, next, receipt },
+    ...(deletePaths.length > 0 ? { deletePaths } : {}),
   };
 }
 
@@ -617,18 +632,23 @@ async function createTree(
   client: QueueGitHubClient,
   baseTree: string,
   files: Array<{ path: string; blob: string }>,
+  deletePaths: string[] = [],
 ): Promise<string> {
   return objectShaSchema.parse(
     await client.json(repositoryPath("git/trees"), {
       method: "POST",
       body: JSON.stringify({
         base_tree: baseTree,
-        tree: files.map((file) => ({
-          path: file.path,
-          mode: "100644",
-          type: "blob",
-          sha: file.blob,
-        })),
+        tree: [
+          ...files.map((file) => ({
+            path: file.path,
+            mode: "100644",
+            type: "blob",
+            sha: file.blob,
+          })),
+          // A null sha removes the path from the new tree.
+          ...deletePaths.map((path) => ({ path, mode: "100644", type: "blob", sha: null })),
+        ],
       }),
     }),
   ).sha;
@@ -667,6 +687,7 @@ async function writeStateCommit(
   message: string,
   now: Date,
   additionalFiles: CommitFile[] = [],
+  deletePaths: string[] = [],
 ): Promise<string> {
   const commit = await getCommit(client, head);
   const files = [
@@ -685,7 +706,25 @@ async function writeStateCommit(
       blob: await createBlob(client, file.content),
     })),
   );
-  const tree = await createTree(client, commit.tree.sha, blobs);
+  if (deletePaths.some((path) => files.some((file) => file.path === path))) {
+    throw new Error("A queue commit cannot write and delete the same path");
+  }
+  // GitHub rejects the whole tree if it is asked to delete a missing path, and
+  // a commit that can never be written would wedge the queue. Prune only what
+  // is actually there.
+  const present = await Promise.all(
+    deletePaths.map(async (path) =>
+      (
+        await client.request(
+          repositoryPath(`contents/${path}?ref=${encodeURIComponent(head)}`),
+          { method: "HEAD" },
+          [404],
+        )
+      ).status !== 404,
+    ),
+  );
+  const removable = deletePaths.filter((_, index) => present[index]);
+  const tree = await createTree(client, commit.tree.sha, blobs, removable);
   return createCommit(client, tree, head, message, now);
 }
 
@@ -754,7 +793,8 @@ async function mutateQueue<T>(
       mutation.state,
       message,
       now,
-      additionalFiles,
+      [...additionalFiles, ...(mutation.files ?? [])],
+      mutation.deletePaths,
     );
     try {
       await client.json(
@@ -872,13 +912,28 @@ export function completeVerificationJob(
   jobId: string,
   completion: QueueCompletionInput,
   options: QueueOptions = {},
+  verifierLog?: string,
 ): Promise<QueueAdvance> {
   z.string().uuid().parse(jobId);
   const now = options.now ?? new Date();
+  const archiveKey = verifierLog === undefined ? undefined : requiredArchiveKey(options);
   return mutateQueue(
     { ...options, now },
     "queue: complete and advance formal verification FIFO",
-    (state) => completeQueueState(state, jobId, completion, now),
+    (state) => {
+      const mutation = completeQueueState(state, jobId, completion, now, archiveKey !== undefined);
+      const receipt = mutation.result.receipt;
+      if (!mutation.changed || archiveKey === undefined || !receipt) return mutation;
+      // The log is committed atomically with the receipt that points at it.
+      const envelope = sealVerifierLog(
+        { jobId: receipt.jobId, proofDigest: receipt.proofDigest, completedAt: receipt.completedAt, log: verifierLog! },
+        archiveKey,
+      );
+      return {
+        ...mutation,
+        files: [{ path: verifierLogPath(receipt.jobId), content: `${JSON.stringify(envelope, null, 2)}\n` }],
+      };
+    },
   );
 }
 

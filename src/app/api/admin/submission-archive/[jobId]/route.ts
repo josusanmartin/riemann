@@ -2,6 +2,7 @@ import { getSession } from "@/auth";
 import {
   isSubmissionArchiveMaintainer,
   readSubmissionArchive,
+  readVerifierLog,
 } from "@/lib/submission-archive-store";
 
 export const runtime = "nodejs";
@@ -27,6 +28,23 @@ export async function GET(
   }
 
   try {
+    // ?log=1 returns the retained verifier log instead of the source.
+    if (new URL(request.url).searchParams.get("log") === "1") {
+      const retained = await readVerifierLog((await params).jobId, null);
+      if (!retained) return json(404, { error: "log_not_found" });
+      return new Response(retained.log, {
+        status: 200,
+        headers: {
+          "Cache-Control": "private, no-store, max-age=0",
+          "Content-Security-Policy": "default-src 'none'; sandbox",
+          "Content-Type": "text/plain; charset=utf-8",
+          "X-Content-Type-Options": "nosniff",
+          "X-Riemann-Proof-Digest": retained.proofDigest,
+          "X-Riemann-Log-Omitted-Bytes": String(retained.omittedBytes),
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
+        },
+      });
+    }
     const archived = await readSubmissionArchive((await params).jobId);
     if (!archived) return json(404, { error: "archive_not_found" });
     const download = new URL(request.url).searchParams.get("download") === "1";

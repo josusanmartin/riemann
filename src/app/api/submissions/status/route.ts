@@ -26,6 +26,7 @@ import {
   type QueuedVerificationJob,
 } from "@/lib/submission-queue";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
+import { readVerifierLog } from "@/lib/submission-archive-store";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -37,16 +38,35 @@ function noStore(status: number, body: object): Response {
   });
 }
 
-function completedReceiptResponse(
+// The sandbox (and its live log) is gone once a verdict is recorded; return
+// the retained encrypted copy instead. Callers have already checked that the
+// signed-in user owns this job. A missing or unreadable log never hides the
+// verdict itself.
+async function retainedLog(receipt: QueueCompletionReceipt): Promise<string | undefined> {
+  if (!receipt.logArchived) return undefined;
+  try {
+    const retained = await readVerifierLog(receipt.jobId, receipt.proofDigest);
+    if (!retained) return undefined;
+    return retained.omittedBytes > 0
+      ? `[${retained.omittedBytes} earlier bytes of this log were not retained]\n${retained.log}`
+      : retained.log;
+  } catch (error) {
+    console.error("Unable to read a retained verifier log", error);
+    return undefined;
+  }
+}
+
+async function completedReceiptResponse(
   submissionId: string,
   expectedDigest: string,
   receipt: QueueCompletionReceipt,
-): Response {
+): Promise<Response> {
   if (receipt.proofDigest !== expectedDigest) {
     throw new Error(
       "The durable queue receipt does not match the verification job",
     );
   }
+  const log = await retainedLog(receipt);
   if (receipt.outcome === "rejected") {
     const feedback =
       receipt.feedback ??
@@ -61,6 +81,7 @@ function completedReceiptResponse(
       completedAt: receipt.completedAt,
       message: feedback.detail,
       feedback,
+      ...(log === undefined ? {} : { log }),
     });
   }
   return noStore(200, {
@@ -68,6 +89,7 @@ function completedReceiptResponse(
     submissionId,
     proofDigest: receipt.proofDigest,
     completedAt: receipt.completedAt,
+    ...(log === undefined ? {} : { log }),
     promotion:
       receipt.outcome === "superseded"
         ? {
@@ -147,7 +169,7 @@ export async function GET(request: Request): Promise<Response> {
       job = await recoveredJobCoordinates(job, queue.job);
     }
     if (queue.status === "completed") {
-      return completedReceiptResponse(
+      return await completedReceiptResponse(
         job.submissionId,
         job.proofDigest,
         queue.receipt,
@@ -211,7 +233,7 @@ export async function GET(request: Request): Promise<Response> {
         feedback,
         evidenceUrl: null,
         completedAt: result.completedAt,
-      });
+      }, result.log);
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, {
         ...result,
@@ -237,7 +259,7 @@ export async function GET(request: Request): Promise<Response> {
         message: null,
         evidenceUrl: promotion.evidenceUrl,
         completedAt: result.completedAt,
-      });
+      }, result.log);
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, { ...result, promotion });
     } catch (error) {
@@ -249,7 +271,7 @@ export async function GET(request: Request): Promise<Response> {
           message,
           evidenceUrl: null,
           completedAt: result.completedAt,
-        });
+        }, result.log);
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
         return noStore(200, {
           ...result,
@@ -275,7 +297,7 @@ export async function GET(request: Request): Promise<Response> {
         // between our initial queue read and sandbox connection. The durable
         // verdict wins; do not tell a successfully judged user it expired.
         if (queue.status === "completed") {
-          return completedReceiptResponse(job.submissionId, job.proofDigest, queue.receipt);
+          return await completedReceiptResponse(job.submissionId, job.proofDigest, queue.receipt);
         }
         if (queue.status === "active") {
           // queue.job.jobId differs from the handle's after admin recovery.
@@ -287,7 +309,7 @@ export async function GET(request: Request): Promise<Response> {
             evidenceUrl: null,
           });
           if (completion.receipt) {
-            return completedReceiptResponse(job.submissionId, job.proofDigest, completion.receipt);
+            return await completedReceiptResponse(job.submissionId, job.proofDigest, completion.receipt);
           }
         }
       } catch (queueError) {

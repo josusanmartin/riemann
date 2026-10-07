@@ -1,10 +1,17 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { computeDirectProofDigest } from "@/lib/direct-submission";
-import { openSubmissionArchive, submissionArchivePath } from "@/lib/submission-archive";
+import {
+  openSubmissionArchive,
+  openVerifierLog,
+  submissionArchivePath,
+  verifierLogPath,
+} from "@/lib/submission-archive";
 import {
   completeQueueState,
+  completeVerificationJob,
   createEmptyQueueState,
+  MAX_COMPLETED_RECEIPTS,
   DailySubmissionLimitError,
   enqueueVerificationJob,
   enqueueQueueState,
@@ -128,10 +135,18 @@ function fakeQueueGitHub() {
     if (url.pathname.endsWith("/git/trees") && method === "POST") {
       const parsed = body as {
         base_tree: string;
-        tree: Array<{ path: string; sha: string }>;
+        tree: Array<{ path: string; sha: string | null }>;
       };
       const files = new Map(trees.get(parsed.base_tree) ?? []);
-      for (const entry of parsed.tree) files.set(entry.path, entry.sha);
+      for (const entry of parsed.tree) {
+        // As on GitHub, a null sha removes the path, and removing a path
+        // that is not in the base tree rejects the whole tree.
+        if (entry.sha === null && !files.has(entry.path)) {
+          return response({ message: "GitRPC::BadObjectState" }, 422);
+        }
+        if (entry.sha === null) files.delete(entry.path);
+        else files.set(entry.path, entry.sha);
+      }
       const tree = sha(
         `tree-${sequence += 1}-${JSON.stringify([...files.entries()].sort())}`,
       );
@@ -189,6 +204,20 @@ function fakeQueueGitHub() {
         release = resolve;
       });
       patchBarrier = { remaining: count, promise, release };
+    },
+    /** Commit an edited queue state directly, as if written by earlier jobs. */
+    seedState(edit: (state: Record<string, unknown>) => Record<string, unknown>) {
+      const tree = commits.get(queueHead ?? "")?.tree ?? "";
+      const files = new Map(trees.get(tree) ?? []);
+      const current = JSON.parse(blobs.get(files.get("runtime/submission-queue.json") ?? "") ?? "{}");
+      const blob = sha(`seed-blob-${sequence += 1}`);
+      blobs.set(blob, `${JSON.stringify(edit(current), null, 2)}\n`);
+      files.set("runtime/submission-queue.json", blob);
+      const newTree = sha(`seed-tree-${sequence += 1}`);
+      trees.set(newTree, files);
+      const commit = sha(`seed-commit-${sequence += 1}`);
+      commits.set(commit, { tree: newTree, parent: queueHead });
+      queueHead = commit;
     },
     latestState: () => {
       const tree = commits.get(queueHead ?? "")?.tree ?? "";
@@ -518,6 +547,121 @@ describe("durable formal verification queue", () => {
       status: "completed",
       receipt: { jobId: input(98).jobId, outcome: "promoted" },
     });
+  });
+
+  it("commits the encrypted verifier log with its receipt", async () => {
+    const github = fakeQueueGitHub();
+    const options = {
+      token: "test-token",
+      ownerSecret,
+      archiveKey,
+      fetchImplementation: github.fetchImplementation,
+      now: firstDay,
+    };
+    const archived = archivedInput(43, "Log-Solver", "log-record");
+    await enqueueVerificationJob(archived.input, "Log-Solver", archived.archive, options);
+    const log = "Building Solution.Candidate\nerror: Solution.lean:9:4: unknown identifier 'secretLemma'\n";
+
+    const advance = await completeVerificationJob(
+      archived.input.jobId,
+      { outcome: "rejected", promotionStatus: null, message: "rejected", evidenceUrl: null },
+      options,
+      log,
+    );
+
+    expect(advance.receipt).toMatchObject({ jobId: archived.input.jobId, logArchived: true });
+    const raw = github.latestPath(verifierLogPath(archived.input.jobId));
+    expect(raw).not.toContain("secretLemma");
+    expect(openVerifierLog(JSON.parse(raw), archiveKey)).toMatchObject({
+      jobId: archived.input.jobId,
+      proofDigest: archived.input.proofDigest,
+      omittedBytes: 0,
+      log,
+    });
+    expect(github.latestState()).not.toContain("secretLemma");
+  });
+
+  it("prunes a retained log when its receipt rotates out of the ledger", () => {
+    const admission = enqueueQueueState(
+      createEmptyQueueState("2026-08-11"),
+      input(1),
+      "pruning-solver",
+      ownerSecret,
+      firstDay,
+    );
+    const receipt = (index: number, logArchived: boolean) => ({
+      jobId: `10000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+      proofDigest: "e".repeat(64),
+      outcome: "rejected" as const,
+      promotionStatus: null,
+      message: "rejected",
+      evidenceUrl: null,
+      completedAt: "2026-08-10T00:00:00.000Z",
+      ...(logArchived ? { logArchived: true as const } : {}),
+    });
+    // A full ledger whose oldest receipt has a retained log.
+    const completed = Array.from({ length: MAX_COMPLETED_RECEIPTS }, (_, index) =>
+      receipt(index, index === MAX_COMPLETED_RECEIPTS - 1),
+    );
+    const mutation = completeQueueState(
+      { ...admission.state, completed },
+      input(1).jobId,
+      { outcome: "rejected", promotionStatus: null, message: "rejected", evidenceUrl: null },
+      firstDay,
+      true,
+    );
+
+    expect(mutation.state.completed).toHaveLength(MAX_COMPLETED_RECEIPTS);
+    expect(mutation.deletePaths).toEqual([verifierLogPath(completed.at(-1)!.jobId)]);
+
+    // Receipts from before log retention carry no log, so nothing is deleted.
+    const legacy = completeQueueState(
+      { ...admission.state, completed: completed.map((item) => receipt(Number(item.jobId.slice(-12)), false)) },
+      input(1).jobId,
+      { outcome: "rejected", promotionStatus: null, message: "rejected", evidenceUrl: null },
+      firstDay,
+      true,
+    );
+    expect(legacy.deletePaths).toBeUndefined();
+  });
+
+  it("still completes a job when a log due for pruning is already missing", async () => {
+    const github = fakeQueueGitHub();
+    const options = {
+      token: "test-token",
+      ownerSecret,
+      archiveKey,
+      fetchImplementation: github.fetchImplementation,
+      now: firstDay,
+    };
+    const archived = archivedInput(44, "Prune-Solver", "prune-record");
+    await enqueueVerificationJob(archived.input, "Prune-Solver", archived.archive, options);
+    // A full ledger whose oldest receipt claims a log that is not in the tree.
+    const missingJobId = "20000000-0000-4000-8000-000000000199";
+    github.seedState((state) => ({
+      ...state,
+      completed: Array.from({ length: MAX_COMPLETED_RECEIPTS }, (_, index) => ({
+        jobId: `20000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+        proofDigest: "e".repeat(64),
+        outcome: "rejected",
+        promotionStatus: null,
+        message: "rejected",
+        evidenceUrl: null,
+        completedAt: "2026-08-10T00:00:00.000Z",
+        ...(index === MAX_COMPLETED_RECEIPTS - 1 ? { logArchived: true } : {}),
+      })),
+    }));
+
+    await expect(
+      completeVerificationJob(
+        archived.input.jobId,
+        { outcome: "rejected", promotionStatus: null, message: "rejected", evidenceUrl: null },
+        options,
+        "error: boom\n",
+      ),
+    ).resolves.toMatchObject({ receipt: { jobId: archived.input.jobId, logArchived: true } });
+    expect(github.latestState()).not.toContain(missingJobId);
+    expect(github.latestPath(verifierLogPath(archived.input.jobId))).not.toBe("");
   });
 
   it("atomically archives encrypted source without publishing identity or plaintext", async () => {
