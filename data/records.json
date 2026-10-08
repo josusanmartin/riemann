@@ -486,5 +486,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/d272437e7ebeb17b87c8c3d7cece592aa23785ab/submissions/dani-bound-2026/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "slight improvement on the previous method by using α = √(τ/E) instead of α = τ/E"
+  },
+  {
+    "id": "attempt-015",
+    "track": "critical-line",
+    "date": "2026-10-08",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673483200000000000000000000000",
+    "method": "Eight-point weighted refinement: pair-distance polytope cells, exact closure with region-boundary splits, Z tangent extension; √ branch of the τ = 8/7 band profile (Gebendorfer 2026 Lemma 3.3).",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673483200000000000000000000000",
+    "scorePercent": "67.3483200000000000000000000000",
+    "exactRational": {
+      "numerator": "6734832",
+      "denominator": "10000000"
+    },
+    "exactExpression": "(6734832 : ℝ) / 10000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6b3438546f3d4a2af2d802dda347c89123768d73/submissions/attempt-015/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6b3438546f3d4a2af2d802dda347c89123768d73/submissions/attempt-015/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-012/013/014. Ainta's weighted n-point simple-zero refinement at n = 8 on the AM-form window v(s) = cos(√2 s) + Σ_{j=1}^{12} c_j cos(2πjs) of AMTOPA's 13-term family, with corrections and LP weights re-optimised for eight points (B = 404350/10⁸) and H ≥ 0.67216841 proved in-file. The finite certificate PC8C5BF proves c = 805124/10⁸ (δ 0.005 %) on g₀ ≤ g₆: its cells are pair-distance polytopes re-closed exactly as difference constraints after each split (4,566 splits, 2,260 at convex-region boundaries); its 4,598 leaves are 4,419 per-term tangent-minorant leaves (LP multipliers on the cell's constraints, zero-order extension) and 179 reflected cells, with cache-shared derivative and pyramid reads. The block bound uses the band profile g_τ(E) = E (E ≤ τ), 2√(τE) − τ (E > τ), τ = 8/7, derived independently from Gebendorfer 2026 Lemma 3.3 (AMTOPA, MIT)"
   }
 ]
