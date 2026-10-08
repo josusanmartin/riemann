@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "attempt-015",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "6734832",
+    "denominator": "10000000"
+  },
+  "scoreDecimal": "0.673483200000000000000000000000",
+  "previousRecordId": "dani-bound-2026",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-08T12:51:07.759Z",
+  "challengeDigest": "1818c7cb91afbb7f41e0817fed1be3cee09e2042f05e2d4e8fcf41c23fbaec27",
+  "verifierTemplateDigest": "7731371f0459694d5856895e5709ad1c73149ae7d86820a2012c5010430b1f7f",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

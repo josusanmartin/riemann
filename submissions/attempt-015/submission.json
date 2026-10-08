@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-015",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6734832",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-012/013/014. Ainta's weighted n-point simple-zero refinement at n = 8 on the AM-form window v(s) = cos(√2 s) + Σ_{j=1}^{12} c_j cos(2πjs) of AMTOPA's 13-term family, with corrections and LP weights re-optimised for eight points (B = 404350/10⁸) and H ≥ 0.67216841 proved in-file. The finite certificate PC8C5BF proves c = 805124/10⁸ (δ 0.005 %) on g₀ ≤ g₆: its cells are pair-distance polytopes re-closed exactly as difference constraints after each split (4,566 splits, 2,260 at convex-region boundaries); its 4,598 leaves are 4,419 per-term tangent-minorant leaves (LP multipliers on the cell's constraints, zero-order extension) and 179 reflected cells, with cache-shared derivative and pyramid reads. The block bound uses the band profile g_τ(E) = E (E ≤ τ), 2√(τE) − τ (E > τ), τ = 8/7, derived independently from Gebendorfer 2026 Lemma 3.3 (AMTOPA, MIT)",
+  "method": "Eight-point weighted refinement: pair-distance polytope cells, exact closure with region-boundary splits, Z tangent extension; √ branch of the τ = 8/7 band profile (Gebendorfer 2026 Lemma 3.3).",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
