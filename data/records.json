@@ -536,5 +536,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/296f7bb9c4e01b0c97554cf76af91ed99a410e8d/submissions/attempt-016/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-015: Ainta's weighted n-point simple-zero refinement at n = 8 on AMTOPA's 13-term AM-form window, certificate PC8C5BF (c = 805124/10⁸), with the √ branch of the τ = 8/7 band profile (derived independently from Gebendorfer 2026 Lemma 3.3; AMTOPA, MIT; branch first used on the board by dani-ani0). New here: edge windows. At both ends of each block, truncated windows of 5 and 6 gaps carry the eight-point weights restricted to their gaps (the weights are exactly reversal-symmetric, so one certificate serves both ends); coverage is proved via virtual window offsets, their floors join the block energy inside g_τ and their pressures join the cost. Edge certificates PCE5KP (c = 552735/10⁸) and PCE6UPC (c = 693058/10⁸, 656 leaves). m = 148, Φ ≥ 0.673501563. Credits: typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Zeta23, Zeta Lab."
+  },
+  {
+    "id": "master-of-puppets",
+    "track": "critical-line",
+    "date": "2026-10-09",
+    "author": "R. Arun Chandru",
+    "github": "arun-chandru",
+    "title": "Certified critical-line bound 0.673547805029767868251581865982",
+    "method": "Gram-defect pinching and separation",
+    "model": "GPT-6 Astra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673547805029767868251581865982",
+    "scorePercent": "67.3547805029767868251581865982",
+    "exactRational": {
+      "numerator": "66812491",
+      "denominator": "99194876"
+    },
+    "exactExpression": "(66812491 : ℝ) / 99194876",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/d95a6d7d11d7836306ec7ec1eb5be3478663718e/submissions/master-of-puppets/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/d95a6d7d11d7836306ec7ec1eb5be3478663718e/submissions/master-of-puppets/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Separated-block spectral control and close-pair matching retain the full Gram defect using a eight-point certificate; both counting windows are covered."
   }
 ]
