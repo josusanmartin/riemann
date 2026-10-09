@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-016",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "6735015",
+    "denominator": "10000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-015: Ainta's weighted n-point simple-zero refinement at n = 8 on AMTOPA's 13-term AM-form window, certificate PC8C5BF (c = 805124/10⁸), with the √ branch of the τ = 8/7 band profile (derived independently from Gebendorfer 2026 Lemma 3.3; AMTOPA, MIT; branch first used on the board by dani-ani0). New here: edge windows. At both ends of each block, truncated windows of 5 and 6 gaps carry the eight-point weights restricted to their gaps (the weights are exactly reversal-symmetric, so one certificate serves both ends); coverage is proved via virtual window offsets, their floors join the block energy inside g_τ and their pressures join the cost. Edge certificates PCE5KP (c = 552735/10⁸) and PCE6UPC (c = 693058/10⁸, 656 leaves). m = 148, Φ ≥ 0.673501563. Credits: typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Zeta23, Zeta Lab.",
+  "method": "Eight-point weighted refinement with edge windows: truncated 5- and 6-gap windows at both block ends recover band-pair coverage; √ branch of the τ = 8/7 band profile (Gebendorfer 2026 Lemma 3.3).",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
