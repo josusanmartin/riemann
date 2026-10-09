@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "master-of-puppets",
+  "track": "critical-line",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "R. Arun Chandru"
+  },
+  "score": {
+    "numerator": "66812491",
+    "denominator": "99194876"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Separated-block spectral control and close-pair matching retain the full Gram defect using a eight-point certificate; both counting windows are covered.",
+  "method": "Gram-defect pinching and separation",
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
