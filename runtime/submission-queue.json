@@ -1,6 +1,13 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "iunlhganc33qtetmsjlqs",
+    "jobId": "06d5d45f-1a07-4168-bd46-0cfa5bea3328",
+    "proofDigest": "9bc2d629e1b0476d34dddec23ee1b8173a153ae7c63e2324db8c79f9dd80332e",
+    "ownerKey": "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526",
+    "submissionKey": "e375b00d5a6e1edaa57e0b6b154bb7e618173f92e04b980815f66cbd91e23017",
+    "enqueuedAt": "2026-10-10T00:42:59.481Z"
+  },
   "pending": [],
   "completed": [
     {
@@ -384,11 +391,9 @@
     }
   ],
   "daily": {
-    "day": "2026-10-09",
+    "day": "2026-10-10",
     "attempts": {
-      "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d": 1,
-      "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526": 1,
-      "de4db794f21be708df7eec4e07152ecba887b58e12da483f7f055d4eac6e5177": 1
+      "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526": 1
     }
   }
 }
