@@ -586,5 +586,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/6fd487c526acbfb0f76d44772614454b7289f9e6/submissions/shi-exact-window-refinement-2026/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Exact rational recalibration of the accepted master-of-puppets proof (66812491/99194876). The same rational enclosure proves H_W >= 672168410508/10^12; with the unchanged eight-point certificate and pressure this yields 15184657057/22544290000, a gain of 127/247987190000. The window coefficients, certificate data, analytic hypotheses, and counting argument are unchanged. The full actual dyadic and cumulative zero-count chain and all three exports passed local modular Lean checks. This is a rounding refinement, not a new method. Inherited authorship and license notices are retained."
+  },
+  {
+    "id": "master-of-puppets2",
+    "track": "critical-line",
+    "date": "2026-10-11",
+    "author": "arun-chandru",
+    "github": "arun-chandru",
+    "title": "Certified critical-line bound 0.673547805591161732991127485254",
+    "method": "trigonometric enclosure refinement of the Gram-defect proof",
+    "model": "GPT-6 Astra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673547805591161732991127485254",
+    "scorePercent": "67.3547805591161732991127485254",
+    "exactRational": {
+      "numerator": "167031227639218487",
+      "denominator": "247987190000000000"
+    },
+    "exactExpression": "(167031227639218487 : ℝ) / 247987190000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/4629926451abb1c3fc193bb90e522fc63b9ac6b7/submissions/master-of-puppets2/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/4629926451abb1c3fc193bb90e522fc63b9ac6b7/submissions/master-of-puppets2/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Sharpens the cosine enclosure and obtains the sine bound from sin²+cos²=1. Exact rational propagation through the Gram-defect certificate."
   }
 ]
