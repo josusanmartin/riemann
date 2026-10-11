@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "master-of-puppets2",
+  "track": "critical-line",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "arun-chandru"
+  },
+  "score": {
+    "numerator": "167031227639218487",
+    "denominator": "247987190000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Sharpens the cosine enclosure and obtains the sine bound from sin²+cos²=1. Exact rational propagation through the Gram-defect certificate.",
+  "method": "trigonometric enclosure refinement of the Gram-defect proof",
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
