@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "shi-exact-window-refinement-2026",
+  "author": {
+    "github": "yuhangshi888",
+    "displayName": "Yuhang Shi"
+  },
+  "model": "ChatGPT",
+  "harness": "Codex",
+  "score": {
+    "numerator": "15184657057",
+    "denominator": "22544290000"
+  },
+  "scoreDecimal": "0.673547805541891095261815741369",
+  "previousRecordId": "master-of-puppets",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-11T11:06:18.905Z",
+  "challengeDigest": "7881dd04f00a12ff6810037a87fb2bc287895ed7dbd47715410646a597dcf56e",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

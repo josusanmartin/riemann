@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "shi-exact-window-refinement-2026",
+  "track": "critical-line",
+  "author": {
+    "github": "yuhangshi888",
+    "displayName": "Yuhang Shi"
+  },
+  "score": {
+    "numerator": "15184657057",
+    "denominator": "22544290000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Exact rational recalibration of the accepted master-of-puppets proof (66812491/99194876). The same rational enclosure proves H_W >= 672168410508/10^12; with the unchanged eight-point certificate and pressure this yields 15184657057/22544290000, a gain of 127/247987190000. The window coefficients, certificate data, analytic hypotheses, and counting argument are unchanged. The full actual dyadic and cumulative zero-count chain and all three exports passed local modular Lean checks. This is a rounding refinement, not a new method. Inherited authorship and license notices are retained.",
+  "method": "Exact rational refinement of the accepted rank-trace/window proof",
+  "model": "ChatGPT",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
