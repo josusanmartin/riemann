@@ -611,5 +611,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/4629926451abb1c3fc193bb90e522fc63b9ac6b7/submissions/master-of-puppets2/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Sharpens the cosine enclosure and obtains the sine bound from sin²+cos²=1. Exact rational propagation through the Gram-defect certificate."
+  },
+  {
+    "id": "attempt-020",
+    "track": "critical-line",
+    "date": "2026-10-11",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673547997925698658188502053809",
+    "method": "Re-optimised eight-point certificate (weights and pressures) in the Gram-defect matching chain, with the master-of-puppets2 window enclosure.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673547997925698658188502053809",
+    "scorePercent": "67.3547997925698658188502053809",
+    "exactRational": {
+      "numerator": "167025220139218487",
+      "denominator": "247978200000000000"
+    },
+    "exactExpression": "(167025220139218487 : ℝ) / 247978200000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/e072ab396e34fd937224ff3f666d3d7a5db9fb18/submissions/attempt-020/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/e072ab396e34fd937224ff3f666d3d7a5db9fb18/submissions/attempt-020/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on R. Arun Chandru's master-of-puppets and master-of-puppets2 (Gram-defect matching chain and circle-enclosure window bound H_W ≥ 672168410556873948/10¹⁸, kept unchanged with notices), which build on our attempt-016. New here: the eight-point certificate is replaced by a re-optimised one, PC8R. Weights and pressures are re-optimised for κ = (H − B)/(1 − c), with B = 406753/10⁸ and certified floor c = 808720/10⁸ over 4,575 leaves. The result is κ = (H_W⁻ − B)/(1 − c) = 167025220139218487/247978200000000000. Credits: Arun Chandru, typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Zeta23."
   }
 ]
