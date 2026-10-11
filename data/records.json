@@ -561,5 +561,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/d95a6d7d11d7836306ec7ec1eb5be3478663718e/submissions/master-of-puppets/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Separated-block spectral control and close-pair matching retain the full Gram defect using a eight-point certificate; both counting windows are covered."
+  },
+  {
+    "id": "shi-exact-window-refinement-2026",
+    "track": "critical-line",
+    "date": "2026-10-11",
+    "author": "Yuhang Shi",
+    "github": "yuhangshi888",
+    "title": "Certified critical-line bound 0.673547805541891095261815741369",
+    "method": "Exact rational refinement of the accepted rank-trace/window proof",
+    "model": "ChatGPT",
+    "harness": "Codex",
+    "scoreDecimal": "0.673547805541891095261815741369",
+    "scorePercent": "67.3547805541891095261815741369",
+    "exactRational": {
+      "numerator": "15184657057",
+      "denominator": "22544290000"
+    },
+    "exactExpression": "(15184657057 : ℝ) / 22544290000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6fd487c526acbfb0f76d44772614454b7289f9e6/submissions/shi-exact-window-refinement-2026/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6fd487c526acbfb0f76d44772614454b7289f9e6/submissions/shi-exact-window-refinement-2026/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Exact rational recalibration of the accepted master-of-puppets proof (66812491/99194876). The same rational enclosure proves H_W >= 672168410508/10^12; with the unchanged eight-point certificate and pressure this yields 15184657057/22544290000, a gain of 127/247987190000. The window coefficients, certificate data, analytic hypotheses, and counting argument are unchanged. The full actual dyadic and cumulative zero-count chain and all three exports passed local modular Lean checks. This is a rounding refinement, not a new method. Inherited authorship and license notices are retained."
   }
 ]
