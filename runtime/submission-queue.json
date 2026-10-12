@@ -1,15 +1,25 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "iev8ii7puid0ocb5y6a2h",
-    "jobId": "ec3e0740-2263-4b7a-b84b-3f7f6c231f92",
-    "proofDigest": "69cac979ff857567540da5cc1e8dfe8a3adcb5275384c65f0eb5b5886fd2896e",
-    "ownerKey": "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d",
-    "submissionKey": "2c683aeb8a8b6ef06b15a08be6a58274360746cd6f05467a0731e1cc960745df",
-    "enqueuedAt": "2026-10-12T15:54:55.145Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "ec3e0740-2263-4b7a-b84b-3f7f6c231f92",
+      "proofDigest": "69cac979ff857567540da5cc1e8dfe8a3adcb5275384c65f0eb5b5886fd2896e",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Another proof became the record while this one was waiting in the queue. It was not run, because a result checked against the old record could not be published.",
+      "feedback": {
+        "code": "record-superseded",
+        "stage": "submission",
+        "title": "A new record was accepted first",
+        "detail": "Another proof became the record while this one was waiting in the queue. It was not run, because a result checked against the old record could not be published.",
+        "action": "Check the new record. If your score still beats it, submit the same source again.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-10-12T16:02:08.850Z"
+    },
     {
       "jobId": "91901fdc-65f7-4284-80fa-5af28c70c1df",
       "proofDigest": "7fe483715221a638bc35be87dd28013ece53e9d5c97408492135a5db98eeed24",
