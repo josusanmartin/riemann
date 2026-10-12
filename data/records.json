@@ -711,5 +711,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/8998f2005d202e4a0a406c8c7507426435466d38/submissions/attempt-021/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-020 and on R. Arun Chandru's master-of-puppets and master-of-puppets2 (Gram-defect matching chain and circle-enclosure window bound H_W ≥ 672168410556873948/10¹⁸, notices kept). New here: a nine-point certificate in place of the eight-point one, with the counting chain generalised to n points (error 4(n−1)δ, boundary (n−1)c). Weights are re-optimised by a separation LP, with B = 436674/10⁸ and certified floor c = 856382/10⁸ over 9,712 cells. κ = (H_W⁻ − B)/(1 − c) = 166950417639218487/247859045000000000. Credits: Arun Chandru, typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Kristian Muri Knausgård, Zeta23."
+  },
+  {
+    "id": "master-of-puppets4",
+    "track": "critical-line",
+    "date": "2026-10-12",
+    "author": "R. Arun Chandru",
+    "github": "arun-chandru",
+    "title": "Certified critical-line bound 0.673570008600517227066544444712",
+    "method": "Gram-defect refinement",
+    "model": "GPT-6 Astra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673570008600517227066544444712",
+    "scorePercent": "67.3570008600517227066544444712",
+    "exactRational": {
+      "numerator": "667801670564118872522651",
+      "denominator": "991436171500000000000000"
+    },
+    "exactExpression": "(667801670564118872522651 : ℝ) / 991436171500000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/65c71d512f51df92bec4a3d1edb6a795fc1cac63/submissions/master-of-puppets4/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/65c71d512f51df92bec4a3d1edb6a795fc1cac63/submissions/master-of-puppets4/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Refines exact rational bounds in the nine-point Gram-defect proof"
   }
 ]
