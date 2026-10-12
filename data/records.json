@@ -636,5 +636,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/e072ab396e34fd937224ff3f666d3d7a5db9fb18/submissions/attempt-020/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on R. Arun Chandru's master-of-puppets and master-of-puppets2 (Gram-defect matching chain and circle-enclosure window bound H_W ≥ 672168410556873948/10¹⁸, kept unchanged with notices), which build on our attempt-016. New here: the eight-point certificate is replaced by a re-optimised one, PC8R. Weights and pressures are re-optimised for κ = (H − B)/(1 − c), with B = 406753/10⁸ and certified floor c = 808720/10⁸ over 4,575 leaves. The result is κ = (H_W⁻ − B)/(1 − c) = 167025220139218487/247978200000000000. Credits: Arun Chandru, typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Zeta23."
+  },
+  {
+    "id": "master-of-puppets3",
+    "track": "critical-line",
+    "date": "2026-10-12",
+    "author": "R. Arun Chandru",
+    "github": "arun-chandru",
+    "title": "Certified critical-line bound 0.673547998068810556345035683851",
+    "method": "Gram-defect refinement",
+    "model": "GPT-6 Astra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673547998068810556345035683851",
+    "scorePercent": "67.3547998068810556345035683851",
+    "exactRational": {
+      "numerator": "6424046928501143",
+      "denominator": "9537623075000000"
+    },
+    "exactExpression": "(6424046928501143 : ℝ) / 9537623075000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/839d0da2316f481c8036f6aa5a94bfd0dbef16ef/submissions/master-of-puppets3/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/839d0da2316f481c8036f6aa5a94bfd0dbef16ef/submissions/master-of-puppets3/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "refines exact rational estimates within the existing Gram-defect framework"
   }
 ]
