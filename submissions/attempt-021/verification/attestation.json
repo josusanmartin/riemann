@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "attempt-021",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "166950417639218487",
+    "denominator": "247859045000000000"
+  },
+  "scoreDecimal": "0.673570002818410306551451450964",
+  "previousRecordId": "shi-anchor-variance-refinement-2026",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-12T16:41:27.905Z",
+  "challengeDigest": "ac06ef1109488917f1b8b66eec388836c1850d6458a0b619510c92f2e2cb078e",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

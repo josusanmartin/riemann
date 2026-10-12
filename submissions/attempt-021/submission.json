@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-021",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "166950417639218487",
+    "denominator": "247859045000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-020 and on R. Arun Chandru's master-of-puppets and master-of-puppets2 (Gram-defect matching chain and circle-enclosure window bound H_W ≥ 672168410556873948/10¹⁸, notices kept). New here: a nine-point certificate in place of the eight-point one, with the counting chain generalised to n points (error 4(n−1)δ, boundary (n−1)c). Weights are re-optimised by a separation LP, with B = 436674/10⁸ and certified floor c = 856382/10⁸ over 9,712 cells. κ = (H_W⁻ − B)/(1 − c) = 166950417639218487/247859045000000000. Credits: Arun Chandru, typh (engine, pyramid tables), AMTOPA, Gebendorfer, Ainta, Kristian Muri Knausgård, Zeta23.",
+  "method": "Nine-point weighted certificate, with an n-generic counting chain, in the Gram-defect matching proof using the master-of-puppets2 window enclosure.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
