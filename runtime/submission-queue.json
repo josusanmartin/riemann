@@ -1,24 +1,25 @@
 {
   "schemaVersion": 1,
   "active": {
-    "sandboxId": "imyz18uz9t62m9yeacfxd",
-    "jobId": "91901fdc-65f7-4284-80fa-5af28c70c1df",
-    "proofDigest": "7fe483715221a638bc35be87dd28013ece53e9d5c97408492135a5db98eeed24",
-    "ownerKey": "af0a1d4cf58235e6674feb603dc1be3f72bbed54bd423f671f317c27864fba56",
-    "submissionKey": "be62c88663cdcb29fc17e6ed507c4848c1a0e4ad773859e0024ae94919b4113a",
-    "enqueuedAt": "2026-10-12T15:24:17.787Z"
+    "sandboxId": "iev8ii7puid0ocb5y6a2h",
+    "jobId": "ec3e0740-2263-4b7a-b84b-3f7f6c231f92",
+    "proofDigest": "69cac979ff857567540da5cc1e8dfe8a3adcb5275384c65f0eb5b5886fd2896e",
+    "ownerKey": "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d",
+    "submissionKey": "2c683aeb8a8b6ef06b15a08be6a58274360746cd6f05467a0731e1cc960745df",
+    "enqueuedAt": "2026-10-12T15:54:55.145Z"
   },
-  "pending": [
-    {
-      "sandboxId": "iev8ii7puid0ocb5y6a2h",
-      "jobId": "ec3e0740-2263-4b7a-b84b-3f7f6c231f92",
-      "proofDigest": "69cac979ff857567540da5cc1e8dfe8a3adcb5275384c65f0eb5b5886fd2896e",
-      "ownerKey": "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d",
-      "submissionKey": "2c683aeb8a8b6ef06b15a08be6a58274360746cd6f05467a0731e1cc960745df",
-      "enqueuedAt": "2026-10-12T15:54:55.145Z"
-    }
-  ],
+  "pending": [],
   "completed": [
+    {
+      "jobId": "91901fdc-65f7-4284-80fa-5af28c70c1df",
+      "proofDigest": "7fe483715221a638bc35be87dd28013ece53e9d5c97408492135a5db98eeed24",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/431cd7d7e2b799a1f41f86e28e75d7f9cd933d34/submissions/shi-anchor-variance-refinement-2026",
+      "completedAt": "2026-10-12T16:01:59.895Z",
+      "logArchived": true
+    },
     {
       "jobId": "0e95adea-3b8b-4f02-bf6f-345f0a5a13bd",
       "proofDigest": "99295f9b605d86e562204653b665348049c9bdddd93ebc37ca89f31e29b31d08",
