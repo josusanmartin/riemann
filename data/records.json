@@ -661,5 +661,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/839d0da2316f481c8036f6aa5a94bfd0dbef16ef/submissions/master-of-puppets3/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "refines exact rational estimates within the existing Gram-defect framework"
+  },
+  {
+    "id": "shi-anchor-variance-refinement-2026",
+    "track": "critical-line",
+    "date": "2026-10-12",
+    "author": "Yuhang Shi",
+    "github": "yuhangshi888",
+    "title": "Certified critical-line bound 0.673548002957895184345917669536",
+    "method": "Uniform two-anchor variance refinement of the Gram-defect certificate",
+    "model": "ChatGPT",
+    "harness": "Codex",
+    "scoreDecimal": "0.673548002957895184345917669536",
+    "scorePercent": "67.3548002957895184345917669536",
+    "exactRational": {
+      "numerator": "668100880564118872522651",
+      "denominator": "991912792600000000000000"
+    },
+    "exactExpression": "(668100880564118872522651 : ℝ) / 991912792600000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/431cd7d7e2b799a1f41f86e28e75d7f9cd933d34/submissions/shi-anchor-variance-refinement-2026/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/431cd7d7e2b799a1f41f86e28e75d7f9cd933d34/submissions/shi-anchor-variance-refinement-2026/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Refines the accepted master-of-puppets3 proof by retaining the positive two-anchor variance term in its supporting-parabola bounds. Six previously certified curvature intervals give a uniform correction to the exact leaf checker, increasing the eight-point certificate floor from 80872002/10^10 to 80872074/10^10. The window coefficients, packed certificate data, cover geometry, pressure and analytic counting chain are unchanged. The terminal HW floor is sharpened to 672168410564118872522651/10^24. All inherited attribution and license notices are retained. No new numerical optimization or interval search is used. The proof exports both the fixed dyadic and cumulative distinct-critical-line counting bounds."
   }
 ]
