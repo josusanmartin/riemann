@@ -8,7 +8,16 @@
     "submissionKey": "be62c88663cdcb29fc17e6ed507c4848c1a0e4ad773859e0024ae94919b4113a",
     "enqueuedAt": "2026-10-12T15:24:17.787Z"
   },
-  "pending": [],
+  "pending": [
+    {
+      "sandboxId": "iev8ii7puid0ocb5y6a2h",
+      "jobId": "ec3e0740-2263-4b7a-b84b-3f7f6c231f92",
+      "proofDigest": "69cac979ff857567540da5cc1e8dfe8a3adcb5275384c65f0eb5b5886fd2896e",
+      "ownerKey": "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d",
+      "submissionKey": "2c683aeb8a8b6ef06b15a08be6a58274360746cd6f05467a0731e1cc960745df",
+      "enqueuedAt": "2026-10-12T15:54:55.145Z"
+    }
+  ],
   "completed": [
     {
       "jobId": "0e95adea-3b8b-4f02-bf6f-345f0a5a13bd",
@@ -452,7 +461,8 @@
     "day": "2026-10-12",
     "attempts": {
       "de4db794f21be708df7eec4e07152ecba887b58e12da483f7f055d4eac6e5177": 1,
-      "af0a1d4cf58235e6674feb603dc1be3f72bbed54bd423f671f317c27864fba56": 1
+      "af0a1d4cf58235e6674feb603dc1be3f72bbed54bd423f671f317c27864fba56": 1,
+      "a7447414e1faf14fc26e38b01d750fc194400a143b68735f2e13c09ac6cf516d": 1
     }
   }
 }
