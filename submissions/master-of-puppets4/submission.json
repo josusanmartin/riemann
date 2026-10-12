@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "master-of-puppets4",
+  "track": "critical-line",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "R. Arun Chandru"
+  },
+  "score": {
+    "numerator": "667801670564118872522651",
+    "denominator": "991436171500000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Refines exact rational bounds in the nine-point Gram-defect proof",
+  "method": "Gram-defect refinement",
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
