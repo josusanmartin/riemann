@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "imdck6pse3tztv2xm9x0t",
-    "jobId": "ebc2aa0d-242f-4eaa-86d5-50f303640d7b",
-    "proofDigest": "ebc9055e2741d1a9e3b5723bcb8b96426d5adb617607d2181490239a65996c6e",
-    "ownerKey": "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526",
-    "submissionKey": "ad609d647da07909cb4cdb72ee01e47100f968ccfdea854f6f75b8452cd4a892",
-    "enqueuedAt": "2026-10-14T03:45:55.677Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "ebc2aa0d-242f-4eaa-86d5-50f303640d7b",
+      "proofDigest": "ebc9055e2741d1a9e3b5723bcb8b96426d5adb617607d2181490239a65996c6e",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/aa868dc8e4c46e7dda5ac21c47e1c53e1a122b91/submissions/lixiang90-nine-point-refinement",
+      "completedAt": "2026-10-14T04:30:44.384Z",
+      "logArchived": true
+    },
     {
       "jobId": "267be9fa-81d7-4c09-853f-994ba06412de",
       "proofDigest": "0d78ae472be62486dab4e2253d09c6207201300229adc71de7453fd4d221fd75",
