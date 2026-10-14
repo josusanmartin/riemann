@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ikx0j1egwhm2znydok46l",
-    "jobId": "1f2df69d-1034-4f3e-958f-84fd29a10be6",
-    "proofDigest": "5c41e6af91ef0a5ad958885991730677b1d956a522f1ba57078ab0ec0cdd8168",
-    "ownerKey": "de4db794f21be708df7eec4e07152ecba887b58e12da483f7f055d4eac6e5177",
-    "submissionKey": "dcde9eb4f8603435cedca18e01acad13edc150543a8577404b96c3a3f9b1e51c",
-    "enqueuedAt": "2026-10-14T10:16:43.295Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "1f2df69d-1034-4f3e-958f-84fd29a10be6",
+      "proofDigest": "5c41e6af91ef0a5ad958885991730677b1d956a522f1ba57078ab0ec0cdd8168",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/23fac47f0bfb5f9e0445ffa2d26a23f094f0fc21/submissions/master-of-puppets5",
+      "completedAt": "2026-10-14T10:55:00.709Z",
+      "logArchived": true
+    },
     {
       "jobId": "1e7ad7be-6f0f-4a5b-982a-c0713458e2c5",
       "proofDigest": "6d99456c2d0904a0bb76b78189a22f2686c71a6c39b6a1b2977345a00fec10f9",
