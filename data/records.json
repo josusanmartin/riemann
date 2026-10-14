@@ -736,5 +736,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/65c71d512f51df92bec4a3d1edb6a795fc1cac63/submissions/master-of-puppets4/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Refines exact rational bounds in the nine-point Gram-defect proof"
+  },
+  {
+    "id": "lixiang90-nine-point-refinement",
+    "track": "critical-line",
+    "date": "2026-10-14",
+    "author": "Li Xiang",
+    "github": "lixiang90",
+    "title": "Certified critical-line bound 0.673570008667708719595754467355",
+    "method": "Exact rational refinement of a nine-point Gram-defect certificate",
+    "model": "GPT-6.1 Sol Ultra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673570008667708719595754467355",
+    "scorePercent": "67.3570008667708719595754467355",
+    "exactRational": {
+      "numerator": "39282451209654051457408555553",
+      "denominator": "58319774788300000000000000000"
+    },
+    "exactExpression": "(39282451209654051457408555553 : ℝ) / 58319774788300000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/aa868dc8e4c46e7dda5ac21c47e1c53e1a122b91/submissions/lixiang90-nine-point-refinement/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/aa868dc8e4c46e7dda5ac21c47e1c53e1a122b91/submissions/lixiang90-nine-point-refinement/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Refines R. Arun Chandru's accepted master-of-puppets4 nine-point Gram-defect proof. A 1000-fold rescaling of the integer certificate representation certifies c = 85638285989/10^13 while preserving the real pair weights, gap pressures, window and span capacities. Sharper rational root and trigonometric enclosures improve the window constant. The resulting exact bound strictly exceeds the accepted record and proves both dyadic and cumulative bounds for distinct critical-line zeros, with the stronger simple-zero conclusions also established. Local modular Lean verification and independent nanoda replay passed, checking 74,963 declarations with no errors."
   }
 ]
