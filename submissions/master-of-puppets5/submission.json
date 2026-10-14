@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "master-of-puppets5",
+  "track": "critical-line",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "R. Arun Chandru"
+  },
+  "score": {
+    "numerator": "834752088205148593469931805501689594457",
+    "denominator": "1239295002184223036525000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Refines rational enclosures and the certified threshold in the earlier nine-point Gram-defect proof.",
+  "method": "Gram-defect refinement",
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "master-of-puppets5",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "R. Arun Chandru"
+  },
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "score": {
+    "numerator": "834752088205148593469931805501689594457",
+    "denominator": "1239295002184223036525000000000000000000"
+  },
+  "scoreDecimal": "0.673570123928460303697174344358",
+  "previousRecordId": "attempt-022",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-14T10:55:00.112Z",
+  "challengeDigest": "a9975c67d2b29a00649a0d8e71c964f5a01cb0cc802a0bf46e2c63a351db32f1",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
