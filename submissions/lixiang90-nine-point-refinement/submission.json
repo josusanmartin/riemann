@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "lixiang90-nine-point-refinement",
+  "track": "critical-line",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "score": {
+    "numerator": "39282451209654051457408555553",
+    "denominator": "58319774788300000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Refines R. Arun Chandru's accepted master-of-puppets4 nine-point Gram-defect proof. A 1000-fold rescaling of the integer certificate representation certifies c = 85638285989/10^13 while preserving the real pair weights, gap pressures, window and span capacities. Sharper rational root and trigonometric enclosures improve the window constant. The resulting exact bound strictly exceeds the accepted record and proves both dyadic and cumulative bounds for distinct critical-line zeros, with the stronger simple-zero conclusions also established. Local modular Lean verification and independent nanoda replay passed, checking 74,963 declarations with no errors.",
+  "method": "Exact rational refinement of a nine-point Gram-defect certificate",
+  "model": "GPT-6.1 Sol Ultra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

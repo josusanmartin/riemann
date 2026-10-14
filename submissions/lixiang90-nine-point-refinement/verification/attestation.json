@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "lixiang90-nine-point-refinement",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "model": "GPT-6.1 Sol Ultra",
+  "harness": "Codex",
+  "score": {
+    "numerator": "39282451209654051457408555553",
+    "denominator": "58319774788300000000000000000"
+  },
+  "scoreDecimal": "0.673570008667708719595754467355",
+  "previousRecordId": "master-of-puppets4",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-14T04:30:43.948Z",
+  "challengeDigest": "f6563573715d8c5c0d58594bcccf5536187c4e23c568afeb1404915fca16b854",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
