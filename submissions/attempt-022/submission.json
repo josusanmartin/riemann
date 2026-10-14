@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-022",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "21541989373036092662021",
+    "denominator": "31981806507980000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-021 (nine-point certificate, n-generic counting chain), on R. Arun Chandru's master-of-puppets / master-of-puppets2 / master-of-puppets3 (Gram-defect matching chain; order-20 window enclosure), and on Yuhang Shi's 10²⁴ window floor, all with their notices kept. New here: the nine-point certificate is re-sized at a tighter certification margin (δ = 3e-5), and the floor is set to the exact maximum the certificate proves, c = 856399825262/10¹⁴, verified leaf by leaf. This gives κ = (H_W⁻ − B)/(1 − c) = 21541989373036092662021/31981806507980000000000.",
+  "method": "Nine-point Gram-defect certificate at a tightened certification margin, with the exact maximal certified floor.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
