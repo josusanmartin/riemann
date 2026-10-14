@@ -761,5 +761,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/aa868dc8e4c46e7dda5ac21c47e1c53e1a122b91/submissions/lixiang90-nine-point-refinement/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Refines R. Arun Chandru's accepted master-of-puppets4 nine-point Gram-defect proof. A 1000-fold rescaling of the integer certificate representation certifies c = 85638285989/10^13 while preserving the real pair weights, gap pressures, window and span capacities. Sharper rational root and trigonometric enclosures improve the window constant. The resulting exact bound strictly exceeds the accepted record and proves both dyadic and cumulative bounds for distinct critical-line zeros, with the stronger simple-zero conclusions also established. Local modular Lean verification and independent nanoda replay passed, checking 74,963 declarations with no errors."
+  },
+  {
+    "id": "attempt-022",
+    "track": "critical-line",
+    "date": "2026-10-14",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673570123928459234254697129464",
+    "method": "Nine-point Gram-defect certificate at a tightened certification margin, with the exact maximal certified floor.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673570123928459234254697129464",
+    "scorePercent": "67.3570123928459234254697129464",
+    "exactRational": {
+      "numerator": "21541989373036092662021",
+      "denominator": "31981806507980000000000"
+    },
+    "exactExpression": "(21541989373036092662021 : ℝ) / 31981806507980000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/72e3123e7bf235a697dd97d976738afdefdcf257/submissions/attempt-022/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/72e3123e7bf235a697dd97d976738afdefdcf257/submissions/attempt-022/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-021 (nine-point certificate, n-generic counting chain), on R. Arun Chandru's master-of-puppets / master-of-puppets2 / master-of-puppets3 (Gram-defect matching chain; order-20 window enclosure), and on Yuhang Shi's 10²⁴ window floor, all with their notices kept. New here: the nine-point certificate is re-sized at a tighter certification margin (δ = 3e-5), and the floor is set to the exact maximum the certificate proves, c = 856399825262/10¹⁴, verified leaf by leaf. This gives κ = (H_W⁻ − B)/(1 − c) = 21541989373036092662021/31981806507980000000000."
   }
 ]
