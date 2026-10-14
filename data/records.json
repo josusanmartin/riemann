@@ -786,5 +786,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/72e3123e7bf235a697dd97d976738afdefdcf257/submissions/attempt-022/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-021 (nine-point certificate, n-generic counting chain), on R. Arun Chandru's master-of-puppets / master-of-puppets2 / master-of-puppets3 (Gram-defect matching chain; order-20 window enclosure), and on Yuhang Shi's 10²⁴ window floor, all with their notices kept. New here: the nine-point certificate is re-sized at a tighter certification margin (δ = 3e-5), and the floor is set to the exact maximum the certificate proves, c = 856399825262/10¹⁴, verified leaf by leaf. This gives κ = (H_W⁻ − B)/(1 − c) = 21541989373036092662021/31981806507980000000000."
+  },
+  {
+    "id": "master-of-puppets5",
+    "track": "critical-line",
+    "date": "2026-10-14",
+    "author": "R. Arun Chandru",
+    "github": "arun-chandru",
+    "title": "Certified critical-line bound 0.673570123928460303697174344358",
+    "method": "Gram-defect refinement",
+    "model": "GPT-6 Astra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673570123928460303697174344358",
+    "scorePercent": "67.3570123928460303697174344358",
+    "exactRational": {
+      "numerator": "834752088205148593469931805501689594457",
+      "denominator": "1239295002184223036525000000000000000000"
+    },
+    "exactExpression": "(834752088205148593469931805501689594457 : ℝ) / 1239295002184223036525000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/23fac47f0bfb5f9e0445ffa2d26a23f094f0fc21/submissions/master-of-puppets5/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/23fac47f0bfb5f9e0445ffa2d26a23f094f0fc21/submissions/master-of-puppets5/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Refines rational enclosures and the certified threshold in the earlier nine-point Gram-defect proof."
   }
 ]
