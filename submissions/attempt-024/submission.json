@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-024",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "34191001116882886388531117129201664",
+    "denominator": "50760020691785094633026544189453125"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-023 and on R. Arun Chandru's master-of-puppets Gram-defect chain, all notices kept. New here: the sizer uses Yuhang Shi's anchor-variance term through a certified per-cell curvature table (module PCellVarW, his notice kept), and a range-end tangent anchor (module PCellDKH). Together they remove the basin that limited the certification margin, so the frame-optimum nine-point weights (B = 437542/10^8) are certified at margin about 1.65e-5 with 10,750 leaves. Each leaf certificate is thinned while every margin stays above the floor; the floor c is the exact supremum of the leaf margins, and the window bound keeps our 10^-32 enclosure.",
+  "method": "Nine-point Gram-defect certificate at the frame-optimum weights, variance-aware sizing with range-end tangent anchors, thinned leaf certificates and the exact maximal floor.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
