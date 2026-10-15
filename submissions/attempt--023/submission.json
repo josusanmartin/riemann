@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt--023",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "2136937569805180399283194820575104",
+    "denominator": "3172501874787736772653167724609375"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-022 and on R. Arun Chandru's master-of-puppets Gram-defect chain. The nine-point certificate is replaced by the frame-optimum weights (B = 437542/10^8), certified at margin 4e-5 with 10,488 leaves. The floor c is the exact supremum of the leaf margins, so no floor digits remain. The window bound H_W is closed to 10^-32 with an order-30 Taylor enclosure and our own pi < 3.14159265358979323846264338328 bound via Mathlib's pi_upper_bound. Yuhang Shi's anchor-variance term is ported to the nine-point leaf checker. All upstream notices are retained; changes are stated in the file header.",
+  "method": "Nine-point Gram-defect certificate at the frame-optimum weights, exact maximal floor, closed window enclosure, and anchor-variance leaf checks.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
