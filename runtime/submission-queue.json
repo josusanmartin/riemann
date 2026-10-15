@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "i1yesxbh31i4kbwskqlp0",
-    "jobId": "4b3e1f92-ac3b-4d39-8916-dd1d437dc667",
-    "proofDigest": "f54475a791dcb983af2408e6a7ada80c1a1d5b38c3f016873eb8712620d7a6b4",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "4cfcb7d08b0355a01e26d9df6ed031f11a73173b9faed965e8911fcc7792c9e5",
-    "enqueuedAt": "2026-10-15T12:42:03.810Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "4b3e1f92-ac3b-4d39-8916-dd1d437dc667",
+      "proofDigest": "f54475a791dcb983af2408e6a7ada80c1a1d5b38c3f016873eb8712620d7a6b4",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/e08fce410ba008ff5c5a03215d9b6bfb3ab91200/submissions/ajp88-reweighted-nine-point",
+      "completedAt": "2026-10-15T13:32:53.420Z",
+      "logArchived": true
+    },
     {
       "jobId": "af3443c9-6bfa-4421-9231-a7c4be94d3e0",
       "proofDigest": "3831a4ce664ba5d61f7fa8111b7207e2be8d2f90a2b3eebc58720d74f4acf3f7",
