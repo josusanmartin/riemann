@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ajp88-reweighted-nine-point",
+  "track": "critical-line",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "score": {
+    "numerator": "834739413205148593469931805501689594457",
+    "denominator": "1239255769294131601825000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Builds on Samuel Lavery’s attempt-021 (nine-point checker and counting chain, generic in n) and R. Arun Chandru’s master-of-puppets5 (Gram-defect chain), whose code is kept unchanged outside the regenerated certificate segments; the modification notice is in the file. Weights re-optimised under the checker’s symmetry constraints; 10,937 checked leaves; cN = 859538456469471854.",
+  "method": "Nine-point Gram-defect certificate regenerated on the record window at re-optimised symmetric weights, keeping attempt-021’s checker and master-of-puppets5’s chain.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
