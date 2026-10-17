@@ -886,5 +886,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/9e6ca6615b9dbfec4a1d722995cff0ffe3abf9bb/submissions/attempt-024/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-023 and on R. Arun Chandru's master-of-puppets Gram-defect chain, all notices kept. New here: the sizer uses Yuhang Shi's anchor-variance term through a certified per-cell curvature table (module PCellVarW, his notice kept), and a range-end tangent anchor (module PCellDKH). Together they remove the basin that limited the certification margin, so the frame-optimum nine-point weights (B = 437542/10^8) are certified at margin about 1.65e-5 with 10,750 leaves. Each leaf certificate is thinned while every margin stays above the floor; the floor c is the exact supremum of the leaf margins, and the window bound keeps our 10^-32 enclosure."
+  },
+  {
+    "id": "ajp88-s1r-window-nine-point",
+    "track": "critical-line",
+    "date": "2026-10-17",
+    "author": "ajp88",
+    "github": "ajp88",
+    "title": "Certified critical-line bound 0.673587172422865894735527202020",
+    "method": "Window s1R with a re-weighted nine-point Gram-defect certificate",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673587172422865894735527202020",
+    "scorePercent": "67.3587172422865894735527202020",
+    "exactRational": {
+      "numerator": "3337839445884019172184136761695440236797",
+      "denominator": "4955319196293399255150000000000000000000"
+    },
+    "exactExpression": "(3337839445884019172184136761695440236797 : ℝ) / 4955319196293399255150000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/5b387fd1388b5ef8dde64ed1a18d65ba49870461/submissions/ajp88-s1r-window-nine-point/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/5b387fd1388b5ef8dde64ed1a18d65ba49870461/submissions/ajp88-s1r-window-nine-point/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Replaces the record window with window s1R (13-term cosine profile, re-optimised for (H - B)/(1 - c); H proved generically in-file) and certifies a nine-point Gram-defect bound on it: symmetric re-optimised weights (B = 28507/6250000), floor c = 893616074132014897/10^20 at a preregistered margin of 2.6e-7, 13,046 leaves. Window tables regenerated from cAMn and kernel-checked; pvCheck on 128 cells. Builds on master-of-puppets5 (R. Arun Chandru), whose file and checker it keeps, attempt-021 (Samuel Lavery), whose nine-point chain it uses, and attempt-016, whose window code it adapts. The window s1R is this programme’s."
   }
 ]
