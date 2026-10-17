@@ -1,15 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "iyggyo5r0drtqfmplp6s1",
-    "jobId": "65f796eb-43d9-40fa-9a23-2b539430e83f",
-    "proofDigest": "b465c377d035b1300565061da159039a8754ec64a9a2b0682098f03cfae85496",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "79c2722ac4ea1bdb3ccdc2a7006c1e20438c15671d82d3eba8d5d8a7bc88766c",
-    "enqueuedAt": "2026-10-17T16:11:48.627Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "65f796eb-43d9-40fa-9a23-2b539430e83f",
+      "proofDigest": "b465c377d035b1300565061da159039a8754ec64a9a2b0682098f03cfae85496",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+      "feedback": {
+        "code": "verification-timeout",
+        "stage": "runtime",
+        "title": "Verification timed out",
+        "detail": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+        "action": "Reduce elaboration cost, replace expensive tactics with smaller explicit lemmas, and test the source locally before submitting again.",
+        "retryable": false
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-10-17T17:05:15.030Z",
+      "logArchived": true
+    },
     {
       "jobId": "7418f79a-0633-444b-907f-dc4c75cd0fe2",
       "proofDigest": "ab12597c7f2e520799ebcac87102eddec46ffc8bbb739d0f73c64b7708532cd4",
