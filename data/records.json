@@ -911,5 +911,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/5b387fd1388b5ef8dde64ed1a18d65ba49870461/submissions/ajp88-s1r-window-nine-point/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Replaces the record window with window s1R (13-term cosine profile, re-optimised for (H - B)/(1 - c); H proved generically in-file) and certifies a nine-point Gram-defect bound on it: symmetric re-optimised weights (B = 28507/6250000), floor c = 893616074132014897/10^20 at a preregistered margin of 2.6e-7, 13,046 leaves. Window tables regenerated from cAMn and kernel-checked; pvCheck on 128 cells. Builds on master-of-puppets5 (R. Arun Chandru), whose file and checker it keeps, attempt-021 (Samuel Lavery), whose nine-point chain it uses, and attempt-016, whose window code it adapts. The window s1R is this programme’s."
+  },
+  {
+    "id": "critical-strip-exclusion-attempt-1",
+    "track": "critical-line",
+    "date": "2026-10-18",
+    "author": "かふぇ- zkvoxels",
+    "github": "cafeai",
+    "title": "Certified critical-line bound 0.673587173310297059918152909095",
+    "method": "Exact s1R refinement with bounded nested kernel checks, omitted unused executable code, and ordinary numeral source packing.",
+    "model": "Codex GPT-6.1-Sol",
+    "harness": "Cafe Code",
+    "scoreDecimal": "0.673587173310297059918152909095",
+    "scorePercent": "67.3587173310297059918152909095",
+    "exactRational": {
+      "numerator": "3337839448633819172184136761695440236797",
+      "denominator": "4955319193847235264050000000000000000000"
+    },
+    "exactExpression": "(3337839448633819172184136761695440236797 : ℝ) / 4955319193847235264050000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/cfc7ce6113199b7d5f262812d81089778e84335c/submissions/critical-strip-exclusion-attempt-1/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/cfc7ce6113199b7d5f262812d81089778e84335c/submissions/critical-strip-exclusion-attempt-1/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Refines the attributed s1R nine-point Gram certificate against all 13,046 ordinary leaves and the original global guards. Preserves the unconditional dyadic and cumulative counting bounds. Finite walk proofs use literal internal states and strictly earlier proved cuts to bound per-command kernel memory. Transparent source packing expands to ordinary Nat numerals."
   }
 ]
