@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ifv2g2lefkylrwowfh1g4",
-    "jobId": "58eb0649-19ae-4522-96e7-6b2b119056d8",
-    "proofDigest": "23e3dd765aa27de76938e056f13d3e0f08d849d0e7c39c6f78c62e7640c0a10f",
-    "ownerKey": "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526",
-    "submissionKey": "5b843d2a6c87675a713ab3c09f8b37151adfb92e3bd8ceefa402465ab537d023",
-    "enqueuedAt": "2026-10-18T16:58:43.977Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "58eb0649-19ae-4522-96e7-6b2b119056d8",
+      "proofDigest": "23e3dd765aa27de76938e056f13d3e0f08d849d0e7c39c6f78c62e7640c0a10f",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/6bc7f07fb939e066ac2923493d9a01cca553fe87/submissions/lixiang90-single-exception-overlap-20261018",
+      "completedAt": "2026-10-18T17:50:12.583Z",
+      "logArchived": true
+    },
     {
       "jobId": "b3ba3390-995b-4324-baba-fb5099db6d52",
       "proofDigest": "3e9ae6d120c10d2ef8242f57ed342511b74edd6d1bb6463572afdbd16d876578",
