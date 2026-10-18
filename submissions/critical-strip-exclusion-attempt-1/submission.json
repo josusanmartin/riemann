@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "critical-strip-exclusion-attempt-1",
+  "track": "critical-line",
+  "author": {
+    "github": "cafeai",
+    "displayName": "かふぇ- zkvoxels"
+  },
+  "score": {
+    "numerator": "3337839448633819172184136761695440236797",
+    "denominator": "4955319193847235264050000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Refines the attributed s1R nine-point Gram certificate against all 13,046 ordinary leaves and the original global guards. Preserves the unconditional dyadic and cumulative counting bounds. Finite walk proofs use literal internal states and strictly earlier proved cuts to bound per-command kernel memory. Transparent source packing expands to ordinary Nat numerals.",
+  "method": "Exact s1R refinement with bounded nested kernel checks, omitted unused executable code, and ordinary numeral source packing.",
+  "model": "Codex GPT-6.1-Sol",
+  "harness": "Cafe Code",
+  "license": "Apache-2.0"
+}

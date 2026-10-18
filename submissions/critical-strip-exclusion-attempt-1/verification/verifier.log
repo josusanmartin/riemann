@@ -1,0 +1,583 @@
+Prepared critical-strip-exclusion-attempt-1 at score 0.673587173310297059918152909095.
+Building Challenge.Candidate
+✔ [8697/8699] Built ChallengeDeps (121s)
+✔ [8698/8699] Built ChallengeDeps.CandidateSpec (4.2s)
+⚠ [8699/8699] Built Challenge.Candidate (5.3s)
+warning: comparator/Challenge/Candidate.lean:7:8: declaration uses `sorry`
+warning: comparator/Challenge/Candidate.lean:12:8: declaration uses `sorry`
+warning: comparator/Challenge/Candidate.lean:18:8: declaration uses `sorry`
+Build completed successfully (8699 jobs).
+Exporting #[Nat, String, String.mk, Char, Quot, Quot.mk, Quot.lift, Quot.ind, candidate_strict_improvement, candidate_critical_line_bound, candidate_critical_line_bound_cumulative, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce] from Challenge.Candidate
+Building Solution.Candidate
+⚠ [8717/8830] Replayed Zeta23.Assembly
+warning: Zeta23/Assembly.lean:885:47: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/Assembly.lean:958:34: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/Assembly.lean:962:90: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8719/8830] Replayed Zeta23.Statement
+warning: Zeta23/Statement.lean:148:30: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8720/8830] Replayed Zeta23.Statement.Seam
+warning: Zeta23/Statement/Seam.lean:59:13: `ENat.toNat_coe` has been deprecated: Use `ENat.toNat_natCast` instead
+⚠ [8722/8830] Replayed Zeta23.ZetaReflect
+warning: Zeta23/ZetaReflect.lean:91:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8729/8830] Replayed Zeta23.Tail
+warning: Zeta23/Tail.lean:290:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/Tail.lean:399:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8730/8830] Replayed Zeta23.ZeroSide
+warning: Zeta23/ZeroSide.lean:701:4: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/ZeroSide.lean:706:66: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/ZeroSide.lean:712:52: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/ZeroSide.lean:755:53: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+ℹ [8738/8830] Replayed Zeta23.GammaFacts.Mu
+info: Zeta23/GammaFacts/Mu.lean:137:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+ℹ [8740/8830] Replayed Zeta23.GammaFacts.StirlingVert
+info: Zeta23/GammaFacts/StirlingVert.lean:452:6: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+⚠ [8744/8830] Replayed Zeta23.FromPNTPlus.StrongPNTPrefix
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:61:71: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:202:9: `Set.setOf_subset_setOf` has been deprecated: Use `Set.ofPred_subset_ofPred` instead
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:343:10: `Set.notMem_setOf_iff` has been deprecated: Use `Set.notMem_ofPred_iff` instead
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:368:48: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:390:10: `Set.notMem_setOf_iff` has been deprecated: Use `Set.notMem_ofPred_iff` instead
+warning: Zeta23/FromPNTPlus/StrongPNTPrefix.lean:432:48: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8752/8830] Replayed Zeta23.FromPNTPlus.ZetaBounds
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:859:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:952:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1092:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1099:32: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1105:56: `Set.preimage_setOf_eq` has been deprecated: Use `Set.preimage_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1115:56: `Set.preimage_setOf_eq` has been deprecated: Use `Set.preimage_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1119:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1135:54: `Set.preimage_setOf_eq` has been deprecated: Use `Set.preimage_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1157:22: `Set.setOf_subset_setOf` has been deprecated: Use `Set.ofPred_subset_ofPred` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1169:15: `Set.setOf_subset_setOf` has been deprecated: Use `Set.ofPred_subset_ofPred` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1169:59: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1185:15: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1835:19: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1837:45: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1840:28: `Set.setOf_subset_setOf` has been deprecated: Use `Set.ofPred_subset_ofPred` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1844:28: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1900:15: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:1906:20: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:2091:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:2884:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/FromPNTPlus/ZetaBounds.lean:2940:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8754/8830] Replayed Zeta23.RvM.Halving
+warning: Zeta23/RvM/Halving.lean:52:55: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/RvM/Halving.lean:62:15: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/RvM/Halving.lean:70:15: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8760/8830] Replayed Zeta23.RvM.ReZeroCount
+warning: Zeta23/RvM/ReZeroCount.lean:272:15: `ENat.toNat_coe` has been deprecated: Use `ENat.toNat_natCast` instead
+⚠ [8765/8830] Replayed Zeta23.RvM.NcountWindow
+warning: Zeta23/RvM/NcountWindow.lean:23:22: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8768/8830] Replayed Zeta23.WeilEF.ZeroSummability
+warning: Zeta23/WeilEF/ZeroSummability.lean:189:4: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8771/8830] Replayed Zeta23.WeilEF.Landau
+warning: Zeta23/WeilEF/Landau.lean:341:13: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/WeilEF/Landau.lean:437:64: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8773/8830] Replayed Zeta23.WeilEF.Contour
+warning: Zeta23/WeilEF/Contour.lean:69:15: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+ℹ [8779/8839] Replayed Zeta23.WeilEF.Main
+info: Zeta23/WeilEF/Main.lean:38:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+⚠ [8780/8839] Replayed Zeta23.ZeroSide.RankTraceMult
+warning: Zeta23/ZeroSide/RankTraceMult.lean:49:32: Variable name `ht0` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _ht0
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:49:60: Variable name `hx` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hx
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:56:30: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:56:43: Variable name `hx` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hx
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:81:32: Variable name `hp` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hp
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:81:58: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:164:20: This simp argument is unused:
+  Matrix.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Zeta23/ZeroSide/RankTraceMult.lean:359:28: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [8782/8839] Replayed Zeta23.Assembly.SeamMult
+warning: Zeta23/Assembly/SeamMult.lean:26:0: automatically included section variable(s) unused in theorem `Zeta23.Assembly.ctr_sub_frobSq_perturb`:
+  [DecidableEq n]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq n] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [8795/8839] Replayed Zeta23.MV.Spacing
+warning: Zeta23/MV/Spacing.lean:58:0: automatically included section variable(s) unused in theorem `Zeta23.MV.Adm.itv_disjoint`:
+  [Fintype ι]
+  [DecidableEq ι]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype ι] [DecidableEq ι] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Zeta23/MV/Spacing.lean:153:8: automatically included section variable(s) unused in theorem `_private.Zeta23.MV.Spacing.0.Zeta23.MV.Adm.mem_window`:
+  [Fintype ι]
+  [DecidableEq ι]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype ι] [DecidableEq ι] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [8800/8839] Replayed Zeta23.PrimeSideA.EndsE1
+warning: Zeta23/PrimeSideA/EndsE1.lean:326:41: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+ℹ [8809/8839] Replayed Zeta23.PrimeSideA
+info: Zeta23/PrimeSideA.lean:372:0: lem_ends : ∀ (cϱ lam : ℝ),
+  GammaFacts →
+    ChebyshevMertens →
+      0 < lam ∧ lam ≤ 1 →
+        ∃ C, EventuallyAtCore cϱ lam fun p F ↦ |trGt2A p F - MtotalA p F| ≤ C * (p.L * p.l * log p.l * (p.l ^ 2 + p.X))
+info: Zeta23/PrimeSideA.lean:398:0: prop_mumu : ∀ (cϱ lam : ℝ),
+  GammaFacts →
+    ChebyshevMertens →
+      0 < lam ∧ lam ≤ 1 →
+        ∃ C,
+          EventuallyAtCore cϱ lam fun p F ↦
+            |Mform F.Phi p.T mu mu - 2 * π * F.b * p.L * ∫ (τ : ℝ) in p.T..2 * p.T, mu τ ^ 2| ≤ C * (p.l ^ 2 * log p.L)
+info: Zeta23/PrimeSideA.lean:404:0: prop_cross_muP : ∀ (cϱ lam : ℝ),
+  GammaFacts →
+    ChebyshevMertens →
+      0 < lam ∧ lam ≤ 1 → ∃ C, EventuallyAtCore cϱ lam fun p F ↦ |Mform F.Phi p.T mu (PX p.X)| ≤ C * (p.l * √p.X)
+⚠ [8814/8839] Replayed Zeta23.ThmD.Window
+warning: Zeta23/ThmD/Window.lean:132:17: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8815/8839] Replayed Zeta23.ThmD.PP
+warning: Zeta23/ThmD/PP.lean:270:29: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+warning: Zeta23/ThmD/PP.lean:276:29: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+⚠ [8818/8839] Replayed Zeta23.ThmD.WindowCore
+warning: Zeta23/ThmD/WindowCore.lean:388:22: Variable name `u` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _u
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [8839/8839] Built Solution.Candidate (1118s)
+warning: comparator/Solution/Candidate.lean:2054:30: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:2138:3: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:2917:55: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:6518:19: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:6977:15: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:8094:3: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:8598:3: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:9490:1: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: comparator/Solution/Candidate.lean:9507:3: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+info: comparator/Solution/Candidate.lean:12442:0: 'AMW.Cert.PC9QB6MData.ready0_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12446:0: 'AMW.Cert.PC9QB6MData.rc0' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12459:0: 'AMW.Cert.PC9QB6MData.ready1_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12463:0: 'AMW.Cert.PC9QB6MData.ready1_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12468:0: 'AMW.Cert.PC9QB6MData.ready1_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12471:0: 'AMW.Cert.PC9QB6MData.ready1_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12475:0: 'AMW.Cert.PC9QB6MData.rc1' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12492:0: 'AMW.Cert.PC9QB6MData.ready2_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12496:0: 'AMW.Cert.PC9QB6MData.ready2_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12501:0: 'AMW.Cert.PC9QB6MData.ready2_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12506:0: 'AMW.Cert.PC9QB6MData.ready2_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12510:0: 'AMW.Cert.PC9QB6MData.ready2_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12515:0: 'AMW.Cert.PC9QB6MData.ready2_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12518:0: 'AMW.Cert.PC9QB6MData.ready2_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12522:0: 'AMW.Cert.PC9QB6MData.rc2' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12539:0: 'AMW.Cert.PC9QB6MData.ready3_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12543:0: 'AMW.Cert.PC9QB6MData.ready3_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12548:0: 'AMW.Cert.PC9QB6MData.ready3_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12553:0: 'AMW.Cert.PC9QB6MData.ready3_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12557:0: 'AMW.Cert.PC9QB6MData.ready3_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12562:0: 'AMW.Cert.PC9QB6MData.ready3_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12565:0: 'AMW.Cert.PC9QB6MData.ready3_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12569:0: 'AMW.Cert.PC9QB6MData.rc3' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12590:0: 'AMW.Cert.PC9QB6MData.ready4_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12594:0: 'AMW.Cert.PC9QB6MData.ready4_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12599:0: 'AMW.Cert.PC9QB6MData.ready4_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12604:0: 'AMW.Cert.PC9QB6MData.ready4_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12608:0: 'AMW.Cert.PC9QB6MData.ready4_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12613:0: 'AMW.Cert.PC9QB6MData.ready4_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12618:0: 'AMW.Cert.PC9QB6MData.ready4_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12622:0: 'AMW.Cert.PC9QB6MData.ready4_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12627:0: 'AMW.Cert.PC9QB6MData.ready4_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12630:0: 'AMW.Cert.PC9QB6MData.ready4_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12634:0: 'AMW.Cert.PC9QB6MData.rc4' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12657:0: 'AMW.Cert.PC9QB6MData.ready5_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12661:0: 'AMW.Cert.PC9QB6MData.ready5_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12666:0: 'AMW.Cert.PC9QB6MData.ready5_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12671:0: 'AMW.Cert.PC9QB6MData.ready5_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12675:0: 'AMW.Cert.PC9QB6MData.ready5_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12680:0: 'AMW.Cert.PC9QB6MData.ready5_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12685:0: 'AMW.Cert.PC9QB6MData.ready5_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12689:0: 'AMW.Cert.PC9QB6MData.ready5_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12694:0: 'AMW.Cert.PC9QB6MData.ready5_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12699:0: 'AMW.Cert.PC9QB6MData.ready5_3_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12703:0: 'AMW.Cert.PC9QB6MData.ready5_3_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12708:0: 'AMW.Cert.PC9QB6MData.ready5_cuts4_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12713:0: 'AMW.Cert.PC9QB6MData.ready5_4_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12717:0: 'AMW.Cert.PC9QB6MData.ready5_4_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12722:0: 'AMW.Cert.PC9QB6MData.ready5_cuts5_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12725:0: 'AMW.Cert.PC9QB6MData.ready5_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12729:0: 'AMW.Cert.PC9QB6MData.rc5' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12746:0: 'AMW.Cert.PC9QB6MData.ready6_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12750:0: 'AMW.Cert.PC9QB6MData.ready6_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12755:0: 'AMW.Cert.PC9QB6MData.ready6_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12760:0: 'AMW.Cert.PC9QB6MData.ready6_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12764:0: 'AMW.Cert.PC9QB6MData.ready6_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12769:0: 'AMW.Cert.PC9QB6MData.ready6_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12772:0: 'AMW.Cert.PC9QB6MData.ready6_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12776:0: 'AMW.Cert.PC9QB6MData.rc6' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12791:0: 'AMW.Cert.PC9QB6MData.ready7_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12795:0: 'AMW.Cert.PC9QB6MData.ready7_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12800:0: 'AMW.Cert.PC9QB6MData.ready7_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12805:0: 'AMW.Cert.PC9QB6MData.ready7_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12809:0: 'AMW.Cert.PC9QB6MData.ready7_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12814:0: 'AMW.Cert.PC9QB6MData.ready7_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12817:0: 'AMW.Cert.PC9QB6MData.ready7_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12821:0: 'AMW.Cert.PC9QB6MData.rc7' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12838:0: 'AMW.Cert.PC9QB6MData.ready8_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12842:0: 'AMW.Cert.PC9QB6MData.ready8_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12847:0: 'AMW.Cert.PC9QB6MData.ready8_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12852:0: 'AMW.Cert.PC9QB6MData.ready8_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12856:0: 'AMW.Cert.PC9QB6MData.ready8_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12861:0: 'AMW.Cert.PC9QB6MData.ready8_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12864:0: 'AMW.Cert.PC9QB6MData.ready8_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12868:0: 'AMW.Cert.PC9QB6MData.rc8' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12889:0: 'AMW.Cert.PC9QB6MData.ready9_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12893:0: 'AMW.Cert.PC9QB6MData.ready9_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12898:0: 'AMW.Cert.PC9QB6MData.ready9_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12903:0: 'AMW.Cert.PC9QB6MData.ready9_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12907:0: 'AMW.Cert.PC9QB6MData.ready9_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12912:0: 'AMW.Cert.PC9QB6MData.ready9_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12917:0: 'AMW.Cert.PC9QB6MData.ready9_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12921:0: 'AMW.Cert.PC9QB6MData.ready9_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12926:0: 'AMW.Cert.PC9QB6MData.ready9_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12931:0: 'AMW.Cert.PC9QB6MData.ready9_3_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12935:0: 'AMW.Cert.PC9QB6MData.ready9_3_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12940:0: 'AMW.Cert.PC9QB6MData.ready9_cuts4_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12943:0: 'AMW.Cert.PC9QB6MData.ready9_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12947:0: 'AMW.Cert.PC9QB6MData.rc9' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12972:0: 'AMW.Cert.PC9QB6MData.ready10_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12976:0: 'AMW.Cert.PC9QB6MData.ready10_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12981:0: 'AMW.Cert.PC9QB6MData.ready10_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12986:0: 'AMW.Cert.PC9QB6MData.ready10_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:12990:0: 'AMW.Cert.PC9QB6MData.ready10_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:12995:0: 'AMW.Cert.PC9QB6MData.ready10_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13000:0: 'AMW.Cert.PC9QB6MData.ready10_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13004:0: 'AMW.Cert.PC9QB6MData.ready10_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13009:0: 'AMW.Cert.PC9QB6MData.ready10_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13014:0: 'AMW.Cert.PC9QB6MData.ready10_3_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13018:0: 'AMW.Cert.PC9QB6MData.ready10_3_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13023:0: 'AMW.Cert.PC9QB6MData.ready10_cuts4_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13028:0: 'AMW.Cert.PC9QB6MData.ready10_4_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13032:0: 'AMW.Cert.PC9QB6MData.ready10_4_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13037:0: 'AMW.Cert.PC9QB6MData.ready10_cuts5_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13040:0: 'AMW.Cert.PC9QB6MData.ready10_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13044:0: 'AMW.Cert.PC9QB6MData.rc10' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13061:0: 'AMW.Cert.PC9QB6MData.ready11_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13065:0: 'AMW.Cert.PC9QB6MData.ready11_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13070:0: 'AMW.Cert.PC9QB6MData.ready11_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13075:0: 'AMW.Cert.PC9QB6MData.ready11_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13079:0: 'AMW.Cert.PC9QB6MData.ready11_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13084:0: 'AMW.Cert.PC9QB6MData.ready11_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13089:0: 'AMW.Cert.PC9QB6MData.ready11_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13093:0: 'AMW.Cert.PC9QB6MData.ready11_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13098:0: 'AMW.Cert.PC9QB6MData.ready11_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13101:0: 'AMW.Cert.PC9QB6MData.ready11_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13105:0: 'AMW.Cert.PC9QB6MData.rc11' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13122:0: 'AMW.Cert.PC9QB6MData.ready12_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13126:0: 'AMW.Cert.PC9QB6MData.ready12_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13131:0: 'AMW.Cert.PC9QB6MData.ready12_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13136:0: 'AMW.Cert.PC9QB6MData.ready12_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13140:0: 'AMW.Cert.PC9QB6MData.ready12_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13145:0: 'AMW.Cert.PC9QB6MData.ready12_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13148:0: 'AMW.Cert.PC9QB6MData.ready12_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13152:0: 'AMW.Cert.PC9QB6MData.rc12' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13169:0: 'AMW.Cert.PC9QB6MData.ready13_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13173:0: 'AMW.Cert.PC9QB6MData.ready13_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13178:0: 'AMW.Cert.PC9QB6MData.ready13_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13183:0: 'AMW.Cert.PC9QB6MData.ready13_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13187:0: 'AMW.Cert.PC9QB6MData.ready13_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13192:0: 'AMW.Cert.PC9QB6MData.ready13_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13195:0: 'AMW.Cert.PC9QB6MData.ready13_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13199:0: 'AMW.Cert.PC9QB6MData.rc13' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13214:0: 'AMW.Cert.PC9QB6MData.ready14_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13218:0: 'AMW.Cert.PC9QB6MData.ready14_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13223:0: 'AMW.Cert.PC9QB6MData.ready14_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13228:0: 'AMW.Cert.PC9QB6MData.ready14_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13232:0: 'AMW.Cert.PC9QB6MData.ready14_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13237:0: 'AMW.Cert.PC9QB6MData.ready14_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13240:0: 'AMW.Cert.PC9QB6MData.ready14_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13244:0: 'AMW.Cert.PC9QB6MData.rc14' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13253:0: 'AMW.Cert.PC9QB6MData.ready15_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13257:0: 'AMW.Cert.PC9QB6MData.rc15' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13266:0: 'AMW.Cert.PC9QB6MData.ready16_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13270:0: 'AMW.Cert.PC9QB6MData.rc16' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13279:0: 'AMW.Cert.PC9QB6MData.ready17_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13283:0: 'AMW.Cert.PC9QB6MData.rc17' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13292:0: 'AMW.Cert.PC9QB6MData.ready18_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13296:0: 'AMW.Cert.PC9QB6MData.rc18' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13305:0: 'AMW.Cert.PC9QB6MData.ready19_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13309:0: 'AMW.Cert.PC9QB6MData.rc19' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13318:0: 'AMW.Cert.PC9QB6MData.ready20_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13322:0: 'AMW.Cert.PC9QB6MData.rc20' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13331:0: 'AMW.Cert.PC9QB6MData.ready21_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13335:0: 'AMW.Cert.PC9QB6MData.rc21' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13344:0: 'AMW.Cert.PC9QB6MData.ready22_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13348:0: 'AMW.Cert.PC9QB6MData.rc22' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13357:0: 'AMW.Cert.PC9QB6MData.ready23_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13361:0: 'AMW.Cert.PC9QB6MData.rc23' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13370:0: 'AMW.Cert.PC9QB6MData.ready24_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13374:0: 'AMW.Cert.PC9QB6MData.rc24' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13383:0: 'AMW.Cert.PC9QB6MData.ready25_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13387:0: 'AMW.Cert.PC9QB6MData.rc25' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13396:0: 'AMW.Cert.PC9QB6MData.ready26_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13400:0: 'AMW.Cert.PC9QB6MData.rc26' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13409:0: 'AMW.Cert.PC9QB6MData.ready27_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13413:0: 'AMW.Cert.PC9QB6MData.rc27' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13422:0: 'AMW.Cert.PC9QB6MData.ready28_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13426:0: 'AMW.Cert.PC9QB6MData.rc28' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13435:0: 'AMW.Cert.PC9QB6MData.ready29_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13439:0: 'AMW.Cert.PC9QB6MData.rc29' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13448:0: 'AMW.Cert.PC9QB6MData.ready30_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13452:0: 'AMW.Cert.PC9QB6MData.rc30' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13461:0: 'AMW.Cert.PC9QB6MData.ready31_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13465:0: 'AMW.Cert.PC9QB6MData.rc31' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13480:0: 'AMW.Cert.PC9QB6MData.ready32_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13484:0: 'AMW.Cert.PC9QB6MData.ready32_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13489:0: 'AMW.Cert.PC9QB6MData.ready32_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13492:0: 'AMW.Cert.PC9QB6MData.ready32_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13496:0: 'AMW.Cert.PC9QB6MData.rc32' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13513:0: 'AMW.Cert.PC9QB6MData.ready33_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13517:0: 'AMW.Cert.PC9QB6MData.ready33_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13522:0: 'AMW.Cert.PC9QB6MData.ready33_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13527:0: 'AMW.Cert.PC9QB6MData.ready33_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13531:0: 'AMW.Cert.PC9QB6MData.ready33_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13536:0: 'AMW.Cert.PC9QB6MData.ready33_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13541:0: 'AMW.Cert.PC9QB6MData.ready33_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13545:0: 'AMW.Cert.PC9QB6MData.ready33_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13550:0: 'AMW.Cert.PC9QB6MData.ready33_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13553:0: 'AMW.Cert.PC9QB6MData.ready33_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13557:0: 'AMW.Cert.PC9QB6MData.rc33' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13580:0: 'AMW.Cert.PC9QB6MData.ready34_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13584:0: 'AMW.Cert.PC9QB6MData.ready34_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13589:0: 'AMW.Cert.PC9QB6MData.ready34_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13594:0: 'AMW.Cert.PC9QB6MData.ready34_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13598:0: 'AMW.Cert.PC9QB6MData.ready34_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13603:0: 'AMW.Cert.PC9QB6MData.ready34_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13608:0: 'AMW.Cert.PC9QB6MData.ready34_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13612:0: 'AMW.Cert.PC9QB6MData.ready34_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13617:0: 'AMW.Cert.PC9QB6MData.ready34_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13622:0: 'AMW.Cert.PC9QB6MData.ready34_3_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13626:0: 'AMW.Cert.PC9QB6MData.ready34_3_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13631:0: 'AMW.Cert.PC9QB6MData.ready34_cuts4_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13636:0: 'AMW.Cert.PC9QB6MData.ready34_4_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13640:0: 'AMW.Cert.PC9QB6MData.ready34_4_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13645:0: 'AMW.Cert.PC9QB6MData.ready34_cuts5_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13648:0: 'AMW.Cert.PC9QB6MData.ready34_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13652:0: 'AMW.Cert.PC9QB6MData.rc34' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13667:0: 'AMW.Cert.PC9QB6MData.ready35_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13671:0: 'AMW.Cert.PC9QB6MData.ready35_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13676:0: 'AMW.Cert.PC9QB6MData.ready35_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13681:0: 'AMW.Cert.PC9QB6MData.ready35_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13685:0: 'AMW.Cert.PC9QB6MData.ready35_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13690:0: 'AMW.Cert.PC9QB6MData.ready35_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13693:0: 'AMW.Cert.PC9QB6MData.ready35_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13697:0: 'AMW.Cert.PC9QB6MData.rc35' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13716:0: 'AMW.Cert.PC9QB6MData.ready36_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13720:0: 'AMW.Cert.PC9QB6MData.ready36_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13725:0: 'AMW.Cert.PC9QB6MData.ready36_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13730:0: 'AMW.Cert.PC9QB6MData.ready36_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13734:0: 'AMW.Cert.PC9QB6MData.ready36_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13739:0: 'AMW.Cert.PC9QB6MData.ready36_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13744:0: 'AMW.Cert.PC9QB6MData.ready36_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13748:0: 'AMW.Cert.PC9QB6MData.ready36_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13753:0: 'AMW.Cert.PC9QB6MData.ready36_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13756:0: 'AMW.Cert.PC9QB6MData.ready36_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13760:0: 'AMW.Cert.PC9QB6MData.rc36' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13781:0: 'AMW.Cert.PC9QB6MData.ready37_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13785:0: 'AMW.Cert.PC9QB6MData.ready37_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13790:0: 'AMW.Cert.PC9QB6MData.ready37_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13795:0: 'AMW.Cert.PC9QB6MData.ready37_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13799:0: 'AMW.Cert.PC9QB6MData.ready37_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13804:0: 'AMW.Cert.PC9QB6MData.ready37_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13809:0: 'AMW.Cert.PC9QB6MData.ready37_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13813:0: 'AMW.Cert.PC9QB6MData.ready37_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13818:0: 'AMW.Cert.PC9QB6MData.ready37_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13821:0: 'AMW.Cert.PC9QB6MData.ready37_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13825:0: 'AMW.Cert.PC9QB6MData.rc37' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13842:0: 'AMW.Cert.PC9QB6MData.ready38_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13846:0: 'AMW.Cert.PC9QB6MData.ready38_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13851:0: 'AMW.Cert.PC9QB6MData.ready38_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13856:0: 'AMW.Cert.PC9QB6MData.ready38_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13860:0: 'AMW.Cert.PC9QB6MData.ready38_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13865:0: 'AMW.Cert.PC9QB6MData.ready38_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13870:0: 'AMW.Cert.PC9QB6MData.ready38_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13874:0: 'AMW.Cert.PC9QB6MData.ready38_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13879:0: 'AMW.Cert.PC9QB6MData.ready38_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13882:0: 'AMW.Cert.PC9QB6MData.ready38_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13886:0: 'AMW.Cert.PC9QB6MData.rc38' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13899:0: 'AMW.Cert.PC9QB6MData.ready39_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13903:0: 'AMW.Cert.PC9QB6MData.ready39_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13908:0: 'AMW.Cert.PC9QB6MData.ready39_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13911:0: 'AMW.Cert.PC9QB6MData.ready39_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13915:0: 'AMW.Cert.PC9QB6MData.rc39' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13930:0: 'AMW.Cert.PC9QB6MData.ready40_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13934:0: 'AMW.Cert.PC9QB6MData.ready40_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13939:0: 'AMW.Cert.PC9QB6MData.ready40_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13944:0: 'AMW.Cert.PC9QB6MData.ready40_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13948:0: 'AMW.Cert.PC9QB6MData.ready40_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13953:0: 'AMW.Cert.PC9QB6MData.ready40_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13956:0: 'AMW.Cert.PC9QB6MData.ready40_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13960:0: 'AMW.Cert.PC9QB6MData.rc40' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13979:0: 'AMW.Cert.PC9QB6MData.ready41_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13983:0: 'AMW.Cert.PC9QB6MData.ready41_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13988:0: 'AMW.Cert.PC9QB6MData.ready41_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:13993:0: 'AMW.Cert.PC9QB6MData.ready41_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:13997:0: 'AMW.Cert.PC9QB6MData.ready41_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14002:0: 'AMW.Cert.PC9QB6MData.ready41_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14007:0: 'AMW.Cert.PC9QB6MData.ready41_2_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14011:0: 'AMW.Cert.PC9QB6MData.ready41_2_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14016:0: 'AMW.Cert.PC9QB6MData.ready41_cuts3_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14019:0: 'AMW.Cert.PC9QB6MData.ready41_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14023:0: 'AMW.Cert.PC9QB6MData.rc41' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14040:0: 'AMW.Cert.PC9QB6MData.ready42_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14044:0: 'AMW.Cert.PC9QB6MData.ready42_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14049:0: 'AMW.Cert.PC9QB6MData.ready42_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14054:0: 'AMW.Cert.PC9QB6MData.ready42_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14058:0: 'AMW.Cert.PC9QB6MData.ready42_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14063:0: 'AMW.Cert.PC9QB6MData.ready42_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14066:0: 'AMW.Cert.PC9QB6MData.ready42_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14070:0: 'AMW.Cert.PC9QB6MData.rc42' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14085:0: 'AMW.Cert.PC9QB6MData.ready43_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14089:0: 'AMW.Cert.PC9QB6MData.ready43_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14094:0: 'AMW.Cert.PC9QB6MData.ready43_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14099:0: 'AMW.Cert.PC9QB6MData.ready43_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14103:0: 'AMW.Cert.PC9QB6MData.ready43_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14108:0: 'AMW.Cert.PC9QB6MData.ready43_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14111:0: 'AMW.Cert.PC9QB6MData.ready43_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14115:0: 'AMW.Cert.PC9QB6MData.rc43' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14130:0: 'AMW.Cert.PC9QB6MData.ready44_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14134:0: 'AMW.Cert.PC9QB6MData.ready44_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14139:0: 'AMW.Cert.PC9QB6MData.ready44_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14144:0: 'AMW.Cert.PC9QB6MData.ready44_1_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14148:0: 'AMW.Cert.PC9QB6MData.ready44_1_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14153:0: 'AMW.Cert.PC9QB6MData.ready44_cuts2_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14156:0: 'AMW.Cert.PC9QB6MData.ready44_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14160:0: 'AMW.Cert.PC9QB6MData.rc44' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14173:0: 'AMW.Cert.PC9QB6MData.ready45_0_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14177:0: 'AMW.Cert.PC9QB6MData.ready45_0_covered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14182:0: 'AMW.Cert.PC9QB6MData.ready45_cuts1_ok' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14185:0: 'AMW.Cert.PC9QB6MData.ready45_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14189:0: 'AMW.Cert.PC9QB6MData.rc45' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14198:0: 'AMW.Cert.PC9QB6MData.ready46_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14202:0: 'AMW.Cert.PC9QB6MData.rc46' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14211:0: 'AMW.Cert.PC9QB6MData.ready47_parent_cursor' depends on axioms: [propext]
+info: comparator/Solution/Candidate.lean:14215:0: 'AMW.Cert.PC9QB6MData.rc47' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:14583:6: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+info: comparator/Solution/Candidate.lean:16937:0: 'candidate_strict_improvement' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:16938:0: 'candidate_critical_line_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: comparator/Solution/Candidate.lean:16939:0: 'candidate_critical_line_bound_cumulative' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (8839 jobs).
+Exporting #[Nat, String, String.mk, Char, Quot, Quot.mk, Quot.lift, Quot.ind, candidate_strict_improvement, candidate_critical_line_bound, candidate_critical_line_bound_cumulative, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce] from Solution.Candidate
+Running nanoda kernel on solution
+Nanoda kernel accepts the solution
+Running Lean default kernel on solution.
+Lean default kernel accepts the solution
+Your solution is okay!
