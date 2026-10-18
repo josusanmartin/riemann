@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ia4tlj1qrfl93s90mqgu5",
-    "jobId": "b3ba3390-995b-4324-baba-fb5099db6d52",
-    "proofDigest": "3e9ae6d120c10d2ef8242f57ed342511b74edd6d1bb6463572afdbd16d876578",
-    "ownerKey": "a80961455901cc8fc4eaa3eaf651755f782b11a713e0906f2aa727e4881100f2",
-    "submissionKey": "ac81a9ddbd3eb965ee627f9aa46c0b8c2371b01487460c3b72b03ad81654bd6e",
-    "enqueuedAt": "2026-10-18T02:47:22.739Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "b3ba3390-995b-4324-baba-fb5099db6d52",
+      "proofDigest": "3e9ae6d120c10d2ef8242f57ed342511b74edd6d1bb6463572afdbd16d876578",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/cfc7ce6113199b7d5f262812d81089778e84335c/submissions/critical-strip-exclusion-attempt-1",
+      "completedAt": "2026-10-18T03:40:45.674Z",
+      "logArchived": true
+    },
     {
       "jobId": "005e55f1-3a27-447c-8440-a512f03f66ed",
       "proofDigest": "b465c377d035b1300565061da159039a8754ec64a9a2b0682098f03cfae85496",
