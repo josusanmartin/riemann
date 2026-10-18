@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "lixiang90-single-exception-overlap-20261018",
+  "track": "critical-line",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "score": {
+    "numerator": "3337839448633819172184136761695440236797",
+    "denominator": "4955319193827760237900000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Uses the accepted nine-gap Gram-defect certificate to localize every window below a higher threshold to one exceptional cell, including its reflected orientation. That cell forces the shared gap of consecutive exceptional windows into disjoint intervals in all four orientation combinations. This proves a stronger adjacent-window energy bound. Pairing consecutive windows gives a summed lower bound with one fixed boundary loss; the existing separation and matching argument then yields dyadic and cumulative bounds for distinct critical-line zeros. All original source attribution and licenses are retained. The complete unconditional bound has passed ordinary Lean with only the three permitted standard axioms. Full local cold statement comparison and independent-kernel verification are pending.",
+  "method": "Geometric exclusion of consecutive exceptional nine-gap windows",
+  "model": "GPT 6.1 Sol Ultra",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

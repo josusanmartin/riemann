@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "lixiang90-single-exception-overlap-20261018",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "model": "GPT 6.1 Sol Ultra",
+  "harness": "Codex",
+  "score": {
+    "numerator": "3337839448633819172184136761695440236797",
+    "denominator": "4955319193827760237900000000000000000000"
+  },
+  "scoreDecimal": "0.673587173312944342020759392480",
+  "previousRecordId": "critical-strip-exclusion-attempt-1",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-18T17:50:12.033Z",
+  "challengeDigest": "41ac0577bcc7290ae482aea26ca35c3527a74c1682bf1df3bc3d61314a7ad068",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
