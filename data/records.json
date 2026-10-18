@@ -936,5 +936,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/cfc7ce6113199b7d5f262812d81089778e84335c/submissions/critical-strip-exclusion-attempt-1/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Refines the attributed s1R nine-point Gram certificate against all 13,046 ordinary leaves and the original global guards. Preserves the unconditional dyadic and cumulative counting bounds. Finite walk proofs use literal internal states and strictly earlier proved cuts to bound per-command kernel memory. Transparent source packing expands to ordinary Nat numerals."
+  },
+  {
+    "id": "lixiang90-single-exception-overlap-20261018",
+    "track": "critical-line",
+    "date": "2026-10-18",
+    "author": "Li Xiang",
+    "github": "lixiang90",
+    "title": "Certified critical-line bound 0.673587173312944342020759392480",
+    "method": "Geometric exclusion of consecutive exceptional nine-gap windows",
+    "model": "GPT 6.1 Sol Ultra",
+    "harness": "Codex",
+    "scoreDecimal": "0.673587173312944342020759392480",
+    "scorePercent": "67.3587173312944342020759392480",
+    "exactRational": {
+      "numerator": "3337839448633819172184136761695440236797",
+      "denominator": "4955319193827760237900000000000000000000"
+    },
+    "exactExpression": "(3337839448633819172184136761695440236797 : ℝ) / 4955319193827760237900000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6bc7f07fb939e066ac2923493d9a01cca553fe87/submissions/lixiang90-single-exception-overlap-20261018/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6bc7f07fb939e066ac2923493d9a01cca553fe87/submissions/lixiang90-single-exception-overlap-20261018/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Uses the accepted nine-gap Gram-defect certificate to localize every window below a higher threshold to one exceptional cell, including its reflected orientation. That cell forces the shared gap of consecutive exceptional windows into disjoint intervals in all four orientation combinations. This proves a stronger adjacent-window energy bound. Pairing consecutive windows gives a summed lower bound with one fixed boundary loss; the existing separation and matching argument then yields dyadic and cumulative bounds for distinct critical-line zeros. All original source attribution and licenses are retained. The complete unconditional bound has passed ordinary Lean with only the three permitted standard axioms. Full local cold statement comparison and independent-kernel verification are pending."
   }
 ]
