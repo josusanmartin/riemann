@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ajp88-w9a2-window-nine-point",
+  "track": "critical-line",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "score": {
+    "numerator": "3337881639516708570682858853672166187793",
+    "denominator": "4955348548503844558750000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Replaces the window by W9A2, a 13-term profile tuned for the nine-point certificate (cAMn and every window table, numeral and H literal regenerated and kernel-checked in-file), and regenerates the nine-point certificate on it: 11,794 checked leaves, weights refitted at 1e-14 resolution and the floor set to the largest value every guard allows. Keeps attempt-021/master-of-puppets5’s checker PC9QB6M and counting chain, and attempt-016’s window code. Walk literals are packed with the zfNat64 block from critical-strip-exclusion-attempt-1 (Zero Forge / @zkvoxels), reproduced unmodified with attribution. Only propext, Classical.choice and Quot.sound.",
+  "method": "Window W9A2 (tuned for n = 9) with a regenerated, exactly refitted nine-point Gram-defect certificate on master-of-puppets5’s file",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
