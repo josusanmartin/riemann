@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ikml67yqcb5bmx1gf8dp4",
-    "jobId": "afc370b9-97e4-49e8-8a10-a99a32b7635f",
-    "proofDigest": "f0fef32d9b4e80b89df54e009f7e8afcae4211d5544c81f3767686098738a8f5",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "fff81dbdd1cb9878d8e904ec73078a97763996a9ee4dbef559be7d6712711fe5",
-    "enqueuedAt": "2026-10-19T05:05:09.947Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "afc370b9-97e4-49e8-8a10-a99a32b7635f",
+      "proofDigest": "f0fef32d9b4e80b89df54e009f7e8afcae4211d5544c81f3767686098738a8f5",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/4889ee768b6b4d9d2aedd5de8445adb151768fd8/submissions/ajp88-w9a2-window-nine-point",
+      "completedAt": "2026-10-19T05:49:12.254Z",
+      "logArchived": true
+    },
     {
       "jobId": "58eb0649-19ae-4522-96e7-6b2b119056d8",
       "proofDigest": "23e3dd765aa27de76938e056f13d3e0f08d849d0e7c39c6f78c62e7640c0a10f",
