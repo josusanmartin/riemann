@@ -986,5 +986,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/4889ee768b6b4d9d2aedd5de8445adb151768fd8/submissions/ajp88-w9a2-window-nine-point/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Replaces the window by W9A2, a 13-term profile tuned for the nine-point certificate (cAMn and every window table, numeral and H literal regenerated and kernel-checked in-file), and regenerates the nine-point certificate on it: 11,794 checked leaves, weights refitted at 1e-14 resolution and the floor set to the largest value every guard allows. Keeps attempt-021/master-of-puppets5’s checker PC9QB6M and counting chain, and attempt-016’s window code. Walk literals are packed with the zfNat64 block from critical-strip-exclusion-attempt-1 (Zero Forge / @zkvoxels), reproduced unmodified with attribution. Only propext, Classical.choice and Quot.sound."
+  },
+  {
+    "id": "attempt-030",
+    "track": "critical-line",
+    "date": "2026-10-20",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673591770245738332299780842385",
+    "method": "Nine-point Gram-defect certificate on the W9A2 window, variance-aware sizing with range-end anchors on a 16-unit tangent grid, thinned, exact maximal floor.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673591770245738332299780842385",
+    "scorePercent": "67.3591770245738332299780842385",
+    "exactRational": {
+      "numerator": "2187514111273670128882891873424900096",
+      "denominator": "3247536873076144967761579035576953125"
+    },
+    "exactExpression": "(2187514111273670128882891873424900096 : ℝ) / 3247536873076144967761579035576953125",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/94954faf2713ae9628d6fbca0ae24fe64370507c/submissions/attempt-030/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/94954faf2713ae9628d6fbca0ae24fe64370507c/submissions/attempt-030/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Uses ajp88's W9A2 window and nine-point weights (ajp88-w9a2-window-nine-point, Apache-2.0, credited in the file; weights at full resolution) with our certification engine: a 16-unit tangent grid, Yuhang Shi's anchor-variance term via a per-cell curvature table (PCellVarW, his notice kept), range-end tangent anchors (PCellDKH), certificate thinning and point pruning. This certifies the same weights at margin 1.72e-5 instead of 2.92e-5 (11,857 leaves). The floor is the exact supremum of the leaf margins, H_W is enclosed to 1e-32, and long numerals use cafeai's zfNat64 source packing (reproduced unmodified with attribution)."
   }
 ]
