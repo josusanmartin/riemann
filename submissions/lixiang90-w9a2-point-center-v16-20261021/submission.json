@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "lixiang90-w9a2-point-center-v16-20261021",
+  "track": "critical-line",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "score": {
+    "numerator": "5468785278184175322207229683562307584",
+    "denominator": "8118842181460468609667905735697265625"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Uses the attributed accepted H33 W9A2 source with the same nine-point window, kernel, weights, B and H_W bound. Retains the original kind-3 endpoint center squares after paying the variance bonus once and uses the ordered-pair constraint g0 <= g7 at root34/cursor40708. At root10/cursor15770, an inner cut uses the existing V checker on the original payload. The generic leafStep is unchanged. The original 48-root certificate is retargeted to the stated uniform c, propagated through actual dyadic and cumulative zero-counting statements. Prior attribution and license notices remain.",
+  "method": "Fixed-cell endpoint-center strengthening and pointed same-payload V cut in the attributed H33 W9A2 certificate",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

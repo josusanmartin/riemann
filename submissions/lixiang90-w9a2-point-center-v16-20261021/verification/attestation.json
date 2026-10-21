@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "lixiang90-w9a2-point-center-v16-20261021",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "5468785278184175322207229683562307584",
+    "denominator": "8118842181460468609667905735697265625"
+  },
+  "scoreDecimal": "0.673591770347778294402523620032",
+  "previousRecordId": "lixiang90-w9a2-hw-rounding-v12-20261021",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-21T12:02:11.696Z",
+  "challengeDigest": "ee4218846539589f08b8d1d2201ed13a1a9336578eea6b1df9443682a1329521",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
