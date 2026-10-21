@@ -1036,5 +1036,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/9ab832ca9c2414b086c39dd9e5a4e4ee45bd5f61/submissions/lixiang90-w9a2-hw-rounding-v12-20261021/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Uses Samuel Lavery's attributed attempt-030 W9A2 certificate, with the same nine-point window, weights, certificate data, c, B, and rational bounds for pi, sqrt(2)/2, sine and cosine. Only the terminal H_W floor is sharpened from 67212374687824171413662471723172/10^32 to 672123746878241714136624717231727/10^33. The sharper rational is propagated through the existing actual dyadic and cumulative zero-counting proofs to the stated exact p/q. All original attribution and license notices are retained; the file adds a notice identifying Li Xiang's change."
+  },
+  {
+    "id": "lixiang90-w9a2-point-center-v16-20261021",
+    "track": "critical-line",
+    "date": "2026-10-21",
+    "author": "Li Xiang",
+    "github": "lixiang90",
+    "title": "Certified critical-line bound 0.673591770347778294402523620032",
+    "method": "Fixed-cell endpoint-center strengthening and pointed same-payload V cut in the attributed H33 W9A2 certificate",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.673591770347778294402523620032",
+    "scorePercent": "67.3591770347778294402523620032",
+    "exactRational": {
+      "numerator": "5468785278184175322207229683562307584",
+      "denominator": "8118842181460468609667905735697265625"
+    },
+    "exactExpression": "(5468785278184175322207229683562307584 : ℝ) / 8118842181460468609667905735697265625",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/aaff49408a7fd7561e5023f9c908604b5fda5b06/submissions/lixiang90-w9a2-point-center-v16-20261021/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/aaff49408a7fd7561e5023f9c908604b5fda5b06/submissions/lixiang90-w9a2-point-center-v16-20261021/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Uses the attributed accepted H33 W9A2 source with the same nine-point window, kernel, weights, B and H_W bound. Retains the original kind-3 endpoint center squares after paying the variance bonus once and uses the ordered-pair constraint g0 <= g7 at root34/cursor40708. At root10/cursor15770, an inner cut uses the existing V checker on the original payload. The generic leafStep is unchanged. The original 48-root certificate is retargeted to the stated uniform c, propagated through actual dyadic and cumulative zero-counting statements. Prior attribution and license notices remain."
   }
 ]
