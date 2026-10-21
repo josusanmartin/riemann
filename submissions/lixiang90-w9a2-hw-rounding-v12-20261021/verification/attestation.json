@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "lixiang90-w9a2-hw-rounding-v12-20261021",
+  "author": {
+    "github": "lixiang90",
+    "displayName": "Li Xiang"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "10937570556368350644414459367124615168",
+    "denominator": "16237684365380724838807895177884765625"
+  },
+  "scoreDecimal": "0.673591770245738332299780842385",
+  "previousRecordId": "attempt-030",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-21T02:52:42.396Z",
+  "challengeDigest": "de58b80efbd6cfc940ab0ed6e1d5294d41a44501241846794ec9aa7a8c551827",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
