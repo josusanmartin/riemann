@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "irzmd44ibnh3l8t12d91b",
-    "jobId": "16701942-1124-4c53-b4e9-84ad85d90b61",
-    "proofDigest": "c0c3df2ca61fc0a55fb6a66d5ce865e803b8d9d67a0f2d22655f13b5a08ca1db",
-    "ownerKey": "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526",
-    "submissionKey": "d6b3b58932eb00275eda8256a3ef7bf763e707b8262479183b3b5ca0f9874671",
-    "enqueuedAt": "2026-10-21T01:59:24.717Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "16701942-1124-4c53-b4e9-84ad85d90b61",
+      "proofDigest": "c0c3df2ca61fc0a55fb6a66d5ce865e803b8d9d67a0f2d22655f13b5a08ca1db",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/9ab832ca9c2414b086c39dd9e5a4e4ee45bd5f61/submissions/lixiang90-w9a2-hw-rounding-v12-20261021",
+      "completedAt": "2026-10-21T02:52:42.913Z",
+      "logArchived": true
+    },
     {
       "jobId": "5050cde6-f37a-434a-8c5b-c2417241ac62",
       "proofDigest": "ae77ffd4ed67f169691b4cb9d2be8d08f27bfe7ec05f2a1073be4b61543e1430",
