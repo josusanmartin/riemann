@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "i5hpf3h17qv1lfmfhbbz6",
-    "jobId": "8521c206-842e-4f61-acea-42f62347278a",
-    "proofDigest": "0cef2c7a041cc705246184c904c0c5c53ca2286bfbd8d540ec957a65f82974a0",
-    "ownerKey": "a4c2a55afe61ef8f01d6305dd9af555a7ec06270cec9afd52e5805aabe154526",
-    "submissionKey": "89ca267f4a5e1c9fd94d143d0c4c2e0bbf9ed8da3cc2cafad2b3f98d977eb6aa",
-    "enqueuedAt": "2026-10-21T11:12:01.377Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8521c206-842e-4f61-acea-42f62347278a",
+      "proofDigest": "0cef2c7a041cc705246184c904c0c5c53ca2286bfbd8d540ec957a65f82974a0",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/aaff49408a7fd7561e5023f9c908604b5fda5b06/submissions/lixiang90-w9a2-point-center-v16-20261021",
+      "completedAt": "2026-10-21T12:02:12.350Z",
+      "logArchived": true
+    },
     {
       "jobId": "16701942-1124-4c53-b4e9-84ad85d90b61",
       "proofDigest": "c0c3df2ca61fc0a55fb6a66d5ce865e803b8d9d67a0f2d22655f13b5a08ca1db",
