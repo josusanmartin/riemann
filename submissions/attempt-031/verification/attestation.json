@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "attempt-031",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "427271048021647188036337931580422111808768",
+    "denominator": "634309227448776561430125697620086669921875"
+  },
+  "scoreDecimal": "0.673600555584147362440720136740",
+  "previousRecordId": "lixiang90-w9a2-point-center-v16-20261021",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-22T07:21:39.336Z",
+  "challengeDigest": "795d6ff6126855de30a459a487f065e672dca2f4ec9b0f07fa894635cff3165f",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

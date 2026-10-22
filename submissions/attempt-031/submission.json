@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "attempt-031",
+  "track": "critical-line",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "score": {
+    "numerator": "427271048021647188036337931580422111808768",
+    "denominator": "634309227448776561430125697620086669921875"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. New window WL1, found by our frame-LP window search started from ajp88's W9A2 (whose window declarations are regenerated from WL1's coefficients, credited in the file). Two kernel/profile lemmas are re-proved with sharper bounds (same statements), lifting the coefficient-sum limit that pinned W9A2. Nine-point weights from our frame LP at full resolution; certified at margin 1.6e-5 (9,932 leaves) with splits at the LP minimiser, a fast leaf checker, an 8-unit tangent grid, range-end anchors, Yuhang Shi's anchor-variance term (PCellVarW, his notice kept), thinning and pruning. Exact maximal floor; H_W to 1e-40; long numerals use cafeai's zfNat64 packing (reproduced with attribution).",
+  "method": "Nine-point Gram-defect certificate on a re-optimised window (WL1), split-at-LP-minimiser tree, fast leaf checker, exact floor, H_W to 1e-40.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
