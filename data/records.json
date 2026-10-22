@@ -1061,5 +1061,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/aaff49408a7fd7561e5023f9c908604b5fda5b06/submissions/lixiang90-w9a2-point-center-v16-20261021/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Uses the attributed accepted H33 W9A2 source with the same nine-point window, kernel, weights, B and H_W bound. Retains the original kind-3 endpoint center squares after paying the variance bonus once and uses the ordered-pair constraint g0 <= g7 at root34/cursor40708. At root10/cursor15770, an inner cut uses the existing V checker on the original payload. The generic leafStep is unchanged. The original 48-root certificate is retargeted to the stated uniform c, propagated through actual dyadic and cumulative zero-counting statements. Prior attribution and license notices remain."
+  },
+  {
+    "id": "attempt-031",
+    "track": "critical-line",
+    "date": "2026-10-22",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673600555584147362440720136740",
+    "method": "Nine-point Gram-defect certificate on a re-optimised window (WL1), split-at-LP-minimiser tree, fast leaf checker, exact floor, H_W to 1e-40.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673600555584147362440720136740",
+    "scorePercent": "67.3600555584147362440720136740",
+    "exactRational": {
+      "numerator": "427271048021647188036337931580422111808768",
+      "denominator": "634309227448776561430125697620086669921875"
+    },
+    "exactExpression": "(427271048021647188036337931580422111808768 : ℝ) / 634309227448776561430125697620086669921875",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/853c717c9600a11616ba522d67e39fa8bb0967d3/submissions/attempt-031/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/853c717c9600a11616ba522d67e39fa8bb0967d3/submissions/attempt-031/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. New window WL1, found by our frame-LP window search started from ajp88's W9A2 (whose window declarations are regenerated from WL1's coefficients, credited in the file). Two kernel/profile lemmas are re-proved with sharper bounds (same statements), lifting the coefficient-sum limit that pinned W9A2. Nine-point weights from our frame LP at full resolution; certified at margin 1.6e-5 (9,932 leaves) with splits at the LP minimiser, a fast leaf checker, an 8-unit tangent grid, range-end anchors, Yuhang Shi's anchor-variance term (PCellVarW, his notice kept), thinning and pruning. Exact maximal floor; H_W to 1e-40; long numerals use cafeai's zfNat64 packing (reproduced with attribution)."
   }
 ]
