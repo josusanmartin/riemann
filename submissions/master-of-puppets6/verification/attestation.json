@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "master-of-puppets6",
+  "author": {
+    "github": "arun-chandru",
+    "displayName": "R. Arun Chandru"
+  },
+  "model": "GPT-6 Astra",
+  "harness": "Codex",
+  "score": {
+    "numerator": "58987908612462284494349855592314158679645234516438349025612654260768856563313361607134169248324623825007433319832062439994237046375344239184440993748764458485636731210387942901195987077978282921428808",
+    "denominator": "87571051008572708229924696424289752272468109314932861522590792816928281812164242305696549289828669076328438208246427026414887827022048813173386260086069387081188662271810766930352410523661850813809055"
+  },
+  "scoreDecimal": "0.673600555584147362440720136740",
+  "previousRecordId": "attempt-031",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-22T12:24:39.338Z",
+  "challengeDigest": "6990ab3d7e950e9c8ec4c1c7ee9d119a6f1f8ed1e259c0c938145e0c7288f9a7",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
