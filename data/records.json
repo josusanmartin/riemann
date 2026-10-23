@@ -1111,5 +1111,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/a9c0a3f1fa6bf78056378d7a3f26e8bdcf51c3b4/submissions/master-of-puppets6/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "sharpens the terminal rational enclosure in a certified Fourier–Gram bound without changing the underlying analytic estimates or finite certificate."
+  },
+  {
+    "id": "attempt-032",
+    "track": "critical-line",
+    "date": "2026-10-23",
+    "author": "Samuel Lavery",
+    "github": "samlavery",
+    "title": "Certified critical-line bound 0.673600764507257397853295271394",
+    "method": "Nine-point Gram-defect certificate on a refined window (WL2), half-space leaf constraint g0 <= g7, split-at-LP-minimiser tree, fast leaf checker, exact floor.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673600764507257397853295271394",
+    "scorePercent": "67.3600764507257397853295271394",
+    "exactRational": {
+      "numerator": "13352209902560743456237498396387948650328",
+      "denominator": "19822141847371502332293849542083740234375"
+    },
+    "exactExpression": "(13352209902560743456237498396387948650328 : ℝ) / 19822141847371502332293849542083740234375",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/121ce483f1b51693f8a3ff61c6915473928763f9/submissions/attempt-032/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/121ce483f1b51693f8a3ff61c6915473928763f9/submissions/attempt-032/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-031. Window WL2 refines WL1 by our frame-LP window search (window declarations regenerated from its coefficients, ajp88's W9A2 structure credited in the file). New in the checker: every leaf may use the reflection half-space g0 <= g7 as an extra LP row (module PCellHalf), certifying straddling cells on one side only, which cuts the tree by about 16 %. Weights from our frame LP at full resolution; certified at margin 1.4e-5 (8,596 leaves) with splits at the LP minimiser, the fast leaf checker, an 8-unit tangent grid, range-end anchors and Yuhang Shi's anchor-variance term (PCellVarW, his notice kept). Exact maximal floor; H_W to 1e-40; long numerals use cafeai's zfNat64 packing."
   }
 ]
