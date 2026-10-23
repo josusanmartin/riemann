@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "attempt-032",
+  "author": {
+    "github": "samlavery",
+    "displayName": "Samuel Lavery"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "13352209902560743456237498396387948650328",
+    "denominator": "19822141847371502332293849542083740234375"
+  },
+  "scoreDecimal": "0.673600764507257397853295271394",
+  "previousRecordId": "master-of-puppets6",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-23T02:22:36.787Z",
+  "challengeDigest": "1c7582f6970e92ac76b4df162338ed9d8b76b998b1cacda8a1e15db0f73d4826",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
