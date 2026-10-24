@@ -1136,5 +1136,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/121ce483f1b51693f8a3ff61c6915473928763f9/submissions/attempt-032/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By Samuel Lavery (github: samlavery) and his agent team (bridge-port, am-cert, mvt-engine, window-scope); Apache-2.0. Builds on our attempt-031. Window WL2 refines WL1 by our frame-LP window search (window declarations regenerated from its coefficients, ajp88's W9A2 structure credited in the file). New in the checker: every leaf may use the reflection half-space g0 <= g7 as an extra LP row (module PCellHalf), certifying straddling cells on one side only, which cuts the tree by about 16 %. Weights from our frame LP at full resolution; certified at margin 1.4e-5 (8,596 leaves) with splits at the LP minimiser, the fast leaf checker, an 8-unit tangent grid, range-end anchors and Yuhang Shi's anchor-variance term (PCellVarW, his notice kept). Exact maximal floor; H_W to 1e-40; long numerals use cafeai's zfNat64 packing."
+  },
+  {
+    "id": "ajp88-ra-window-nine-point",
+    "track": "critical-line",
+    "date": "2026-10-24",
+    "author": "ajp88",
+    "github": "ajp88",
+    "title": "Certified critical-line bound 0.673601151492093332650021101259",
+    "method": "Nine-point Gram-defect certificate on a re-optimised window (RA), one frozen KMT numeral relaxed (proof unchanged), exact refit, zfNat64 packing.",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673601151492093332650021101259",
+    "scorePercent": "67.3601151492093332650021101259",
+    "exactRational": {
+      "numerator": "1669044344675499575055516274525441801367",
+      "denominator": "2477793188117925391575000000000000000000"
+    },
+    "exactExpression": "(1669044344675499575055516274525441801367 : ℝ) / 2477793188117925391575000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/bde9aed224cbb50749d74c75574290f92a73afa2/submissions/ajp88-ra-window-nine-point/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/bde9aed224cbb50749d74c75574290f92a73afa2/submissions/ajp88-ra-window-nine-point/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Window RA, found by this programme's template study starting from its own W9A2 (ajp88-w9a2-window-nine-point): c12's sign freed, the |v''| and pvCheck numerals relaxed, and normalized_KMT_at_sep_ge's bound raised from 1/5 to 2109/10000 with its proof unchanged. Built on R. Arun Chandru's master-of-puppets5 (PC9QB6M checker and counting chain, notices kept). Nine-point weights from an LP, certificate regenerated at margin 2.6e-7 (11,285 checked leaves, no cuts), refitted exactly over its own leaves (weights at 1e-14, cN at the leaves' maximum). Walk data packed with cafeai's zfNat64 macro (reproduced with attribution). Independently replayed in exact arithmetic and built locally in the verifier's workspace with standard axioms only."
   }
 ]
