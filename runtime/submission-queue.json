@@ -1,15 +1,31 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ilkgv93l3w2473e1gckez",
-    "jobId": "ac09192f-077e-444a-ab51-732d1286282d",
-    "proofDigest": "256fb7316d3a218a79edcb44d8ffeefaf0af04a7d881d1a001a04b727c3dfa03",
-    "ownerKey": "30a1013c479a6a70566e815aff5f9f82b9c5274ef483232bc925ddd97169be85",
-    "submissionKey": "24357d58e33f11ff088c644f045afc953a45d8008e8762ef0bea8e8d2d0345e0",
-    "enqueuedAt": "2026-10-24T11:46:37.826Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "ac09192f-077e-444a-ab51-732d1286282d",
+      "proofDigest": "256fb7316d3a218a79edcb44d8ffeefaf0af04a7d881d1a001a04b727c3dfa03",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false,
+        "location": {
+          "file": "Solution.lean",
+          "line": 2380,
+          "column": 30
+        }
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-10-24T12:11:25.391Z",
+      "logArchived": true
+    },
     {
       "jobId": "eeda4118-51cc-4025-8310-04cf27b8dfcb",
       "proofDigest": "bef0677bc5e83cb08ff993bc17c9cf78b6677a6eb6b2c0c2d55d23da897a5228",
