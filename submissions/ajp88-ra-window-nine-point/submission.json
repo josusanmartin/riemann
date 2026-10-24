@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ajp88-ra-window-nine-point",
+  "track": "critical-line",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "score": {
+    "numerator": "1669044344675499575055516274525441801367",
+    "denominator": "2477793188117925391575000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Window RA, found by this programme's template study starting from its own W9A2 (ajp88-w9a2-window-nine-point): c12's sign freed, the |v''| and pvCheck numerals relaxed, and normalized_KMT_at_sep_ge's bound raised from 1/5 to 2109/10000 with its proof unchanged. Built on R. Arun Chandru's master-of-puppets5 (PC9QB6M checker and counting chain, notices kept). Nine-point weights from an LP, certificate regenerated at margin 2.6e-7 (11,285 checked leaves, no cuts), refitted exactly over its own leaves (weights at 1e-14, cN at the leaves' maximum). Walk data packed with cafeai's zfNat64 macro (reproduced with attribution). Independently replayed in exact arithmetic and built locally in the verifier's workspace with standard axioms only.",
+  "method": "Nine-point Gram-defect certificate on a re-optimised window (RA), one frozen KMT numeral relaxed (proof unchanged), exact refit, zfNat64 packing.",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
