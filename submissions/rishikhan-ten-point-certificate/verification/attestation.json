@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "rishikhan-ten-point-certificate",
+  "author": {
+    "github": "rishikhan",
+    "displayName": "Rishi Khan"
+  },
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "427087268273684578806621164366783516828288",
+    "denominator": "634000487577729869848042199009857177734375"
+  },
+  "scoreDecimal": "0.673638706344563701676735239271",
+  "previousRecordId": "ajp88-ra-window-nine-point",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-25T02:27:54.377Z",
+  "challengeDigest": "0c5a156ed56f9f694be4580959e88e73e3553820738fcd91b0f5a17ff89a0169",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

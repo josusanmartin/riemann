@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "rishikhan-ten-point-certificate",
+  "track": "critical-line",
+  "author": {
+    "github": "rishikhan",
+    "displayName": "Rishi Khan"
+  },
+  "score": {
+    "numerator": "427087268273684578806621164366783516828288",
+    "denominator": "634000487577729869848042199009857177734375"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "The proof bounds the defect with a ten-point certificate, which covers every configuration of 9 consecutive gaps; earlier entries cover 8. The window is cos(√2 s) plus 16 cosine corrections, the certificate has 45 weighted pair terms, and κ = (H_W⁻ − B)/(1 − c). The file derives from Samuel Lavery's attempt-031 and attempt-032, which include code by R. Arun Chandru, Yuhang Shi, Kristian Muri Knausgård and anthropics/zeta-23-lean; every notice from those files appears unchanged. The kernel checks 27,554 leaves over 72 roots with 4,701 tangent points, and each leaf lists only its nonzero terms. A command decodes the range-coded leaf data at elaboration time. cafeai's zfNat64 macro appears unmodified, with attribution. The file contains set_option debug.skipKernelTC true, so the build skips its own kernel check; nanoda and the comparator's Lean kernel replay check every declaration. The three theorems take no hypothesis and use only propext, Classical.choice and Quot.sound.",
+  "method": "Ten-point (nine-gap) Gram-defect certificate on a 16-correction window, with the reflection half-space row, a sparse leaf check and range-coded walk data.",
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
