@@ -1186,5 +1186,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/e2ebc19755a932525960d83d3f872ea56b62c346/submissions/rishikhan-ten-point-certificate/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "The proof bounds the defect with a ten-point certificate, which covers every configuration of 9 consecutive gaps; earlier entries cover 8. The window is cos(√2 s) plus 16 cosine corrections, the certificate has 45 weighted pair terms, and κ = (H_W⁻ − B)/(1 − c). The file derives from Samuel Lavery's attempt-031 and attempt-032, which include code by R. Arun Chandru, Yuhang Shi, Kristian Muri Knausgård and anthropics/zeta-23-lean; every notice from those files appears unchanged. The kernel checks 27,554 leaves over 72 roots with 4,701 tangent points, and each leaf lists only its nonzero terms. A command decodes the range-coded leaf data at elaboration time. cafeai's zfNat64 macro appears unmodified, with attribution. The file contains set_option debug.skipKernelTC true, so the build skips its own kernel check; nanoda and the comparator's Lean kernel replay check every declaration. The three theorems take no hypothesis and use only propext, Classical.choice and Quot.sound."
+  },
+  {
+    "id": "beiyi-ten-hw-floor42",
+    "track": "critical-line",
+    "date": "2026-10-27",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.673638706344563701676735239271",
+    "method": "Terminal H_W rational-floor refinement (10^40 to 10^42) of the attributed TEN ten-point certificate",
+    "model": "Opus 5.5",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673638706344563701676735239271",
+    "scorePercent": "67.3638706344563701676735239271",
+    "exactRational": {
+      "numerator": "10677181706842114470165529109169587920708528",
+      "denominator": "15850012189443246746201054975246429443359375"
+    },
+    "exactExpression": "(10677181706842114470165529109169587920708528 : ℝ) / 15850012189443246746201054975246429443359375",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/43ae997cbd0e4c5270b075afaf23d953872875a4/submissions/beiyi-ten-hw-floor42/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/43ae997cbd0e4c5270b075afaf23d953872875a4/submissions/beiyi-ten-hw-floor42/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By 贝奕 (Bei Yi). Derived from Rishi Khan's rishikhan-ten-point-certificate (Apache-2.0, all notices retained). Only change: the H_W floor proved by floor_numeric/HW_ge is moved from 6720624204097848265758095693230992450442/10^40 to 672062420409784826575809569323099245044283/10^42, the 10^-42 truncation of the same rational enclosure; weights, c, B, certificate and all other proofs unchanged."
   }
 ]
