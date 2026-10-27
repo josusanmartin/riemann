@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "izlinr380wrb3d54jdcpb",
-    "jobId": "edd533fc-6b2d-4ccf-9f22-4ce67d31abb0",
-    "proofDigest": "36f4eaae48f234563d7c6f979bdb5461531c369c1efafe6101bb7ce54bb27939",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "7bb763eff2f157960cfe605b5837cd3631a3ffa62fc66bf1f773017ab1e5fb93",
-    "enqueuedAt": "2026-10-27T16:50:48.865Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "edd533fc-6b2d-4ccf-9f22-4ce67d31abb0",
+      "proofDigest": "36f4eaae48f234563d7c6f979bdb5461531c369c1efafe6101bb7ce54bb27939",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/43ae997cbd0e4c5270b075afaf23d953872875a4/submissions/beiyi-ten-hw-floor42",
+      "completedAt": "2026-10-27T17:43:24.977Z",
+      "logArchived": true
+    },
     {
       "jobId": "dee752ad-7207-4fbf-819a-ea6c63d8a86d",
       "proofDigest": "009c31de4db4a94c154c9dd791d0052244e09e1c1be8873dae394bd3a0bae8dc",
