@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-hw-floor42",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "10677181706842114470165529109169587920708528",
+    "denominator": "15850012189443246746201054975246429443359375"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By 贝奕 (Bei Yi). Derived from Rishi Khan's rishikhan-ten-point-certificate (Apache-2.0, all notices retained). Only change: the H_W floor proved by floor_numeric/HW_ge is moved from 6720624204097848265758095693230992450442/10^40 to 672062420409784826575809569323099245044283/10^42, the 10^-42 truncation of the same rational enclosure; weights, c, B, certificate and all other proofs unchanged.",
+  "method": "Terminal H_W rational-floor refinement (10^40 to 10^42) of the attributed TEN ten-point certificate",
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}

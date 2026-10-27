@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-ten-hw-floor42",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "10677181706842114470165529109169587920708528",
+    "denominator": "15850012189443246746201054975246429443359375"
+  },
+  "scoreDecimal": "0.673638706344563701676735239271",
+  "previousRecordId": "rishikhan-ten-point-certificate",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-27T17:43:24.150Z",
+  "challengeDigest": "fec3b379952bb9352295afcfc8ebd28368ef987193e58ce0219059b77fe102fa",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
