@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-raise-c",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "10677181706842114470165529109169587920708528",
+    "denominator": "15850012181982099492098184266895294189453125"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "By 贝奕 (Bei Yi). Derived from the attributed TEN ten-point certificate (Rishi Khan; Samuel Lavery, R. Arun Chandru et al.; Apache-2.0, all notices retained). An exact integer recomputation of all 27,554 leaf checks shows the floor c is not tight: c is raised from 78636809221179049927741289138/SA to 78636813132969021486827167078/SA (SA = 2^23*10^24), the largest value every leaf certifies (tightest leaf: root 54, walk position 10521). Certificate data (weights, lambdas, tangent table, pyramids, trees, multipliers) and all other proofs are unchanged.",
+  "method": "Exact leaf-slack recomputation of the attributed TEN ten-point certificate: floor c raised at unchanged certificate data",
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
