@@ -1211,5 +1211,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/43ae997cbd0e4c5270b075afaf23d953872875a4/submissions/beiyi-ten-hw-floor42/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "By 贝奕 (Bei Yi). Derived from Rishi Khan's rishikhan-ten-point-certificate (Apache-2.0, all notices retained). Only change: the H_W floor proved by floor_numeric/HW_ge is moved from 6720624204097848265758095693230992450442/10^40 to 672062420409784826575809569323099245044283/10^42, the 10^-42 truncation of the same rational enclosure; weights, c, B, certificate and all other proofs unchanged."
+  },
+  {
+    "id": "beiyi-ten-raise-c",
+    "track": "critical-line",
+    "date": "2026-10-28",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.673638706661668668309739930008",
+    "method": "Exact leaf-slack recomputation of the attributed TEN ten-point certificate: floor c raised at unchanged certificate data",
+    "model": "Opus 5.5",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.673638706661668668309739930008",
+    "scorePercent": "67.3638706661668668309739930008",
+    "exactRational": {
+      "numerator": "10677181706842114470165529109169587920708528",
+      "denominator": "15850012181982099492098184266895294189453125"
+    },
+    "exactExpression": "(10677181706842114470165529109169587920708528 : ℝ) / 15850012181982099492098184266895294189453125",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6ae513fe57fe02d115596aabbe2851b44f68c056/submissions/beiyi-ten-raise-c/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6ae513fe57fe02d115596aabbe2851b44f68c056/submissions/beiyi-ten-raise-c/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "By 贝奕 (Bei Yi). Derived from the attributed TEN ten-point certificate (Rishi Khan; Samuel Lavery, R. Arun Chandru et al.; Apache-2.0, all notices retained). An exact integer recomputation of all 27,554 leaf checks shows the floor c is not tight: c is raised from 78636809221179049927741289138/SA to 78636813132969021486827167078/SA (SA = 2^23*10^24), the largest value every leaf certifies (tightest leaf: root 54, walk position 10521). Certificate data (weights, lambdas, tangent table, pyramids, trees, multipliers) and all other proofs are unchanged."
   }
 ]
