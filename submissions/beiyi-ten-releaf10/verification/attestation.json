@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-ten-releaf10",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "21354363413684228940331058218339175841417056",
+    "denominator": "31700024287577301388751104587551116943359375"
+  },
+  "scoreDecimal": "0.673638708284922027211999924623",
+  "previousRecordId": "beiyi-ten-raise-c",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-10-28T17:52:10.153Z",
+  "challengeDigest": "5241c1239d69f82bbf635e6905bcd22defa51431c2b6a6e9e53dc8564b738552",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

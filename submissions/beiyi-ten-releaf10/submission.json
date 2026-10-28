@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-releaf10",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "21354363413684228940331058218339175841417056",
+    "denominator": "31700024287577301388751104587551116943359375"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Derived from the attributed TEN ten-point certificate (Rishi Khan) via our previous record beiyi-ten-raise-c; all notices retained, changes documented under Apache-2.0 §4(b). A re-implemented exact checker gives every leaf's exact floor; the 10 leaves with the lowest floor were each replaced in place by one new leaf (new term kinds, anchors, λ and multiplier rows chosen by a linear program over the leaf cell, then checked exactly), with the zfE payload re-encoded by the same range coder (all other leaves bit-identical). The certified floor c rises to 78636833157335904747230439001/2^23·10^24, the floor of the 11th tightest leaf, so κ = (H_W⁻ − B)/(1 − c) improves by about 1.62e-9. Weights, B, H_W⁻, tangent table and pyramids are unchanged. Kernel-level build (skipKernelTC removed) passed; axioms only propext, Classical.choice, Quot.sound.",
+  "method": "Exact re-certification of the 10 tightest leaves of the attributed TEN ten-point certificate, raising its floor c",
+  "model": "Opus 5.5",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
