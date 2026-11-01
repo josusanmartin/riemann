@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-ten-strongcover-t014",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": "GPT-6 family (Codex); prior work with Claude Opus 5.5",
+  "harness": "Codex; prior work with Claude Code",
+  "score": {
+    "numerator": "10677181706842114470165529109169587920708528",
+    "denominator": "15850008981982099492098184266895294189453125"
+  },
+  "scoreDecimal": "0.673638842664358872953956820071",
+  "previousRecordId": "beiyi-ten-releaf10",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-01T14:16:26.799Z",
+  "challengeDigest": "5649a07506cacec464645365f328455bf117e34e62bbf5003c8abd4cd664d3af",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}
