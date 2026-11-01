@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "imfebwvg7sxpu6toz5v1b",
-    "jobId": "f6943af9-5ab9-4671-a3e9-31938626fdd9",
-    "proofDigest": "8de72a2615d85a15e0b94791ec04a7495cca6ace7c7a15fca93ccfdd71fdc272",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "047c7d51f6ddad61a20607d1ee3b79dfda636ee1c8af3719704cf4b9a45994fc",
-    "enqueuedAt": "2026-11-01T13:24:13.214Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "f6943af9-5ab9-4671-a3e9-31938626fdd9",
+      "proofDigest": "8de72a2615d85a15e0b94791ec04a7495cca6ace7c7a15fca93ccfdd71fdc272",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/f5315e90a43801b1b0df0a915efee25a926b0d59/submissions/beiyi-ten-strongcover-t014",
+      "completedAt": "2026-11-01T14:16:27.318Z",
+      "logArchived": true
+    },
     {
       "jobId": "91ab5823-b278-4f3e-8f8b-b4698d0c064d",
       "proofDigest": "6b6117a33e05dcb9ee11a115b99876f1bd3e132af885658fbcf03b461472c04d",
