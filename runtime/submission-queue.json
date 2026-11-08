@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "i6k7pquyz6kxvvq0tliou",
-    "jobId": "8e55fce1-0259-4f00-a317-fa5e1e403454",
-    "proofDigest": "cc34b14e3401a939b595ac541d66943856cdb6e254993db5398e3f337293bce0",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "2aef92ed4bc2f785d35ff70b5040dacf3dd88bc9db8640b305a90f8f52c1d79a",
-    "enqueuedAt": "2026-11-08T12:21:29.691Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8e55fce1-0259-4f00-a317-fa5e1e403454",
+      "proofDigest": "cc34b14e3401a939b595ac541d66943856cdb6e254993db5398e3f337293bce0",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/ada8f0af0433366e8b5dd05b76f211d95085bdde/submissions/knausgard-ten-hw50-order36",
+      "completedAt": "2026-11-08T13:11:13.718Z",
+      "logArchived": true
+    },
     {
       "jobId": "fdbc3259-e454-40f6-972b-03da4a800c41",
       "proofDigest": "5309f69df86088173a6bbb5d91624e61e570e59ec11830788acecf1afd61c260",
