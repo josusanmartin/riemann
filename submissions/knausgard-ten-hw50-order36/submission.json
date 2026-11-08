@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-ten-hw50-order36",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "13346477133552643087706911386461984900885759775221",
+    "denominator": "19812511227477624365122730333619117736816406250000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Kristian Muri Knausgård's contribution: improves the terminal H_W lower bound of 贝奕 (Bei Yi)'s beiyi-ten-strongcover-t014 (2026-11-01). Extends AMW.taylorN_F using Complex.exp_bound (n := 36; cosine/sine degrees 34/35). Tightens rational bounds for sqrt(2)/2, cos(sqrt(2)/2), sin(sqrt(2)/2), and H_W from denominator 10^42 to 10^50; propagates the floor through dyadic and cumulative counts. Window coefficients, certificate data, tree and checker are unchanged. κ gain over predecessor: ~5.04e-42.\n\nBuilds on Rishi Khan (TEN), Samuel Lavery/team (OpethN; am-cert/bridge-port), R. Arun Chandru (master-of-puppets), Yuhang Shi, AMTOPA, Zeta Lab, Anthropic (Zeta23), ajp88, typh and cafeai/Zero Forge.\n\nAlso reuses Knausgård's Lean work for arXiv:2610.08965 (github.com/kristianmk/839): card_near_le/Simple673, Distinct839 matching labels, the real-form eigenvalue lemma, and adapted Poisson/sum-of-squares steps. All upstream notices retained.",
+  "method": "Terminal H_W enclosure and rational-floor refinement of Bei Yi's beiyi-ten-strongcover-t014 (TEN; order-36 Taylor enclosure, denominators 10^42 to 10^50)",
+  "model": "Claude Fable 5.1; Gemini 4 Argon",
+  "harness": "Claude (Anthropic); Antigravity (Google)",
+  "license": "Apache-2.0"
+}
