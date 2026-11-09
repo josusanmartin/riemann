@@ -1336,5 +1336,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/d6240e3a4526be23c2d5803f2ddd8e973d6f3157/submissions/beiyi-ten-d250-t022/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Derived from Rishi Khan’s TEN certificate and Zeta23, with all prior attribution retained. This T015 ladder variant uses 5,447 certified points and 28,421 leaves, strengthens root coverage, and certifies the stated exact bound. The identical source passed Comparator, nanoda and independent Lean replay in 2,512.58 seconds on a pinned GitHub Linux runner (2 CPUs; 8 GiB limit; no swap). An independent audit found only the three permitted axioms for all three targets. Official E2B verification is requested."
+  },
+  {
+    "id": "knausgard-d250-hw50",
+    "track": "critical-line",
+    "date": "2026-11-09",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.673638876665040004721950996645",
+    "method": "Order-36 Taylor enclosure and H_W rational-floor refinement of Bei Yi's beiyi-ten-d250-t022 (denominator 10^50; TEN certificate unchanged)",
+    "model": "Claude Opus 5.5",
+    "harness": "Claude",
+    "scoreDecimal": "0.673638876665040004721950996645",
+    "scorePercent": "67.3638876665040004721950996645",
+    "exactRational": {
+      "numerator": "13346477133552643087706911386461984900885759775221",
+      "denominator": "19812510227477624365122730333619117736816406250000"
+    },
+    "exactExpression": "(13346477133552643087706911386461984900885759775221 : ℝ) / 19812510227477624365122730333619117736816406250000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/45a34a0a552c8ad579ecfbb112b9765610bea472/submissions/knausgard-d250-hw50/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/45a34a0a552c8ad579ecfbb112b9765610bea472/submissions/knausgard-d250-hw50/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Derived from Bei Yi's beiyi-ten-d250-t022 (2026-11-09), building on Rishi Khan's TEN certificate, Samuel Lavery's agent team's OpethN/am-cert/bridge-port, R. Arun Chandru's master-of-puppets series, Yuhang Shi's refinements, ajp88's window work, the Zeta Lab bridge, Anthropic's Zeta23 library and Knausgård's Lean developments for arXiv:2609.33043 and arXiv:2610.08965. Carries over the terminal H_W enclosure from knausgard-ten-hw50-order36: AMW.taylorN_F uses Complex.exp_bound with n := 36; the rational bounds for sqrt(2)/2, cos(sqrt(2)/2), sin(sqrt(2)/2) and the H_W floor use denominator 10^50 instead of 10^42. The improved floor is propagated to the final exact bound. Window coefficients, certificate data, tree, root cover and certificate checker are unchanged. Upstream copyright, license and attribution notices are retained."
   }
 ]
