@@ -1311,5 +1311,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/ada8f0af0433366e8b5dd05b76f211d95085bdde/submissions/knausgard-ten-hw50-order36/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Kristian Muri Knausgård's contribution: improves the terminal H_W lower bound of 贝奕 (Bei Yi)'s beiyi-ten-strongcover-t014 (2026-11-01). Extends AMW.taylorN_F using Complex.exp_bound (n := 36; cosine/sine degrees 34/35). Tightens rational bounds for sqrt(2)/2, cos(sqrt(2)/2), sin(sqrt(2)/2), and H_W from denominator 10^42 to 10^50; propagates the floor through dyadic and cumulative counts. Window coefficients, certificate data, tree and checker are unchanged. κ gain over predecessor: ~5.04e-42.\n\nBuilds on Rishi Khan (TEN), Samuel Lavery/team (OpethN; am-cert/bridge-port), R. Arun Chandru (master-of-puppets), Yuhang Shi, AMTOPA, Zeta Lab, Anthropic (Zeta23), ajp88, typh and cafeai/Zero Forge.\n\nAlso reuses Knausgård's Lean work for arXiv:2610.08965 (github.com/kristianmk/839): card_near_le/Simple673, Distinct839 matching labels, the real-form eigenvalue lemma, and adapted Poisson/sum-of-squares steps. All upstream notices retained."
+  },
+  {
+    "id": "beiyi-ten-d250-t022",
+    "track": "critical-line",
+    "date": "2026-11-09",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.673638876665040004721950996645",
+    "method": "Exact recertification of the TEN certificate with stronger root coverage",
+    "model": "GPT-6 family (Codex); prior work with Claude Opus 5.5",
+    "harness": "Codex; prior work with Claude Code",
+    "scoreDecimal": "0.673638876665040004721950996645",
+    "scorePercent": "67.3638876665040004721950996645",
+    "exactRational": {
+      "numerator": "970652882440192224560502646288144356428048",
+      "denominator": "1440909834725645408372562206081390380859375"
+    },
+    "exactExpression": "(970652882440192224560502646288144356428048 : ℝ) / 1440909834725645408372562206081390380859375",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/d6240e3a4526be23c2d5803f2ddd8e973d6f3157/submissions/beiyi-ten-d250-t022/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/d6240e3a4526be23c2d5803f2ddd8e973d6f3157/submissions/beiyi-ten-d250-t022/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Derived from Rishi Khan’s TEN certificate and Zeta23, with all prior attribution retained. This T015 ladder variant uses 5,447 certified points and 28,421 leaves, strengthens root coverage, and certifies the stated exact bound. The identical source passed Comparator, nanoda and independent Lean replay in 2,512.58 seconds on a pinned GitHub Linux runner (2 CPUs; 8 GiB limit; no swap). An independent audit found only the three permitted axioms for all three targets. Official E2B verification is requested."
   }
 ]
