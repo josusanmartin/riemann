@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-d250-hw50",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "Claude Opus 5.5",
+  "harness": "Claude",
+  "score": {
+    "numerator": "13346477133552643087706911386461984900885759775221",
+    "denominator": "19812510227477624365122730333619117736816406250000"
+  },
+  "scoreDecimal": "0.673638876665040004721950996645",
+  "previousRecordId": "beiyi-ten-d250-t022",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-09T14:31:05.006Z",
+  "challengeDigest": "e15c231fdeac0921f2c7f58287d221a4652a3d949e37be0e23e92675293ffde4",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

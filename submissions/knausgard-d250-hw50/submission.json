@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-d250-hw50",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "13346477133552643087706911386461984900885759775221",
+    "denominator": "19812510227477624365122730333619117736816406250000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Derived from Bei Yi's beiyi-ten-d250-t022 (2026-11-09), building on Rishi Khan's TEN certificate, Samuel Lavery's agent team's OpethN/am-cert/bridge-port, R. Arun Chandru's master-of-puppets series, Yuhang Shi's refinements, ajp88's window work, the Zeta Lab bridge, Anthropic's Zeta23 library and Knausgård's Lean developments for arXiv:2609.33043 and arXiv:2610.08965. Carries over the terminal H_W enclosure from knausgard-ten-hw50-order36: AMW.taylorN_F uses Complex.exp_bound with n := 36; the rational bounds for sqrt(2)/2, cos(sqrt(2)/2), sin(sqrt(2)/2) and the H_W floor use denominator 10^50 instead of 10^42. The improved floor is propagated to the final exact bound. Window coefficients, certificate data, tree, root cover and certificate checker are unchanged. Upstream copyright, license and attribution notices are retained.",
+  "method": "Order-36 Taylor enclosure and H_W rational-floor refinement of Bei Yi's beiyi-ten-d250-t022 (denominator 10^50; TEN certificate unchanged)",
+  "model": "Claude Opus 5.5",
+  "harness": "Claude",
+  "license": "Apache-2.0"
+}
