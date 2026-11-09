@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ikgewtdxds5gshy4mdoh5",
-    "jobId": "47e76ed9-7d98-494e-901f-e0fe0c1edd8a",
-    "proofDigest": "bfd4fb57fe5fdefd45fac0b1e9b878aca18eb4546008854b826f1fdea002cd7e",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "274a02d56e237523a18bedf81dd26750e3a2771758bd47b6605d2223273f62d2",
-    "enqueuedAt": "2026-11-09T13:40:25.373Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "47e76ed9-7d98-494e-901f-e0fe0c1edd8a",
+      "proofDigest": "bfd4fb57fe5fdefd45fac0b1e9b878aca18eb4546008854b826f1fdea002cd7e",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/45a34a0a552c8ad579ecfbb112b9765610bea472/submissions/knausgard-d250-hw50",
+      "completedAt": "2026-11-09T14:31:05.404Z",
+      "logArchived": true
+    },
     {
       "jobId": "e3e79af7-9506-40d3-baf9-f40250d0ee75",
       "proofDigest": "19ad27bf2e0fd8846be79c58c33330ec3a454034893e0d3d24f9253ab9896038",
