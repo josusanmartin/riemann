@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-d250-t022",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "970652882440192224560502646288144356428048",
+    "denominator": "1440909834725645408372562206081390380859375"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Derived from Rishi Khan’s TEN certificate and Zeta23, with all prior attribution retained. This T015 ladder variant uses 5,447 certified points and 28,421 leaves, strengthens root coverage, and certifies the stated exact bound. The identical source passed Comparator, nanoda and independent Lean replay in 2,512.58 seconds on a pinned GitHub Linux runner (2 CPUs; 8 GiB limit; no swap). An independent audit found only the three permitted axioms for all three targets. Official E2B verification is requested.",
+  "method": "Exact recertification of the TEN certificate with stronger root coverage",
+  "model": "GPT-6 family (Codex); prior work with Claude Opus 5.5",
+  "harness": "Codex; prior work with Claude Code",
+  "license": "Apache-2.0"
+}
