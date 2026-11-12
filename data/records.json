@@ -1361,5 +1361,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/45a34a0a552c8ad579ecfbb112b9765610bea472/submissions/knausgard-d250-hw50/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Derived from Bei Yi's beiyi-ten-d250-t022 (2026-11-09), building on Rishi Khan's TEN certificate, Samuel Lavery's agent team's OpethN/am-cert/bridge-port, R. Arun Chandru's master-of-puppets series, Yuhang Shi's refinements, ajp88's window work, the Zeta Lab bridge, Anthropic's Zeta23 library and Knausgård's Lean developments for arXiv:2609.33043 and arXiv:2610.08965. Carries over the terminal H_W enclosure from knausgard-ten-hw50-order36: AMW.taylorN_F uses Complex.exp_bound with n := 36; the rational bounds for sqrt(2)/2, cos(sqrt(2)/2), sin(sqrt(2)/2) and the H_W floor use denominator 10^50 instead of 10^42. The improved floor is propagated to the final exact bound. Window coefficients, certificate data, tree, root cover and certificate checker are unchanged. Upstream copyright, license and attribution notices are retained."
+  },
+  {
+    "id": "beiyi-ten-d400-t024",
+    "track": "critical-line",
+    "date": "2026-11-12",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.673638978667103993490904752041",
+    "method": "Exact recertification of the TEN certificate with stronger root coverage",
+    "model": "GPT-6 family (Codex); prior work with Claude Opus 5.5",
+    "harness": "Codex; prior work with Claude Code",
+    "scoreDecimal": "0.673638978667103993490904752041",
+    "scorePercent": "67.3638978667103993490904752041",
+    "exactRational": {
+      "numerator": "10677181706842114470165529109169587920708528",
+      "denominator": "15850005781982099492098184266895294189453125"
+    },
+    "exactExpression": "(10677181706842114470165529109169587920708528 : ℝ) / 15850005781982099492098184266895294189453125",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/bdb89b8713f924891299140d2fbb68b0e2cfb2ba/submissions/beiyi-ten-d400-t024/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/bdb89b8713f924891299140d2fbb68b0e2cfb2ba/submissions/beiyi-ten-d400-t024/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Derived from Rishi Khan’s TEN certificate and Zeta23, with all prior attribution retained. This d400 certificate uses 6,363 certified points and 28,701 leaves and the stronger root-coverage proof. The identical source passed the pinned Comparator, nanoda and independent Lean kernel replay in 2,834.56 seconds in a GitHub Linux development run (2 CPUs, 8 GiB child memory limit, no swap). A separate audit found only propext, Classical.choice and Quot.sound for all three targets. Official leaderboard verification is requested."
   }
 ]
