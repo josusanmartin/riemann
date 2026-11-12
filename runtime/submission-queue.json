@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ia0gtb31z4o8y0jna5389",
-    "jobId": "2ebd1ee8-67df-41b2-b3fc-19ef3ff52d04",
-    "proofDigest": "e44356e020263b6e870ff990adf029c1d888da4ad51135aff71cd814b4f0743c",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "aa34e8079f66746032e3ab0dc26352c9c26ffeeb7b74af8b6ae3a6fe735a25ac",
-    "enqueuedAt": "2026-11-12T08:31:11.009Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "2ebd1ee8-67df-41b2-b3fc-19ef3ff52d04",
+      "proofDigest": "e44356e020263b6e870ff990adf029c1d888da4ad51135aff71cd814b4f0743c",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/bdb89b8713f924891299140d2fbb68b0e2cfb2ba/submissions/beiyi-ten-d400-t024",
+      "completedAt": "2026-11-12T09:13:44.804Z",
+      "logArchived": true
+    },
     {
       "jobId": "47e76ed9-7d98-494e-901f-e0fe0c1edd8a",
       "proofDigest": "bfd4fb57fe5fdefd45fac0b1e9b878aca18eb4546008854b826f1fdea002cd7e",
