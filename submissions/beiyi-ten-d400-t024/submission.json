@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-d400-t024",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "10677181706842114470165529109169587920708528",
+    "denominator": "15850005781982099492098184266895294189453125"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Derived from Rishi Khan’s TEN certificate and Zeta23, with all prior attribution retained. This d400 certificate uses 6,363 certified points and 28,701 leaves and the stronger root-coverage proof. The identical source passed the pinned Comparator, nanoda and independent Lean kernel replay in 2,834.56 seconds in a GitHub Linux development run (2 CPUs, 8 GiB child memory limit, no swap). A separate audit found only propext, Classical.choice and Quot.sound for all three targets. Official leaderboard verification is requested.",
+  "method": "Exact recertification of the TEN certificate with stronger root coverage",
+  "model": "GPT-6 family (Codex); prior work with Claude Opus 5.5",
+  "harness": "Codex; prior work with Claude Code",
+  "license": "Apache-2.0"
+}
