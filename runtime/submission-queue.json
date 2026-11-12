@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ij6q8j5sejwgu58iyady9",
-    "jobId": "452213e8-679f-4105-ad26-775290e8eebf",
-    "proofDigest": "20d09a5c0e2e679e58270304337ee70620fcd39383fbcc8057ee3d77c6380ef6",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "5a8b2c8f8b7cc46ae3b4bd83f441e5f0bb1e2ccda4723f0c471012ee176c2bf4",
-    "enqueuedAt": "2026-11-12T10:44:00.681Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "452213e8-679f-4105-ad26-775290e8eebf",
+      "proofDigest": "20d09a5c0e2e679e58270304337ee70620fcd39383fbcc8057ee3d77c6380ef6",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/fe796b7a07c2f759370dfdea1d9560f243395534/submissions/knausgard-ten-win10-lp",
+      "completedAt": "2026-11-12T11:37:21.604Z",
+      "logArchived": true
+    },
     {
       "jobId": "2ebd1ee8-67df-41b2-b3fc-19ef3ff52d04",
       "proofDigest": "e44356e020263b6e870ff990adf029c1d888da4ad51135aff71cd814b4f0743c",
