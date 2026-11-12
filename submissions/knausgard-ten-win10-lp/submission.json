@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-ten-win10-lp",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "33366251109982218737921064894121261303861213265473",
+    "denominator": "49531331836748571742426383080768585205078125000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Derived from Bei Yi's beiyi-ten-d250-t022, building on Rishi Khan (TEN), Samuel Lavery/team (OpethN/am-cert/bridge-port), R. Arun Chandru (master-of-puppets), Yuhang Shi, ajp88, AMTOPA, Zero Forge/cafeai (zfNat64), Zeta Lab, Anthropic (Zeta23) and Knausgård's Lean work for arXiv:2609.33043 and arXiv:2610.08965. Jointly re-optimises the 16-harmonic cosine window and 10-point weights a_ij, b_r and floor c by cutting-plane LP. Uses an order-36 Taylor enclosure and an H_W floor with denominator 10^50. Regenerates pyramids, convexity cover, 5,385 tangent entries and walk payload (1,138 additional splits, 29,555 term leaves); re-partitions cleared root-cover intervals with unchanged root boxes. Upstream copyright, license and attribution notices retained.",
+  "method": "Joint LP co-optimisation of the 16-harmonic cosine window and 10-point certificate weights with regenerated Lean pyramids, tangent table and leaf set (H_W floor with denominator 10^50)",
+  "model": "Gemini 4 Argon; Claude Fable 5.2 and 5.1; Claude Opus 5.5",
+  "harness": "Antigravity; Claude",
+  "license": "Apache-2.0"
+}
