@@ -1411,5 +1411,30 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/fe796b7a07c2f759370dfdea1d9560f243395534/submissions/knausgard-ten-win10-lp/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Derived from Bei Yi's beiyi-ten-d250-t022, building on Rishi Khan (TEN), Samuel Lavery/team (OpethN/am-cert/bridge-port), R. Arun Chandru (master-of-puppets), Yuhang Shi, ajp88, AMTOPA, Zero Forge/cafeai (zfNat64), Zeta Lab, Anthropic (Zeta23) and Knausgård's Lean work for arXiv:2609.33043 and arXiv:2610.08965. Jointly re-optimises the 16-harmonic cosine window and 10-point weights a_ij, b_r and floor c by cutting-plane LP. Uses an order-36 Taylor enclosure and an H_W floor with denominator 10^50. Regenerates pyramids, convexity cover, 5,385 tangent entries and walk payload (1,138 additional splits, 29,555 term leaves); re-partitions cleared root-cover intervals with unchanged root boxes. Upstream copyright, license and attribution notices retained."
+  },
+  {
+    "id": "beiyi-ten-parent-cover-t039",
+    "track": "critical-line",
+    "date": "2026-11-18",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.673639288166603967358714355985",
+    "method": "Ten-point AM certificate with direct coverage of 49 nonempty parent cells",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.673639288166603967358714355985",
+    "scorePercent": "67.3639288166603967358714355985",
+    "exactRational": {
+      "numerator": "1450706565044040550311260940539809753291817356651",
+      "denominator": "2153536158783620236840259201407432556152343750000"
+    },
+    "exactExpression": "(1450706565044040550311260940539809753291817356651 : ℝ) / 2153536158783620236840259201407432556152343750000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/08b92821712037ac092b83609892cedc4904ef29/submissions/beiyi-ten-parent-cover-t039/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/08b92821712037ac092b83609892cedc4904ef29/submissions/beiyi-ten-parent-cover-t039/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Extends the attributed centered-moment certificate by certifying 49 nonempty parent cells directly. The repacked tree covers the same domain with 354 fewer leaves and 15,107 fewer point lookups. All 72 roots, 62 cut boundaries, and 5,385 point witnesses were checked at the stated rational bound."
   }
 ]
