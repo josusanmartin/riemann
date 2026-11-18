@@ -1,15 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "ix1uhm8uwkbbwc3jeiqay",
-    "jobId": "3f862a11-1b92-4eaf-a503-03cba1b5a574",
-    "proofDigest": "9605ab4b91c48fe9f532cf6da1dcce5bb6e9475c5d3890bdbf6a9e7f13f8b2c1",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "2f7becb9234d1fb0b85d8d9756b72bdae263408c25819bae84471e52260c6b21",
-    "enqueuedAt": "2026-11-18T04:46:15.067Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "3f862a11-1b92-4eaf-a503-03cba1b5a574",
+      "proofDigest": "9605ab4b91c48fe9f532cf6da1dcce5bb6e9475c5d3890bdbf6a9e7f13f8b2c1",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+      "feedback": {
+        "code": "verification-timeout",
+        "stage": "runtime",
+        "title": "Verification timed out",
+        "detail": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+        "action": "Reduce elaboration cost, replace expensive tactics with smaller explicit lemmas, and test the source locally before submitting again.",
+        "retryable": false
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-18T05:39:42.175Z",
+      "logArchived": true
+    },
     {
       "jobId": "7d1b06bf-3f4a-46db-b4cb-16820223ec36",
       "proofDigest": "fe27d3c30502a4ac7b25b6a5b7df901c4384b24fa2f4f056132a5663c0d7a954",
