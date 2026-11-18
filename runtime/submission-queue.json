@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "i06f2iy5f6cho8xhucnhk",
-    "jobId": "245153f1-6ff0-4523-a340-1e5110f488e6",
-    "proofDigest": "92176ae01b7df15072a51180d8ec7ae576111c7f19d31b082be742e56b74edbb",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "71a9f8211c3128c16eea0789a6e729de801d229b2958549af3ff9e0b5272cb7f",
-    "enqueuedAt": "2026-11-18T12:26:23.793Z"
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "245153f1-6ff0-4523-a340-1e5110f488e6",
+      "proofDigest": "92176ae01b7df15072a51180d8ec7ae576111c7f19d31b082be742e56b74edbb",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/08b92821712037ac092b83609892cedc4904ef29/submissions/beiyi-ten-parent-cover-t039",
+      "completedAt": "2026-11-18T13:19:09.071Z",
+      "logArchived": true
+    },
     {
       "jobId": "3f862a11-1b92-4eaf-a503-03cba1b5a574",
       "proofDigest": "9605ab4b91c48fe9f532cf6da1dcce5bb6e9475c5d3890bdbf6a9e7f13f8b2c1",
