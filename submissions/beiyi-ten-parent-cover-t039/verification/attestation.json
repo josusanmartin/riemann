@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-ten-parent-cover-t039",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "1450706565044040550311260940539809753291817356651",
+    "denominator": "2153536158783620236840259201407432556152343750000"
+  },
+  "scoreDecimal": "0.673639288166603967358714355985",
+  "previousRecordId": "knausgard-ten-win10-lp",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-18T13:19:08.634Z",
+  "challengeDigest": "8eebc0661c57a805892299cb557f8b9d934a096b488e61547fc33d48a2587cfb",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

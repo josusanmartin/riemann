@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-ten-parent-cover-t039",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "1450706565044040550311260940539809753291817356651",
+    "denominator": "2153536158783620236840259201407432556152343750000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Extends the attributed centered-moment certificate by certifying 49 nonempty parent cells directly. The repacked tree covers the same domain with 354 fewer leaves and 15,107 fewer point lookups. All 72 roots, 62 cut boundaries, and 5,385 point witnesses were checked at the stated rational bound.",
+  "method": "Ten-point AM certificate with direct coverage of 49 nonempty parent cells",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
