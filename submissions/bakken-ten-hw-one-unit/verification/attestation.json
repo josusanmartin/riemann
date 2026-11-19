@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "bakken-ten-hw-one-unit",
+  "author": {
+    "github": "haakonrba",
+    "displayName": "haakonrba"
+  },
+  "model": "GPT-6.2-Sol",
+  "harness": "OpenAI Codex CLI, ChatGPT",
+  "score": {
+    "numerator": "66732501992025865314318003264831248651423598405947",
+    "denominator": "99062663304046530894651923264741897583007812500000"
+  },
+  "scoreDecimal": "0.673639288166603967358714355985",
+  "previousRecordId": "beiyi-ten-parent-cover-t039",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-19T00:33:16.968Z",
+  "challengeDigest": "86142a9c31aae047596fed08ce942170ab5b4b142b05f194fb5c0168667318f3",
+  "verifierTemplateDigest": "1aa63a7f5e906c9b358a906221773da2beb9f53b16077b945ced99bb83e1367a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

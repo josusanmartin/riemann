@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "bakken-ten-hw-one-unit",
+  "track": "critical-line",
+  "author": {
+    "github": "haakonrba",
+    "displayName": "haakonrba"
+  },
+  "score": {
+    "numerator": "66732501992025865314318003264831248651423598405947",
+    "denominator": "99062663304046530894651923264741897583007812500000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Building on Bei Yi's beiyi-ten-parent-cover-t039 submission, this contribution tightens the rational enclosure of the window functional using a higher-degree cosine polynomial bound. The lower-bound numerator is increased by one unit at a denominator of 10^50, yielding a strictly improved exact rational critical-line proportion bound. The original window coefficients, pair weights and coverage certificate remain unchanged. All three required theorem statements were privately verified using Lean and Nanoda. Developed with AI assistance.",
+  "method": "Ten-point parent-cover method with refined rational window-functional enclosure",
+  "model": "GPT-6.2-Sol",
+  "harness": "OpenAI Codex CLI, ChatGPT",
+  "license": "Apache-2.0"
+}
