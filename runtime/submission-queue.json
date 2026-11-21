@@ -1,23 +1,31 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-f4d46b2c-660d-4552-abc8-a1d0df2827c0",
-    "jobId": "f4d46b2c-660d-4552-abc8-a1d0df2827c0",
-    "proofDigest": "9e3df8ca39cc72e3f3bad68f990cf76ca5b7daf90ab134361d98fdfd4f033880",
-    "ownerKey": "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e",
-    "submissionKey": "3dd463fc66ea1a73b786e5e031001fb2d2eb22f91e6e99cdb95e66f147a9e62c",
-    "enqueuedAt": "2026-11-21T18:47:31.560Z",
-    "boat": {
-      "baseCommitSha": "c6028e03c3fd48605ef06a14c0aa5262ac915743",
-      "previousRecordId": "bakken-ten-hw-one-unit",
-      "issuedAt": 1795286851559,
-      "startedAt": 1795286853875,
-      "workerId": "bx_nhz79d96",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "f4d46b2c-660d-4552-abc8-a1d0df2827c0",
+      "proofDigest": "9e3df8ca39cc72e3f3bad68f990cf76ca5b7daf90ab134361d98fdfd4f033880",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false,
+        "location": {
+          "file": "Solution.lean",
+          "line": 1,
+          "column": 0
+        }
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-21T18:54:41.883Z",
+      "logArchived": true
+    },
     {
       "jobId": "20e38882-3219-430e-89f1-7e109b2492c0",
       "proofDigest": "28271b08603ea31b5abe0f6ec661baeb88d11553bc2e0cd3f110c91c2fd90b94",
