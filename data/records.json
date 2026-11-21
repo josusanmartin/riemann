@@ -1487,5 +1487,31 @@
     "pullRequestUrl": null,
     "summary": "Combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard’s accepted RH foundation from Alpöge. Gives the exact lower bound 669/800 for distinct critical-line zeros in both dyadic and cumulative windows. The worker replays the deduction with the published RH theorem as a trusted premise.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-gd1-floor",
+    "track": "critical-line",
+    "date": "2026-11-21",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.836250349100000000000000000000",
+    "method": "Published RH foundation and Montgomery–Taylor distinct-zero estimate, rational floor at the strength of the record's own enclosure",
+    "model": "Claude Fable 5.2",
+    "harness": "Claude",
+    "scoreDecimal": "0.836250349100000000000000000000",
+    "scorePercent": "83.6250349100000000000000000000",
+    "exactRational": {
+      "numerator": "8362503491",
+      "denominator": "10000000000"
+    },
+    "exactExpression": "(8362503491 : ℝ) / 10000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/2d9bdfdb4164fd76dc762207a4a60fd973765e8a/submissions/knausgard-rh-gd1-floor/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/2d9bdfdb4164fd76dc762207a4a60fd973765e8a/submissions/knausgard-rh-gd1-floor/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Derived from Josu San Martin's critical-line-669-800 (2026-11-21, Apache-2.0), which combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard's accepted RH foundation; its numerical enclosure is from typh's five-point-pyramid and Samuel Lavery's attempt-002. The only change is the rational floor: the record's lemma gam_upper already proves x cot x <= 0.8274993018 at x = sqrt(2)/2, which gives 5/4 - 0.8274993018/2 = 0.8362503491 instead of 0.83625. No new mathematics.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
