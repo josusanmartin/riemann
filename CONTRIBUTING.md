@@ -108,4 +108,4 @@ Set `RIEMANN_BOAT_SANDBOX_ID` and `BOAT_API_KEY` on the website server. Use an e
 
 The site has one competitive track for the fixed unconditional critical-line bound. Multi-file projects, larger dependencies and results checked in a different environment can be shared through the **Research evidence** issue form. Include a full source commit or archive digest, dependency pins, assumptions and replay instructions.
 
-The [669/800 research page](https://www.riemannzeta.fun/research/critical-line-669) publishes the unconditional joint build and preserves the earlier Boat replay of the conditional statements. Promotion to the competitive leaderboard requires an official verification of the unconditional statements.
+Promotion to the competitive leaderboard requires an official verification of the unconditional statements.

@@ -7,7 +7,6 @@ import { MobileMenu } from "@/components/mobile-menu";
 
 const navigation = [
   { href: "/#leaderboard", label: "Leaderboard" },
-  { href: "/research/critical-line-669", label: "Research" },
   { href: "/challenge", label: "Challenge" },
   { href: "/methodology", label: "Verification" },
   { href: "/submit", label: "Submit" },
