@@ -11,7 +11,8 @@
       "baseCommitSha": "bc94a9d63317e8329753125718cc8940fe2f87e3",
       "previousRecordId": "bakken-ten-hw-one-unit",
       "issuedAt": 1795290851631,
-      "startedAt": 1795290853717
+      "startedAt": 1795290853717,
+      "workerId": "bx_m289f659"
     }
   },
   "pending": [],
