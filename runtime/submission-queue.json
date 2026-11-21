@@ -12,7 +12,8 @@
       "previousRecordId": "critical-line-669-800",
       "issuedAt": 1795297636773,
       "startedAt": 1795297639222,
-      "workerId": "bx_rzemk7zd"
+      "workerId": "bx_rzemk7zd",
+      "uploaded": true
     }
   },
   "pending": [],
