@@ -161,6 +161,17 @@ h3 {
   margin: 0 auto;
 }
 
+.contributor-notice p + p {
+  margin-top: 0.25rem;
+  max-width: 92ch;
+  font-weight: 400;
+}
+
+.contributor-notice a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 :focus-visible {
   outline: 3px solid var(--forest);
   outline-offset: 3px;
