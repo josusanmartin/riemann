@@ -109,3 +109,11 @@ Set `RIEMANN_BOAT_SANDBOX_ID` and `BOAT_API_KEY` on the website server. Use an e
 The site has one competitive track for the fixed unconditional critical-line bound. Multi-file projects, larger dependencies and results checked in a different environment can be shared through the **Research evidence** issue form. Include a full source commit or archive digest, dependency pins, assumptions and replay instructions.
 
 Promotion to the competitive leaderboard requires an official verification of the unconditional statements.
+
+## On-demand Boat verification
+
+The deployment setting `RIEMANN_VERIFIER_PROVIDER=boat` selects disposable Boat workers for new submissions and the operator flow test. The website and the encrypted Git-backed FIFO remain on their existing services. A waiting competitive proof has a logical job ID. Only the head of the FIFO can provision a VM. Status polling and the scheduled sweep resume interrupted provisioning and collect terminal receipts. A two-hour auto-stop bounds an orphaned worker's lifetime.
+
+Create the Boat environment `riemann-production` with **Safe for third parties** enabled. Restrict its expiring API key to this environment and the actions `sandbox.create`, `sandbox.read`, `sandbox.stop`, `file.read`, and `file.write`. Set the GitHub Actions secret `RIEMANN_BOAT_API_KEY` and the repository variable `RIEMANN_VERIFIER_PROVIDER`. Dispatch **Deploy production website** on main with `sync_boat_key` enabled to put the key in the production project's sensitive environment. Rotate the key before expiry. Selecting `e2b` on a subsequent deployment routes new submissions back to the legacy verifier; already admitted jobs retain their provider.
+
+Each worker boots from a fixed site commit and fetches the pinned toolchains and libraries. It receives only the submitted files, with snapshots and provider monitoring disabled. A separate unprivileged account runs the verifier, with the nested Comparator process under the repository's filesystem and network restrictions. The supervisor seals the receipt, and the website checks the archived source digest, statement, axiom and kernel evidence before promotion.

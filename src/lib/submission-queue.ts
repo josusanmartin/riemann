@@ -41,6 +41,15 @@ const recoveredJobIdsSchema = z
   .max(MAX_RECOVERED_JOB_IDS)
   .optional();
 
+const boatJobSchema = z.object({
+  baseCommitSha: shaSchema,
+  previousRecordId: z.string().min(1).max(160),
+  issuedAt: z.number().int().positive(),
+  startedAt: z.number().int().positive().optional(),
+  workerId: z.string().regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/).optional(),
+  uploaded: z.literal(true).optional(),
+}).strict();
+
 export const queuedVerificationJobSchema = z
   .object({
     sandboxId: sandboxIdSchema,
@@ -50,6 +59,7 @@ export const queuedVerificationJobSchema = z
     submissionKey: digestSchema,
     enqueuedAt: z.string().datetime({ offset: true }),
     recoveredJobIds: recoveredJobIdsSchema,
+    boat: boatJobSchema.optional(),
   })
   .strict();
 
@@ -142,6 +152,7 @@ export type QueueCompletionReceipt = z.infer<typeof queueCompletionReceiptSchema
 export type SubmissionQueueState = z.infer<typeof submissionQueueStateSchema>;
 
 export type QueueJobInput = {
+  boat?: Pick<z.infer<typeof boatJobSchema>, "baseCommitSha" | "previousRecordId" | "issuedAt">;
   sandboxId: string;
   jobId: string;
   proofDigest: string;
@@ -358,6 +369,7 @@ export function enqueueQueueState(
     proofDigest: input.proofDigest,
     ownerKey,
     submissionKey,
+    ...(input.boat ? {boat: input.boat} : {}),
     enqueuedAt: now.toISOString(),
   });
   next.daily.attempts[ownerKey] = used + 1;
@@ -1015,4 +1027,16 @@ export async function getActiveVerificationJob(
     options.fetchImplementation ?? fetch,
   );
   return (await readBranchState(client))?.active ?? null;
+}
+
+/** Persist provider coordinates only while the same submission owns the FIFO head. */
+export async function updateBoatJob(jobId: string, update: {startedAt?: number; workerId?: string; uploaded?: true}) {
+  return mutateQueue({}, "queue: bind Boat worker", state => {
+    const job = state.active;
+    if (!job?.boat || job.jobId !== jobId) throw new Error("Boat job is no longer active");
+    if (job.boat.workerId && update.workerId && job.boat.workerId !== update.workerId) throw new Error("Boat worker mismatch");
+    const boat = boatJobSchema.parse({...job.boat, ...update, startedAt:job.boat.startedAt ?? update.startedAt});
+    const active = {...job,boat};
+    return {changed:JSON.stringify(boat)!==JSON.stringify(job.boat),state:{...state,active},result:active};
+  });
 }

@@ -1,3 +1,4 @@
+import { boatResult,flowWorkerId,stopBoatWorker,readBoatFile,workerLifetime } from "@/lib/boat-worker";
 import { getSession } from "@/auth";
 import { compareRationals } from "@/lib/challenge";
 import {
@@ -108,11 +109,15 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
 
-    const result = await readE2BVerification(job.sandboxId, job.jobId);
+    const id=job.sandboxId.startsWith("boat-") ? flowWorkerId(job.sandboxId) : null;
+    const stop=()=>id ? stopBoatWorker(id) : killE2BSandbox(job.sandboxId);
+    const result = id ? await boatResult(id,job.issuedAt+workerLifetime,job.submissionId,job.proofDigest)
+      : await readE2BVerification(job.sandboxId, job.jobId);
+    if (id && !result) return noStore(200,{status:"running",submissionId:job.submissionId,proofDigest:job.proofDigest,message:"Boat is preparing or checking the pinned proof."});
     if (!result) {
       const elapsedMs = Math.max(0, Date.now() - job.issuedAt);
       if (elapsedMs >= FLOW_TEST_OPERATIONAL_LIMIT_MS) {
-        await killE2BSandbox(job.sandboxId).catch(() => undefined);
+        await stop().catch(() => undefined);
         return noStore(200, {
           status: "rejected",
           submissionId: job.submissionId,
@@ -213,7 +218,7 @@ export async function GET(request: Request): Promise<Response> {
     assertE2BResultMatchesJob(job, result);
     if (result.status === "rejected") {
       const feedback = describeVerifierRejection(result.log, result.message);
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      await stop().catch(() => undefined);
       return noStore(200, {
         ...result,
         message: feedback.detail,
@@ -227,19 +232,20 @@ export async function GET(request: Request): Promise<Response> {
       throw new Error("The verifier returned an attestation for a different contract");
     }
     try {
-      await validateFlowTestAttestation(result, await readE2BSubmissionBundle(job.sandboxId, job.jobId));
+      const bundle=id ? {manifest:await readBoatFile(id,"riemann-incoming/manifest"),solution:await readBoatFile(id,"riemann-incoming/solution")} : await readE2BSubmissionBundle(job.sandboxId, job.jobId);
+      await validateFlowTestAttestation(result,bundle);
     } catch (error) {
       console.error("Flow-test publication gate failed", { jobId: job.jobId, error });
       // A terminal publication mismatch must not become endless 502 polling
       // that keeps reconnecting and extending the sandbox's lifetime.
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      await stop().catch(() => undefined);
       return noStore(409, {
         error: "flow_test_attestation_failed",
         proofDigest: job.proofDigest,
         message: "The proof replay finished, but its attestation did not match this deployment. This is an infrastructure failure, not a mathematical rejection. Send the digest to the maintainers. Nothing was promoted.",
       });
     }
-    await killE2BSandbox(job.sandboxId).catch(() => undefined);
+    await stop().catch(() => undefined);
     return noStore(200, {
       ...result,
       message:

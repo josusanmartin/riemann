@@ -1,3 +1,4 @@
+import { boatMetadata,reconcileBoat } from "@/lib/boat-queue";
 import { getSession } from "@/auth";
 import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
 import {
@@ -112,7 +113,7 @@ async function recoveredJobCoordinates(
   job: SubmissionJobToken,
   queued: QueuedVerificationJob,
 ): Promise<SubmissionJobToken> {
-  const metadata = await readQueuedE2BJobMetadata(queued.sandboxId);
+  const metadata = queued.boat ? await boatMetadata(queued) : await readQueuedE2BJobMetadata(queued.sandboxId);
   assertQueueJobMatches(queued, metadata);
   if (
     metadata.github.toLowerCase() !== job.github.toLowerCase() ||
@@ -192,6 +193,7 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
     assertQueueJobMatches(queue.job, job);
+    if (queue.job.boat) return noStore(200,await reconcileBoat(queue.job));
     let runnerState;
     try {
       runnerState = await ensureQueuedJobRunning(queue.job);

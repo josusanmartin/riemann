@@ -312,7 +312,7 @@ export function DirectSubmissionForm({
     }
     if (!verifierConfigured) {
       setPhase("error");
-      setMessage("The pinned E2B verifier template is still being configured.");
+      setMessage("The pinned verifier template is still being configured.");
       return;
     }
     const starterPlaceholders = solution.match(/^\s{2}sorry\s*$/gm)?.length ?? 0;
@@ -330,7 +330,7 @@ export function DirectSubmissionForm({
     }
 
     setPhase("starting");
-    setMessage("Creating a private no-egress E2B sandbox.");
+    setMessage("Creating a private isolated verifier worker.");
     const form = new FormData(event.currentTarget);
     const model = (form.get("model")?.toString() ?? "").trim();
     const harness = (form.get("harness")?.toString() ?? "").trim();

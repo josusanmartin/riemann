@@ -1,3 +1,4 @@
+import { boatSelected,boatConfigured } from "@/lib/boat-worker";
 import { NextResponse } from "next/server";
 import { contract, getCurrentRecord } from "@/lib/records";
 import { getE2BTemplate, isE2BConfigured } from "@/lib/e2b-config";
@@ -31,13 +32,13 @@ export async function GET(): Promise<NextResponse> {
     process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA ?? "",
   );
   const directSubmissionsConfigured = Boolean(
-    e2bConfigured && e2bWebhookConfigured && promotionConfigured &&
+    (boatSelected() ? boatConfigured() : e2bConfigured && e2bWebhookConfigured && verifierTemplateIdentityConfigured) && promotionConfigured &&
     submissionQueueConfigured && trustedMaterialAvailable &&
-    verifierTemplateIdentityConfigured && deploymentIdentityConfigured && process.env.AUTH_SECRET,
+    deploymentIdentityConfigured && process.env.AUTH_SECRET,
   );
   return NextResponse.json({
     status: directSubmissionsConfigured ? "ok" : "degraded",
-    checkScope: "configuration-only; each upload checks the actual sandbox identity before admission",
+    checkScope: boatSelected() ? "configuration-only; the active FIFO job checks its Boat worker before source transfer" : "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
     recordId: current.id,
     record: current.scoreDecimal,
@@ -46,6 +47,8 @@ export async function GET(): Promise<NextResponse> {
         process.env.AUTH_GITHUB_SECRET &&
         process.env.AUTH_SECRET,
     ),
+    verifierProvider: boatSelected() ? "boat" : "e2b",
+    boatConfigured: boatConfigured(),
     e2bConfigured,
     e2bTemplate: getE2BTemplate(),
     expectedVerifierTemplateDigest,

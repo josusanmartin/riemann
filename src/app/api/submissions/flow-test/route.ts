@@ -1,3 +1,4 @@
+import { boatSelected,boatConfigured,activeBoatFlow,startBoatFlow,stopBoatWorker,flowWorkerId } from "@/lib/boat-worker";
 import { ZodError } from "zod";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
@@ -16,6 +17,8 @@ import {
 import { prepareFlowTestSubmission } from "@/lib/flow-test-server";
 import { signSubmissionJob } from "@/lib/submission-jobs";
 import { getActiveVerificationJob } from "@/lib/submission-queue";
+
+function stopFlow(handle:string) { return handle.startsWith("boat-") ? stopBoatWorker(flowWorkerId(handle)) : killE2BSandbox(handle); }
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -42,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
       message: "The noncompetitive flow test is currently restricted to site operators.",
     });
   }
-  if (!isE2BConfigured()) {
+  if (boatSelected() ? !boatConfigured() : !isE2BConfigured()) {
     return noStore(503, {
       error: "verifier_unavailable",
       message: "The E2B verifier is not configured for this deployment.",
@@ -53,8 +56,8 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const [competitiveJob, flowTestActive, ownerJobActive] = await Promise.all([
       getActiveVerificationJob(),
-      hasActiveE2BFlowTest(),
-      hasActiveE2BJob(github),
+      boatSelected() ? activeBoatFlow() : hasActiveE2BFlowTest(),
+      boatSelected() ? false : hasActiveE2BJob(github),
     ]);
     if (competitiveJob || flowTestActive || ownerJobActive) {
       return noStore(409, {
@@ -87,7 +90,8 @@ export async function POST(request: Request): Promise<Response> {
       session.user.name ?? github,
       issuedAt,
     );
-    const job = await startE2BFlowTest({
+    const start = boatSelected() ? startBoatFlow : startE2BFlowTest;
+    const job = await start({
       ...prepared,
       recordsSnapshot: `${JSON.stringify([flowTestRecord], null, 2)}\n`,
       baseCommitSha,
@@ -97,7 +101,7 @@ export async function POST(request: Request): Promise<Response> {
     startedSandboxId = job.sandboxId;
     const competitiveJobAfterStart = await getActiveVerificationJob();
     if (competitiveJobAfterStart) {
-      await killE2BSandbox(job.sandboxId).catch(() => undefined);
+      await stopFlow(job.sandboxId).catch(() => undefined);
       startedSandboxId = undefined;
       return noStore(409, {
         error: "verifier_busy",
@@ -131,7 +135,7 @@ export async function POST(request: Request): Promise<Response> {
     });
   } catch (error) {
     if (startedSandboxId) {
-      await killE2BSandbox(startedSandboxId).catch(() => undefined);
+      await stopFlow(startedSandboxId).catch(() => undefined);
     }
     if (error instanceof VerifierTemplateMismatchError) {
       return noStore(503, { error: "verifier_template_stale", message: error.message });

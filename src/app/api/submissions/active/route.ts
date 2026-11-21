@@ -1,3 +1,4 @@
+import { boatMetadata } from "@/lib/boat-queue";
 import { getSession } from "@/auth";
 import { readQueuedE2BJobMetadata } from "@/lib/e2b-queue";
 import { assertQueueJobMatches } from "@/lib/queue-orchestration";
@@ -35,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
     if (queue.status === "missing") {
       return noStore(200, { status: "none" });
     }
-    const metadata = await readQueuedE2BJobMetadata(queue.job.sandboxId);
+    const metadata = queue.job.boat ? await boatMetadata(queue.job) : await readQueuedE2BJobMetadata(queue.job.sandboxId);
     assertQueueJobMatches(queue.job, metadata);
     if (metadata.github.toLowerCase() !== github.toLowerCase()) {
       throw new Error("The recovered queue job belongs to another GitHub account");

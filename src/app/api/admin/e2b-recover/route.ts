@@ -46,6 +46,7 @@ export async function POST(request: Request): Promise<Response> {
     if (!active) {
       return noStore(409, { error: "no_active_verification" });
     }
+    if (active.boat) return Response.json({error:"boat_job",message:"Boat jobs are reconciled by the queue sweep."}, {status:409});
     const metadata = await readQueuedE2BJobMetadata(active.sandboxId);
     if (
       metadata.jobId !== active.jobId ||

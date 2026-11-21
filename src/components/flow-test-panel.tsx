@@ -163,7 +163,7 @@ export function FlowTestPanel({
   async function runFlowTest() {
     if (!verifierConfigured) {
       setPhase("error");
-      setMessage("The pinned E2B verifier is not configured for this deployment.");
+      setMessage("The pinned verifier is not configured for this deployment.");
       return;
     }
     if (new Blob([source]).size > MAX_FILE_BYTES) {
@@ -172,7 +172,7 @@ export function FlowTestPanel({
       return;
     }
     setPhase("starting");
-    setMessage("Creating a private no-egress E2B sandbox for the flow test.");
+    setMessage("Creating a private isolated verifier worker for the flow test.");
     setDigest("");
     setLog("");
     setFeedback(undefined);
@@ -217,7 +217,7 @@ export function FlowTestPanel({
         <p>
           This controlled lane fixes the previous record at <code>1/3</code> and
           the candidate at <code>2/3</code>, then replays Anthropic&apos;s checked
-          dyadic and cumulative theorems. It uses the production E2B image,
+          dyadic and cumulative theorems. It uses the pinned production verifier,
           Comparator, Lean, and nanoda, but never promotes a record and does not
           consume the three-per-day competitive allowance. A complete two-kernel
           replay can take up to about 55 minutes; the runner reports its live

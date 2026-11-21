@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      sync_boat_key:
+        description: Copy the scoped verifier key into the production project's sensitive environment
+        type: boolean
+        default: false
 
 concurrency:
   group: production-website
@@ -23,8 +28,29 @@ jobs:
         with:
           node-version: 22
 
-      - name: Deploy the exact main commit
+      - name: Sync scoped Boat key
+        if: github.ref == 'refs/heads/main' && inputs.sync_boat_key
         env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          python3 - <<'PYTHON'
+          import json, os, urllib.request
+          e=os.environ
+          if not e["BOAT_KEY"]: raise SystemExit("Missing scoped key")
+          url=f'https://api.vercel.com/v10/projects/{e["VERCEL_PROJECT_ID"]}/env?teamId={e["VERCEL_ORG_ID"]}&upsert=true'
+          payload={"key":"RIEMANN_BOAT_API_KEY","value":e["BOAT_KEY"],"type":"sensitive","target":["production"]}
+          req=urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Authorization":"Bearer "+e["VERCEL_TOKEN"],"Content-Type":"application/json"})
+          with urllib.request.urlopen(req,timeout=30) as response:
+              if json.load(response).get("failed"): raise SystemExit("Sensitive variable update failed")
+          PYTHON
+
+      - name: Deploy the exact main commit
+        if: github.ref == 'refs/heads/main'
+        env:
+          PROVIDER: ${{ vars.RIEMANN_VERIFIER_PROVIDER || 'e2b' }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
@@ -36,6 +62,7 @@ jobs:
             --prod \
             --yes \
             --archive=tgz \
+            --env RIEMANN_VERIFIER_PROVIDER="$PROVIDER" \
             --env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
             --meta githubCommitSha="$GITHUB_SHA" \
             --meta githubCommitRef="$GITHUB_REF_NAME" \

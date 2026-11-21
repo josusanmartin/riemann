@@ -1,3 +1,5 @@
+import { boatSelected, boatConfigured } from "@/lib/boat-worker";
+import { reserveBoatJob } from "@/lib/boat-queue";
 import { ZodError } from "zod";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { getSession } from "@/auth";
@@ -71,15 +73,15 @@ export async function POST(request: Request): Promise<Response> {
       message: "Sign in with GitHub before submitting a formal proof.",
     });
   }
-  if (!isE2BConfigured()) {
+  if (boatSelected() ? !boatConfigured() : !isE2BConfigured()) {
     return noStore(503, {
       error: "verifier_unavailable",
-      message: "The E2B verifier is not configured for this deployment.",
+      message: "The verifier is not configured for this deployment.",
     });
   }
   if (
     !isGitHubPromotionConfigured() ||
-    !isE2BWebhookConfigured() ||
+    (!boatSelected() && !isE2BWebhookConfigured()) ||
     !isSubmissionQueueConfigured()
   ) {
     return noStore(503, {
@@ -129,9 +131,9 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
-    await ensureE2BWebhookRecently();
+    if (!boatSelected()) await ensureE2BWebhookRecently();
     const issuedAt = Date.now();
-    const job = await stageE2BVerification({
+    const job = boatSelected() ? reserveBoatJob(baseCommitSha,currentRecord.id,issuedAt) : await stageE2BVerification({
       ...prepared,
       recordsSnapshot: `${JSON.stringify(records, null, 2)}\n`,
       baseCommitSha,
@@ -150,7 +152,7 @@ export async function POST(request: Request): Promise<Response> {
         { manifest: prepared.manifest, solution: prepared.solution },
       );
     } catch (error) {
-      if (!(error instanceof QueueCommitUncertainError)) {
+      if (!boatSelected() && !(error instanceof QueueCommitUncertainError)) {
         await killE2BSandbox(job.sandboxId).catch(() => undefined);
       }
       throw error;
@@ -167,8 +169,8 @@ export async function POST(request: Request): Promise<Response> {
     const jobToken = signSubmissionJob(
       {
         schemaVersion: 1,
-        sandboxId: job.sandboxId,
-        jobId: job.jobId,
+        sandboxId: admission.job.sandboxId,
+        jobId: admission.job.jobId,
         submissionId: prepared.submission.id,
         github,
         proofDigest: prepared.proofDigest,

@@ -1,3 +1,4 @@
+import { reconcileBoat } from "@/lib/boat-queue";
 import { timingSafeEqual } from "node:crypto";
 import {
   inspectE2BVerificationProgress,
@@ -54,6 +55,12 @@ export async function GET(request: Request): Promise<Response> {
   try {
     activeQueueJob = await getActiveVerificationJob();
     if (!activeQueueJob) return noStore(200, { status: "idle" });
+    if (activeQueueJob.boat) {
+      const result = await reconcileBoat(activeQueueJob);
+      if (result.status === "running") return noStore(200, {error:"result_not_ready"});
+      if (result.status === "rejected") return noStore(200,{status:"rejected-cleaned"});
+      return noStore(200,{status:result.promotion.status === "superseded" ? "superseded" : "promoted"});
+    }
     const job = await readQueuedE2BJobMetadata(activeQueueJob.sandboxId);
     assertQueueJobMatches(activeQueueJob, job);
     const runnerState = await ensureQueuedJobRunning(activeQueueJob);

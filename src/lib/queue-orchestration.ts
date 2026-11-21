@@ -1,3 +1,4 @@
+import { ensureBoatWorker } from "./boat-queue";
 import {
   launchQueuedE2BVerification,
   pauseQueuedE2BVerification,
@@ -51,6 +52,10 @@ export function assertQueueJobMatches(
 export async function ensureQueuedJobRunning(
   job: QueuedVerificationJob,
 ): Promise<QueuedE2BRunnerState> {
+  if (job.boat) {
+    await ensureBoatWorker(job);
+    return "running";
+  }
   const { hasActiveE2BFlowTest } = await import("@/lib/e2b-flow-test");
   if (await hasActiveE2BFlowTest()) {
     throw new VerifierOccupiedByFlowTestError();
@@ -61,6 +66,7 @@ export async function ensureQueuedJobRunning(
 export function ensureQueuedJobPaused(
   job: QueuedVerificationJob,
 ): Promise<void> {
+  if (job.boat) return Promise.resolve();
   return pauseQueuedE2BVerification(job.sandboxId);
 }
 
@@ -104,6 +110,7 @@ async function isSupersededBeforeStart(
   publishedRecordId: string | null,
 ): Promise<boolean> {
   if (!publishedRecordId) return false;
+  if (job.boat) return job.boat.previousRecordId !== publishedRecordId;
   try {
     const metadata = await readQueuedE2BJobMetadata(job.sandboxId);
     if (metadata.jobId !== job.jobId) return false;
@@ -143,7 +150,7 @@ export async function advanceVerificationQueue(
           evidenceUrl: null,
         })
       ).next;
-      await killE2BSandbox(stale.sandboxId).catch(() => undefined);
+      if (!stale.boat) await killE2BSandbox(stale.sandboxId).catch(() => undefined);
       continue;
     }
     try {
