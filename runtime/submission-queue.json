@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "c6028e03c3fd48605ef06a14c0aa5262ac915743",
       "previousRecordId": "bakken-ten-hw-one-unit",
-      "issuedAt": 1795286851559
+      "issuedAt": 1795286851559,
+      "startedAt": 1795286853875
     }
   },
   "pending": [],
