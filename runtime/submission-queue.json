@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-d3a893ab-b8eb-4644-b8ab-d5b1cbab4d60",
-    "jobId": "d3a893ab-b8eb-4644-b8ab-d5b1cbab4d60",
-    "proofDigest": "e765b70284a152531987eec64c8ccd10c663f7fa791635ade386e97964b32eb7",
-    "ownerKey": "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e",
-    "submissionKey": "3dd463fc66ea1a73b786e5e031001fb2d2eb22f91e6e99cdb95e66f147a9e62c",
-    "enqueuedAt": "2026-11-21T19:54:11.632Z",
-    "boat": {
-      "baseCommitSha": "bc94a9d63317e8329753125718cc8940fe2f87e3",
-      "previousRecordId": "bakken-ten-hw-one-unit",
-      "issuedAt": 1795290851631,
-      "startedAt": 1795290853717,
-      "workerId": "bx_m289f659",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "d3a893ab-b8eb-4644-b8ab-d5b1cbab4d60",
+      "proofDigest": "e765b70284a152531987eec64c8ccd10c663f7fa791635ade386e97964b32eb7",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/b13a32d590666d36453b0ac684181d4f642beb7a/submissions/critical-line-669-800",
+      "completedAt": "2026-11-21T20:03:53.912Z",
+      "logArchived": true
+    },
     {
       "jobId": "f4d46b2c-660d-4552-abc8-a1d0df2827c0",
       "proofDigest": "9e3df8ca39cc72e3f3bad68f990cf76ca5b7daf90ab134361d98fdfd4f033880",
