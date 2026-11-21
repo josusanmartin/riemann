@@ -11,7 +11,8 @@
       "baseCommitSha": "5670a889abbe72f22ab79367f775b6b327546f86",
       "previousRecordId": "critical-line-669-800",
       "issuedAt": 1795297636773,
-      "startedAt": 1795297639222
+      "startedAt": 1795297639222,
+      "workerId": "bx_rzemk7zd"
     }
   },
   "pending": [],
