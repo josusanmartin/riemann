@@ -12,7 +12,8 @@
       "previousRecordId": "bakken-ten-hw-one-unit",
       "issuedAt": 1795290851631,
       "startedAt": 1795290853717,
-      "workerId": "bx_m289f659"
+      "workerId": "bx_m289f659",
+      "uploaded": true
     }
   },
   "pending": [],
