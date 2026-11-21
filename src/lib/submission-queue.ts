@@ -20,6 +20,15 @@ const GITHUB_API_VERSION = "2026-03-10";
 export const SUBMISSION_QUEUE_BRANCH = "automation-queue";
 export const SUBMISSION_QUEUE_PATH = "runtime/submission-queue.json";
 export const MAX_DAILY_SUBMISSIONS = 3;
+const OWNER_DAILY_SUBMISSIONS = 5;
+
+export function dailySubmissionLimit(github?: string): number {
+  const [owner] = RECORDS_REPOSITORY.split("/");
+  return github?.toLowerCase() === owner.toLowerCase()
+    ? OWNER_DAILY_SUBMISSIONS
+    : MAX_DAILY_SUBMISSIONS;
+}
+
 export const MAX_QUEUED_SUBMISSIONS = 100;
 export const MAX_COMPLETED_RECEIPTS = 200;
 const MAX_CAS_ATTEMPTS = 8;
@@ -108,7 +117,7 @@ export const submissionQueueStateSchema = z
     daily: z
       .object({
         day: utcDaySchema,
-        attempts: z.record(digestSchema, z.number().int().min(0).max(MAX_DAILY_SUBMISSIONS)),
+        attempts: z.record(digestSchema, z.number().int().min(0).max(OWNER_DAILY_SUBMISSIONS)),
       })
       .strict(),
   })
@@ -223,10 +232,8 @@ type QueueMutation<T> = {
 };
 
 export class DailySubmissionLimitError extends Error {
-  readonly limit = MAX_DAILY_SUBMISSIONS;
-
-  constructor(public readonly retryAt: string) {
-    super(`Each GitHub account may submit at most ${MAX_DAILY_SUBMISSIONS} proofs per UTC day`);
+  constructor(public readonly retryAt: string, public readonly limit: number) {
+    super(`This GitHub account may submit at most ${limit} proofs per UTC day`);
     this.name = "DailySubmissionLimitError";
   }
 }
@@ -329,6 +336,7 @@ export function enqueueQueueState(
   const existingJobs = next.active ? [next.active, ...next.pending] : next.pending;
   const existing = existingJobs.find((job) => job.jobId === input.jobId);
   const used = next.daily.attempts[ownerKey] ?? 0;
+  const dailyLimit = dailySubmissionLimit(login);
   if (existing) {
     if (
       existing.sandboxId !== input.sandboxId ||
@@ -348,7 +356,7 @@ export function enqueueQueueState(
           ? 0
           : next.pending.findIndex((job) => job.jobId === existing.jobId) + 1,
         dailyUsed: used,
-        dailyLimit: MAX_DAILY_SUBMISSIONS,
+        dailyLimit,
         shouldStart: false,
       },
     };
@@ -356,8 +364,8 @@ export function enqueueQueueState(
   if (existingJobs.some((job) => job.submissionKey === submissionKey)) {
     throw new SubmissionAlreadyQueuedError();
   }
-  if (used >= MAX_DAILY_SUBMISSIONS) {
-    throw new DailySubmissionLimitError(nextUtcDay(now));
+  if (used >= dailyLimit) {
+    throw new DailySubmissionLimitError(nextUtcDay(now), dailyLimit);
   }
   if (existingJobs.length >= MAX_QUEUED_SUBMISSIONS) {
     throw new SubmissionQueueFullError();
@@ -390,7 +398,7 @@ export function enqueueQueueState(
       job,
       position,
       dailyUsed: used + 1,
-      dailyLimit: MAX_DAILY_SUBMISSIONS,
+      dailyLimit,
       shouldStart,
     },
   };
@@ -861,8 +869,9 @@ export async function getDailySubmissionUsage(
     options.fetchImplementation ?? fetch,
   );
   const state = await readBranchState(client);
+  const limit = dailySubmissionLimit(github);
   if (!state) {
-    return { used: 0, limit: MAX_DAILY_SUBMISSIONS, retryAt: nextUtcDay(now) };
+    return { used: 0, limit, retryAt: nextUtcDay(now) };
   }
   const ownerKey = hmacKey(
     "owner",
@@ -871,7 +880,7 @@ export async function getDailySubmissionUsage(
   );
   return {
     used: state.daily.day === utcDay(now) ? state.daily.attempts[ownerKey] ?? 0 : 0,
-    limit: MAX_DAILY_SUBMISSIONS,
+    limit,
     retryAt: nextUtcDay(now),
   };
 }

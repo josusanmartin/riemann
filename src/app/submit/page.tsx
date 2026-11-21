@@ -32,7 +32,7 @@ import {
 import {
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
-  MAX_DAILY_SUBMISSIONS,
+  dailySubmissionLimit,
 } from "@/lib/submission-queue";
 import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import {
@@ -64,9 +64,10 @@ export default async function SubmitPage() {
           return null;
         })
       : null;
+  const dailyLimit = dailyUsage?.limit ?? dailySubmissionLimit(github);
   const uploadsRemaining = dailyUsage
     ? Math.max(0, dailyUsage.limit - dailyUsage.used)
-    : MAX_DAILY_SUBMISSIONS;
+    : dailyLimit;
 
   return (
     <main id="main-content">
@@ -79,7 +80,7 @@ export default async function SubmitPage() {
               Enter an exact rational and paste or upload your Lean source. A
               private {boatSelected() ? "Boat" : "E2B"} sandbox rechecks the fixed theorem with Comparator, the
               Lean kernel, and nanoda. Jobs run one at a time in submission order,
-              with three admitted uploads per GitHub account per UTC calendar day.
+              with a daily allowance of three uploads per GitHub account and five for the repository owner.
               The budget resets at 00:00 UTC, and a rejected job still counts once
               queued. No pull request is required.
             </p>
@@ -166,7 +167,7 @@ export default async function SubmitPage() {
           <strong>
             {dailyUsage
               ? `${uploadsRemaining} of ${dailyUsage.limit} uploads remaining today`
-              : `${MAX_DAILY_SUBMISSIONS} admitted uploads per GitHub account per day`}
+              : `${dailyLimit} admitted uploads per day`}
           </strong>
           <p>
             A slot is charged only after an upload enters the durable FIFO. From
@@ -252,7 +253,7 @@ export default async function SubmitPage() {
           <li><FileCode2 size={15} /> Starter available above</li>
           <li><Check size={15} /> Lean source only</li>
           <li><Check size={15} /> 2 MB maximum</li>
-          <li><Check size={15} /> 3 admitted uploads per account per UTC day</li>
+          <li><Check size={15} /> {dailyLimit} admitted uploads per UTC day</li>
           <li><Check size={15} /> FIFO · 1 verifier at a time</li>
           <li><Check size={15} /> Apache-2.0</li>
         </ul>

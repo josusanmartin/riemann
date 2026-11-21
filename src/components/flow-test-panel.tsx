@@ -219,7 +219,7 @@ export function FlowTestPanel({
           the candidate at <code>2/3</code>, then replays Anthropic&apos;s checked
           dyadic and cumulative theorems. It uses the pinned production verifier,
           Comparator, Lean, and nanoda, but never promotes a record and does not
-          consume the three-per-day competitive allowance. A complete two-kernel
+          consume the daily competitive allowance. A complete two-kernel
           replay can take up to about 55 minutes; the runner reports its live
           stage while it works.
         </p>

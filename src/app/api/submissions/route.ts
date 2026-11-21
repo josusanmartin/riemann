@@ -108,7 +108,7 @@ export async function POST(request: Request): Promise<Response> {
     if (dailyUsage.used >= dailyUsage.limit) {
       return noStore(429, {
         error: "daily_submission_limit",
-        message: `Each GitHub account may submit at most ${dailyUsage.limit} proofs per UTC day.`,
+        message: `This GitHub account may submit at most ${dailyUsage.limit} proofs per UTC day.`,
         dailyUsed: dailyUsage.used,
         dailyLimit: dailyUsage.limit,
         retryAt: dailyUsage.retryAt,

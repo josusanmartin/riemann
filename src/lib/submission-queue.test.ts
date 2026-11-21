@@ -420,6 +420,17 @@ describe("durable formal verification queue", () => {
     ).not.toThrow();
   });
 
+  it("admits five owner uploads and rejects the sixth against the same UTC counter", () => {
+    let state = createEmptyQueueState("2026-08-11");
+    for (let index = 1; index <= 5; index += 1) {
+      const admission = enqueueQueueState(state, input(index), "JosuSanMartin", ownerSecret, firstDay);
+      state = admission.state;
+      expect(admission.result).toMatchObject({ dailyUsed: index, dailyLimit: 5 });
+    }
+    expect(() => enqueueQueueState(state, input(6), "josusanmartin", ownerSecret, firstDay))
+      .toThrow("at most 5 proofs");
+  });
+
   it("keeps rejected receipts from before structured feedback readable", () => {
     const admission = enqueueQueueState(
       createEmptyQueueState("2026-08-11"),

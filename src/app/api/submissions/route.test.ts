@@ -91,7 +91,7 @@ describe("official submission admission", () => {
     expect(mocks.kill).not.toHaveBeenCalled();
   });
   it("cleans up a definitively rejected concurrent admission", async () => {
-    mocks.enqueue.mockRejectedValueOnce(new DailySubmissionLimitError("2026-09-08T00:00:00.000Z"));
+    mocks.enqueue.mockRejectedValueOnce(new DailySubmissionLimitError("2026-09-08T00:00:00.000Z", 3));
     expect((await POST(request())).status).toBe(429);
     expect(mocks.kill).toHaveBeenCalledWith(job.sandboxId);
   });
