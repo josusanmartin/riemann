@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "critical-line-669-800",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "model": null,
+  "harness": "OpenAI Codex",
+  "score": {
+    "numerator": "669",
+    "denominator": "800"
+  },
+  "scoreDecimal": "0.836250000000000000000000000000",
+  "previousRecordId": "bakken-ten-hw-one-unit",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-21T20:03:53.595Z",
+  "challengeDigest": "7b04b8bacaa084cd8c6e3a2b215303ff60af4b10e98f8c8c1494cb815e24c463",
+  "verifierTemplateDigest": "257fe226002152d8ed2c4048359f2de323980c8a81b6b61cc371d767befb5b4a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

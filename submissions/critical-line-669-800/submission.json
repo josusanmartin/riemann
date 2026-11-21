@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "critical-line-669-800",
+  "track": "critical-line",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "score": {
+    "numerator": "669",
+    "denominator": "800"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard’s accepted RH foundation from Alpöge. Gives the exact lower bound 669/800 for distinct critical-line zeros in both dyadic and cumulative windows. The worker replays the deduction with the published RH theorem as a trusted premise.",
+  "method": "Published RH foundation and Montgomery–Taylor distinct-zero estimate",
+  "model": null,
+  "harness": "OpenAI Codex",
+  "license": "Apache-2.0"
+}
