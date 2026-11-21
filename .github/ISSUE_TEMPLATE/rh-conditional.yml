@@ -1,0 +1,29 @@
+name: RH-conditional proof
+description: Submit a versioned Lean project for review on the RH-conditional track.
+title: "[RH-conditional] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This submission and the source you link are public. Both counting theorems must take an explicit RiemannHypothesis argument. A maintainer checks the fixed statements with Comparator, Lean, and nanoda before adding a record.
+  - type: input
+    id: score
+    attributes:
+      label: Exact rational bound
+      placeholder: numerator / denominator
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Immutable source
+      description: Link to a public repository at a full commit SHA or a downloadable source archive with its SHA-256 digest.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Proof and reproduction
+      description: Give the solution path, method, dependency commits, attribution, license, and any replay instructions or logs.
+    validations:
+      required: true

@@ -82,6 +82,7 @@ export default async function SubmitPage() {
               The budget resets at 00:00 UTC, and a rejected job still counts once
               queued. No pull request is required.
             </p>
+            <p>Assuming RH? <Link className="text-link" href="/rh-conditional">Submit to the RH-conditional track.</Link></p>
             {!github && isGitHubAuthConfigured && (
               <form action={signInWithGitHub}>
                 <button className="button button-lime" type="submit">
