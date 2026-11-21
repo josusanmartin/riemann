@@ -50,6 +50,7 @@ const nextConfig: NextConfig = {
     "/api/submissions/status": trustedPromotionRuntimeFiles,
     "/api/e2b/webhook": trustedPromotionRuntimeFiles,
     "/api/e2b/sweep": trustedPromotionRuntimeFiles,
+    "/api/submissions/sweep": trustedPromotionRuntimeFiles,
     "/api/health": trustedPromotionRuntimeFiles,
     "/api/admin/e2b-template": verifierTemplateBuildFiles,
   },

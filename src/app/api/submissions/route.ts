@@ -164,7 +164,7 @@ export async function POST(request: Request): Promise<Response> {
     } catch (error) {
       // Admission is already durable. Status polling and the cron backstop can
       // safely retry this idempotent transition without losing the upload.
-      console.error("Unable to apply the initial E2B queue state", error);
+      console.error("Unable to apply the initial verifier queue state", error);
     }
     const jobToken = signSubmissionJob(
       {
@@ -229,7 +229,7 @@ export async function POST(request: Request): Promise<Response> {
     ) {
       return noStore(400, { error: "invalid_submission", message });
     }
-    console.error("Unable to start E2B verification", error);
+    console.error("Unable to start verification", error);
     return noStore(502, {
       error: "verifier_start_failed",
       message: "The isolated verifier could not be started. Please retry shortly.",

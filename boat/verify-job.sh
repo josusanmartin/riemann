@@ -57,11 +57,16 @@ install -m 0755 "$(command -v node)" "$root/bin/node"
 export PATH="$root/bin:$root/lean/bin:/usr/local/bin:/usr/bin:/bin"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
 # File content is data; no submission text appears in shell commands or Boat history.
-for _ in $(seq 1 90); do [[ -f "$inbox/ready" ]] && break; sleep 2; done
-test -f "$inbox/ready"
 mkdir -p "$root/input/proof"
-cp "$inbox/manifest" "$root/input/submission.json"
-cp "$inbox/solution" "$root/input/proof/Solution.lean"
+staged=false
+for _ in $(seq 1 90); do
+  if [[ -f "$inbox/ready" ]] && cp "$inbox/manifest" "$root/input/submission.json" && cp "$inbox/solution" "$root/input/proof/Solution.lean"; then
+    actual="$({ printf 'submission.json\0'; cat "$root/input/submission.json"; printf 'proof/Solution.lean\0'; cat "$root/input/proof/Solution.lean"; } | sha256sum | cut -d' ' -f1)"
+    if [[ "$actual" == "$digest" ]]; then staged=true; break; fi
+  fi
+  sleep 2
+done
+[[ "$staged" == true ]]
 if [[ "$kind" == flow ]]; then
   cp challenge/flow-test-records.json "$root/input/trusted-records.json"
 else

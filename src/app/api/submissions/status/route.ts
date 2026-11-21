@@ -30,7 +30,7 @@ import { describeVerifierRejection } from "@/lib/verifier-feedback";
 import { readVerifierLog } from "@/lib/submission-archive-store";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 function noStore(status: number, body: object): Response {
   return Response.json(body, {
