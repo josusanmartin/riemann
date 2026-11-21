@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "fce5b1108e4605f8b60e4b9eb1500e06e9c3ada5",
       "previousRecordId": "knausgard-rh-gd1-floor",
-      "issuedAt": 1795303481267
+      "issuedAt": 1795303481267,
+      "startedAt": 1795303484239
     }
   },
   "pending": [],
