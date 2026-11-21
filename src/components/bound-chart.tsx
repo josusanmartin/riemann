@@ -5,8 +5,6 @@ import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 const START_YEAR = 1974;
 const END_YEAR = 2026;
 const MIN_SCORE = 0.3;
-const MAX_SCORE = 0.7;
-const Y_TICKS = [0.3, 0.4, 0.5, 0.6, 0.7];
 
 type Geometry = {
   width: number;
@@ -45,10 +43,13 @@ function ChartSvg({
   variant: "wide" | "compact";
 }) {
   const { width, height, padding, xTicks } = geometry;
+  const topTenth = Math.max(7, ...points.map(point => Math.ceil(point.score * 10)));
+  const maxScore = topTenth / 10;
+  const yTicks = Array.from({ length: topTenth - 2 }, (_, i) => (i + 3) / 10);
   const x = (year: number) =>
     padding.left + ((year - START_YEAR) / (END_YEAR - START_YEAR)) * (width - padding.left - padding.right);
   const y = (score: number) =>
-    padding.top + ((MAX_SCORE - score) / (MAX_SCORE - MIN_SCORE)) * (height - padding.top - padding.bottom);
+    padding.top + ((maxScore - score) / (maxScore - MIN_SCORE)) * (height - padding.top - padding.bottom);
 
   // A record is a step function: each bound holds until the next one is proved.
   const line = points
@@ -68,7 +69,7 @@ function ChartSvg({
       role="img"
       aria-label={`Certified critical-line lower bound by year. ${summary}`}
     >
-      {Y_TICKS.map((tick) => (
+      {yTicks.map((tick) => (
         <g key={tick}>
           <line x1={padding.left} y1={y(tick)} x2={width - padding.right} y2={y(tick)} className="chart-grid" />
           <text x={padding.left - 12} y={y(tick) + 4} textAnchor="end" className="chart-label">
