@@ -1,0 +1,29 @@
+21 November 2026. Local verification on macOS arm64.
+Lean 4.33.1 (819816b2e0a3bf405af45ae5c7af2491d8f5bee6)
+Mathlib 0df444a360eaa60ab8c11dca51a86af692955474
+Zeta23 3635e74826a4c1fcece7d1cd2b6fa75e43a00510
+RH 2f097b744a6460c73f3e4cc550baa83698409876
+RH source tree 24df20b62d9976ccd20da819bc20b16f808f0fdd
+RH cache manifest SHA256 292caa386a620d935cfc736b56fcceaab9fe7073086693b62e899c1ee4725f04
+175187 published RH module archives matched the manifest hashes and were restored.
+
+First joint build, exit 0
+'CriticalLine669.offLineLoss' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CriticalLine669.dyadic_669' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CriticalLine669.cumulative_669' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Kernel replay of new declarations against their imported environments
+leanchecker -v DistinctBound, exit 0
+replaying DistinctBound
+leanchecker -v CriticalLine669, exit 0
+replaying CriticalLine669
+
+Fresh checkout and rebuild with the bundled verify.sh, exit 0
+'CriticalLine669.offLineLoss' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CriticalLine669.dyadic_669' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CriticalLine669.cumulative_669' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Source SHA256
+30ac6f18f9bd9ee0cd68154700e69ce9855d466831fba831ebfe52972b2a6652  CriticalLine669.lean
+366e236c1e9b966871fc56643a10819af1fd8c3f19f1620dee5223fff3dba2f0  DistinctBound.lean
+29b33e5d5bd72c7911a3c83a74bc9b62f8b9608934e7cfd903f7476f2de4da09  verify.sh

@@ -17,6 +17,7 @@ import { BoatSmokeButton } from "@/components/boat-smoke-button";
 import { isBoatSmokeConfigured } from "@/lib/boat-smoke";
 import { FlowTestPanel } from "@/components/flow-test-panel";
 import { signInWithGitHub } from "@/lib/auth-actions";
+import { repositoryUrl } from "@/lib/site";
 import { getCurrentRecord } from "@/lib/records";
 import { isE2BConfigured } from "@/lib/e2b-config";
 import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
@@ -82,7 +83,7 @@ export default async function SubmitPage() {
               The budget resets at 00:00 UTC, and a rejected job still counts once
               queued. No pull request is required.
             </p>
-            <p>Assuming RH? <Link className="text-link" href="/rh-conditional">Submit to the RH-conditional track.</Link></p>
+            <p>Multi-file project or large dependencies? <a className="text-link" href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package for research review.</a></p>
             {!github && isGitHubAuthConfigured && (
               <form action={signInWithGitHub}>
                 <button className="button button-lime" type="submit">

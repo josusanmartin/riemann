@@ -1,11 +1,11 @@
-name: RH-conditional proof
-description: Submit a versioned Lean project for review on the RH-conditional track.
-title: "[RH-conditional] "
+name: Research evidence
+description: Share a versioned proof package and its verification evidence.
+title: "[Research evidence] "
 body:
   - type: markdown
     attributes:
       value: |
-        This submission and the source you link are public. Both counting theorems must take an explicit RiemannHypothesis argument. A maintainer checks the fixed statements with Comparator, Lean, and nanoda before adding a record.
+        This submission and the source you link are public. Specify the exact theorem statements, assumptions and dependency pins. A leaderboard entry requires an official verification of the unconditional competition statements.
   - type: input
     id: score
     attributes:
