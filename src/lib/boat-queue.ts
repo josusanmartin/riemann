@@ -1,3 +1,4 @@
+import { boatCompletionToken } from "./boat-completion-token";
 import { randomUUID } from "node:crypto";
 import { computeDirectProofDigest } from "./direct-submission";
 import { readSubmissionArchive } from "./submission-archive-store";
@@ -84,11 +85,22 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
     entry.payload.manifest,
     entry.payload.solution,
     job.proofDigest,
+    {
+      jobId: job.jobId,
+      token: boatCompletionToken(
+        job.jobId,
+        job.proofDigest,
+        process.env.AUTH_SECRET ?? "",
+      ),
+    },
   );
   return updateBoatJob(job.jobId, { uploaded: true });
 }
 
-export async function reconcileBoat(job: QueuedVerificationJob) {
+export async function reconcileBoat(
+  job: QueuedVerificationJob,
+  receiptReady = false,
+) {
   const b = job.boat!;
   if (
     !b.uploaded &&
@@ -123,6 +135,7 @@ export async function reconcileBoat(job: QueuedVerificationJob) {
     startedAt! + workerLifetime,
     async () => (await archived(active)).summary.submission.id,
     job.proofDigest,
+    receiptReady,
   );
   if (!result)
     return { status: "running" as const, proofDigest: job.proofDigest };

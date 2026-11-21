@@ -106,3 +106,28 @@ if [[ $status == 0 ]]; then
   sudo install -m 0644 /home/proofcheck/attestation.json "$root/attestation.json"
 fi
 ./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" "$root/attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"
+
+# Only the supervisor can read this job-specific wake-up token. A notification
+# never supplies a verdict. The website fetches the receipt using its own key.
+if [[ "$kind" == competitive && -f "$inbox/notification" ]]; then
+  python3 - "$inbox/notification" "$digest" <<'PY' || true
+import json, re, sys, time, urllib.request
+with open(sys.argv[1]) as file:
+    notice = json.load(file)
+if not re.fullmatch(r'[0-9a-f-]{36}', notice["jobId"]) or not re.fullmatch(r'[0-9a-f]{64}', notice["token"]):
+    raise ValueError("Invalid notification coordinates")
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+opener = urllib.request.build_opener(NoRedirect())
+request = urllib.request.Request("https://www.riemannzeta.fun/api/submissions/boat/complete", method="POST",
+    headers={"X-Riemann-Job":notice["jobId"], "X-Riemann-Digest":sys.argv[2], "X-Riemann-Notification":notice["token"]})
+for delay in (0, 5, 20):
+    time.sleep(delay)
+    try:
+        with opener.open(request, timeout=45) as response:
+            if response.status == 204: break
+    except OSError:
+        continue
+PY
+fi

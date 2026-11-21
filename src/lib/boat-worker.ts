@@ -103,6 +103,7 @@ export async function stageBoatFiles(
   manifest: string,
   solution: string,
   proofDigest: string,
+  notification?: { jobId: string; token: string },
 ) {
   const worker = `/sandboxes/${workerId.parse(id)}`;
   const info = (await api(worker)).sandbox;
@@ -118,6 +119,7 @@ export async function stageBoatFiles(
   for (const [file, content] of [
     ["manifest", manifest],
     ["solution", solution],
+    ...(notification ? [["notification", JSON.stringify(notification)]] : []),
     ["ready", proofDigest],
   ]) {
     await api(path, "PUT", {
@@ -140,6 +142,7 @@ export async function boatResult(
   expires: number,
   submissionId: string | (() => Promise<string>),
   proofDigest: string,
+  receiptReady = false,
 ) {
   const unavailable = async (message: string) => ({
     schemaVersion: 1 as const,
@@ -167,7 +170,7 @@ export async function boatResult(
     return unavailable(
       "The Boat worker stopped before sealing a verification result.",
     );
-  if (info.setupStatus === "done")
+  if (receiptReady || info.setupStatus === "done")
     return e2bVerificationResultSchema.parse(
       JSON.parse(await readBoatFile(id, "riemann-receipt.json")),
     );

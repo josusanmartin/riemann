@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { computeDirectProofDigest } from "./direct-submission";
 import type { QueuedVerificationJob } from "./submission-queue";
 import { ensureBoatWorker, reconcileBoat, reserveBoatJob } from "./boat-queue";
@@ -40,7 +40,9 @@ const manifest = "test manifest",
 const proofDigest = computeDirectProofDigest(manifest, solution);
 const id = "bx_23456789";
 let job: QueuedVerificationJob;
+afterEach(() => vi.unstubAllEnvs());
 beforeEach(() => {
+  vi.stubEnv("AUTH_SECRET", "test-only-key");
   vi.resetAllMocks();
   job = {
     ...reserveBoatJob("a".repeat(40), "previous", Date.now()),
@@ -74,6 +76,7 @@ describe("competitive Boat queue", () => {
       manifest,
       solution,
       proofDigest,
+      { jobId: job.jobId, token: expect.stringMatching(/^[0-9a-f]{64}$/) },
     );
     expect(job.boat?.uploaded).toBe(true);
   });

@@ -193,7 +193,14 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
     assertQueueJobMatches(queue.job, job);
-    if (queue.job.boat) return noStore(200,await reconcileBoat(queue.job));
+    if (queue.job.boat) {
+      const result = await reconcileBoat(queue.job);
+      if (result.status !== "running") {
+        const final = await inspectVerificationJob(job.jobId);
+        if (final.status === "completed") return completedReceiptResponse(job.submissionId,job.proofDigest,final.receipt);
+      }
+      return noStore(200,result);
+    }
     let runnerState;
     try {
       runnerState = await ensureQueuedJobRunning(queue.job);
