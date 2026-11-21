@@ -109,6 +109,13 @@ await writeFile(
   await readTemplate("Challenge.Candidate.lean"),
 );
 await writeFile(join(workspace, "comparator", "Solution", "Candidate.lean"), solution);
+// Some valid legacy sources spell the statements directly instead of importing
+// CandidateSpec. Always export the trusted premise alongside the exact source.
+await writeFile(
+  join(workspace, "comparator", "Solution", "ExportBundle.lean"),
+  "import Main\nimport Solution.Candidate\n",
+);
+
 await writeFile(
   join(workspace, "comparator", "PrintAxioms", "Candidate.lean"),
   await readTemplate("PrintAxioms.Candidate.lean"),
@@ -128,7 +135,7 @@ for (const entry of await readdir(proofDirectory, { withFileTypes: true })) {
 
 const comparatorConfig = {
   challenge_module: "Challenge.Candidate",
-  solution_module: "Solution.Candidate",
+  solution_module: "Solution.ExportBundle",
   theorem_names: [
     contract.theorems.strictImprovement,
     contract.theorems.dyadicBound,
