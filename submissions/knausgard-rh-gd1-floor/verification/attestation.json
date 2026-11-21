@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-gd1-floor",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "Claude Fable 5.2",
+  "harness": "Claude",
+  "score": {
+    "numerator": "8362503491",
+    "denominator": "10000000000"
+  },
+  "scoreDecimal": "0.836250349100000000000000000000",
+  "previousRecordId": "critical-line-669-800",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-21T21:59:54.583Z",
+  "challengeDigest": "d630c10e8aee19b8a582a87c184fc185672b474397c0e36be7ae9634cb53b249",
+  "verifierTemplateDigest": "257fe226002152d8ed2c4048359f2de323980c8a81b6b61cc371d767befb5b4a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-gd1-floor",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "8362503491",
+    "denominator": "10000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Derived from Josu San Martin's critical-line-669-800 (2026-11-21, Apache-2.0), which combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard's accepted RH foundation; its numerical enclosure is from typh's five-point-pyramid and Samuel Lavery's attempt-002. The only change is the rational floor: the record's lemma gam_upper already proves x cot x <= 0.8274993018 at x = sqrt(2)/2, which gives 5/4 - 0.8274993018/2 = 0.8362503491 instead of 0.83625. No new mathematics.",
+  "method": "Published RH foundation and Montgomery–Taylor distinct-zero estimate, rational floor at the strength of the record's own enclosure",
+  "model": "Claude Fable 5.2",
+  "harness": "Claude",
+  "license": "Apache-2.0"
+}
