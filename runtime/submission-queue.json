@@ -12,7 +12,8 @@
       "previousRecordId": "knausgard-rh-gd1-floor",
       "issuedAt": 1795303481267,
       "startedAt": 1795303484239,
-      "workerId": "bx_fgdwua43"
+      "workerId": "bx_fgdwua43",
+      "uploaded": true
     }
   },
   "pending": [],
