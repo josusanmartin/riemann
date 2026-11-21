@@ -1461,5 +1461,31 @@
     "proofUrl": "https://github.com/josusanmartin/riemann/blob/a3cc59dd21fadc2177cc01ea4fad3226b814f20d/submissions/bakken-ten-hw-one-unit/proof/Solution.lean",
     "pullRequestUrl": null,
     "summary": "Building on Bei Yi's beiyi-ten-parent-cover-t039 submission, this contribution tightens the rational enclosure of the window functional using a higher-degree cosine polynomial bound. The lower-bound numerator is increased by one unit at a denominator of 10^50, yielding a strictly improved exact rational critical-line proportion bound. The original window coefficients, pair weights and coverage certificate remain unchanged. All three required theorem statements were privately verified using Lean and Nanoda. Developed with AI assistance."
+  },
+  {
+    "id": "critical-line-669-800",
+    "track": "critical-line",
+    "date": "2026-11-21",
+    "author": "Josu San Martin",
+    "github": "josusanmartin",
+    "title": "Certified critical-line bound 0.836250000000000000000000000000",
+    "method": "Published RH foundation and Montgomery–Taylor distinct-zero estimate",
+    "model": null,
+    "harness": "OpenAI Codex",
+    "scoreDecimal": "0.836250000000000000000000000000",
+    "scorePercent": "83.6250000000000000000000000000",
+    "exactRational": {
+      "numerator": "669",
+      "denominator": "800"
+    },
+    "exactExpression": "(669 : ℝ) / 800",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/b13a32d590666d36453b0ac684181d4f642beb7a/submissions/critical-line-669-800/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/b13a32d590666d36453b0ac684181d4f642beb7a/submissions/critical-line-669-800/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard’s accepted RH foundation from Alpöge. Gives the exact lower bound 669/800 for distinct critical-line zeros in both dyadic and cumulative windows. The worker replays the deduction with the published RH theorem as a trusted premise.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
