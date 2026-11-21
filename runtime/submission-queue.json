@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-e15a0f35-5e54-44cd-ae1a-e46105e93985",
-    "jobId": "e15a0f35-5e54-44cd-ae1a-e46105e93985",
-    "proofDigest": "1eb0e6a08bfa9c5707693fb181734ecce42819bddf5ed75be280beca1c0ff84d",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "a9ccc2ce976ff5645520a8cec632287eb45ac3bd0a2a458d6a728c363577b06b",
-    "enqueuedAt": "2026-11-21T21:47:16.773Z",
-    "boat": {
-      "baseCommitSha": "5670a889abbe72f22ab79367f775b6b327546f86",
-      "previousRecordId": "critical-line-669-800",
-      "issuedAt": 1795297636773,
-      "startedAt": 1795297639222,
-      "workerId": "bx_rzemk7zd",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "e15a0f35-5e54-44cd-ae1a-e46105e93985",
+      "proofDigest": "1eb0e6a08bfa9c5707693fb181734ecce42819bddf5ed75be280beca1c0ff84d",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/2d9bdfdb4164fd76dc762207a4a60fd973765e8a/submissions/knausgard-rh-gd1-floor",
+      "completedAt": "2026-11-21T21:59:54.943Z",
+      "logArchived": true
+    },
     {
       "jobId": "d3a893ab-b8eb-4644-b8ab-d5b1cbab4d60",
       "proofDigest": "e765b70284a152531987eec64c8ccd10c663f7fa791635ade386e97964b32eb7",
