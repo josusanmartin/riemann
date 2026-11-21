@@ -81,3 +81,25 @@ Review metadata is a separate infrastructure change. It is never accepted from t
 ## Security
 
 Lean elaboration executes contributor-controlled metaprograms. Never run an unfamiliar proof directly on a workstation with credentials. Authoritative verification runs without repository secrets or network access in a resource-limited E2B sandbox. See [SECURITY.md](SECURITY.md).
+
+## Test the verifier on Boat
+
+The Submit page offers a Boat test to accounts listed in `RIEMANN_FLOW_TEST_GITHUB` when both Boat settings are present. It runs the repository’s arithmetic fixture through Comparator, Lean and nanoda, then tests that Comparator rejects a valid Lean proof of a different statement. The sandbox runs fixed test fixtures. Competitive uploads continue through the E2B queue.
+
+Use a fresh x86-64 Ubuntu Boat sandbox with **No env** enabled and a short auto-stop. Check out the revision of this site that you are testing at `~/.local/share/riemann-boat/site` on that sandbox. As its normal user, prepare the verifier once:
+
+```bash
+set -eu
+cd "$HOME/.local/share/riemann-boat/site"
+bash scripts/install-lean-toolchain.sh
+export PATH="$HOME/.elan/bin:$PATH"
+elan toolchain install "$(cat challenge/smoke/lean-toolchain)"
+bash scripts/install-native-build-toolchains.sh
+export CARGO_HOME="$HOME/.riemann-build-toolchains/cargo"
+export RUSTUP_HOME="$HOME/.riemann-build-toolchains/rustup"
+export PATH="$HOME/.riemann-build-toolchains/go/bin:$CARGO_HOME/bin:$PATH"
+bash scripts/install-verifier-tools.sh "$HOME/.local/share/riemann-boat/tools"
+bash scripts/boat-smoke.sh
+```
+
+Set `RIEMANN_BOAT_SANDBOX_ID` and `BOAT_API_KEY` on the website server. Use an expiring key restricted to that sandbox with the `exec` action. Sign in as an operator and choose **Run Boat test** on `/submit`. The endpoint also accepts an authenticated GitHub user token via a JSON POST to `/api/admin/boat-smoke`. Stop the sandbox and revoke the test key when finished.

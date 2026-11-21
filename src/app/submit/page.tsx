@@ -13,6 +13,8 @@ import {
 import { getSession, isGitHubAuthConfigured } from "@/auth";
 import { CodeBlock } from "@/components/code-block";
 import { DirectSubmissionForm } from "@/components/direct-submission-form";
+import { BoatSmokeButton } from "@/components/boat-smoke-button";
+import { isBoatSmokeConfigured } from "@/lib/boat-smoke";
 import { FlowTestPanel } from "@/components/flow-test-panel";
 import { signInWithGitHub } from "@/lib/auth-actions";
 import { getCurrentRecord } from "@/lib/records";
@@ -178,6 +180,8 @@ export default async function SubmitPage() {
           <div><dt>Queue</dt><dd>1 verifier at a time</dd></div>
         </dl>
       </section>
+
+      {flowTestAllowed && isBoatSmokeConfigured() && <BoatSmokeButton />}
 
       {flowTestAllowed && (
         <FlowTestPanel
