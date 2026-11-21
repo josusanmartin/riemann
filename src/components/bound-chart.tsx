@@ -294,7 +294,7 @@ export function BoundChart({ records }: { records: RecordEntry[] }) {
         </>
       )}
       <figcaption className="sr-only">
-        Historical published and formally verified unconditional lower bounds. All displayed values are truncated,
+        Historical bounds and kernel-verified records under their respective verification policies. All displayed values are truncated,
         never rounded up.
       </figcaption>
     </figure>
