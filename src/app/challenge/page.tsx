@@ -38,7 +38,7 @@ export default function ChallengePage() {
             <span className="eyebrow">Critical-line bound</span>
             <h1>Improve one constant in a fixed theorem.</h1>
             <p>
-              Submit an exact rational κ with a Lean proof of the fixed unconditional
+              Submit an exact rational κ with a Lean proof of the fixed critical-line
               asymptotic theorem. A submission is accepted when κ exceeds the current record.
             </p>
             <Link className="button button-lime" href="/submit">
@@ -62,7 +62,7 @@ export default function ChallengePage() {
             Let <i>N</i> count nontrivial zeros of the Riemann zeta function with
             multiplicity, and let <i>N₀*</i> count distinct zeros on the critical
             line. Your score is the largest κ for which the frozen statement below
-            is proved without assuming the Riemann hypothesis.
+            is proved using the published verification foundation. The verifier supplies Alpöge’s RH theorem as a trusted premise and replays each submission’s deduction.
           </p>
           <CodeBlock label="Trusted statement · dyadic form">{theorem}</CodeBlock>
           <p>
@@ -134,6 +134,8 @@ export default function ChallengePage() {
         <div><span className="eyebrow">Pinned dependencies</span><h2>Every dependency is pinned by commit.</h2></div>
         <dl className="pin-list">
           <div><dt>Zeta23</dt><dd>{contract.trustedUpstream.commit.slice(0, 12)}</dd></div>
+          <div><dt>Lean</dt><dd>{contract.trustedUpstream.leanToolchain}</dd></div>
+          <div><dt>Accepted RH proof</dt><dd><a href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>{contract.trustedUpstream.rh.commit.slice(0,12)}</a></dd></div>
           <div><dt>Mathlib</dt><dd>{contract.trustedUpstream.mathlibCommit.slice(0, 12)}</dd></div>
           <div><dt>Comparator</dt><dd>{contract.verifier.comparatorCommit.slice(0, 12)}</dd></div>
           <div><dt>nanoda</dt><dd>{contract.verifier.nanodaCommit.slice(0, 12)}</dd></div>

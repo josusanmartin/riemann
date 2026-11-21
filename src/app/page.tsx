@@ -34,7 +34,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <div className="hero-content">
             <div className="status-pill"><span className="pulse-dot" /> Open for submissions <span>·</span> Verified in Lean</div>
             <h1>The largest <em>proven</em> proportion of zeros on the critical line.</h1>
-            <p className="hero-lede">This site records the current unconditional lower bound on the fraction of nontrivial Riemann zeta zeros that lie on the critical line. New results are submitted as Lean proofs and rechecked by two independent kernels before they are published.</p>
+            <p className="hero-lede">This site ranks verified lower bounds for distinct critical-line zeros. The current rules accept Alpöge’s published RH theorem as a foundation. Lean and nanoda check each submitted deduction.</p>
             <div className="hero-actions">
               <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={17} /></Link>
               <a className="button button-ghost-light" href={repositoryUrl} target="_blank" rel="noreferrer"><Github size={17} /> View source</a>
@@ -58,7 +58,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <div className="hero-metrics">
             <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the Anthropic 2026 starting record</p></div>
             <div><span>Verification</span><strong>2<small> kernels</small></strong><p>the Lean kernel and an independent nanoda replay</p></div>
-            <div><span>Assumptions</span><strong>0</strong><p>the result does not assume the Riemann hypothesis</p></div>
+            <div><span>Record foundation</span><strong>{current.rhFoundationCommit ? "RH" : "Original"}</strong><p>{current.rhFoundationCommit ? "published RH theorem accepted as a premise" : "checked under the earlier rules without an RH premise"}</p></div>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">
-          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. A larger κ is a stronger unconditional result.</p>
+          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Each record lists the verification rules used for its replay.</p>
           <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
           <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the reference starting point, then accepts only machine-checked improvements to that baseline.</p>
         </div>

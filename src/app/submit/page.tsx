@@ -151,7 +151,7 @@ export default async function SubmitPage() {
           <ul className="template-check-list">
             <li><Check size={15} /> Exactly three required theorem declarations</li>
             <li><Check size={15} /> One UTF-8 Lean file, at most 2 MB</li>
-            <li><Check size={15} /> No <code>sorry</code>, custom axioms, or RH assumption</li>
+            <li><Check size={15} /> The verifier trusts <code>riemannHypothesis</code> from the pinned RH release.</li>
           </ul>
         </div>
         <CodeBlock label="Solution.lean · downloadable starter">

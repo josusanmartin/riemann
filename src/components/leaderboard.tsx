@@ -10,7 +10,7 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
     <section className="leaderboard-card" id="leaderboard" aria-labelledby="leaderboard-title">
       <div className="section-heading leaderboard-heading">
         <div>
-          <span className="eyebrow">Unconditional lower bounds</span>
+          <span className="eyebrow">Verified lower bounds</span>
           <h2 id="leaderboard-title">Record ledger</h2>
         </div>
         <div className="legend"><span className="legend-dot" /> Higher is better</div>
@@ -55,7 +55,7 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
                   <div className="evidence-links">
                     <a className="evidence-link" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">
                       {record.formalVerification ? <BadgeCheck size={17} /> : <BookOpen size={17} />}
-                      {record.formalVerification ? "Kernel" : "Paper"}
+                      {record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
                       <ArrowUpRight size={13} />
                     </a>
                     {record.independentReview && (

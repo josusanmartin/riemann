@@ -19,7 +19,7 @@ describe("flow-test publication gate", () => {
         score: prepared.submission.score, scoreDecimal: rationalToDecimal("2", "3", 30),
         previousRecordId: flowTestRecord.id, upstreamCommit: contract.trustedUpstream.commit,
         theoremNames: [contract.theorems.strictImprovement, contract.theorems.dyadicBound, contract.theorems.cumulativeBound],
-        verifiedAt: new Date().toISOString(), kernels: ["lean", "nanoda"], permittedAxioms: contract.permittedAxioms,
+        verifiedAt: new Date().toISOString(), kernels: ["lean", "nanoda"], permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
         challengeDigest: await computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths, {
           "data/records.json": `${JSON.stringify([flowTestRecord], null, 2)}\n`,
         }),

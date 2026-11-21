@@ -38,7 +38,7 @@ export default function SubmissionsIndexPage() {
                 <span className="submissions-badges">
                   <span className={record.formalVerification ? "submissions-badge verified" : "submissions-badge"}>
                     {record.formalVerification ? <BadgeCheck size={15} /> : <BookOpen size={15} />}
-                    {record.formalVerification ? "Kernel" : "Paper"}
+                    {record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
                   </span>
                   {record.independentReview && (
                     <span className="submissions-badge expert"><UserCheck size={15} /> Expert</span>

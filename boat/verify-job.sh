@@ -21,6 +21,7 @@ upstream="$(node -p "require('./challenge/contract.json').trustedUpstream.commit
 git init -q "$root/zeta"
 git -C "$root/zeta" fetch -q --depth=1 https://github.com/anthropics/formal-math.git "$upstream"
 git -C "$root/zeta" checkout -q --detach FETCH_HEAD
+python3 scripts/prepare-rh-foundation.py "$root/zeta"
 (cd "$root/zeta" && lean --version)
 (
   bash scripts/install-native-build-toolchains.sh

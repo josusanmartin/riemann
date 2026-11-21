@@ -51,6 +51,7 @@ export function createRiemannVerifierTemplate(
       },
       { src: "tsconfig.json", dest: "/opt/riemann/tsconfig.json" },
       { src: "challenge", dest: "/opt/riemann/challenge" },
+      { src: "scripts/prepare-rh-foundation.py", dest: "/opt/riemann/scripts/prepare-rh-foundation.py" },
       {
         src: "e2b/mathlib-cache-bounded-disk.patch",
         dest: "/opt/riemann/e2b/mathlib-cache-bounded-disk.patch",
@@ -121,6 +122,7 @@ export function createRiemannVerifierTemplate(
       },
       { src: "e2b/runtime", dest: "/opt/riemann/e2b/runtime" },
       { src: "e2b/template.ts", dest: "/opt/riemann/e2b/template.ts" },
+      { src: "boat/verify-job.sh", dest: "/opt/riemann/boat/verify-job.sh" },
     ])
     .runCmd(
       "install -d -o root -g root -m 0755 /opt/riemann/.runtime && " +

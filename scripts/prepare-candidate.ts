@@ -87,6 +87,8 @@ await assertRegularLeanTree(proofDirectory);
 
 const solution = await readFile(solutionPath, "utf8");
 
+await writeFile(join(workspace, "comparator", "Main.lean"), await readTemplate("Main.lean"));
+
 const candidateSpec = (await readTemplate("CandidateSpec.lean.tmpl"))
   .replace("{{CURRENT_EXPRESSION}}", currentRecord.exactExpression)
   .replace("{{NUMERATOR}}", submission.score.numerator)
@@ -113,7 +115,7 @@ await writeFile(
 );
 await appendFile(
   join(workspace, "lakefile.toml"),
-  '\n[[lean_lib]]\nname = "Candidate"\n',
+  '\n[[lean_lib]]\nname = "Candidate"\n\n[[lean_lib]]\nname = "Main"\nsrcDir = "comparator"\n',
 );
 
 for (const entry of await readdir(proofDirectory, { withFileTypes: true })) {

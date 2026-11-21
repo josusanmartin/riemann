@@ -154,7 +154,7 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
       contract.trustedPaths,
     ),
     kernels: ["lean", "nanoda"],
-    permittedAxioms: contract.permittedAxioms,
+    permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
   };
   const result: Extract<E2BVerificationResult, { status: "verified" }> = {
     schemaVersion: 1,
