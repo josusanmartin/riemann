@@ -54,6 +54,13 @@ prefix="$(cd "$root/zeta" && lean --print-prefix)"
 mkdir -p "$root/bin"
 cp -a "$prefix" "$root/lean"
 install -m 0755 "$(command -v node)" "$root/bin/node"
+# NSS may try a socket while Bash starts. Return EPERM for denied network
+# syscalls so the shell can fall back. Both network-denial probes still run.
+cat > "$root/bin/systemd-run" <<'WRAPPER'
+#!/bin/sh
+exec /usr/bin/systemd-run --property=SystemCallErrorNumber=EPERM "$@"
+WRAPPER
+chmod 0755 "$root/bin/systemd-run"
 export PATH="$root/bin:$root/lean/bin:/usr/local/bin:/usr/bin:/bin"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
 # File content is data; no submission text appears in shell commands or Boat history.
