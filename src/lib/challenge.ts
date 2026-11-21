@@ -92,6 +92,7 @@ export const recordSchema = z
     proofUrl: z.string().url().nullable(),
     pullRequestUrl: z.string().url().nullable(),
     summary: z.string().min(1),
+    rhFoundationCommit: z.string().regex(/^[0-9a-f]{40}$/).optional(),
   })
   .strict();
 
@@ -100,7 +101,7 @@ export type RecordEntry = z.infer<typeof recordSchema>;
 export const recordsSchema = z.array(recordSchema).min(1);
 
 export const contractSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   name: z.string().min(1),
   track: z.literal("critical-line"),
   direction: z.literal("higher"),
@@ -109,6 +110,17 @@ export const contractSchema = z.object({
     commit: z.string().regex(/^[0-9a-f]{40}$/),
     leanToolchain: z.string().min(1),
     mathlibCommit: z.string().regex(/^[0-9a-f]{40}$/),
+    rh: z.object({
+      repository: z.string().regex(/^[^/]+\/[^/]+$/),
+      commit: z.string().regex(/^[0-9a-f]{40}$/),
+      sourceTree: z.string().regex(/^[0-9a-f]{40}$/),
+      dependencyManifestSha256: z.string().regex(/^[0-9a-f]{64}$/),
+      interfaceAxiom: z.literal("RiemannFoundation.alpogeRH"),
+      releaseTheorem: z.literal("riemannHypothesis"),
+      referenceExportSha256: z.string().regex(/^[0-9a-f]{64}$/),
+      publishedProofExportSha256: z.string().regex(/^[0-9a-f]{64}$/),
+      verificationUrl: z.url(),
+    }),
   }),
   verifier: z.object({
     comparatorCommit: z.string().regex(/^[0-9a-f]{40}$/),
@@ -210,6 +222,7 @@ export const verificationAttestationSchema = z
     verifierTemplateDigest: z.string().regex(/^[0-9a-f]{64}$/),
     kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
     permittedAxioms: z.array(z.string()),
+    rhFoundationCommit: z.string().regex(/^[0-9a-f]{40}$/).optional(),
   })
   .strict();
 

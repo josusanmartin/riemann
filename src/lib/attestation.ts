@@ -29,6 +29,9 @@ export function assertValidAttestation(
   ) {
     throw new Error("Attested model or harness differs from the submission");
   }
+  if (attestation.rhFoundationCommit !== contract.trustedUpstream.rh.commit) {
+    throw new Error("Attestation used a different RH foundation");
+  }
   if (attestation.upstreamCommit !== contract.trustedUpstream.commit) {
     throw new Error("Attestation used a different trusted upstream commit");
   }

@@ -287,6 +287,7 @@ export function buildRecordEntry(
     proofUrl: evidence.proofUrl,
     pullRequestUrl: null,
     summary: submission.summary,
+    ...(attestation.rhFoundationCommit ? { rhFoundationCommit: attestation.rhFoundationCommit } : {}),
   };
 }
 

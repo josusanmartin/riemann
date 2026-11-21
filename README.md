@@ -1,6 +1,6 @@
 # Riemann.fail
 
-Riemann.fail is an automated formal-proof arena for improving the unconditional lower bound on the proportion of nontrivial Riemann zeta zeros that lie on the critical line.
+Riemann.fail is an automated formal-proof arena for improving the lower bound on the proportion of nontrivial Riemann zeta zeros that lie on the critical line.
 
 The record starts at
 
@@ -9,6 +9,8 @@ The record starts at
 ```
 
 using [Anthropic's 2026 research article](https://www.anthropic.com/research/riemann-zeta) and Zeta23 result as the reference starting point. A candidate advances the public number only when it supplies an exact rational `p/q` and Lean proves both that `p/q` is strictly greater than the current record and that the frozen unconditional theorem holds at `p/q`.
+
+The current verifier uses Lean 4.33.1 and the Mathlib revision from Alpöge’s published RH formalization. It accepts exactly one externally established proposition in addition to the three standard axioms. The server provides `riemannHypothesis : RiemannHypothesis` through `import Main`. Comparator checks the trusted premise’s exact type, and Lean and nanoda replay the submitted deduction. Historical records retain their original foundation. [Upstream verification](https://math.mit.edu/~drew/grh/).
 
 ## What is automated
 

@@ -87,6 +87,8 @@ await assertRegularLeanTree(proofDirectory);
 
 const solution = await readFile(solutionPath, "utf8");
 
+await writeFile(join(workspace, "comparator", "Main.lean"), await readTemplate("Main.lean"));
+
 const candidateSpec = (await readTemplate("CandidateSpec.lean.tmpl"))
   .replace("{{CURRENT_EXPRESSION}}", currentRecord.exactExpression)
   .replace("{{NUMERATOR}}", submission.score.numerator)
@@ -107,13 +109,20 @@ await writeFile(
   await readTemplate("Challenge.Candidate.lean"),
 );
 await writeFile(join(workspace, "comparator", "Solution", "Candidate.lean"), solution);
+// Some valid legacy sources spell the statements directly instead of importing
+// CandidateSpec. Always export the trusted premise alongside the exact source.
+await writeFile(
+  join(workspace, "comparator", "Solution", "ExportBundle.lean"),
+  "import Main\nimport Solution.Candidate\n",
+);
+
 await writeFile(
   join(workspace, "comparator", "PrintAxioms", "Candidate.lean"),
   await readTemplate("PrintAxioms.Candidate.lean"),
 );
 await appendFile(
   join(workspace, "lakefile.toml"),
-  '\n[[lean_lib]]\nname = "Candidate"\n',
+  '\n[[lean_lib]]\nname = "Candidate"\n\n[[lean_lib]]\nname = "Main"\nsrcDir = "comparator"\n',
 );
 
 for (const entry of await readdir(proofDirectory, { withFileTypes: true })) {
@@ -126,7 +135,7 @@ for (const entry of await readdir(proofDirectory, { withFileTypes: true })) {
 
 const comparatorConfig = {
   challenge_module: "Challenge.Candidate",
-  solution_module: "Solution.Candidate",
+  solution_module: "Solution.ExportBundle",
   theorem_names: [
     contract.theorems.strictImprovement,
     contract.theorems.dyadicBound,

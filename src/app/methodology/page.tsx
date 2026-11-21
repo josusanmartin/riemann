@@ -86,7 +86,10 @@ export default function MethodologyPage() {
           <ul>
             {contract.permittedAxioms.map((axiom) => <li key={axiom}><CheckCircle2 size={16} /><code>{axiom}</code></li>)}
           </ul>
-          <p>Any additional transitive axiom rejects the submission.</p>
+          <p>Lean {contract.trustedUpstream.leanToolchain.split(":v")[1]} uses a pinned interface to Alpöge’s published proof. The verifier accepts the exact Mathlib statement <code>RiemannHypothesis</code> as a foundation axiom. Comparator checks its type and both kernels replay the candidate. The upstream proof body is checked externally.</p>
+          <p><a className="text-link" href={contract.trustedUpstream.rh.verificationUrl}>Independent verification of the RH release</a></p>
+          <p><a className="text-link" href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>Pinned release</a> · Reference export SHA-256 <code style={{ overflowWrap: "anywhere" }}>{contract.trustedUpstream.rh.referenceExportSha256}</code></p>
+          <p>Records checked under this policy carry the RH foundation label. Earlier records retain their original evidence.</p>
         </article>
       </section>
 

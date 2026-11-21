@@ -40,6 +40,9 @@ export async function GET(): Promise<NextResponse> {
     status: directSubmissionsConfigured ? "ok" : "degraded",
     checkScope: boatSelected() ? "configuration-only; the active FIFO job checks its Boat worker before source transfer" : "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
+    verificationPolicyVersion: contract.schemaVersion,
+    leanToolchain: contract.trustedUpstream.leanToolchain,
+    rhFoundationCommit: contract.trustedUpstream.rh.commit,
     recordId: current.id,
     record: current.scoreDecimal,
     authConfigured: Boolean(

@@ -64,7 +64,7 @@ A submission becomes a formal record when all of the following hold automaticall
 
 1. Its authenticated fields and server-generated manifest validate.
 2. Comparator proves exact equality with the trusted generated statements.
-3. Its transitive axiom set is exactly a subset of `propext`, `Quot.sound`, and `Classical.choice`.
+3. Its transitive axiom set is a subset of the three standard axioms and the fixed external premise `RiemannFoundation.alpogeRH : RiemannHypothesis`. Comparator matches the premise and its dependencies to the trusted declarations.
 4. Lean accepts the exported proof.
 5. The independent nanoda kernel accepts the proof.
 6. `candidate_strict_improvement` proves the rational exceeds the exact current record.

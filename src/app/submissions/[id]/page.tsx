@@ -54,6 +54,7 @@ export default async function SubmissionPage({ params }: PageProps) {
           <dl className="record-metadata">
             <div><dt><CalendarDays size={16} /> Date</dt><dd><time dateTime={recordVerifiedAt(record) ?? record.date}>{formatRecordTime(record, recordVerifiedAt(record))}</time></dd></div>
             <div><dt><UserRound size={16} /> Author</dt><dd>{record.github ? `@${record.github}` : record.author}</dd></div>
+            {record.rhFoundationCommit && <div><dt>Verification foundation</dt><dd><Link href="/methodology">Published RH proof accepted as a premise</Link> · {record.rhFoundationCommit.slice(0,12)}</dd></div>}
             <div><dt><CircleDot size={16} /> Method</dt><dd>{record.method}</dd></div>
             {record.model && <div><dt><Bot size={16} /> Model</dt><dd>{record.model}</dd></div>}
             {record.harness && <div><dt><GitBranch size={16} /> Harness</dt><dd>{record.harness}</dd></div>}

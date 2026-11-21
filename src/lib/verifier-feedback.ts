@@ -200,7 +200,7 @@ export function describeVerifierRejection(
       stage: "axiom-audit",
       title: "The proof uses an unpermitted axiom",
       detail:
-        "The exported proof depends on an axiom outside the challenge allowlist: propext, Quot.sound, and Classical.choice.",
+        "The exported proof depends on an axiom outside the published challenge allowlist.",
       action:
         "Remove sorry, custom axioms, and unsafe shortcuts, then rebuild and inspect the theorem’s axioms before resubmitting.",
       retryable: false,

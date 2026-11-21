@@ -194,6 +194,7 @@ async function prepareTrustedUpstream(): Promise<void> {
     ["checkout", "--quiet", "--detach", contract.trustedUpstream.commit],
     { cwd: zetaWorkspace },
   );
+  await run("python3", [join(repositoryRoot, "scripts", "prepare-rh-foundation.py"), zetaWorkspace]);
 }
 
 async function configurePrebuiltRuntime(): Promise<void> {
@@ -356,6 +357,7 @@ try {
             verifierTemplateDigest,
             kernels: ["lean", "nanoda"],
             permittedAxioms: contract.permittedAxioms,
+            rhFoundationCommit: contract.trustedUpstream.rh.commit,
           },
           null,
           2,

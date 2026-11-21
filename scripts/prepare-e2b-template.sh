@@ -48,6 +48,7 @@ if [[ "$(git -C "$zeta_dir" rev-parse HEAD)" != "$upstream_commit" ]]; then
   printf 'Pinned Zeta23 checkout verification failed.\n' >&2
   exit 1
 fi
+python3 "$repository_root/scripts/prepare-rh-foundation.py" "$zeta_dir"
 if [[ "$(tr -d '\r\n' < "$zeta_dir/lean-toolchain")" != "$lean_toolchain" ]]; then
   printf 'Pinned Lean toolchain verification failed.\n' >&2
   exit 1

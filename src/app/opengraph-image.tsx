@@ -69,7 +69,7 @@ export default function OpenGraphImage(): ImageResponse {
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
             <div style={{ display: "flex", maxWidth: 620, flexDirection: "column" }}>
               <div style={{ marginBottom: 18, color: "#d8f58b", fontSize: 20, letterSpacing: 3 }}>
-                UNCONDITIONAL CRITICAL-LINE BOUND
+                VERIFIED CRITICAL-LINE BOUND
               </div>
               <div style={{ fontSize: 60, lineHeight: 1.04, letterSpacing: -2 }}>
                 The largest proven proportion of zeros on the critical line.

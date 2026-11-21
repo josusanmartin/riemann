@@ -1,13 +1,24 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Riemann.fail critical-line bound",
   "track": "critical-line",
   "direction": "higher",
   "trustedUpstream": {
     "repository": "anthropics/zeta-23-lean",
     "commit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
-    "leanToolchain": "leanprover/lean4:v4.33.0-rc2",
-    "mathlibCommit": "51e6992efd06126df61a496bebf8f49482a4e129"
+    "leanToolchain": "leanprover/lean4:v4.33.1",
+    "mathlibCommit": "0df444a360eaa60ab8c11dca51a86af692955474",
+    "rh": {
+      "repository": "leanprover-community/riemann-hypothesis",
+      "commit": "2f097b744a6460c73f3e4cc550baa83698409876",
+      "sourceTree": "24df20b62d9976ccd20da819bc20b16f808f0fdd",
+      "dependencyManifestSha256": "fee57ee9ed399d0a638ca955e5ad40a37a36eeb9b6dfd9f5964114fa7bbe4774",
+      "interfaceAxiom": "RiemannFoundation.alpogeRH",
+      "releaseTheorem": "riemannHypothesis",
+      "referenceExportSha256": "bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9",
+      "publishedProofExportSha256": "5ea74b912147c5c93cc2b6d70cc727cf908df2f62ac6a20480a3fa02f6be244e",
+      "verificationUrl": "https://math.mit.edu/~drew/grh/"
+    }
   },
   "verifier": {
     "comparatorCommit": "273294467ce06429e6667ece7f5699f8678c9f4e",
@@ -29,7 +40,8 @@
   "permittedAxioms": [
     "propext",
     "Quot.sound",
-    "Classical.choice"
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
   ],
   "trustedPaths": [
     ".github/workflows/build-e2b-template.yml",
@@ -70,6 +82,9 @@
     "src/lib/e2b-webhooks.ts",
     "src/lib/github-promotion.ts",
     "src/lib/submission-finalization.ts",
-    "src/lib/submission-jobs.ts"
+    "src/lib/submission-jobs.ts",
+    "scripts/prepare-rh-foundation.py",
+    "boat/verify-job.sh",
+    "challenge/foundation/lake-manifest.json"
   ]
 }

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Riemann zeta function",
     short_name: "Riemann ζ",
     description:
-      "A machine-checked record of unconditional critical-line bounds for the Riemann zeta function.",
+      "A machine-checked record of verified critical-line bounds for the Riemann zeta function.",
     start_url: "/",
     display: "standalone",
     background_color: "#f5f3eb",
