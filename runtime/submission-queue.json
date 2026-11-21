@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-e15a0f35-5e54-44cd-ae1a-e46105e93985",
+    "jobId": "e15a0f35-5e54-44cd-ae1a-e46105e93985",
+    "proofDigest": "1eb0e6a08bfa9c5707693fb181734ecce42819bddf5ed75be280beca1c0ff84d",
+    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
+    "submissionKey": "a9ccc2ce976ff5645520a8cec632287eb45ac3bd0a2a458d6a728c363577b06b",
+    "enqueuedAt": "2026-11-21T21:47:16.773Z",
+    "boat": {
+      "baseCommitSha": "5670a889abbe72f22ab79367f775b6b327546f86",
+      "previousRecordId": "critical-line-669-800",
+      "issuedAt": 1795297636773
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1106,7 +1118,8 @@
   "daily": {
     "day": "2026-11-21",
     "attempts": {
-      "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e": 3
+      "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e": 3,
+      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 1
     }
   }
 }
