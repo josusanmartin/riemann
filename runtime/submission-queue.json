@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "967e7e0ff315b44d65a9f9433ea79a7c8022cd1b",
       "previousRecordId": "ajp88-distinct-spacing-hw-pi46",
-      "issuedAt": 1795353438483
+      "issuedAt": 1795353438483,
+      "startedAt": 1795353440787
     }
   },
   "pending": [],
