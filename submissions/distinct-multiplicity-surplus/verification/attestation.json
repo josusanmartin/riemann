@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "distinct-multiplicity-surplus",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "model": null,
+  "harness": "OpenAI Codex",
+  "score": {
+    "numerator": "165795165296072396208969926529573146234431410905947",
+    "denominator": "198125326608093061789303846529483795166015625000000"
+  },
+  "scoreDecimal": "0.836819644083301983679357177992",
+  "previousRecordId": "knausgard-rh-gd1-floor",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-22T00:16:17.626Z",
+  "challengeDigest": "a4af7a7f85dc072c71d812158467fe4bbd83199ab8f68b4e0ca27dadd6f27d2d",
+  "verifierTemplateDigest": "257fe226002152d8ed2c4048359f2de323980c8a81b6b61cc371d767befb5b4a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

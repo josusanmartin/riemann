@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "distinct-multiplicity-surplus",
+  "track": "critical-line",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "score": {
+    "numerator": "165795165296072396208969926529573146234431410905947",
+    "denominator": "198125326608093061789303846529483795166015625000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Retains the surplus from zeros of multiplicity greater than two in the Bakken / Bei Yi / Opeth rank–trace certificate. This strengthens the dyadic lower bound on twice the number of distinct zeros minus the total multiplicity. The challenge RH foundation identifies those distinct locations with critical-line zeros. Zeta23 transfers the bound to cumulative windows. Developed with OpenAI Codex. Upstream notices are included in the proof.",
+  "method": "Multiplicity surplus in the ten-point rank–trace certificate",
+  "model": null,
+  "harness": "OpenAI Codex",
+  "license": "Apache-2.0"
+}
