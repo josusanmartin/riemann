@@ -12,7 +12,8 @@
       "previousRecordId": "knausgard-rh-third-moment-quartic",
       "issuedAt": 1795384603810,
       "startedAt": 1795384606147,
-      "workerId": "bx_e6tm7768"
+      "workerId": "bx_e6tm7768",
+      "uploaded": true
     }
   },
   "pending": [],
