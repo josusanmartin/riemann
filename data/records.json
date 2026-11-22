@@ -1513,5 +1513,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Derived from Josu San Martin's critical-line-669-800 (2026-11-21, Apache-2.0), which combines the Zeta23 distinct-zero theorem of Alpöge and Furman with the leaderboard's accepted RH foundation; its numerical enclosure is from typh's five-point-pyramid and Samuel Lavery's attempt-002. The only change is the rational floor: the record's lemma gam_upper already proves x cot x <= 0.8274993018 at x = sqrt(2)/2, which gives 5/4 - 0.8274993018/2 = 0.8362503491 instead of 0.83625. No new mathematics.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "distinct-multiplicity-surplus",
+    "track": "critical-line",
+    "date": "2026-11-22",
+    "author": "Josu San Martin",
+    "github": "josusanmartin",
+    "title": "Certified critical-line bound 0.836819644083301983679357177992",
+    "method": "Multiplicity surplus in the ten-point rank–trace certificate",
+    "model": null,
+    "harness": "OpenAI Codex",
+    "scoreDecimal": "0.836819644083301983679357177992",
+    "scorePercent": "83.6819644083301983679357177992",
+    "exactRational": {
+      "numerator": "165795165296072396208969926529573146234431410905947",
+      "denominator": "198125326608093061789303846529483795166015625000000"
+    },
+    "exactExpression": "(165795165296072396208969926529573146234431410905947 : ℝ) / 198125326608093061789303846529483795166015625000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6ce9ca317d22f2a183115b1f3928d6309895927f/submissions/distinct-multiplicity-surplus/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6ce9ca317d22f2a183115b1f3928d6309895927f/submissions/distinct-multiplicity-surplus/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Retains the surplus from zeros of multiplicity greater than two in the Bakken / Bei Yi / Opeth rank–trace certificate. This strengthens the dyadic lower bound on twice the number of distinct zeros minus the total multiplicity. The challenge RH foundation identifies those distinct locations with critical-line zeros. Zeta23 transfers the bound to cumulative windows. Developed with OpenAI Codex. Upstream notices are included in the proof.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
