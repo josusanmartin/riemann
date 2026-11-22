@@ -288,7 +288,7 @@ try {
         "--property=SystemCallArchitectures=native",
         "--property=SystemCallFilter=~@network-io",
         "--property=PrivateNetwork=yes",
-        "--property=MemoryMax=12G",
+        process.env.RIEMANN_BOAT_MEMORY_LIMIT === "28G" ? "--property=MemoryMax=28G" : "--property=MemoryMax=12G",
         "--property=TasksMax=512",
         "--property=RuntimeMaxSec=9000",
         "--property=LimitFSIZE=8589934592",

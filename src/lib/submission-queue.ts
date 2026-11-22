@@ -51,6 +51,7 @@ const recoveredJobIdsSchema = z
   .optional();
 
 const boatJobSchema = z.object({
+  memoryReplayOf: z.string().uuid().optional(),
   baseCommitSha: shaSchema,
   previousRecordId: z.string().min(1).max(160),
   issuedAt: z.number().int().positive(),

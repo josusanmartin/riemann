@@ -8,6 +8,8 @@ inbox="$HOME/riemann-incoming"
 receipt="$HOME/riemann-receipt.json"
 digest="${1:?proof digest}"
 kind="${2:?job kind}"
+memory_limit="${3:-12G}"
+[[ "$memory_limit" == 12G || "$memory_limit" == 28G ]]
 [[ "$digest" =~ ^[0-9a-f]{64}$ && "$kind" =~ ^(competitive|flow)$ ]]
 sudo install -d -o "$(id -un)" -g "$(id -gn)" "$root"
 cp -R "$site" "$root/site"
@@ -91,7 +93,7 @@ uid="$(id -u proofcheck)"
 sudo systemctl start "user@$uid.service"
 set +e
 sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-  PATH="$PATH" LEAN_NUM_THREADS=2 RIEMANN_PREBUILT_ZETA23="$root/zeta" RIEMANN_RECORDS_PATH="$root/input/trusted-records.json" \
+  PATH="$PATH" RIEMANN_BOAT_MEMORY_LIMIT="$memory_limit" LEAN_NUM_THREADS=2 RIEMANN_PREBUILT_ZETA23="$root/zeta" RIEMANN_RECORDS_PATH="$root/input/trusted-records.json" \
   COMPARATOR_BIN="$root/tools/comparator/.lake/build/bin/comparator" COMPARATOR_LANDRUN="$root/tools/landrun/landrun" \
   COMPARATOR_LEAN4EXPORT="$root/tools/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export" COMPARATOR_NANODA="$root/tools/nanoda/target/release/nanoda_bin" \
   timeout -k 15s 5800s ./node_modules/.bin/tsx scripts/verify-submission.ts "$root/input" --mode=full --artifact=/home/proofcheck/attestation.json \

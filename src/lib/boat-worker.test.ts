@@ -25,6 +25,7 @@ it("uses one idempotency key per reserved job and isolates account data", async 
   expect(url).toBe("https://boat.dev/api/v1/sandboxes");
   expect(init.headers["Idempotency-Key"]).toBe(job);
   expect(JSON.parse(init.body)).toMatchObject({
+    type: "large",
     noEnv: true,
     monitoring: false,
     snapshots: false,
@@ -91,4 +92,12 @@ it("does not transfer sources if the workspace received creator logins", async (
     stageBoatFiles(box, "manifest", "solution", digest),
   ).rejects.toThrow("isolation");
   expect(mockedFetch).toHaveBeenCalledTimes(1);
+});
+
+it("allocates the larger worker and limit for an operator replay", async () => {
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, sandbox: { id: box } }));
+  await createBoatWorker(job, sha, digest, "competitive", true);
+  const request = JSON.parse(mockedFetch.mock.calls[0][1].body);
+  expect(request.type).toBe("xlarge");
+  expect(request.setupScript).toContain(`${digest} competitive 28G`);
 });

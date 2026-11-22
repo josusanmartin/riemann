@@ -35,7 +35,7 @@ export function reserveBoatJob(
 }
 
 async function archived(job: QueuedVerificationJob) {
-  const entry = await readSubmissionArchive(job.jobId);
+  const entry = await readSubmissionArchive(job.boat?.memoryReplayOf ?? job.jobId);
   if (
     !entry ||
     entry.payload.proofDigest !== job.proofDigest ||
@@ -77,6 +77,7 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
       b.baseCommitSha,
       job.proofDigest,
       "competitive",
+      Boolean(b.memoryReplayOf),
     ));
   if (!b.workerId) await updateBoatJob(job.jobId, { workerId: id });
   const entry = await archived(job);
@@ -171,7 +172,10 @@ export async function reconcileBoat(
       proofDigest: job.proofDigest,
       manifest: entry.payload.manifest,
       solution: entry.payload.solution,
-      result,
+      result: active.boat?.memoryReplayOf ? {
+        ...result,
+        log: `Original archive admission: ${entry.payload.submittedAt}\nOfficial memory retry: 28 GiB, same archived manifest and proof.\n${result.log}`,
+      } : result,
     });
     await advanceVerificationQueue(
       job.jobId,

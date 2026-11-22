@@ -59,6 +59,7 @@ export async function createBoatWorker(
   sha: string,
   proofDigest: string,
   kind: "flow" | "competitive",
+  highMemory = false,
 ) {
   z.string().uuid().parse(jobId);
   commit.parse(sha);
@@ -68,12 +69,12 @@ cd "$HOME"
 git init -q riemann-site
 git -C riemann-site fetch --quiet --depth=1 https://github.com/josusanmartin/riemann.git ${sha}
 git -C riemann-site checkout --quiet --detach FETCH_HEAD
-exec bash riemann-site/boat/verify-job.sh ${proofDigest} ${kind}`;
+exec bash riemann-site/boat/verify-job.sh ${proofDigest} ${kind} ${highMemory ? "28G" : "12G"}`;
   const data = await api(
     "/sandboxes",
     "POST",
     {
-      type: "large",
+      type: highMemory ? "xlarge" : "large",
       name: `Riemann ${kind} ${jobId}`,
       org: "personal",
       environment: "riemann-production",
