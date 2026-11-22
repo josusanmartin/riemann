@@ -1,37 +1,30 @@
 {
   "schemaVersion": 1,
   "active": {
-    "sandboxId": "boat-373d81c5-7cde-485a-b1d0-a65b536e9bc2",
-    "jobId": "373d81c5-7cde-485a-b1d0-a65b536e9bc2",
-    "proofDigest": "c45b985fa6cc45cecccb34f71d0a9a19b7d51be097d7aaa25a576a2057047913",
-    "ownerKey": "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd",
-    "submissionKey": "05d0e92b2bec2ae8fcc692188518367c535b41c5cff1df0edbcee5884bd724f0",
-    "enqueuedAt": "2026-11-22T21:56:43.810Z",
+    "sandboxId": "boat-f7065d63-3533-47b1-b021-8b38a860ca43",
+    "jobId": "f7065d63-3533-47b1-b021-8b38a860ca43",
+    "proofDigest": "18cb00a342ee66a73927adc7ca34d4ac9cad5bcb966551cc1e0bcfe82d797973",
+    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
+    "submissionKey": "e33efa0bcf3c32b7b8604996c6caa3451e4d28239a0d20b682e60d838a782b8f",
+    "enqueuedAt": "2026-11-22T22:02:12.558Z",
     "boat": {
       "baseCommitSha": "267b3494c77f9864a536b80cce2acc13b026163f",
       "previousRecordId": "knausgard-rh-third-moment-quartic",
-      "issuedAt": 1795384603810,
-      "startedAt": 1795384606147,
-      "workerId": "bx_e6tm7768",
-      "uploaded": true
+      "issuedAt": 1795384932558
     }
   },
-  "pending": [
-    {
-      "sandboxId": "boat-f7065d63-3533-47b1-b021-8b38a860ca43",
-      "jobId": "f7065d63-3533-47b1-b021-8b38a860ca43",
-      "proofDigest": "18cb00a342ee66a73927adc7ca34d4ac9cad5bcb966551cc1e0bcfe82d797973",
-      "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-      "submissionKey": "e33efa0bcf3c32b7b8604996c6caa3451e4d28239a0d20b682e60d838a782b8f",
-      "enqueuedAt": "2026-11-22T22:02:12.558Z",
-      "boat": {
-        "baseCommitSha": "267b3494c77f9864a536b80cce2acc13b026163f",
-        "previousRecordId": "knausgard-rh-third-moment-quartic",
-        "issuedAt": 1795384932558
-      }
-    }
-  ],
+  "pending": [],
   "completed": [
+    {
+      "jobId": "373d81c5-7cde-485a-b1d0-a65b536e9bc2",
+      "proofDigest": "c45b985fa6cc45cecccb34f71d0a9a19b7d51be097d7aaa25a576a2057047913",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/d6be7c1bf5f6351fe82aaf48d14f88dc94a7a6b2/submissions/devine-retained-pair-quartic",
+      "completedAt": "2026-11-22T22:09:40.287Z",
+      "logArchived": true
+    },
     {
       "jobId": "593edee5-1db8-42e9-9d10-79cde008bee0",
       "proofDigest": "3259112daf9b5cdae716c4245559d18c3a86bc05b845dc6de128d8b49a03b6ef",
