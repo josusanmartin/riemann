@@ -1,24 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-3d3d5423-f06d-4867-94fa-a21888b7cd68",
-    "jobId": "3d3d5423-f06d-4867-94fa-a21888b7cd68",
-    "proofDigest": "ca2b5fea864feabc0768f7c76025e5a48c554bc2fb9015579062ea0473adeea8",
-    "ownerKey": "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd",
-    "submissionKey": "a87b165cff4e01b53544e388e112bf7ddb575381fce9485b513656111608d2e8",
-    "enqueuedAt": "2026-11-22T04:50:19.912Z",
-    "boat": {
-      "memoryReplayOf": "c8d2a9da-21cb-4963-8cc3-8f0fca1c8ad6",
-      "baseCommitSha": "d10ebad05610816f324a12b321d0b7967fd72fd6",
-      "previousRecordId": "all-distinct-spacing",
-      "issuedAt": 1795325721237,
-      "startedAt": 1795325751080,
-      "workerId": "bx_v7urt6bg",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "3d3d5423-f06d-4867-94fa-a21888b7cd68",
+      "proofDigest": "ca2b5fea864feabc0768f7c76025e5a48c554bc2fb9015579062ea0473adeea8",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+      "feedback": {
+        "code": "verification-timeout",
+        "stage": "runtime",
+        "title": "Verification timed out",
+        "detail": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+        "action": "Reduce elaboration cost, replace expensive tactics with smaller explicit lemmas, and test the source locally before submitting again.",
+        "retryable": false
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-22T07:23:48.341Z",
+      "logArchived": true
+    },
     {
       "jobId": "c8d2a9da-21cb-4963-8cc3-8f0fca1c8ad6",
       "proofDigest": "ca2b5fea864feabc0768f7c76025e5a48c554bc2fb9015579062ea0473adeea8",
