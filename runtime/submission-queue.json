@@ -1,20 +1,25 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
-    "jobId": "6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
-    "proofDigest": "a89d02035d102e14afc6b0c98cd87373b7d9bd032e94ac6770a5667bfc2c77b5",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "fb50c6cac79f2bf8f0cfd611f785b73ec8afa98a1fb74dfea77a098f87d7bf8a",
-    "enqueuedAt": "2026-11-22T00:04:10.102Z",
-    "boat": {
-      "baseCommitSha": "fce5b1108e4605f8b60e4b9eb1500e06e9c3ada5",
-      "previousRecordId": "knausgard-rh-gd1-floor",
-      "issuedAt": 1795305850102
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
+      "proofDigest": "a89d02035d102e14afc6b0c98cd87373b7d9bd032e94ac6770a5667bfc2c77b5",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Another proof became the record while this one was waiting in the queue. It was not run, because a result checked against the old record could not be published.",
+      "feedback": {
+        "code": "record-superseded",
+        "stage": "submission",
+        "title": "A new record was accepted first",
+        "detail": "Another proof became the record while this one was waiting in the queue. It was not run, because a result checked against the old record could not be published.",
+        "action": "Check the new record. If your score still beats it, submit the same source again.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-22T00:16:26.544Z"
+    },
     {
       "jobId": "f291fb25-ebe3-4cbe-83bb-0d66dcbbec15",
       "proofDigest": "f183b1c80a17593d4c8804ae3a052bf9cbf553bb5169253636538dd53be2254c",
