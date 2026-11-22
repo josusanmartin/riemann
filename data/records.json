@@ -1539,5 +1539,31 @@
     "pullRequestUrl": null,
     "summary": "Retains the surplus from zeros of multiplicity greater than two in the Bakken / Bei Yi / Opeth rank–trace certificate. This strengthens the dyadic lower bound on twice the number of distinct zeros minus the total multiplicity. The challenge RH foundation identifies those distinct locations with critical-line zeros. Zeta23 transfers the bound to cumulative windows. Developed with OpenAI Codex. Upstream notices are included in the proof.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "all-distinct-spacing",
+    "track": "critical-line",
+    "date": "2026-11-22",
+    "author": "Josu San Martin",
+    "github": "josusanmartin",
+    "title": "Certified critical-line bound 0.837588019895826137652299827441",
+    "method": "Ten-point spacing applied to all distinct critical-line locations",
+    "model": null,
+    "harness": "OpenAI Codex",
+    "scoreDecimal": "0.837588019895826137652299827441",
+    "scorePercent": "83.7588019895826137652299827441",
+    "exactRational": {
+      "numerator": "55577500664008621771439334421610416217141199468649",
+      "denominator": "66354221101348843631550641088247299194335937500000"
+    },
+    "exactExpression": "(55577500664008621771439334421610416217141199468649 : ℝ) / 66354221101348843631550641088247299194335937500000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/005a55fe448f089e93217fd83beff5cec7fecc59/submissions/all-distinct-spacing/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/005a55fe448f089e93217fd83beff5cec7fecc59/submissions/all-distinct-spacing/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Under the challenge RH foundation the multiplicity-weighted matrix is a positive Gram matrix. Its diagonal controls the number of distinct zeros and its off-diagonal squares dominate the pair energy of all distinct interior locations. Applying the Bakken / Bei Yi / Opeth ten-point spacing certificate to these locations strengthens the bound in dyadic windows. Zeta23 gives the cumulative bound. Developed with OpenAI Codex. Upstream notices remain in the source.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
