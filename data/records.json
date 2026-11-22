@@ -1591,5 +1591,31 @@
     "pullRequestUrl": null,
     "summary": "Derived from Josu San Martin's all-distinct-spacing (2026-11-22, Apache-2.0). Its certificate, the constants c and B, the counting argument and the three final statements are unchanged. The only change is the proved lower bound for the window constant H_W = 3/2 − cos t/(√2 sin t) − PAM/(2 sin² t), t = √2/2, in the score (1 + H − B)/(2 − c). The record bounds π to 40 decimals inside PAM, which costs its floor 17,165 units of 10^-50. Here π is bounded to 46 decimals with Mathlib's pi_upper_bound (76 witnesses), the cosine literal is lowered to the ceiling of the file's own polynomial bound, and a sine lemma is re-derived from that cosine by sin² + cos² = 1. The floor rises by 17,239 units of 10^-50, to within 4 units of H_W, and the score by 8.66e-47. No new mathematics. A change notice is at the top of the file; all upstream notices are retained.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-third-moment-quartic",
+    "track": "critical-line",
+    "date": "2026-11-22",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.842778850143325474213352473438",
+    "method": "Third moment of the zero multiplicities under RH: Gram matrix of the zeros, second and third traces from the explicit formula (general windows; best quartic), tangent-line inequality for PSD matrices.",
+    "model": "Claude Fable 5.2",
+    "harness": "Claude",
+    "scoreDecimal": "0.842778850143325474213352473438",
+    "scorePercent": "84.2778850143325474213352473438",
+    "exactRational": {
+      "numerator": "504678117694414992253315078804551328482467",
+      "denominator": "598826272881181027171250673799386945725202"
+    },
+    "exactExpression": "(504678117694414992253315078804551328482467 : ℝ) / 598826272881181027171250673799386945725202",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/b4eac24d64f8cb9573cb8cfc83a6b32dce0c5b50/submissions/knausgard-rh-third-moment-quartic/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/b4eac24d64f8cb9573cb8cfc83a6b32dce0c5b50/submissions/knausgard-rh-third-moment-quartic/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). Third-moment (cubic trace) bound; no pair certificate and no tables. Under RH, for every bounded window g ≥ 0 on [−1/2,1/2] with integral 1 and every t ≥ 0, the sum of m(m−t)₊² over the distinct zeros in (T,2T] is at most (C3(g) − 2tC2(g) + t² + o(1))·N. For the quartic window 1 − 1.4768021u² + 1.1788294u⁴ (normalised) at its exact optimal t this gives N_d ≥ (0.84277885014 − o(1))·N. Formalised from Mathlib's RiemannHypothesis with Zeta23 (explicit formula, Riemann–von Mangoldt, Gamma estimates); traces by exact matching of prime packets. The cubic certificate is due to Alpöge and Furman (arXiv:2608.13637, §7.3); the shifted form appears in Josu San Martin's note of 21 November 2026; the packet method follows rStation paper 155.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
