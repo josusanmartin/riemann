@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-8c4c6551-d164-420a-b05b-e8eb1cf89ece",
-    "jobId": "8c4c6551-d164-420a-b05b-e8eb1cf89ece",
-    "proofDigest": "99fb5b3ad95240cd6c7694c23057cbed8dbf0f4875468d197263351422e6877f",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "7a0bc7551739cc4eeae9573451fb6907f5a32a0d23d8d5c28d12d8bedd0b7b5b",
-    "enqueuedAt": "2026-11-22T11:36:20.448Z",
-    "boat": {
-      "baseCommitSha": "2c0a81535f1c025a1a8d21521b4af246357a12ce",
-      "previousRecordId": "all-distinct-spacing",
-      "issuedAt": 1795347380448,
-      "startedAt": 1795347383589,
-      "workerId": "bx_9nq4rzvj",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8c4c6551-d164-420a-b05b-e8eb1cf89ece",
+      "proofDigest": "99fb5b3ad95240cd6c7694c23057cbed8dbf0f4875468d197263351422e6877f",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/1cd9ef738bed46f8064c6f4f88fda7d94309dcab/submissions/ajp88-distinct-spacing-hw-pi46",
+      "completedAt": "2026-11-22T12:17:23.915Z",
+      "logArchived": true
+    },
     {
       "jobId": "3d3d5423-f06d-4867-94fa-a21888b7cd68",
       "proofDigest": "ca2b5fea864feabc0768f7c76025e5a48c554bc2fb9015579062ea0473adeea8",
