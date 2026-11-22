@@ -16,7 +16,21 @@
       "uploaded": true
     }
   },
-  "pending": [],
+  "pending": [
+    {
+      "sandboxId": "boat-f7065d63-3533-47b1-b021-8b38a860ca43",
+      "jobId": "f7065d63-3533-47b1-b021-8b38a860ca43",
+      "proofDigest": "18cb00a342ee66a73927adc7ca34d4ac9cad5bcb966551cc1e0bcfe82d797973",
+      "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
+      "submissionKey": "e33efa0bcf3c32b7b8604996c6caa3451e4d28239a0d20b682e60d838a782b8f",
+      "enqueuedAt": "2026-11-22T22:02:12.558Z",
+      "boat": {
+        "baseCommitSha": "267b3494c77f9864a536b80cce2acc13b026163f",
+        "previousRecordId": "knausgard-rh-third-moment-quartic",
+        "issuedAt": 1795384932558
+      }
+    }
+  ],
   "completed": [
     {
       "jobId": "593edee5-1db8-42e9-9d10-79cde008bee0",
@@ -1224,7 +1238,7 @@
   "daily": {
     "day": "2026-11-22",
     "attempts": {
-      "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 2,
+      "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 3,
       "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e": 1,
       "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 2,
       "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 1
