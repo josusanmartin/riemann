@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "devine-retained-pair-quartic",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "model": "Anthropic Opus 5.5, Fable 5.2, and OpenAI Astra 6.2",
+  "harness": null,
+  "score": {
+    "numerator": "421389757897",
+    "denominator": "500000000000"
+  },
+  "scoreDecimal": "0.842779515794000000000000000000",
+  "previousRecordId": "knausgard-rh-third-moment-quartic",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-22T22:09:39.717Z",
+  "challengeDigest": "d4a3b761fc979e74d14f1f6933633214c49d1c4c551caab02fa25ec64e1e3f83",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

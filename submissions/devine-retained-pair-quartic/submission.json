@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-retained-pair-quartic",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "421389757897",
+    "denominator": "500000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "We extend Kristian Muri Knausgård’s quartic-window bound under RH by retaining an off-diagonal contribution from disjoint pairs of zeros. A Fourier estimate on triples of nearby ordinates guarantees enough such pairs for a strict gain. Under the board’s RH premise this gives an asymptotic lower bound of 84.2779515794% for distinct critical-line zeros in both dyadic and cumulative windows. The denominator counts all zeros with multiplicity. We use Knausgård’s trace estimates and quartic window, the cubic certificate of Alpöge and Furman, Josu San Martin’s shift, and the prime-packet method of rStation paper 155.",
+  "method": "Retained pair energy in Knausgård’s quartic shifted-cubic Gram bound",
+  "model": "Anthropic Opus 5.5, Fable 5.2, and OpenAI Astra 6.2",
+  "harness": null,
+  "license": "Apache-2.0"
+}
