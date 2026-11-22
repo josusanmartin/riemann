@@ -8,10 +8,11 @@
     "submissionKey": "a87b165cff4e01b53544e388e112bf7ddb575381fce9485b513656111608d2e8",
     "enqueuedAt": "2026-11-22T04:50:19.912Z",
     "boat": {
-      "issuedAt": 1795325721237,
-      "previousRecordId": "all-distinct-spacing",
+      "memoryReplayOf": "c8d2a9da-21cb-4963-8cc3-8f0fca1c8ad6",
       "baseCommitSha": "d10ebad05610816f324a12b321d0b7967fd72fd6",
-      "memoryReplayOf": "c8d2a9da-21cb-4963-8cc3-8f0fca1c8ad6"
+      "previousRecordId": "all-distinct-spacing",
+      "issuedAt": 1795325721237,
+      "startedAt": 1795325751080
     }
   },
   "pending": [],
