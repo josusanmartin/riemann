@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "2c0a81535f1c025a1a8d21521b4af246357a12ce",
       "previousRecordId": "all-distinct-spacing",
-      "issuedAt": 1795347380448
+      "issuedAt": 1795347380448,
+      "startedAt": 1795347383589
     }
   },
   "pending": [],
