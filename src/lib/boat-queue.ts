@@ -2,7 +2,7 @@ import { boatCompletionToken } from "./boat-completion-token";
 import { randomUUID } from "node:crypto";
 import { computeDirectProofDigest } from "./direct-submission";
 import { readSubmissionArchive } from "./submission-archive-store";
-import { updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
+import { retryBoatAfterOom, updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
 import {
   activeBoatFlow,
   createBoatWorker,
@@ -15,7 +15,7 @@ import {
   promoteVerifiedSubmission,
   UnpublishableResultError,
 } from "./github-promotion";
-import { describeVerifierRejection } from "./verifier-feedback";
+import { describeVerifierRejection, kernelOomMessage } from "./verifier-feedback";
 import {
   advanceVerificationQueue,
   VerifierOccupiedByFlowTestError,
@@ -70,6 +70,9 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
   const b = reserved.boat!;
   if (Date.now() - b.startedAt! >= workerLifetime)
     throw new Error("Boat launch expired");
+  if (b.retiredWorkerId && !b.workerId) {
+    await stopBoatWorker(b.retiredWorkerId);
+  }
   const id =
     b.workerId ??
     (await createBoatWorker(
@@ -139,7 +142,16 @@ export async function reconcileBoat(
     receiptReady,
   );
   if (!result)
-    return { status: "running" as const, proofDigest: job.proofDigest };
+    return {
+      status: "running" as const,
+      proofDigest: job.proofDigest,
+      ...(active.boat?.memoryReplayOf
+        ? {
+            message:
+              "Verification is running on the 32 GB memory-retry worker.",
+          }
+        : {}),
+    };
   const entry = await archived(active);
   const submission = entry.summary.submission;
   if (
@@ -147,6 +159,25 @@ export async function reconcileBoat(
     result.submissionId !== submission.id
   )
     throw new Error("Boat receipt identity mismatch");
+  if (
+    result.status === "rejected" &&
+    result.message === kernelOomMessage &&
+    !active.boat?.memoryReplayOf
+  ) {
+    const retry = await retryBoatAfterOom(
+      active,
+      randomUUID(),
+      result.log,
+      result.completedAt,
+    );
+    await ensureBoatWorker(retry);
+    return {
+      status: "running" as const,
+      proofDigest: job.proofDigest,
+      message:
+        "The standard worker reached its memory limit. Retrying once on a 32 GB worker.",
+    };
+  }
   if (result.status === "rejected") {
     const feedback = describeVerifierRejection(result.log, result.message);
     await advanceVerificationQueue(

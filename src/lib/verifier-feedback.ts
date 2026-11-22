@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// Set by the trusted Boat supervisor from a kernel cgroup counter.
+export const kernelOomMessage = "The kernel killed the isolated verifier after it reached its memory limit.";
+
 export const verifierFeedbackSchema = z
   .object({
     code: z.enum([
@@ -12,6 +15,7 @@ export const verifierFeedbackSchema = z
       "nanoda-rejected",
       "lean-kernel-rejected",
       "verification-timeout",
+      "verification-out-of-memory",
       "sandbox-expired",
       "record-superseded",
       "verifier-infrastructure",
@@ -99,6 +103,17 @@ export function describeVerifierRejection(
 ): VerifierFeedback {
   const diagnostic = `${fallbackMessage}\n${log}`.toLowerCase();
   const location = candidateLocation(log);
+
+  if (fallbackMessage === kernelOomMessage) {
+    return feedback({
+      code: "verification-out-of-memory",
+      stage: "runtime",
+      title: "Verifier memory limit reached",
+      detail: "The worker exhausted its memory before verification finished.",
+      action: "Review peak memory during local compilation and kernel replay before submitting again.",
+      retryable: false,
+    });
+  }
 
   if (
     diagnostic.includes("expired before producing a result") ||

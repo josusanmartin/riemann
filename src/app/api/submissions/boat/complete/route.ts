@@ -16,12 +16,11 @@ export async function POST(request: Request) {
   const current = await inspectVerificationJob(jobId);
   if (current.status === "completed" && current.receipt.proofDigest === digest)
     return new Response(null, { status: 204 });
-  if (
-    current.status !== "active" ||
-    !current.job.boat?.uploaded ||
-    current.job.proofDigest !== digest
-  )
+  if (current.status !== "active" || current.job.proofDigest !== digest)
     return new Response(null, { status: 409 });
+  // Duplicate notification from the first VM after its replacement was bound.
+  if (current.job.jobId !== jobId) return new Response(null, { status: 204 });
+  if (!current.job.boat?.uploaded) return new Response(null, { status: 409 });
   const result = await reconcileBoat(current.job, true);
   return new Response(null, {
     status: result.status === "running" ? 503 : 204,

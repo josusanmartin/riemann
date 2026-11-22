@@ -52,6 +52,7 @@ const recoveredJobIdsSchema = z
 
 const boatJobSchema = z.object({
   memoryReplayOf: z.string().uuid().optional(),
+  retiredWorkerId: z.string().regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/).optional(),
   baseCommitSha: shaSchema,
   previousRecordId: z.string().min(1).max(160),
   issuedAt: z.number().int().positive(),
@@ -86,6 +87,7 @@ export const queueCompletionReceiptSchema = z
     recoveredJobIds: recoveredJobIdsSchema,
     // An encrypted verifier log for this job exists at verifierLogPath(jobId).
     logArchived: z.literal(true).optional(),
+    firstAttemptLogId: z.string().uuid().optional(),
   })
   .strict()
   .superRefine((receipt, context) => {
@@ -437,6 +439,9 @@ export function completeQueueState(
       ? { recoveredJobIds: parsed.active.recoveredJobIds }
       : {}),
     ...(logArchived ? { logArchived: true } : {}),
+    ...(parsed.active.boat?.retiredWorkerId
+      ? { firstAttemptLogId: parsed.active.boat.memoryReplayOf }
+      : {}),
   });
   const pending = [...parsed.pending];
   const next = pending.shift() ?? null;
@@ -449,8 +454,10 @@ export function completeQueueState(
   // Logs are retained only while their receipt is: prune those that rotate out.
   const deletePaths = [receipt, ...parsed.completed]
     .slice(MAX_COMPLETED_RECEIPTS)
-    .filter((dropped) => dropped.logArchived)
-    .map((dropped) => verifierLogPath(dropped.jobId));
+    .flatMap((dropped) => [
+      ...(dropped.logArchived ? [verifierLogPath(dropped.jobId)] : []),
+      ...(dropped.firstAttemptLogId ? [verifierLogPath(dropped.firstAttemptLogId)] : []),
+    ]);
   return {
     state: updated,
     changed: true,
@@ -969,6 +976,46 @@ export function replaceActiveVerificationJob(
     "queue: recover active formal verification",
     (state) => replaceActiveQueueState(state, expected, replacement),
   );
+}
+
+/** Keep the FIFO position and daily charge while giving the second VM a fresh
+ * idempotency key. Its notification, archived log and receipt have distinct IDs. */
+export function retryBoatMemoryState(
+  state: SubmissionQueueState, expected: QueuedVerificationJob, nextId: string, issuedAt: number,
+): QueueMutation<QueuedVerificationJob> {
+  const active = state.active;
+  if (active?.boat?.memoryReplayOf === expected.jobId &&
+      active.proofDigest === expected.proofDigest && active.ownerKey === expected.ownerKey) {
+    return { state, result: active, changed: false };
+  }
+  const boat = active?.boat;
+  if (!active || active.jobId !== expected.jobId || !boat?.uploaded ||
+      !boat.workerId || boat.memoryReplayOf || boat.workerId !== expected.boat?.workerId) {
+    throw new Error("The standard worker is no longer eligible for a memory retry");
+  }
+  const replacement = replaceActiveQueueState(state, expected, {
+    sandboxId: `boat-${nextId}`, jobId: nextId, proofDigest: expected.proofDigest,
+  });
+  const retry = queuedVerificationJobSchema.parse({
+    ...replacement.result,
+    boat: { baseCommitSha: boat.baseCommitSha, previousRecordId: boat.previousRecordId,
+      issuedAt, memoryReplayOf: active.jobId, retiredWorkerId: boat.workerId },
+  });
+  return { state: { ...replacement.state, active: retry }, result: retry, changed: true };
+}
+
+export function retryBoatAfterOom(
+  expected: QueuedVerificationJob, nextId: string, log: string, completedAt: string,
+) {
+  const issuedAt = Date.now();
+  return mutateQueue({}, "queue: retry confirmed memory exhaustion on a larger worker", state => {
+    const mutation = retryBoatMemoryState(state, expected, nextId, issuedAt);
+    if (!mutation.changed) return mutation;
+    const envelope = sealVerifierLog({
+      jobId: expected.jobId, proofDigest: expected.proofDigest, completedAt, log,
+    }, requiredArchiveKey({}));
+    return { ...mutation, files: [{ path: verifierLogPath(expected.jobId), content: JSON.stringify(envelope) + "\n" }] };
+  });
 }
 
 export async function inspectVerificationJob(

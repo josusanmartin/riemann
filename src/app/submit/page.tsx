@@ -82,7 +82,7 @@ export default async function SubmitPage() {
               Lean kernel, and nanoda. Jobs run one at a time in submission order,
               with a daily allowance of three uploads per GitHub account and five for the repository owner.
               The budget resets at 00:00 UTC, and a rejected job still counts once
-              queued. No pull request is required.
+              queued. A confirmed memory failure gets one larger-worker retry using the same slot.
             </p>
             <p>Multi-file project or large dependencies? <a className="text-link" href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package for research review.</a></p>
             {!github && isGitHubAuthConfigured && (

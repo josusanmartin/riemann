@@ -1,3 +1,4 @@
+import { kernelOomMessage } from "../src/lib/verifier-feedback";
 import { chmod, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import contractJson from "../challenge/contract.json";
@@ -104,9 +105,11 @@ if (exitCode === 0) {
     completedAt,
     log,
     message:
-      exitCode === 124 || exitCode === 137
-        ? "The verifier exceeded its isolated runtime limit."
-        : `The formal verifier exited with status ${exitCode}.`,
+      process.env.RIEMANN_KERNEL_OOM === "1"
+        ? kernelOomMessage
+        : exitCode === 124 || exitCode === 137
+          ? "The verifier exceeded its isolated runtime limit."
+          : `The formal verifier exited with status ${exitCode}.`,
   };
 }
 

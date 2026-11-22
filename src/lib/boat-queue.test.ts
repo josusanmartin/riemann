@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { kernelOomMessage } from "./verifier-feedback";
 import { computeDirectProofDigest } from "./direct-submission";
 import type { QueuedVerificationJob } from "./submission-queue";
 import { ensureBoatWorker, reconcileBoat, reserveBoatJob } from "./boat-queue";
 
 const m = vi.hoisted(() => ({
   update: vi.fn(),
+  retry: vi.fn(),
   archive: vi.fn(),
   create: vi.fn(),
   upload: vi.fn(),
@@ -14,7 +16,7 @@ const m = vi.hoisted(() => ({
   promote: vi.fn(),
   flow: vi.fn(),
 }));
-vi.mock("./submission-queue", () => ({ updateBoatJob: m.update }));
+vi.mock("./submission-queue", () => ({ updateBoatJob: m.update, retryBoatAfterOom: m.retry }));
 vi.mock("./submission-archive-store", () => ({
   readSubmissionArchive: m.archive,
 }));
@@ -100,7 +102,7 @@ describe("competitive Boat queue", () => {
       status: "rejected",
       submissionId: "candidate",
       proofDigest,
-      log: "error",
+      log: "Finished with result: oom-kill",
       message: "Proof failed",
       completedAt: new Date().toISOString(),
     });
@@ -108,10 +110,56 @@ describe("competitive Boat queue", () => {
     expect(m.advance).toHaveBeenCalledWith(
       job.jobId,
       expect.objectContaining({ outcome: "rejected" }),
-      "error",
+      "Finished with result: oom-kill",
     );
+    expect(m.retry).not.toHaveBeenCalled();
     expect(m.stop).toHaveBeenCalledWith(id);
     expect(m.promote).not.toHaveBeenCalled();
+  });
+  it("replays only a trusted OOM receipt, once, using the original archive", async () => {
+    await ensureBoatWorker(job);
+    const original = job;
+    m.result.mockResolvedValue({
+      status: "rejected",
+      submissionId: "candidate",
+      proofDigest,
+      log: "diagnostic",
+      message: kernelOomMessage,
+      completedAt: new Date().toISOString(),
+    });
+    m.retry.mockImplementation(async (old, nextId) => {
+      const boat = old.boat;
+      job = {
+        ...old,
+        jobId: nextId,
+        sandboxId: `boat-${nextId}`,
+        boat: {
+          baseCommitSha: boat.baseCommitSha,
+          previousRecordId: boat.previousRecordId,
+          issuedAt: boat.issuedAt,
+          memoryReplayOf: old.jobId,
+          retiredWorkerId: boat.workerId,
+        },
+      };
+      return job;
+    });
+    const reply = await reconcileBoat(original);
+    expect(reply.status).toBe("running");
+    expect(m.create.mock.calls.map((call) => call[4])).toEqual([false, true]);
+    expect(m.archive).toHaveBeenLastCalledWith(original.jobId);
+    expect(m.advance).not.toHaveBeenCalled();
+    await reconcileBoat(job);
+    expect(m.retry).toHaveBeenCalledTimes(1);
+    expect(m.advance).toHaveBeenCalledWith(
+      job.jobId,
+      expect.objectContaining({
+        outcome: "rejected",
+        feedback: expect.objectContaining({
+          code: "verification-out-of-memory",
+        }),
+      }),
+      "diagnostic",
+    );
   });
   it("requires the existing publication gate to accept the archived submission", async () => {
     await ensureBoatWorker(job);

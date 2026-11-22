@@ -11,6 +11,7 @@ import {
   completeQueueState,
   completeVerificationJob,
   createEmptyQueueState,
+  retryBoatMemoryState,
   MAX_COMPLETED_RECEIPTS,
   DailySubmissionLimitError,
   enqueueVerificationJob,
@@ -375,6 +376,77 @@ describe("durable formal verification queue", () => {
     });
   });
 
+  it("keeps a memory retry in the original FIFO slot and coalesces overlapping completions", () => {
+    const admission = enqueueQueueState(
+      createEmptyQueueState("2026-08-11"),
+      {
+        ...input(1),
+        boat: {
+          baseCommitSha: "a".repeat(40),
+          previousRecordId: "previous",
+          issuedAt: firstDay.getTime(),
+        },
+      },
+      "solver",
+      ownerSecret,
+      firstDay,
+    );
+    const state = enqueueQueueState(
+      admission.state,
+      input(2),
+      "other",
+      ownerSecret,
+      firstDay,
+    ).state;
+    const active = state.active!;
+    active.boat = { ...active.boat!, workerId: "bx_23456789", uploaded: true };
+    const retry = retryBoatMemoryState(
+      state,
+      active,
+      input(3).jobId,
+      firstDay.getTime() + 3600000,
+    );
+    expect(retry.result).toMatchObject({
+      proofDigest: active.proofDigest,
+      ownerKey: active.ownerKey,
+      enqueuedAt: active.enqueuedAt,
+      recoveredJobIds: [active.jobId],
+      boat: { memoryReplayOf: active.jobId },
+    });
+    expect(retry.result.boat?.uploaded).toBeUndefined();
+    expect(retry.result.boat?.startedAt).toBeUndefined();
+    expect(retry.result.boat?.issuedAt).toBe(firstDay.getTime() + 3600000);
+    const finished = completeQueueState(
+      retry.state,
+      retry.result.jobId,
+      {
+        outcome: "rejected",
+        promotionStatus: null,
+        message: "finished",
+        evidenceUrl: null,
+      },
+      firstDay,
+    );
+    expect(finished.result.receipt?.firstAttemptLogId).toBe(active.jobId);
+    expect(retry.state.daily).toEqual(state.daily);
+    expect(retry.state.pending).toEqual(state.pending);
+    expect(
+      retryBoatMemoryState(
+        retry.state,
+        active,
+        input(4).jobId,
+        firstDay.getTime() + 3600001,
+      ),
+    ).toMatchObject({ changed: false, result: retry.result });
+    expect(() =>
+      retryBoatMemoryState(
+        retry.state,
+        retry.result,
+        input(4).jobId,
+        firstDay.getTime() + 3600002,
+      ),
+    ).toThrow();
+  });
   it("enforces three admissions per GitHub account per UTC day", () => {
     let state = createEmptyQueueState("2026-08-11");
     for (let index = 1; index <= MAX_DAILY_SUBMISSIONS; index += 1) {
@@ -608,7 +680,7 @@ describe("durable formal verification queue", () => {
       message: "rejected",
       evidenceUrl: null,
       completedAt: "2026-08-10T00:00:00.000Z",
-      ...(logArchived ? { logArchived: true as const } : {}),
+      ...(logArchived ? { logArchived: true as const, firstAttemptLogId: input(42).jobId } : {}),
     });
     // A full ledger whose oldest receipt has a retained log.
     const completed = Array.from({ length: MAX_COMPLETED_RECEIPTS }, (_, index) =>
@@ -623,7 +695,7 @@ describe("durable formal verification queue", () => {
     );
 
     expect(mutation.state.completed).toHaveLength(MAX_COMPLETED_RECEIPTS);
-    expect(mutation.deletePaths).toEqual([verifierLogPath(completed.at(-1)!.jobId)]);
+    expect(mutation.deletePaths).toEqual([verifierLogPath(completed.at(-1)!.jobId), verifierLogPath(input(42).jobId)]);
 
     // Receipts from before log retention carry no log, so nothing is deleted.
     const legacy = completeQueueState(

@@ -189,7 +189,7 @@ export function DirectSubmissionForm({
           delayMs = 10_000;
           setPhase("running");
           setMessage(
-            "Lean and both kernels are checking the frozen theorem contract.",
+            payload.message ?? "Lean and both kernels are checking the frozen theorem contract.",
           );
           continue;
         }

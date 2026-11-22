@@ -95,7 +95,12 @@ export async function stopBoatWorker(id: string) {
   try {
     await api(`/sandboxes/${workerId.parse(id)}/stop`, "POST", {});
   } catch (error) {
-    if (!(error instanceof BoatError && error.status === 404)) throw error;
+    if (error instanceof BoatError && error.status === 404) return;
+    if (error instanceof BoatError && error.status === 409) {
+      const info = (await api(`/sandboxes/${workerId.parse(id)}`)).sandbox;
+      if (["stopped", "archived", "deleted"].includes(info?.state)) return;
+    }
+    throw error;
   }
 }
 

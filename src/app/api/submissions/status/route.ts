@@ -198,6 +198,13 @@ export async function GET(request: Request): Promise<Response> {
       if (result.status !== "running") {
         const final = await inspectVerificationJob(job.jobId);
         if (final.status === "completed") return completedReceiptResponse(job.submissionId,job.proofDigest,final.receipt);
+        // A concurrent poll can still see the retired VM after another caller
+        // committed its replacement. The durable job owns the public verdict.
+        if (final.status === "active" && final.job.boat?.memoryReplayOf === job.jobId &&
+            final.job.proofDigest === job.proofDigest) {
+          return noStore(200, { status: "running", proofDigest: job.proofDigest,
+            message: "The proof is continuing on its larger memory-retry worker." });
+        }
       }
       return noStore(200,result);
     }

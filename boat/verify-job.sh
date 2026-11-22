@@ -91,6 +91,15 @@ find "$root/zeta/.lake/packages" -mindepth 2 -maxdepth 2 -name .git -type d -pri
 sudo loginctl enable-linger proofcheck
 uid="$(id -u proofcheck)"
 sudo systemctl start "user@$uid.service"
+# A new account in this disposable VM owns only this verification run. Read
+# hierarchical kernel counters outside the proof account and its stdout.
+proof_group="$(sudo systemctl show "user-$uid.slice" -p ControlGroup --value)"
+oom_count() {
+  if [[ -n "$proof_group" ]]; then
+    sudo awk '$1 == "oom_kill" { print $2 }' "/sys/fs/cgroup$proof_group/memory.events" 2>/dev/null || true
+  fi
+}
+oom_before="$(oom_count)"
 set +e
 sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
   PATH="$PATH" RIEMANN_BOAT_MEMORY_LIMIT="$memory_limit" LEAN_NUM_THREADS=2 RIEMANN_PREBUILT_ZETA23="$root/zeta" RIEMANN_RECORDS_PATH="$root/input/trusted-records.json" \
@@ -100,6 +109,11 @@ sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid"
   > "$HOME/riemann-proof.log" 2>&1
 status=$?
 set -e
+oom_after="$(oom_count)"
+kernel_oom=0
+if [[ "$status" != 0 && "$oom_before" =~ ^[0-9]+$ && "$oom_after" =~ ^[0-9]+$ ]] && (( oom_after > oom_before )); then
+  kernel_oom=1
+fi
 # Stop the proof account and its remaining processes before reading its artifact.
 sudo loginctl terminate-user proofcheck || true
 sudo pkill -KILL -u proofcheck 2>/dev/null || true
@@ -108,7 +122,7 @@ if [[ $status == 0 ]]; then
   sudo test ! -L /home/proofcheck/attestation.json
   sudo install -m 0644 /home/proofcheck/attestation.json "$root/attestation.json"
 fi
-./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" "$root/attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"
+RIEMANN_KERNEL_OOM="$kernel_oom" ./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" "$root/attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"
 
 # Only the supervisor can read this job-specific wake-up token. A notification
 # never supplies a verdict. The website fetches the receipt using its own key.
