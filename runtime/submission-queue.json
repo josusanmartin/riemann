@@ -11,7 +11,8 @@
       "baseCommitSha": "ea1bcc7da07fd9873a4a1cf0acc4f2f150133ef2",
       "previousRecordId": "distinct-multiplicity-surplus",
       "issuedAt": 1795312028946,
-      "startedAt": 1795312032066
+      "startedAt": 1795312032066,
+      "workerId": "bx_ef2vq393"
     }
   },
   "pending": [],
