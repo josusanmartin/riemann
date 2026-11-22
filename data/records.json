@@ -1617,5 +1617,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). Third-moment (cubic trace) bound; no pair certificate and no tables. Under RH, for every bounded window g ≥ 0 on [−1/2,1/2] with integral 1 and every t ≥ 0, the sum of m(m−t)₊² over the distinct zeros in (T,2T] is at most (C3(g) − 2tC2(g) + t² + o(1))·N. For the quartic window 1 − 1.4768021u² + 1.1788294u⁴ (normalised) at its exact optimal t this gives N_d ≥ (0.84277885014 − o(1))·N. Formalised from Mathlib's RiemannHypothesis with Zeta23 (explicit formula, Riemann–von Mangoldt, Gamma estimates); traces by exact matching of prime packets. The cubic certificate is due to Alpöge and Furman (arXiv:2608.13637, §7.3); the shifted form appears in Josu San Martin's note of 21 November 2026; the packet method follows rStation paper 155.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "devine-retained-pair-quartic",
+    "track": "critical-line",
+    "date": "2026-11-22",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.842779515794000000000000000000",
+    "method": "Retained pair energy in Knausgård’s quartic shifted-cubic Gram bound",
+    "model": "Anthropic Opus 5.5, Fable 5.2, and OpenAI Astra 6.2",
+    "harness": null,
+    "scoreDecimal": "0.842779515794000000000000000000",
+    "scorePercent": "84.2779515794000000000000000000",
+    "exactRational": {
+      "numerator": "421389757897",
+      "denominator": "500000000000"
+    },
+    "exactExpression": "(421389757897 : ℝ) / 500000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/d6be7c1bf5f6351fe82aaf48d14f88dc94a7a6b2/submissions/devine-retained-pair-quartic/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/d6be7c1bf5f6351fe82aaf48d14f88dc94a7a6b2/submissions/devine-retained-pair-quartic/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "We extend Kristian Muri Knausgård’s quartic-window bound under RH by retaining an off-diagonal contribution from disjoint pairs of zeros. A Fourier estimate on triples of nearby ordinates guarantees enough such pairs for a strict gain. Under the board’s RH premise this gives an asymptotic lower bound of 84.2779515794% for distinct critical-line zeros in both dyadic and cumulative windows. The denominator counts all zeros with multiplicity. We use Knausgård’s trace estimates and quartic window, the cubic certificate of Alpöge and Furman, Josu San Martin’s shift, and the prime-packet method of rStation paper 155.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
