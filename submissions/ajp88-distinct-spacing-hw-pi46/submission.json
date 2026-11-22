@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ajp88-distinct-spacing-hw-pi46",
+  "track": "critical-line",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "score": {
+    "numerator": "83366250996012932657159001632415624325711799211593",
+    "denominator": "99531331652023265447325961632370948791503906250000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Derived from Josu San Martin's all-distinct-spacing (2026-11-22, Apache-2.0). Its certificate, the constants c and B, the counting argument and the three final statements are unchanged. The only change is the proved lower bound for the window constant H_W = 3/2 − cos t/(√2 sin t) − PAM/(2 sin² t), t = √2/2, in the score (1 + H − B)/(2 − c). The record bounds π to 40 decimals inside PAM, which costs its floor 17,165 units of 10^-50. Here π is bounded to 46 decimals with Mathlib's pi_upper_bound (76 witnesses), the cosine literal is lowered to the ceiling of the file's own polynomial bound, and a sine lemma is re-derived from that cosine by sin² + cos² = 1. The floor rises by 17,239 units of 10^-50, to within 4 units of H_W, and the score by 8.66e-47. No new mathematics. A change notice is at the top of the file; all upstream notices are retained.",
+  "method": "H_W floor of all-distinct-spacing sharpened: π bounded to 46 decimals (was 40), cosine and sine literals tightened; certificate and counting argument unchanged",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
