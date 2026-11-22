@@ -1,37 +1,30 @@
 {
   "schemaVersion": 1,
   "active": {
-    "sandboxId": "boat-f291fb25-ebe3-4cbe-83bb-0d66dcbbec15",
-    "jobId": "f291fb25-ebe3-4cbe-83bb-0d66dcbbec15",
-    "proofDigest": "f183b1c80a17593d4c8804ae3a052bf9cbf553bb5169253636538dd53be2254c",
-    "ownerKey": "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e",
-    "submissionKey": "aa3ea6dec9a47ede72202ab44674977d75201584b9dccf7761a6ea43fb6b22c3",
-    "enqueuedAt": "2026-11-21T23:24:41.267Z",
+    "sandboxId": "boat-6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
+    "jobId": "6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
+    "proofDigest": "a89d02035d102e14afc6b0c98cd87373b7d9bd032e94ac6770a5667bfc2c77b5",
+    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
+    "submissionKey": "fb50c6cac79f2bf8f0cfd611f785b73ec8afa98a1fb74dfea77a098f87d7bf8a",
+    "enqueuedAt": "2026-11-22T00:04:10.102Z",
     "boat": {
       "baseCommitSha": "fce5b1108e4605f8b60e4b9eb1500e06e9c3ada5",
       "previousRecordId": "knausgard-rh-gd1-floor",
-      "issuedAt": 1795303481267,
-      "startedAt": 1795303484239,
-      "workerId": "bx_fgdwua43",
-      "uploaded": true
+      "issuedAt": 1795305850102
     }
   },
-  "pending": [
-    {
-      "sandboxId": "boat-6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
-      "jobId": "6e1ab03f-f38e-4ce4-a31a-a1a07c5e3381",
-      "proofDigest": "a89d02035d102e14afc6b0c98cd87373b7d9bd032e94ac6770a5667bfc2c77b5",
-      "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-      "submissionKey": "fb50c6cac79f2bf8f0cfd611f785b73ec8afa98a1fb74dfea77a098f87d7bf8a",
-      "enqueuedAt": "2026-11-22T00:04:10.102Z",
-      "boat": {
-        "baseCommitSha": "fce5b1108e4605f8b60e4b9eb1500e06e9c3ada5",
-        "previousRecordId": "knausgard-rh-gd1-floor",
-        "issuedAt": 1795305850102
-      }
-    }
-  ],
+  "pending": [],
   "completed": [
+    {
+      "jobId": "f291fb25-ebe3-4cbe-83bb-0d66dcbbec15",
+      "proofDigest": "f183b1c80a17593d4c8804ae3a052bf9cbf553bb5169253636538dd53be2254c",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/6ce9ca317d22f2a183115b1f3928d6309895927f/submissions/distinct-multiplicity-surplus",
+      "completedAt": "2026-11-22T00:16:18.089Z",
+      "logArchived": true
+    },
     {
       "jobId": "e15a0f35-5e54-44cd-ae1a-e46105e93985",
       "proofDigest": "1eb0e6a08bfa9c5707693fb181734ecce42819bddf5ed75be280beca1c0ff84d",
