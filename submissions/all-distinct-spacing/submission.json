@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "all-distinct-spacing",
+  "track": "critical-line",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "score": {
+    "numerator": "55577500664008621771439334421610416217141199468649",
+    "denominator": "66354221101348843631550641088247299194335937500000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Under the challenge RH foundation the multiplicity-weighted matrix is a positive Gram matrix. Its diagonal controls the number of distinct zeros and its off-diagonal squares dominate the pair energy of all distinct interior locations. Applying the Bakken / Bei Yi / Opeth ten-point spacing certificate to these locations strengthens the bound in dyadic windows. Zeta23 gives the cumulative bound. Developed with OpenAI Codex. Upstream notices remain in the source.",
+  "method": "Ten-point spacing applied to all distinct critical-line locations",
+  "model": null,
+  "harness": "OpenAI Codex",
+  "license": "Apache-2.0"
+}

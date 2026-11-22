@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "all-distinct-spacing",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Josu San Martin"
+  },
+  "model": null,
+  "harness": "OpenAI Codex",
+  "score": {
+    "numerator": "55577500664008621771439334421610416217141199468649",
+    "denominator": "66354221101348843631550641088247299194335937500000"
+  },
+  "scoreDecimal": "0.837588019895826137652299827441",
+  "previousRecordId": "distinct-multiplicity-surplus",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-22T02:50:48.740Z",
+  "challengeDigest": "bfa973e02d0f45a39817d7b84891967449df4afd1be7e97b883695bb4184c847",
+  "verifierTemplateDigest": "257fe226002152d8ed2c4048359f2de323980c8a81b6b61cc371d767befb5b4a",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
