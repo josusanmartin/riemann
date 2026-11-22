@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "267b3494c77f9864a536b80cce2acc13b026163f",
       "previousRecordId": "knausgard-rh-third-moment-quartic",
-      "issuedAt": 1795384603810
+      "issuedAt": 1795384603810,
+      "startedAt": 1795384606147
     }
   },
   "pending": [],
