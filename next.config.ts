@@ -56,6 +56,9 @@ const nextConfig: NextConfig = {
     "/api/health": trustedPromotionRuntimeFiles,
     "/api/admin/e2b-template": verifierTemplateBuildFiles,
   },
+  async redirects() {
+    return [{ source: "/rules", destination: "/challenge", permanent: true }];
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

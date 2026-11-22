@@ -19,7 +19,7 @@ export function SiteNotice() {
         <Link href="/submissions/bakken-ten-hw-one-unit">67.3639%</Link> without assuming RH.
         The <Link href="/submissions/critical-line-669-800">83.625% record</Link> uses Alpöge’s
         published RH theorem as a trusted premise. Each earlier proof keeps its original
-        verification history. <Link href="/methodology">Read the updated rules.</Link>
+        verification history. <Link href="/challenge">Read the updated rules.</Link>
       </p>
     </aside>
   );

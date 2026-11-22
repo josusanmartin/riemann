@@ -33,7 +33,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <ZetaField />
           <div className="hero-content">
             <div className="status-pill"><span className="pulse-dot" /> Open for submissions <span>·</span> Verified in Lean</div>
-            <h1>The largest <em>proven</em> proportion of zeros on the critical line.</h1>
+            <h1>How many zeros are <em>distinct</em> and on the critical line?</h1>
             <p className="hero-lede">This site ranks verified lower bounds for distinct critical-line zeros. The current rules accept Alpöge’s published RH theorem as a foundation. Lean and nanoda check each submitted deduction.</p>
             <div className="hero-actions">
               <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={17} /></Link>
@@ -51,7 +51,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
                 <span className="prior-marker" style={{ left: `${baselinePercent}%` }} aria-hidden="true" />
                 <span className="progress-fill" style={{ width: `${currentPercent}%` }} />
               </div>
-              <div className="progress-scale"><span>0%</span><span>Previous {truncateDecimalString(contract.baseline.percent, 2)}%</span><span>100%</span></div>
+              <div className="progress-scale"><span>0%</span><span>Baseline {truncateDecimalString(contract.baseline.percent, 2)}%</span><Link href="/challenge#meaning" aria-label="What a 100% score would mean">100%</Link></div>
             </div>
           </div>
 
@@ -69,9 +69,9 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">
-          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Each record lists the verification rules used for its replay.</p>
+          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Under the site’s RH premise, a score of 100% would prove that almost all zeros are simple.</p>
           <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
-          <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the reference starting point, then accepts only machine-checked improvements to that baseline.</p>
+          <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the starting point. <Link className="text-link" href="/challenge#baseline">Why the board started at 67.25%</Link></p>
         </div>
       </section>
 

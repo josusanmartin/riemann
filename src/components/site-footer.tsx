@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div className="footer-links">
           <div>
             <span className="footer-label">Pages</span>
-            <Link href="/challenge">Challenge contract</Link>
+            <Link href="/challenge">Competition rules</Link>
             <Link href="/methodology">Trust & verification</Link>
             <Link href="/submit">Submit a proof</Link>
             <Link href="/submissions">All submissions</Link>

@@ -3943,3 +3943,26 @@ h3 {
   .record-periods { grid-template-columns: 1fr; }
   .record-period + .record-period { border-inline-start: 0; border-top: 1px solid var(--line, #e0dfd6); padding-top: 1rem; }
 }
+
+.competition-rules {
+  padding-inline-start: 1.5rem;
+  margin: 1.25rem 0 2.25rem;
+  list-style: decimal;
+}
+.competition-rules li { margin-block: .8rem; padding-inline-start: .3rem; line-height: 1.65; }
+.competition-rules li::marker { color: var(--forest); font-weight: 700; }
+.prose-section h2[id] { scroll-margin-top: 6rem; }
+.sandbox-limits { margin-block: 0 2rem; }
+.sandbox-limits > div {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) 3fr;
+  gap: 1.5rem;
+  padding-block: 1rem;
+  border-top: 1px solid var(--line);
+}
+.sandbox-limits dt { font-weight: 700; }
+.sandbox-limits dd { margin: 0; max-width: 72ch; line-height: 1.6; }
+.progress-scale a { color: inherit; text-decoration: underline; text-underline-offset: .2em; }
+@media (max-width: 600px) {
+  .sandbox-limits > div { grid-template-columns: 1fr; gap: .25rem; }
+}
