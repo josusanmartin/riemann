@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-third-moment-quartic",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "Claude Fable 5.2",
+  "harness": "Claude",
+  "score": {
+    "numerator": "504678117694414992253315078804551328482467",
+    "denominator": "598826272881181027171250673799386945725202"
+  },
+  "scoreDecimal": "0.842778850143325474213352473438",
+  "previousRecordId": "ajp88-distinct-spacing-hw-pi46",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-22T13:28:21.588Z",
+  "challengeDigest": "3016da8f9be38852ce8d3e103e4e0f8817a2eaee4ebb761daaa5f22712abf064",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

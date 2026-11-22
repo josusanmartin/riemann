@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-third-moment-quartic",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "504678117694414992253315078804551328482467",
+    "denominator": "598826272881181027171250673799386945725202"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). Third-moment (cubic trace) bound; no pair certificate and no tables. Under RH, for every bounded window g ≥ 0 on [−1/2,1/2] with integral 1 and every t ≥ 0, the sum of m(m−t)₊² over the distinct zeros in (T,2T] is at most (C3(g) − 2tC2(g) + t² + o(1))·N. For the quartic window 1 − 1.4768021u² + 1.1788294u⁴ (normalised) at its exact optimal t this gives N_d ≥ (0.84277885014 − o(1))·N. Formalised from Mathlib's RiemannHypothesis with Zeta23 (explicit formula, Riemann–von Mangoldt, Gamma estimates); traces by exact matching of prime packets. The cubic certificate is due to Alpöge and Furman (arXiv:2608.13637, §7.3); the shifted form appears in Josu San Martin's note of 21 November 2026; the packet method follows rStation paper 155.",
+  "method": "Third moment of the zero multiplicities under RH: Gram matrix of the zeros, second and third traces from the explicit formula (general windows; best quartic), tangent-line inequality for PSD matrices.",
+  "model": "Claude Fable 5.2",
+  "harness": "Claude",
+  "license": "Apache-2.0"
+}
