@@ -1,6 +1,19 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-3d3d5423-f06d-4867-94fa-a21888b7cd68",
+    "jobId": "3d3d5423-f06d-4867-94fa-a21888b7cd68",
+    "proofDigest": "ca2b5fea864feabc0768f7c76025e5a48c554bc2fb9015579062ea0473adeea8",
+    "ownerKey": "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd",
+    "submissionKey": "a87b165cff4e01b53544e388e112bf7ddb575381fce9485b513656111608d2e8",
+    "enqueuedAt": "2026-11-22T04:50:19.912Z",
+    "boat": {
+      "issuedAt": 1795325721237,
+      "previousRecordId": "all-distinct-spacing",
+      "baseCommitSha": "d10ebad05610816f324a12b321d0b7967fd72fd6",
+      "memoryReplayOf": "c8d2a9da-21cb-4963-8cc3-8f0fca1c8ad6"
+    }
+  },
   "pending": [],
   "completed": [
     {
