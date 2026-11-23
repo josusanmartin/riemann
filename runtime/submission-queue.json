@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "2fd8d0e06e965881e0fdd7827edd3a2b87b39725",
       "previousRecordId": "knausgard-rh-bui-heath-brown-deg40",
-      "issuedAt": 1795466473582
+      "issuedAt": 1795466473582,
+      "startedAt": 1795466477302
     }
   },
   "pending": [],
