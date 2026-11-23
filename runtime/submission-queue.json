@@ -11,7 +11,8 @@
       "baseCommitSha": "b4fd9b68b1ff503b9e0630f3a9160c52b957b6ba",
       "previousRecordId": "knausgard-rh-bui-heath-brown",
       "issuedAt": 1795447523415,
-      "startedAt": 1795447526593
+      "startedAt": 1795447526593,
+      "workerId": "bx_kev9gebr"
     }
   },
   "pending": [],
