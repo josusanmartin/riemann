@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "cb55842bd7ed6eafe157dbf5ff06271f18973a70",
       "previousRecordId": "devine-octic-fourier-overlap",
-      "issuedAt": 1795412127940
+      "issuedAt": 1795412127940,
+      "startedAt": 1795412130383
     }
   },
   "pending": [],
