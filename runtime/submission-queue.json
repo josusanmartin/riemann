@@ -11,7 +11,8 @@
       "baseCommitSha": "c96731895ce83910784cb322ce14dd4ca7e81074",
       "previousRecordId": "beiyi-octic-retained-pair-shift",
       "issuedAt": 1795405606091,
-      "startedAt": 1795405608536
+      "startedAt": 1795405608536,
+      "workerId": "bx_9sr8ts5v"
     }
   },
   "pending": [],
