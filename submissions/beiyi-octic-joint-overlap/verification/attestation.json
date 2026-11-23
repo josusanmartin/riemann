@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-octic-joint-overlap",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "84277963493",
+    "denominator": "100000000000"
+  },
+  "scoreDecimal": "0.842779634930000000000000000000",
+  "previousRecordId": "devine-octic-fourier-overlap",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T05:47:20.485Z",
+  "challengeDigest": "53d069d01ad115dc304f1da5c2c52cd145a26fdd245d0052016bbbc7395f88dd",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
