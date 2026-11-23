@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-bui-heath-brown",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "142844914183271838785035521346505078433005235250696131382749896706763610613543817536842488633550231381119",
+    "denominator": "167878659999888875382189217818946569202353145861770144550217596982294595321962505449011440000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Policy v2: RH foundation. A full Lean proof, from RiemannHypothesis, of the theorem of Bui and Heath-Brown that 19/27 of the zeros are simple. The proof uses the mollifier method of Conrey–Ghosh–Gonek and includes the reduction, arithmetic error terms with Siegel–Walfisz, Vaughan and the large sieve, and the three main terms. It is combined with the third-moment certificate: N_d ≥ (0.8508819059156559 − o(1))·N, with a degree-14 window re-tuned for 19/27, yielding a value 3.7e-20 below the numerical supremum. The cubic certificate is due to Anthropic’s Claude and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. The 184 modules (4 MB) are carried compressed and are decoded and elaborated by a plain-text command in the file; see the header.",
+  "method": "Formal proof of Bui-Heath-Brown 19/27 simple zeros under RH plus the third-moment (cubic trace) certificate for distinct zeros; degree-14 window re-tuned for 19/27.",
+  "model": "Claude Fable 5.2 and Opus 5.5",
+  "harness": "Claude",
+  "license": "Apache-2.0"
+}
