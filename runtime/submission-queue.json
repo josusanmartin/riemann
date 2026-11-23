@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-724ffe65-f394-4932-9100-6db23cba976d",
+    "jobId": "724ffe65-f394-4932-9100-6db23cba976d",
+    "proofDigest": "76e21a9f51d17d09c8dc2006984511fcccf9c8191ea93c9ee2acae9a45b41fa2",
+    "ownerKey": "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd",
+    "submissionKey": "c5efa9c0f4baf4faf6832b27fd424eff091303d0c97136a03b266ac88e0a953f",
+    "enqueuedAt": "2026-11-23T06:55:12.630Z",
+    "boat": {
+      "baseCommitSha": "f3abc5826a0192568bdcc90a4d9c76388f82c90f",
+      "previousRecordId": "beiyi-octic-joint-overlap",
+      "issuedAt": 1795416912630
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1287,7 +1299,7 @@
     "day": "2026-11-23",
     "attempts": {
       "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 1,
-      "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 2,
+      "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 3,
       "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 2
     }
   }
