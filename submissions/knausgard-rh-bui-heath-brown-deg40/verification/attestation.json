@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-bui-heath-brown-deg40",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "Claude Fable 5.2 and Opus 5.5",
+  "harness": "Claude",
+  "score": {
+    "numerator": "850881905915655942916451493668659468971332872739",
+    "denominator": "1000000000000000000000000000000000000000000000000"
+  },
+  "scoreDecimal": "0.850881905915655942916451493668",
+  "previousRecordId": "knausgard-rh-bui-heath-brown",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T15:42:43.320Z",
+  "challengeDigest": "265cc1132e3e5bf2dcb595eef7187b6b6d54e9e0fe93627d06f44a5ba9170ce2",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

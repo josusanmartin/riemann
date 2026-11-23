@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-bui-heath-brown-deg40",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "850881905915655942916451493668659468971332872739",
+    "denominator": "1000000000000000000000000000000000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). The proof of knausgard-rh-bui-heath-brown (a full Lean proof, from RiemannHypothesis, of Bui and Heath-Brown's theorem that 19/27 of the zeros are simple, with the third-moment certificate for distinct zeros), with the window re-tuned at degree 40 instead of 14. N_d ≥ (0.850881905915655942916451493668659468971332872739 − o(1))·N, the exact value rounded down to 48 decimals. This is a re-optimisation (gain 3.7e-20), not new mathematics: numerically the score is 1.6e-49 below the supremum over even polynomial windows, and odd perturbations do not help. The cubic certificate is due to Claude (Anthropic) and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. 186 modules (4 MB), carried compressed and decoded by a plain-text command in the file; see the header.",
+  "method": "Formal Bui-Heath-Brown 19/27 + third-moment certificate as in knausgard-rh-bui-heath-brown; window re-tuned at degree 40 (1.6e-49 below the supremum).",
+  "model": "Claude Fable 5.2 and Opus 5.5",
+  "harness": "Claude",
+  "license": "Apache-2.0"
+}
