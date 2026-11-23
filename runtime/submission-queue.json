@@ -12,7 +12,8 @@
       "previousRecordId": "knausgard-rh-bui-heath-brown",
       "issuedAt": 1795447523415,
       "startedAt": 1795447526593,
-      "workerId": "bx_kev9gebr"
+      "workerId": "bx_kev9gebr",
+      "uploaded": true
     }
   },
   "pending": [],
