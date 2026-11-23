@@ -1851,5 +1851,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Policy v2: RH foundation. A full Lean proof, from RiemannHypothesis, of the theorem of Bui and Heath-Brown that 19/27 of the zeros are simple. The proof uses the mollifier method of Conrey–Ghosh–Gonek and includes the reduction, arithmetic error terms with Siegel–Walfisz, Vaughan and the large sieve, and the three main terms. It is combined with the third-moment certificate: N_d ≥ (0.8508819059156559 − o(1))·N, with a degree-14 window re-tuned for 19/27, yielding a value 3.7e-20 below the numerical supremum. The cubic certificate is due to Anthropic’s Claude and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. The 184 modules (4 MB) are carried compressed and are decoded and elaborated by a plain-text command in the file; see the header.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-bui-heath-brown-deg40",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.850881905915655942916451493668",
+    "method": "Formal Bui-Heath-Brown 19/27 + third-moment certificate as in knausgard-rh-bui-heath-brown; window re-tuned at degree 40 (1.6e-49 below the supremum).",
+    "model": "Claude Fable 5.2 and Opus 5.5",
+    "harness": "Claude",
+    "scoreDecimal": "0.850881905915655942916451493668",
+    "scorePercent": "85.0881905915655942916451493668",
+    "exactRational": {
+      "numerator": "850881905915655942916451493668659468971332872739",
+      "denominator": "1000000000000000000000000000000000000000000000000"
+    },
+    "exactExpression": "(850881905915655942916451493668659468971332872739 : ℝ) / 1000000000000000000000000000000000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/c9090d08839b5577835f2470d287a1874038d9e6/submissions/knausgard-rh-bui-heath-brown-deg40/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/c9090d08839b5577835f2470d287a1874038d9e6/submissions/knausgard-rh-bui-heath-brown-deg40/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). The proof of knausgard-rh-bui-heath-brown (a full Lean proof, from RiemannHypothesis, of Bui and Heath-Brown's theorem that 19/27 of the zeros are simple, with the third-moment certificate for distinct zeros), with the window re-tuned at degree 40 instead of 14. N_d ≥ (0.850881905915655942916451493668659468971332872739 − o(1))·N, the exact value rounded down to 48 decimals. This is a re-optimisation (gain 3.7e-20), not new mathematics: numerically the score is 1.6e-49 below the supremum over even polynomial windows, and odd perturbations do not help. The cubic certificate is due to Claude (Anthropic) and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. 186 modules (4 MB), carried compressed and decoded by a plain-text command in the file; see the header.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
