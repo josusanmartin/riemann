@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-octic-retained-pair-shift",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "1053474479120143",
+    "denominator": "1250000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Under the official RH foundation, an octic-window refinement of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s third-moment method, optimized for its retained-pair quotient.",
+  "method": "Exact octic moments and Fourier certificate with an independently optimized rational retained-pair shift.",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
