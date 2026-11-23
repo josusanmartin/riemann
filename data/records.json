@@ -1695,5 +1695,31 @@
     "pullRequestUrl": null,
     "summary": "Michael Devine’s retained-pair bound uses Kristian Muri Knausgård’s quartic window. ajp88 first re-optimized the shift for this bound and reported a 100-decimal floor. We sharpen the shift and the rational floor together. With the same window and pair certificate, the gain over ajp88 is approximately 9.314 × 10⁻⁹⁹ percentage points. The Lean proof establishes the submitted exact rational in both required intervals under the board’s RH premise.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "beiyi-octic-retained-pair-shift",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.842779583296114400000000000000",
+    "method": "Exact octic moments and Fourier certificate with an independently optimized rational retained-pair shift.",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.842779583296114400000000000000",
+    "scorePercent": "84.2779583296114400000000000000",
+    "exactRational": {
+      "numerator": "1053474479120143",
+      "denominator": "1250000000000000"
+    },
+    "exactExpression": "(1053474479120143 : ℝ) / 1250000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/76849514fb03d02aedcb82c1be4dbf351e8109b1/submissions/beiyi-octic-retained-pair-shift/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/76849514fb03d02aedcb82c1be4dbf351e8109b1/submissions/beiyi-octic-retained-pair-shift/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Under the official RH foundation, an octic-window refinement of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s third-moment method, optimized for its retained-pair quotient.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
