@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-8c1bbeb5-bad8-4e78-9062-7c81b32b79a6",
+    "jobId": "8c1bbeb5-bad8-4e78-9062-7c81b32b79a6",
+    "proofDigest": "196136e5329f10393fc5aa6f121d55db33c34d8a31a88c01888de5cef36b08ce",
+    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
+    "submissionKey": "000e0dcc3958424b764707efd07a671f771c0f69994c4bb1588f157263f55d16",
+    "enqueuedAt": "2026-11-23T05:35:27.940Z",
+    "boat": {
+      "baseCommitSha": "cb55842bd7ed6eafe157dbf5ff06271f18973a70",
+      "previousRecordId": "devine-octic-fourier-overlap",
+      "issuedAt": 1795412127940
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1278,7 +1290,7 @@
     "attempts": {
       "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 1,
       "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 2,
-      "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 1
+      "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 2
     }
   }
 }
