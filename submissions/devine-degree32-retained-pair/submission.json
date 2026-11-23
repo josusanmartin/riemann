@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-degree32-retained-pair",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "7467259030701813869739730211166225298027652489304375443581010163149153437228159306762267726029670194888697704273164057355823112360018062855667878677027709276696065953004943987720266315230953455410883",
+    "denominator": "8860274382827684373426110524043993283228053047698953524152136784089094997182778051879727134858536985101946476314074081005564061157704101990052816823160393668320260609150049071187435095675724245271026"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Starting from Bei Yi’s octic specialization of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic, we jointly refine the normalized polynomial window through degree 32, the triple span and the certified Fourier overlap. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
+  "method": "Joint degree-32 window, triple-span, Fourier-overlap and shift refinement",
+  "model": "OpenAI GPT-6.2 Astra; upstream proof credits in source",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "devine-degree32-retained-pair",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "model": "OpenAI GPT-6.2 Astra; upstream proof credits in source",
+  "harness": "Codex",
+  "score": {
+    "numerator": "7467259030701813869739730211166225298027652489304375443581010163149153437228159306762267726029670194888697704273164057355823112360018062855667878677027709276696065953004943987720266315230953455410883",
+    "denominator": "8860274382827684373426110524043993283228053047698953524152136784089094997182778051879727134858536985101946476314074081005564061157704101990052816823160393668320260609150049071187435095675724245271026"
+  },
+  "scoreDecimal": "0.842779659868580615591271597646",
+  "previousRecordId": "beiyi-octic-joint-overlap",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T07:12:12.150Z",
+  "challengeDigest": "b83f7a19759f439b93edba8846d8c50c574fb66d3cc0152060802c0fd9596f4c",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
