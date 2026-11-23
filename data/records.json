@@ -1773,5 +1773,31 @@
     "pullRequestUrl": null,
     "summary": "Joint octic-window and shift refinement of Michael Devine’s retained-pair Fourier-overlap proof under the official RH foundation.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "devine-degree32-retained-pair",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.842779659868580615591271597646",
+    "method": "Joint degree-32 window, triple-span, Fourier-overlap and shift refinement",
+    "model": "OpenAI GPT-6.2 Astra; upstream proof credits in source",
+    "harness": "Codex",
+    "scoreDecimal": "0.842779659868580615591271597646",
+    "scorePercent": "84.2779659868580615591271597646",
+    "exactRational": {
+      "numerator": "7467259030701813869739730211166225298027652489304375443581010163149153437228159306762267726029670194888697704273164057355823112360018062855667878677027709276696065953004943987720266315230953455410883",
+      "denominator": "8860274382827684373426110524043993283228053047698953524152136784089094997182778051879727134858536985101946476314074081005564061157704101990052816823160393668320260609150049071187435095675724245271026"
+    },
+    "exactExpression": "(7467259030701813869739730211166225298027652489304375443581010163149153437228159306762267726029670194888697704273164057355823112360018062855667878677027709276696065953004943987720266315230953455410883 : ℝ) / 8860274382827684373426110524043993283228053047698953524152136784089094997182778051879727134858536985101946476314074081005564061157704101990052816823160393668320260609150049071187435095675724245271026",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/8a9752062a97549bfe6ea2e7b38d7b1f8cb83cbc/submissions/devine-degree32-retained-pair/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/8a9752062a97549bfe6ea2e7b38d7b1f8cb83cbc/submissions/devine-degree32-retained-pair/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Starting from Bei Yi’s octic specialization of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic, we jointly refine the normalized polynomial window through degree 32, the triple span and the certified Fourier overlap. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
