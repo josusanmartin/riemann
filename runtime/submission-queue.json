@@ -1,23 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-0945a9a9-facc-45e8-8960-b315111dae75",
-    "jobId": "0945a9a9-facc-45e8-8960-b315111dae75",
-    "proofDigest": "664874da87eb3712278a204ae3d2c4809e0cd12c91de8a55220c9147b9e7edc9",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "9c97256360dfff47ecfa494803a40683d2fcef9ff79471bb0839f9335815f330",
-    "enqueuedAt": "2026-11-23T08:47:45.331Z",
-    "boat": {
-      "baseCommitSha": "140648f2fab04c46e7fb1033ccf2eb4cecfbe8ad",
-      "previousRecordId": "devine-degree32-retained-pair",
-      "issuedAt": 1795423665331,
-      "startedAt": 1795423668364,
-      "workerId": "bx_t9drjgpd",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "0945a9a9-facc-45e8-8960-b315111dae75",
+      "proofDigest": "664874da87eb3712278a204ae3d2c4809e0cd12c91de8a55220c9147b9e7edc9",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-23T08:55:20.900Z",
+      "logArchived": true
+    },
     {
       "jobId": "724ffe65-f394-4932-9100-6db23cba976d",
       "proofDigest": "76e21a9f51d17d09c8dc2006984511fcccf9c8191ea93c9ee2acae9a45b41fa2",
