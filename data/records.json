@@ -1825,5 +1825,31 @@
     "pullRequestUrl": null,
     "summary": "Variable retained-pair payments on Michael Devine’s degree-32 window improve the critical-line bound under the official RH foundation.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-bui-heath-brown",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.850881905915655942879413670176",
+    "method": "Formal proof of Bui-Heath-Brown 19/27 simple zeros under RH plus the third-moment (cubic trace) certificate for distinct zeros; degree-14 window re-tuned for 19/27.",
+    "model": "Claude Fable 5.2 and Opus 5.5",
+    "harness": "Claude",
+    "scoreDecimal": "0.850881905915655942879413670176",
+    "scorePercent": "85.0881905915655942879413670176",
+    "exactRational": {
+      "numerator": "142844914183271838785035521346505078433005235250696131382749896706763610613543817536842488633550231381119",
+      "denominator": "167878659999888875382189217818946569202353145861770144550217596982294595321962505449011440000000000000000"
+    },
+    "exactExpression": "(142844914183271838785035521346505078433005235250696131382749896706763610613543817536842488633550231381119 : ℝ) / 167878659999888875382189217818946569202353145861770144550217596982294595321962505449011440000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/c69fb689d09b361f02b6b5e006f0d7097153c374/submissions/knausgard-rh-bui-heath-brown/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/c69fb689d09b361f02b6b5e006f0d7097153c374/submissions/knausgard-rh-bui-heath-brown/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Policy v2: RH foundation. A full Lean proof, from RiemannHypothesis, of the theorem of Bui and Heath-Brown that 19/27 of the zeros are simple. The proof uses the mollifier method of Conrey–Ghosh–Gonek and includes the reduction, arithmetic error terms with Siegel–Walfisz, Vaughan and the large sieve, and the three main terms. It is combined with the third-moment certificate: N_d ≥ (0.8508819059156559 − o(1))·N, with a degree-14 window re-tuned for 19/27, yielding a value 3.7e-20 below the numerical supremum. The cubic certificate is due to Anthropic’s Claude and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. The 184 modules (4 MB) are carried compressed and are decoded and elaborated by a plain-text command in the file; see the header.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
