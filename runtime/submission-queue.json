@@ -11,7 +11,8 @@
       "baseCommitSha": "019eaa1881c7de880a19b1e57d25bf51b0c3846b",
       "previousRecordId": "devine-retained-pair-quartic",
       "issuedAt": 1795394375240,
-      "startedAt": 1795394378002
+      "startedAt": 1795394378002,
+      "workerId": "bx_qa9c3shh"
     }
   },
   "pending": [],
