@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-tight85-triple-v3",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "73216584199827098997597266626355724063694669973252932845657514188639301327206972288620297379187220494791775643660010013860126958184187908281106159015209757749062614941647888437329120716666277123844625",
+    "denominator": "86047841435124734854483561644542246018586771148041303052829283597647906130991473339111626737126536418248179143794123276825917493652060410995233911993443002036767292955532782966539308288030192117918458"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Extending Kristian Muri Knausgård’s 19/27 Bui–Heath-Brown shifted-cubic proof under RH, we combine Michael Devine’s degree-32 window and retained-triple Gram inequalities with Bei Yi’s weighted affine residue-class packing adapted to three-site disjoint triples, a tightened short-span anchor at S1 = 4273/2000 (continuous affine pair and same-sign Rayleigh triple rewards), and mixed-sign Rayleigh tiers extending the span to L = 3. Wiring both public 19/27 endpoints (BHB.simple_dyadic_of_RH and BHB.simple_cumulative_of_RH) establishes an asymptotic distinct critical-line zero proportion exceeding 85.088228802378863% in dyadic and cumulative windows.",
+  "method": "Tightened weighted retained-triple energy in shifted-cubic Gram trace (S1=2.1365 affine short box, L=3 mixed tier, degree-32 window, Bei Yi packing) + Knausgård 19/27 BHB",
+  "model": "GPT-6.2 Astra, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon. Upstream credits",
+  "harness": "Codex, Claude Code, Antigravity",
+  "license": "Apache-2.0"
+}
