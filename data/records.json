@@ -1643,5 +1643,31 @@
     "pullRequestUrl": null,
     "summary": "We extend Kristian Muri Knausgård’s quartic-window bound under RH by retaining an off-diagonal contribution from disjoint pairs of zeros. A Fourier estimate on triples of nearby ordinates guarantees enough such pairs for a strict gain. Under the board’s RH premise this gives an asymptotic lower bound of 84.2779515794% for distinct critical-line zeros in both dyadic and cumulative windows. The denominator counts all zeros with multiplicity. We use Knausgård’s trace estimates and quartic window, the cubic certificate of Alpöge and Furman, Josu San Martin’s shift, and the prime-packet method of rStation paper 155.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "ajp88-retained-pair-shift",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "ajp88",
+    "github": "ajp88",
+    "title": "Certified critical-line bound 0.842779579148564930131886845553",
+    "method": "Devine's retained-pair bound on Knausgård's quartic window, evaluated at a re-optimised shift t (1.01945 in place of 1.01989); the theorem, the window and the certificates are unchanged",
+    "model": "Claude",
+    "harness": "Claude Code",
+    "scoreDecimal": "0.842779579148564930131886845553",
+    "scorePercent": "84.2779579148564930131886845553",
+    "exactRational": {
+      "numerator": "8427795791485649301318868455531674111463156143308779484174389789796506780197904349680110277543279933",
+      "denominator": "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "exactExpression": "(8427795791485649301318868455531674111463156143308779484174389789796506780197904349680110277543279933 : ℝ) / 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/e05b8571c1ad2945f9841f97b9d8f78d32afbb9c/submissions/ajp88-retained-pair-shift/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/e05b8571c1ad2945f9841f97b9d8f78d32afbb9c/submissions/ajp88-retained-pair-shift/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Derived from Michael Devine's devine-retained-pair-quartic (2026-11-22, Apache-2.0), which builds on Kristian Muri Knausgård's third-moment proof. Policy v2 (RH foundation). Devine's bound with retained pairs is proved for every shift t in a range and is evaluated at Knausgård's tStar, the best shift without the pair term. With the pair term the best shift is lower. This file evaluates the same bound at t = 1.01944754949189..., a 50-decimal rational (TMG.PairGain.tPair): one new definition; the six side conditions and the value are re-proved by the file's own norm_num calls; the numeral changes in five statements. The window, eta, the Fourier certificates and every other proof are unchanged. The score is the constant at that shift, cut below at 100 decimals; it is 6.34e-8 above the record. No new mathematics. A change notice is at the top of the file; all upstream notices are retained.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
