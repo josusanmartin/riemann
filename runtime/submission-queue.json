@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-65ee25ec-e135-481c-afc5-e7ca72833707",
-    "jobId": "65ee25ec-e135-481c-afc5-e7ca72833707",
-    "proofDigest": "103ba2d3b77de11de00c2fed8d3a79111644727fe9592b38b3f4c7abc2141c4c",
-    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
-    "submissionKey": "e4e7c69f529b37f75dc9dbf6e0d5e9846f72cd1a4b3e4c94ff5db169f40c3abc",
-    "enqueuedAt": "2026-11-23T15:25:23.416Z",
-    "boat": {
-      "baseCommitSha": "b4fd9b68b1ff503b9e0630f3a9160c52b957b6ba",
-      "previousRecordId": "knausgard-rh-bui-heath-brown",
-      "issuedAt": 1795447523415,
-      "startedAt": 1795447526593,
-      "workerId": "bx_kev9gebr",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "65ee25ec-e135-481c-afc5-e7ca72833707",
+      "proofDigest": "103ba2d3b77de11de00c2fed8d3a79111644727fe9592b38b3f4c7abc2141c4c",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/c9090d08839b5577835f2470d287a1874038d9e6/submissions/knausgard-rh-bui-heath-brown-deg40",
+      "completedAt": "2026-11-23T15:42:43.647Z",
+      "logArchived": true
+    },
     {
       "jobId": "5fb1cf44-e313-4e0c-b7f3-bcbeb112836d",
       "proofDigest": "72ebf39f05984c35759eb4e7e30d1ce92d8eb3d77da45b12a48a8ddec59ed593",
