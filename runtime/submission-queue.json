@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "f3abc5826a0192568bdcc90a4d9c76388f82c90f",
       "previousRecordId": "beiyi-octic-joint-overlap",
-      "issuedAt": 1795416912630
+      "issuedAt": 1795416912630,
+      "startedAt": 1795416915086
     }
   },
   "pending": [],
