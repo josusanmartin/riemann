@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-3535b24f-c474-4fc5-95a4-c49eea41cd64",
+    "jobId": "3535b24f-c474-4fc5-95a4-c49eea41cd64",
+    "proofDigest": "d810afd035b9070241184c57921ed3547bcc67f7a9117cab4791d0053c756b66",
+    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
+    "submissionKey": "6f74d3cd37cb339c853281e953a734bcb0426dfd9c70b19a32d54be7dfc0936e",
+    "enqueuedAt": "2026-11-23T00:39:35.240Z",
+    "boat": {
+      "baseCommitSha": "019eaa1881c7de880a19b1e57d25bf51b0c3846b",
+      "previousRecordId": "devine-retained-pair-quartic",
+      "issuedAt": 1795394375240
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1234,12 +1246,9 @@
     }
   ],
   "daily": {
-    "day": "2026-11-22",
+    "day": "2026-11-23",
     "attempts": {
-      "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 3,
-      "020bc97953b7a6423bce5d8192bfd06e3064eac68e015d6e3f00011640a3b06e": 1,
-      "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 2,
-      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 1
+      "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 1
     }
   }
 }
