@@ -13,6 +13,7 @@ export function SiteNotice() {
 
   return (
     <aside className="site-notice contributor-notice" aria-label="Notice to contributors">
+      <p className="compact-record-notice"><Link href="/challenge#baseline">Contributor update · Why the RH foundation changed the baseline</Link></p>
       <p><strong>Contributor update · November 21, 2026</strong></p>
       <p>
         Thank you to everyone who raised the bound to{" "}

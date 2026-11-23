@@ -3966,3 +3966,8 @@ h3 {
 @media (max-width: 600px) {
   .sandbox-limits > div { grid-template-columns: 1fr; gap: .25rem; }
 }
+
+.contributor-notice .compact-record-notice { display: none; }
+body:has(.submission-sheet) .contributor-notice { padding-block: 5px; }
+body:has(.submission-sheet) .contributor-notice p { display: none; }
+body:has(.submission-sheet) .contributor-notice .compact-record-notice { display: block; margin: 0 auto; font-size: .75rem; }
