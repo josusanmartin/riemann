@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "140648f2fab04c46e7fb1033ccf2eb4cecfbe8ad",
       "previousRecordId": "devine-degree32-retained-pair",
-      "issuedAt": 1795424865316
+      "issuedAt": 1795424865316,
+      "startedAt": 1795424868201
     }
   },
   "pending": [],
