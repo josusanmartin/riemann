@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-octic-fourier-overlap",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "1020304099904737317502771060066281400710517377888202507813724305351258712983728999493328031671265274371389554930698369219595158203176041963779005044574073618954552724117015852591933110858270717598053",
+    "denominator": "1210641625193550671812160709711738649869520298587107385166795591990664862309074621404246962372691539912675295520807403174650672340876686857651951734417240394711392995548061966880124166410980261141011"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "We sharpen the Fourier overlap for Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic on Bei Yi’s octic window, by changing the interval endpoints and tightening the Taylor and pi enclosures. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
+  "method": "Sharper short-triple Fourier overlap and optimized shift on the octic window",
+  "model": "OpenAI GPT-6.2 Astra; upstream proof credits in source",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
