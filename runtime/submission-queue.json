@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-5fb1cf44-e313-4e0c-b7f3-bcbeb112836d",
+    "jobId": "5fb1cf44-e313-4e0c-b7f3-bcbeb112836d",
+    "proofDigest": "72ebf39f05984c35759eb4e7e30d1ce92d8eb3d77da45b12a48a8ddec59ed593",
+    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
+    "submissionKey": "9c97256360dfff47ecfa494803a40683d2fcef9ff79471bb0839f9335815f330",
+    "enqueuedAt": "2026-11-23T09:36:17.794Z",
+    "boat": {
+      "baseCommitSha": "15444e5cf9071e0a2060af0e30d2d0afab9db550",
+      "previousRecordId": "beiyi-degree32-variable-retained-pair",
+      "issuedAt": 1795426577794
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1327,7 +1339,7 @@
       "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 1,
       "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 3,
       "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 3,
-      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 1
+      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 2
     }
   }
 }
