@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-degree32-variable-retained-pair",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "8427815160217",
+    "denominator": "10000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Variable retained-pair payments on Michael Devine’s degree-32 window improve the critical-line bound under the official RH foundation.",
+  "method": "Two certified Fourier payment tiers, affine minorant, disjoint weighted triple packing and shifted-cubic Gram budget.",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-degree32-variable-retained-pair",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "8427815160217",
+    "denominator": "10000000000000"
+  },
+  "scoreDecimal": "0.842781516021700000000000000000",
+  "previousRecordId": "devine-degree32-retained-pair",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T09:20:40.997Z",
+  "challengeDigest": "7e1a7fb3d5a5220bbdce17f8e241433af8ab3e640fae4ac1df0b4364ced89557",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
