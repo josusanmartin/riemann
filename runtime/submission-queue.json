@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-8c1bbeb5-bad8-4e78-9062-7c81b32b79a6",
-    "jobId": "8c1bbeb5-bad8-4e78-9062-7c81b32b79a6",
-    "proofDigest": "196136e5329f10393fc5aa6f121d55db33c34d8a31a88c01888de5cef36b08ce",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "000e0dcc3958424b764707efd07a671f771c0f69994c4bb1588f157263f55d16",
-    "enqueuedAt": "2026-11-23T05:35:27.940Z",
-    "boat": {
-      "baseCommitSha": "cb55842bd7ed6eafe157dbf5ff06271f18973a70",
-      "previousRecordId": "devine-octic-fourier-overlap",
-      "issuedAt": 1795412127940,
-      "startedAt": 1795412130383,
-      "workerId": "bx_r7d2ywzb",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8c1bbeb5-bad8-4e78-9062-7c81b32b79a6",
+      "proofDigest": "196136e5329f10393fc5aa6f121d55db33c34d8a31a88c01888de5cef36b08ce",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/3f0789a16c8b4056a62b41023ce75abb4a8ef019/submissions/beiyi-octic-joint-overlap",
+      "completedAt": "2026-11-23T05:47:21.025Z",
+      "logArchived": true
+    },
     {
       "jobId": "015bf1fc-b4c1-4199-af01-a09ccec8232a",
       "proofDigest": "a8afb1d1eff6debae2551f2b4610737c12d3f17516273f1365de6c5ed5d73e04",
