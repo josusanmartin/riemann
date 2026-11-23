@@ -1,6 +1,6 @@
 /** Real authenticated HTTP test; never bypasses the queue or mathematical judge.
  * npx tsx scripts/test-production-flow.ts [--negative-control]
- * The optional negative control consumes ONE of the caller's three daily slots.
+ * The optional negative control consumes ONE of the caller's five daily slots.
  * Requires the maintainer's GitHub login for the positive operator-only replay.
  */
 import { execFileSync } from "node:child_process";

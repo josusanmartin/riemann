@@ -19,16 +19,7 @@ const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
 export const SUBMISSION_QUEUE_BRANCH = "automation-queue";
 export const SUBMISSION_QUEUE_PATH = "runtime/submission-queue.json";
-export const MAX_DAILY_SUBMISSIONS = 3;
-const OWNER_DAILY_SUBMISSIONS = 5;
-
-export function dailySubmissionLimit(github?: string): number {
-  const [owner] = RECORDS_REPOSITORY.split("/");
-  return github?.toLowerCase() === owner.toLowerCase()
-    ? OWNER_DAILY_SUBMISSIONS
-    : MAX_DAILY_SUBMISSIONS;
-}
-
+export const MAX_DAILY_SUBMISSIONS = 5;
 export const MAX_QUEUED_SUBMISSIONS = 100;
 export const MAX_COMPLETED_RECEIPTS = 200;
 const MAX_CAS_ATTEMPTS = 8;
@@ -120,7 +111,7 @@ export const submissionQueueStateSchema = z
     daily: z
       .object({
         day: utcDaySchema,
-        attempts: z.record(digestSchema, z.number().int().min(0).max(OWNER_DAILY_SUBMISSIONS)),
+        attempts: z.record(digestSchema, z.number().int().min(0).max(MAX_DAILY_SUBMISSIONS)),
       })
       .strict(),
   })
@@ -339,7 +330,7 @@ export function enqueueQueueState(
   const existingJobs = next.active ? [next.active, ...next.pending] : next.pending;
   const existing = existingJobs.find((job) => job.jobId === input.jobId);
   const used = next.daily.attempts[ownerKey] ?? 0;
-  const dailyLimit = dailySubmissionLimit(login);
+  const dailyLimit = MAX_DAILY_SUBMISSIONS;
   if (existing) {
     if (
       existing.sandboxId !== input.sandboxId ||
@@ -877,7 +868,7 @@ export async function getDailySubmissionUsage(
     options.fetchImplementation ?? fetch,
   );
   const state = await readBranchState(client);
-  const limit = dailySubmissionLimit(github);
+  const limit = MAX_DAILY_SUBMISSIONS;
   if (!state) {
     return { used: 0, limit, retryAt: nextUtcDay(now) };
   }

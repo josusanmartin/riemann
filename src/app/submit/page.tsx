@@ -32,7 +32,7 @@ import {
 import {
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
-  dailySubmissionLimit,
+  MAX_DAILY_SUBMISSIONS,
 } from "@/lib/submission-queue";
 import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import {
@@ -64,7 +64,7 @@ export default async function SubmitPage() {
           return null;
         })
       : null;
-  const dailyLimit = dailyUsage?.limit ?? dailySubmissionLimit(github);
+  const dailyLimit = dailyUsage?.limit ?? MAX_DAILY_SUBMISSIONS;
   const uploadsRemaining = dailyUsage
     ? Math.max(0, dailyUsage.limit - dailyUsage.used)
     : dailyLimit;
@@ -80,7 +80,7 @@ export default async function SubmitPage() {
               Enter an exact rational and paste or upload your Lean source. A
               private {boatSelected() ? "Boat" : "E2B"} sandbox rechecks the fixed theorem with Comparator, the
               Lean kernel, and nanoda. Jobs run one at a time in submission order,
-              with a daily allowance of three uploads per GitHub account and five for the repository owner.
+              with a daily allowance of five uploads per GitHub account.
               The budget resets at 00:00 UTC, and a rejected job still counts once
               queued. A confirmed memory failure gets one larger-worker retry using the same slot.
             </p>

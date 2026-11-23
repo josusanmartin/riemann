@@ -48,8 +48,8 @@ beforeEach(() => {
   mocks.session.mockResolvedValue({ user: { githubLogin: "solver" } });
   mocks.stage.mockResolvedValue(job);
   mocks.kill.mockResolvedValue(undefined);
-  mocks.usage.mockResolvedValue({ used: 0, limit: 3, retryAt: "2026-09-08T00:00:00.000Z" });
-  mocks.enqueue.mockResolvedValue({ job, position: 0, dailyUsed: 1, dailyLimit: 3, shouldStart: true });
+  mocks.usage.mockResolvedValue({ used: 4, limit: 5, retryAt: "2026-09-08T00:00:00.000Z" });
+  mocks.enqueue.mockResolvedValue({ job, position: 0, dailyUsed: 5, dailyLimit: 5, shouldStart: true });
   mocks.start.mockResolvedValue(true);
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -76,10 +76,10 @@ describe("official submission admission", () => {
     const response = await POST(request());
     expect(response.status).toBe(202);
     expect(mocks.enqueue).toHaveBeenCalledWith(expect.objectContaining(job), "solver", expect.objectContaining({ solution: input.solution }));
-    expect(await response.json()).toMatchObject({ status: "running", dailyUsed: 1, dailyLimit: 3 });
+    expect(await response.json()).toMatchObject({ status: "running", dailyUsed: 5, dailyLimit: 5 });
   });
-  it("does not allocate a worker for the fourth admitted upload", async () => {
-    mocks.usage.mockResolvedValue({ used: 3, limit: 3, retryAt: "2026-09-08T00:00:00.000Z" });
+  it("does not allocate a worker for the sixth upload", async () => {
+    mocks.usage.mockResolvedValue({ used: 5, limit: 5, retryAt: "2026-09-08T00:00:00.000Z" });
     expect((await POST(request())).status).toBe(429);
     expect(mocks.stage).not.toHaveBeenCalled();
   });
@@ -91,7 +91,7 @@ describe("official submission admission", () => {
     expect(mocks.kill).not.toHaveBeenCalled();
   });
   it("cleans up a definitively rejected concurrent admission", async () => {
-    mocks.enqueue.mockRejectedValueOnce(new DailySubmissionLimitError("2026-09-08T00:00:00.000Z", 3));
+    mocks.enqueue.mockRejectedValueOnce(new DailySubmissionLimitError("2026-09-08T00:00:00.000Z", 5));
     expect((await POST(request())).status).toBe(429);
     expect(mocks.kill).toHaveBeenCalledWith(job.sandboxId);
   });

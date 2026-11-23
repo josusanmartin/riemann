@@ -50,7 +50,7 @@ function admission(shouldStart: boolean): QueueAdmission {
     job,
     position: shouldStart ? 0 : 1,
     dailyUsed: 1,
-    dailyLimit: 3,
+    dailyLimit: 5,
     shouldStart,
   };
 }

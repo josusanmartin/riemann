@@ -29,7 +29,7 @@ export async function generateMetadata({
   const description = `${record.author} · ${status}. ${record.method}`;
   const url = `/submissions/${record.id}`;
   const image = {
-    url: `${url}/share-image`,
+    url: `${url}/share-image?v=2`,
     width: 1200,
     height: 630,
     alt: `${title} · ${record.author}`,
@@ -61,6 +61,10 @@ export default async function SubmissionPage({ params }: PageProps) {
   const { score, heading, status } = recordPresentation(record);
   const verifiedAt = recordVerifiedAt(record);
   const Badge = record.formalVerification ? BadgeCheck : BookOpen;
+  const fraction = record.exactRational;
+  const powerOfTen = fraction && /^10{7,}$/.test(fraction.denominator)
+    ? fraction.denominator.length - 1
+    : null;
   const sourceIsManifest = record.sourceUrl.endsWith("/submission.json");
 
   return (
@@ -114,6 +118,18 @@ export default async function SubmissionPage({ params }: PageProps) {
         <div className={styles.body}>
           <dl className={styles.facts}>
             <div>
+              <dt>Exact bound κ</dt>
+              <dd className={styles.exact}>
+                {fraction ? (
+                  <span>
+                    {fraction.numerator} / {powerOfTen === null
+                      ? fraction.denominator
+                      : <>10<sup>{powerOfTen}</sup></>}
+                  </span>
+                ) : record.exactExpression}
+              </dd>
+            </div>
+            <div>
               <dt>Method</dt>
               <dd>{record.method}</dd>
             </div>
@@ -140,7 +156,7 @@ export default async function SubmissionPage({ params }: PageProps) {
           </dl>
           <details className={styles.details}>
             <summary>
-              Exact bound and submission notes <ChevronDown size={17} />
+              Submission notes and proof expression <ChevronDown size={17} />
             </summary>
             <code>κ = {record.exactExpression}</code>
             <p>{record.summary}</p>

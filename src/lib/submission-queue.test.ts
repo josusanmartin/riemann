@@ -447,7 +447,7 @@ describe("durable formal verification queue", () => {
       ),
     ).toThrow();
   });
-  it("enforces three admissions per GitHub account per UTC day", () => {
+  it("enforces five admissions per GitHub account per UTC day", () => {
     let state = createEmptyQueueState("2026-08-11");
     for (let index = 1; index <= MAX_DAILY_SUBMISSIONS; index += 1) {
       const admission = enqueueQueueState(
@@ -464,7 +464,7 @@ describe("durable formal verification queue", () => {
     expect(() =>
       enqueueQueueState(
         state,
-        input(4),
+        input(6),
         "rate-limited-solver",
         ownerSecret,
         firstDay,
@@ -474,7 +474,7 @@ describe("durable formal verification queue", () => {
     expect(() =>
       enqueueQueueState(
         state,
-        input(5, "record-1"),
+        input(7, "record-1"),
         "different-solver",
         ownerSecret,
         firstDay,
@@ -484,7 +484,7 @@ describe("durable formal verification queue", () => {
     expect(() =>
       enqueueQueueState(
         state,
-        input(6),
+        input(8),
         "different-solver",
         ownerSecret,
         firstDay,
@@ -814,8 +814,8 @@ describe("durable formal verification queue", () => {
       options,
     );
 
-    github.synchronizeNextPatches(3);
-    const candidates = [2, 3, 4].map((index) =>
+    github.synchronizeNextPatches(5);
+    const candidates = [2, 3, 4, 5, 6].map((index) =>
       archivedInput(index, "CONCURRENT-SOLVER"),
     );
     const results = await Promise.allSettled(
@@ -836,12 +836,12 @@ describe("durable formal verification queue", () => {
       (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
-    expect(admitted).toHaveLength(2);
+    expect(admitted).toHaveLength(4);
     expect(rejected).toHaveLength(1);
     expect(rejected[0].reason).toBeInstanceOf(DailySubmissionLimitError);
     const state = JSON.parse(github.latestState());
     expect(state.active.jobId).toBe(first.input.jobId);
-    expect(state.pending).toHaveLength(2);
+    expect(state.pending).toHaveLength(4);
     expect(new Set(state.pending.map((job: { jobId: string }) => job.jobId))).toEqual(
       new Set(admitted.map((result) => result.value.job.jobId)),
     );

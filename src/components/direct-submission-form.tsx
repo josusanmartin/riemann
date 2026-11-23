@@ -360,15 +360,13 @@ export function DirectSubmissionForm({
       const queued = payload.status === "queued";
       setPhase(queued ? "queued" : "running");
       setDigest(payload.proofDigest ?? "");
-      setMessage(
-        queued
-          ? `Upload sealed · queue position ${payload.queuePosition ?? 1}. ${
-              payload.dailyUsed ?? 1
-            }/${payload.dailyLimit ?? 3} submissions used today.`
-          : `Upload sealed. Formal verification is running · ${
-              payload.dailyUsed ?? 1
-            }/${payload.dailyLimit ?? 3} submissions used today.`,
-      );
+      const receipt = queued
+        ? `Upload sealed · queue position ${payload.queuePosition ?? 1}.`
+        : "Upload sealed. Formal verification is running.";
+      const usage = payload.dailyUsed != null && payload.dailyLimit != null
+        ? ` ${payload.dailyUsed}/${payload.dailyLimit} submissions used today.`
+        : "";
+      setMessage(receipt + usage);
       storeActiveJob(storageKey, {
         jobToken: payload.jobToken,
         proofDigest: payload.proofDigest ?? "",

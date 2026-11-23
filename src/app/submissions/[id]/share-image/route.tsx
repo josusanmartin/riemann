@@ -39,7 +39,7 @@ export async function GET(
           <strong
             style={{
               color: "#d8f58b",
-              fontSize: 152,
+              fontSize: 128,
               letterSpacing: -8,
               lineHeight: 1.06,
             }}

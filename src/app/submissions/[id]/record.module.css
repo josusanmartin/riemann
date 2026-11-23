@@ -54,7 +54,7 @@
 .score {
   font-family: Georgia, "Times New Roman", serif;
   color: var(--lime);
-  font-size: clamp(4.7rem, 8.4vw, 6.8rem);
+  font-size: clamp(2.9rem, 7vw, 5rem);
   letter-spacing: -0.067em;
   line-height: 0.98;
   white-space: nowrap;
@@ -127,6 +127,10 @@
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
+.facts .exact {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+}
 .body a {
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -177,6 +181,9 @@
     grid-template-columns: 1fr;
     gap: 12px;
     margin: 18px 0;
+  }
+  .score {
+    font-size: clamp(2.9rem, 13vw, 4.5rem);
   }
   .credit h1 {
     font-size: 1.9rem;

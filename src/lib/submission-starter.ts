@@ -12,7 +12,7 @@ Before submitting:
 3. Put any helper declarations and additional imports in this same file.
 4. The provided riemannHypothesis proves the pinned RH premise under the leaderboard foundation policy. Use only the published allowlist.
 
-Rate limit: three admitted uploads per GitHub account (five for the repository owner) per UTC calendar day,
+Rate limit: five admitted uploads per GitHub account per UTC calendar day,
 resetting at 00:00 UTC. Once an upload enters the verification queue, it uses
 one slot even if it later ends in a compilation error, comparison or kernel
 rejection, timeout, or infrastructure failure. Validate locally first whenever

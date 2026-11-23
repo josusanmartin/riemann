@@ -99,7 +99,7 @@ export default function ChallengePage() {
           <div><dt>Time</dt><dd>The full verification command has 5,800 seconds (96 minutes 40 seconds) per attempt for preparation, compilation, export and replay. Each VM has a two-hour lifetime including worker setup.</dd></div>
           <div><dt>Processes and files</dt><dd>Lean is configured for two threads. The isolated check allows up to 512 tasks (processes and threads) and limits each file it writes to 8 GiB.</dd></div>
           <div><dt>Isolation</dt><dd>Proof code runs as an unprivileged user without network access or publishing credentials. The verifier, toolchain and staged inputs are read-only to that user. Dependencies are prepared before the proof runs.</dd></div>
-          <div><dt>Queue and publication</dt><dd>One job runs at a time in admission order. Each GitHub account gets three admissions per UTC day, or five for the repository owner, resetting at 00:00 UTC. Every admitted upload is archived privately, including failed attempts. Accepted proofs are published under Apache-2.0.</dd></div>
+          <div><dt>Queue and publication</dt><dd>One job runs at a time in admission order. Each GitHub account gets five admissions per UTC day, resetting at 00:00 UTC. Every admitted upload is archived privately, including failed attempts. Accepted proofs are published under Apache-2.0.</dd></div>
         </dl>
       </section>
 
