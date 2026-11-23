@@ -1721,5 +1721,31 @@
     "pullRequestUrl": null,
     "summary": "Under the official RH foundation, an octic-window refinement of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s third-moment method, optimized for its retained-pair quotient.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "devine-octic-fourier-overlap",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.842779629142205278207490653821",
+    "method": "Sharper short-triple Fourier overlap and optimized shift on the octic window",
+    "model": "OpenAI GPT-6.2 Astra; upstream proof credits in source",
+    "harness": "Codex",
+    "scoreDecimal": "0.842779629142205278207490653821",
+    "scorePercent": "84.2779629142205278207490653821",
+    "exactRational": {
+      "numerator": "1020304099904737317502771060066281400710517377888202507813724305351258712983728999493328031671265274371389554930698369219595158203176041963779005044574073618954552724117015852591933110858270717598053",
+      "denominator": "1210641625193550671812160709711738649869520298587107385166795591990664862309074621404246962372691539912675295520807403174650672340876686857651951734417240394711392995548061966880124166410980261141011"
+    },
+    "exactExpression": "(1020304099904737317502771060066281400710517377888202507813724305351258712983728999493328031671265274371389554930698369219595158203176041963779005044574073618954552724117015852591933110858270717598053 : ℝ) / 1210641625193550671812160709711738649869520298587107385166795591990664862309074621404246962372691539912675295520807403174650672340876686857651951734417240394711392995548061966880124166410980261141011",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/6b58b92e1b72a82758322a865192cb5c2bc2767d/submissions/devine-octic-fourier-overlap/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/6b58b92e1b72a82758322a865192cb5c2bc2767d/submissions/devine-octic-fourier-overlap/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "We sharpen the Fourier overlap for Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic on Bei Yi’s octic window, by changing the interval endpoints and tightening the Taylor and pi enclosures. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
