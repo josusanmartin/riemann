@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-3535b24f-c474-4fc5-95a4-c49eea41cd64",
-    "jobId": "3535b24f-c474-4fc5-95a4-c49eea41cd64",
-    "proofDigest": "d810afd035b9070241184c57921ed3547bcc67f7a9117cab4791d0053c756b66",
-    "ownerKey": "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee",
-    "submissionKey": "6f74d3cd37cb339c853281e953a734bcb0426dfd9c70b19a32d54be7dfc0936e",
-    "enqueuedAt": "2026-11-23T00:39:35.240Z",
-    "boat": {
-      "baseCommitSha": "019eaa1881c7de880a19b1e57d25bf51b0c3846b",
-      "previousRecordId": "devine-retained-pair-quartic",
-      "issuedAt": 1795394375240,
-      "startedAt": 1795394378002,
-      "workerId": "bx_qa9c3shh",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "3535b24f-c474-4fc5-95a4-c49eea41cd64",
+      "proofDigest": "d810afd035b9070241184c57921ed3547bcc67f7a9117cab4791d0053c756b66",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/e05b8571c1ad2945f9841f97b9d8f78d32afbb9c/submissions/ajp88-retained-pair-shift",
+      "completedAt": "2026-11-23T00:50:54.969Z",
+      "logArchived": true
+    },
     {
       "jobId": "f7065d63-3533-47b1-b021-8b38a860ca43",
       "proofDigest": "18cb00a342ee66a73927adc7ca34d4ac9cad5bcb966551cc1e0bcfe82d797973",
