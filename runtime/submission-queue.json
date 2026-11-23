@@ -12,7 +12,8 @@
       "previousRecordId": "knausgard-rh-bui-heath-brown-deg40",
       "issuedAt": 1795466473582,
       "startedAt": 1795466477302,
-      "workerId": "bx_dkrqdp45"
+      "workerId": "bx_dkrqdp45",
+      "uploaded": true
     }
   },
   "pending": [],
