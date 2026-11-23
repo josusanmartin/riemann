@@ -1877,5 +1877,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). The proof of knausgard-rh-bui-heath-brown (a full Lean proof, from RiemannHypothesis, of Bui and Heath-Brown's theorem that 19/27 of the zeros are simple, with the third-moment certificate for distinct zeros), with the window re-tuned at degree 40 instead of 14. N_d ≥ (0.850881905915655942916451493668659468971332872739 − o(1))·N, the exact value rounded down to 48 decimals. This is a re-optimisation (gain 3.7e-20), not new mathematics: numerically the score is 1.6e-49 below the supremum over even polynomial windows, and odd perturbations do not help. The cubic certificate is due to Claude (Anthropic) and Alpöge–Furman (arXiv:2608.13637, §7.3); the shifted form and 0.8508819 are in Josu San Martin's note of 21 November 2026. 186 modules (4 MB), carried compressed and decoded by a plain-text command in the file; see the header.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "devine-tight85-triple-v3",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.850882288023788639030117227291",
+    "method": "Tightened weighted retained-triple energy in shifted-cubic Gram trace (S1=2.1365 affine short box, L=3 mixed tier, degree-32 window, Bei Yi packing) + Knausgård 19/27 BHB",
+    "model": "GPT-6.2 Astra, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon. Upstream credits",
+    "harness": "Codex, Claude Code, Antigravity",
+    "scoreDecimal": "0.850882288023788639030117227291",
+    "scorePercent": "85.0882288023788639030117227291",
+    "exactRational": {
+      "numerator": "73216584199827098997597266626355724063694669973252932845657514188639301327206972288620297379187220494791775643660010013860126958184187908281106159015209757749062614941647888437329120716666277123844625",
+      "denominator": "86047841435124734854483561644542246018586771148041303052829283597647906130991473339111626737126536418248179143794123276825917493652060410995233911993443002036767292955532782966539308288030192117918458"
+    },
+    "exactExpression": "(73216584199827098997597266626355724063694669973252932845657514188639301327206972288620297379187220494791775643660010013860126958184187908281106159015209757749062614941647888437329120716666277123844625 : ℝ) / 86047841435124734854483561644542246018586771148041303052829283597647906130991473339111626737126536418248179143794123276825917493652060410995233911993443002036767292955532782966539308288030192117918458",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/b29b1e00a36282fdfcaa5fcca777c195605def19/submissions/devine-tight85-triple-v3/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/b29b1e00a36282fdfcaa5fcca777c195605def19/submissions/devine-tight85-triple-v3/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Extending Kristian Muri Knausgård’s 19/27 Bui–Heath-Brown shifted-cubic proof under RH, we combine Michael Devine’s degree-32 window and retained-triple Gram inequalities with Bei Yi’s weighted affine residue-class packing adapted to three-site disjoint triples, a tightened short-span anchor at S1 = 4273/2000 (continuous affine pair and same-sign Rayleigh triple rewards), and mixed-sign Rayleigh tiers extending the span to L = 3. Wiring both public 19/27 endpoints (BHB.simple_dyadic_of_RH and BHB.simple_cumulative_of_RH) establishes an asymptotic distinct critical-line zero proportion exceeding 85.088228802378863% in dyadic and cumulative windows.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
