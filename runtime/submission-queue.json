@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "7e301e6f63dd2bb492c0591eb6a0d29c767387ee",
       "previousRecordId": "ajp88-retained-pair-shift",
-      "issuedAt": 1795402919614
+      "issuedAt": 1795402919614,
+      "startedAt": 1795402922495
     }
   },
   "pending": [],
