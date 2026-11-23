@@ -12,7 +12,8 @@
       "previousRecordId": "devine-degree32-retained-pair",
       "issuedAt": 1795424865316,
       "startedAt": 1795424868201,
-      "workerId": "bx_7k7jpmcm"
+      "workerId": "bx_7k7jpmcm",
+      "uploaded": true
     }
   },
   "pending": [],
