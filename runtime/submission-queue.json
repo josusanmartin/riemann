@@ -12,7 +12,8 @@
       "previousRecordId": "devine-retained-pair-quartic",
       "issuedAt": 1795394375240,
       "startedAt": 1795394378002,
-      "workerId": "bx_qa9c3shh"
+      "workerId": "bx_qa9c3shh",
+      "uploaded": true
     }
   },
   "pending": [],
