@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "devine-retained-pair-optimal-shift",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "model": "OpenAI GPT-6.2 Astra (optimization); earlier proof credits in the source",
+  "harness": "Codex",
+  "score": {
+    "numerator": "81806448634231243213207114398151692687616232961475012343058215498853552130517162480396918499201560806105961440847562279763375988997950998926132384206252174731664406623998045846476201067832221169611246",
+    "denominator": "97067430984597251508509409873930136130947203990684779270311008831067874938033338957721169163607147105580744741532035673422583265043311509074301311573023826815257759955626299991345133727440206817535533"
+  },
+  "scoreDecimal": "0.842779579148564930131886845553",
+  "previousRecordId": "ajp88-retained-pair-shift",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T03:11:49.666Z",
+  "challengeDigest": "3380a63735a342b39caf140113a0337f70ecc168d0a42017c438af05c101a09a",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

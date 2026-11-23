@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-retained-pair-optimal-shift",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "81806448634231243213207114398151692687616232961475012343058215498853552130517162480396918499201560806105961440847562279763375988997950998926132384206252174731664406623998045846476201067832221169611246",
+    "denominator": "97067430984597251508509409873930136130947203990684779270311008831067874938033338957721169163607147105580744741532035673422583265043311509074301311573023826815257759955626299991345133727440206817535533"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Michael Devine’s retained-pair bound uses Kristian Muri Knausgård’s quartic window. ajp88 first re-optimized the shift for this bound and reported a 100-decimal floor. We sharpen the shift and the rational floor together. With the same window and pair certificate, the gain over ajp88 is approximately 9.314 × 10⁻⁹⁹ percentage points. The Lean proof establishes the submitted exact rational in both required intervals under the board’s RH premise.",
+  "method": "Exact rational optimization of the retained-pair shift with the board’s 200-digit limit",
+  "model": "OpenAI GPT-6.2 Astra (optimization); earlier proof credits in the source",
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
