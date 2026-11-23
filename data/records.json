@@ -1747,5 +1747,31 @@
     "pullRequestUrl": null,
     "summary": "We sharpen the Fourier overlap for Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic on Bei Yi’s octic window, by changing the interval endpoints and tightening the Taylor and pi enclosures. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "beiyi-octic-joint-overlap",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.842779634930000000000000000000",
+    "method": "Mass-zero Legendre perturbation with exact octic moments and three whole-interval Fourier certificates.",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.842779634930000000000000000000",
+    "scorePercent": "84.2779634930000000000000000000",
+    "exactRational": {
+      "numerator": "84277963493",
+      "denominator": "100000000000"
+    },
+    "exactExpression": "(84277963493 : ℝ) / 100000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/3f0789a16c8b4056a62b41023ce75abb4a8ef019/submissions/beiyi-octic-joint-overlap/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/3f0789a16c8b4056a62b41023ce75abb4a8ef019/submissions/beiyi-octic-joint-overlap/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Joint octic-window and shift refinement of Michael Devine’s retained-pair Fourier-overlap proof under the official RH foundation.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
