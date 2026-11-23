@@ -11,7 +11,8 @@
       "baseCommitSha": "0a7e705111d4d6632a3e88958bca1512bddc331c",
       "previousRecordId": "devine-retained-pair-optimal-shift",
       "issuedAt": 1795403872259,
-      "startedAt": 1795403875050
+      "startedAt": 1795403875050,
+      "workerId": "bx_7rjnanah"
     }
   },
   "pending": [],
