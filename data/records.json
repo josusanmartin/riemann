@@ -1799,5 +1799,31 @@
     "pullRequestUrl": null,
     "summary": "Starting from Bei Yi’s octic specialization of Michael Devine’s retained-pair extension of Kristian Muri Knausgård’s shifted cubic, we jointly refine the normalized polynomial window through degree 32, the triple span and the certified Fourier overlap. We then optimize the shift and rational floor for these certified constants. Both dyadic and cumulative bounds use the leaderboard’s RH premise.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "beiyi-degree32-variable-retained-pair",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.842781516021700000000000000000",
+    "method": "Two certified Fourier payment tiers, affine minorant, disjoint weighted triple packing and shifted-cubic Gram budget.",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.842781516021700000000000000000",
+    "scorePercent": "84.2781516021700000000000000000",
+    "exactRational": {
+      "numerator": "8427815160217",
+      "denominator": "10000000000000"
+    },
+    "exactExpression": "(8427815160217 : ℝ) / 10000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/c4c6c89986c34d6c5a16eceb197997c523db2f65/submissions/beiyi-degree32-variable-retained-pair/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/c4c6c89986c34d6c5a16eceb197997c523db2f65/submissions/beiyi-degree32-variable-retained-pair/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Variable retained-pair payments on Michael Devine’s degree-32 window improve the critical-line bound under the official RH foundation.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
