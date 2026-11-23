@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-65ee25ec-e135-481c-afc5-e7ca72833707",
+    "jobId": "65ee25ec-e135-481c-afc5-e7ca72833707",
+    "proofDigest": "103ba2d3b77de11de00c2fed8d3a79111644727fe9592b38b3f4c7abc2141c4c",
+    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
+    "submissionKey": "e4e7c69f529b37f75dc9dbf6e0d5e9846f72cd1a4b3e4c94ff5db169f40c3abc",
+    "enqueuedAt": "2026-11-23T15:25:23.416Z",
+    "boat": {
+      "baseCommitSha": "b4fd9b68b1ff503b9e0630f3a9160c52b957b6ba",
+      "previousRecordId": "knausgard-rh-bui-heath-brown",
+      "issuedAt": 1795447523415
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1337,7 +1349,7 @@
       "f3a3ee26ed0a22611b4f55abc629d865593dc010f6d60a00e8ea92fe239de9ee": 1,
       "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd": 3,
       "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 3,
-      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 2
+      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 3
     }
   }
 }
