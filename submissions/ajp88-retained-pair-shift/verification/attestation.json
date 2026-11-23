@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "ajp88-retained-pair-shift",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "model": "Claude",
+  "harness": "Claude Code",
+  "score": {
+    "numerator": "8427795791485649301318868455531674111463156143308779484174389789796506780197904349680110277543279933",
+    "denominator": "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "scoreDecimal": "0.842779579148564930131886845553",
+  "previousRecordId": "devine-retained-pair-quartic",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-23T00:50:54.547Z",
+  "challengeDigest": "77d6698fe20a7f6d7f4b7a2e5fd5c44de04f854582439f22855a00f71b3a7e71",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

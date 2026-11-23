@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "ajp88-retained-pair-shift",
+  "track": "critical-line",
+  "author": {
+    "github": "ajp88",
+    "displayName": "ajp88"
+  },
+  "score": {
+    "numerator": "8427795791485649301318868455531674111463156143308779484174389789796506780197904349680110277543279933",
+    "denominator": "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Derived from Michael Devine's devine-retained-pair-quartic (2026-11-22, Apache-2.0), which builds on Kristian Muri Knausgård's third-moment proof. Policy v2 (RH foundation). Devine's bound with retained pairs is proved for every shift t in a range and is evaluated at Knausgård's tStar, the best shift without the pair term. With the pair term the best shift is lower. This file evaluates the same bound at t = 1.01944754949189..., a 50-decimal rational (TMG.PairGain.tPair): one new definition; the six side conditions and the value are re-proved by the file's own norm_num calls; the numeral changes in five statements. The window, eta, the Fourier certificates and every other proof are unchanged. The score is the constant at that shift, cut below at 100 decimals; it is 6.34e-8 above the record. No new mathematics. A change notice is at the top of the file; all upstream notices are retained.",
+  "method": "Devine's retained-pair bound on Knausgård's quartic window, evaluated at a re-optimised shift t (1.01945 in place of 1.01989); the theorem, the window and the certificates are unchanged",
+  "model": "Claude",
+  "harness": "Claude Code",
+  "license": "Apache-2.0"
+}
