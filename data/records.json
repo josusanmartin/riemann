@@ -1669,5 +1669,31 @@
     "pullRequestUrl": null,
     "summary": "Derived from Michael Devine's devine-retained-pair-quartic (2026-11-22, Apache-2.0), which builds on Kristian Muri Knausgård's third-moment proof. Policy v2 (RH foundation). Devine's bound with retained pairs is proved for every shift t in a range and is evaluated at Knausgård's tStar, the best shift without the pair term. With the pair term the best shift is lower. This file evaluates the same bound at t = 1.01944754949189..., a 50-decimal rational (TMG.PairGain.tPair): one new definition; the six side conditions and the value are re-proved by the file's own norm_num calls; the numeral changes in five statements. The window, eta, the Fourier certificates and every other proof are unchanged. The score is the constant at that shift, cut below at 100 decimals; it is 6.34e-8 above the record. No new mathematics. A change notice is at the top of the file; all upstream notices are retained.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "devine-retained-pair-optimal-shift",
+    "track": "critical-line",
+    "date": "2026-11-23",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.842779579148564930131886845553",
+    "method": "Exact rational optimization of the retained-pair shift with the board’s 200-digit limit",
+    "model": "OpenAI GPT-6.2 Astra (optimization); earlier proof credits in the source",
+    "harness": "Codex",
+    "scoreDecimal": "0.842779579148564930131886845553",
+    "scorePercent": "84.2779579148564930131886845553",
+    "exactRational": {
+      "numerator": "81806448634231243213207114398151692687616232961475012343058215498853552130517162480396918499201560806105961440847562279763375988997950998926132384206252174731664406623998045846476201067832221169611246",
+      "denominator": "97067430984597251508509409873930136130947203990684779270311008831067874938033338957721169163607147105580744741532035673422583265043311509074301311573023826815257759955626299991345133727440206817535533"
+    },
+    "exactExpression": "(81806448634231243213207114398151692687616232961475012343058215498853552130517162480396918499201560806105961440847562279763375988997950998926132384206252174731664406623998045846476201067832221169611246 : ℝ) / 97067430984597251508509409873930136130947203990684779270311008831067874938033338957721169163607147105580744741532035673422583265043311509074301311573023826815257759955626299991345133727440206817535533",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/0e8241797779e44f69c5fdf15d1f49b6609d0911/submissions/devine-retained-pair-optimal-shift/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/0e8241797779e44f69c5fdf15d1f49b6609d0911/submissions/devine-retained-pair-optimal-shift/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Michael Devine’s retained-pair bound uses Kristian Muri Knausgård’s quartic window. ajp88 first re-optimized the shift for this bound and reported a 100-decimal floor. We sharpen the shift and the rational floor together. With the same window and pair certificate, the gain over ajp88 is approximately 9.314 × 10⁻⁹⁹ percentage points. The Lean proof establishes the submitted exact rational in both required intervals under the board’s RH premise.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
