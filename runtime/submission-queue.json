@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-ee2348a9-9623-4c17-a82e-afc8199a7b13",
-    "jobId": "ee2348a9-9623-4c17-a82e-afc8199a7b13",
-    "proofDigest": "88100c70f3329c11969451558eb9276e1b176a2b850673380671864f13a16ced",
-    "ownerKey": "6b96080168c8e4ce7dc06304c1f42265e3912e839b8301738345d3425dff85fd",
-    "submissionKey": "a5c11adcf03bac55122582b721352156beb39a678ebe7d6c4dd465db16b1dc20",
-    "enqueuedAt": "2026-11-23T20:41:13.582Z",
-    "boat": {
-      "baseCommitSha": "2fd8d0e06e965881e0fdd7827edd3a2b87b39725",
-      "previousRecordId": "knausgard-rh-bui-heath-brown-deg40",
-      "issuedAt": 1795466473582,
-      "startedAt": 1795466477302,
-      "workerId": "bx_dkrqdp45",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "ee2348a9-9623-4c17-a82e-afc8199a7b13",
+      "proofDigest": "88100c70f3329c11969451558eb9276e1b176a2b850673380671864f13a16ced",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/b29b1e00a36282fdfcaa5fcca777c195605def19/submissions/devine-tight85-triple-v3",
+      "completedAt": "2026-11-23T21:00:47.226Z",
+      "logArchived": true
+    },
     {
       "jobId": "65ee25ec-e135-481c-afc5-e7ca72833707",
       "proofDigest": "103ba2d3b77de11de00c2fed8d3a79111644727fe9592b38b3f4c7abc2141c4c",
