@@ -1929,5 +1929,31 @@
     "pullRequestUrl": null,
     "summary": "Extending Kristian Muri Knausgård’s 19/27 Bui–Heath-Brown shifted-cubic proof under RH, we combine Michael Devine’s degree-32 window and retained-triple Gram inequalities with Bei Yi’s weighted affine residue-class packing adapted to three-site disjoint triples, a squeezed short-span anchor at S1 = 21373/10000 with a two-piece continuous affine same-sign Rayleigh short box split at 10679/5000, and three sloped (91/100, 9/20) mixed-sign Rayleigh tiers extending the span to L = 601/200. Wiring both public 19/27 endpoints (BHB.simple_dyadic_of_RH and BHB.simple_cumulative_of_RH) establishes an asymptotic distinct critical-line zero proportion exceeding 85.088228960566815% in dyadic and cumulative windows.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-reflected-bhb-78",
+    "track": "critical-line",
+    "date": "2026-11-24",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.853900000000000000000000000000",
+    "method": "Explicit-formula multiplicity bound with a von Mangoldt sum of length T^0.999, coupled to the Bui-Heath-Brown mollifier (P(v) = 1.78v-0.78v^2) by a reflected mixed moment; 19/27 base from deg40.",
+    "model": "GPT-6.2 Astra, Claude Opus 5.5 and Fable 5.2",
+    "harness": "Codex and Claude",
+    "scoreDecimal": "0.853900000000000000000000000000",
+    "scorePercent": "85.3900000000000000000000000000",
+    "exactRational": {
+      "numerator": "8539",
+      "denominator": "10000"
+    },
+    "exactExpression": "(8539 : ℝ) / 10000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/0cad97715565b958fab1eeb139095d264b316d8e/submissions/knausgard-rh-reflected-bhb-78/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/0cad97715565b958fab1eeb139095d264b316d8e/submissions/knausgard-rh-reflected-bhb-78/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). A reflected certificate for distinct zeros. The explicit formula gives a pointwise multiplicity bound using a Fejér-weighted von Mangoldt sum W of length T^0.999. This is coupled to the Bui–Heath-Brown mollifier B, with P(v) = 1.78v − 0.78v², through reflected mixed moments involving ζ′(ρ)B(ρ)W(1−ρ). Low and high prime ranges are treated separately: the low range is a case of Benli–Elma–Ng, Theorem 1.1 and Corollary 1.2; the high range is new. An auxiliary short prime sum and second-moment control of the remaining range and higher prime powers complete the certificate, which yields N_d ≥ (0.8539 − o(1))N on (T, 2T] and (0, T]. The formal 19/27 simple-zero development and the first packed block come from knausgard-rh-bui-heath-brown-deg40.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
