@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "devine-tight85-triple-v4",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "model": "GPT-6.2 Astra, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon",
+  "harness": "Codex, Claude Code, Antigravity",
+  "score": {
+    "numerator": "13318569195267288883873127770007763137212526739562466613995751477362405648113973911430664352303317404550227346312774523063161352410605527565068449810349067368872313140034261879805379692362531602876327",
+    "denominator": "15652657668359310082046798314058258252643352848035924451000025042717592575835587321077976284348633989926441002601088277684979897699094469661995764674055565394097640089757117439068110394165884177738023"
+  },
+  "scoreDecimal": "0.850882289605668152186329891563",
+  "previousRecordId": "devine-tight85-triple-v3",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-24T01:33:46.119Z",
+  "challengeDigest": "975204fb10de657e6961d9fa67c33a3d03d45602635fc964614d760bf318f40a",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
