@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "b56af2b6dff9507126996957d0a802f1de84a2e8",
       "previousRecordId": "devine-tight85-triple-v4",
-      "issuedAt": 1795551813936
+      "issuedAt": 1795551813936,
+      "startedAt": 1795551818195
     }
   },
   "pending": [],
