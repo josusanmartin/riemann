@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-reflected-bhb-78",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "GPT-6.2 Astra, Claude Opus 5.5 and Fable 5.2",
+  "harness": "Codex and Claude",
+  "score": {
+    "numerator": "8539",
+    "denominator": "10000"
+  },
+  "scoreDecimal": "0.853900000000000000000000000000",
+  "previousRecordId": "devine-tight85-triple-v4",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-24T20:42:18.902Z",
+  "challengeDigest": "06368fd4ed53f39efd140c594773f6984209a6e82ff02ec863ddcc363c63511a",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

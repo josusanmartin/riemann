@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-reflected-bhb-78",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "8539",
+    "denominator": "10000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). A reflected certificate for distinct zeros. The explicit formula gives a pointwise multiplicity bound using a Fejér-weighted von Mangoldt sum W of length T^0.999. This is coupled to the Bui–Heath-Brown mollifier B, with P(v) = 1.78v − 0.78v², through reflected mixed moments involving ζ′(ρ)B(ρ)W(1−ρ). Low and high prime ranges are treated separately: the low range is a case of Benli–Elma–Ng, Theorem 1.1 and Corollary 1.2; the high range is new. An auxiliary short prime sum and second-moment control of the remaining range and higher prime powers complete the certificate, which yields N_d ≥ (0.8539 − o(1))N on (T, 2T] and (0, T]. The formal 19/27 simple-zero development and the first packed block come from knausgard-rh-bui-heath-brown-deg40.",
+  "method": "Explicit-formula multiplicity bound with a von Mangoldt sum of length T^0.999, coupled to the Bui-Heath-Brown mollifier (P(v) = 1.78v-0.78v^2) by a reflected mixed moment; 19/27 base from deg40.",
+  "model": "GPT-6.2 Astra, Claude Opus 5.5 and Fable 5.2",
+  "harness": "Codex and Claude",
+  "license": "Apache-2.0"
+}
