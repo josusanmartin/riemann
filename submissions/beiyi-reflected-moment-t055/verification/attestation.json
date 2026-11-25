@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "beiyi-reflected-moment-t055",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "85390845089",
+    "denominator": "100000000000"
+  },
+  "scoreDecimal": "0.853908450890000000000000000000",
+  "previousRecordId": "knausgard-rh-reflected-bhb-78",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-25T07:06:26.912Z",
+  "challengeDigest": "a9b91b9beb7c1c97c2c59cccdc26b75fb35f4f438ead305cc4906ad6a2320e0f",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}

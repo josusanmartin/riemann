@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-reflected-moment-t055",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "85390845089",
+    "denominator": "100000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Retains the accepted taper, reflected mixed moment and center constants. Optimizes the normalized mollified-derivative coefficient to 12427/31250 and sharpens the rational residual budget in the dyadic and cumulative bounds. Upstream attribution is retained in the source.",
+  "method": "Sharper residual-square bound in Knausgård's reflected mixed-moment certificate",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}
