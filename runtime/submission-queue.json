@@ -11,7 +11,8 @@
       "baseCommitSha": "919082eda3f96173c9b8ab89683ef1c87fe39b28",
       "previousRecordId": "knausgard-rh-reflected-bhb-78",
       "issuedAt": 1795589294818,
-      "startedAt": 1795589298579
+      "startedAt": 1795589298579,
+      "workerId": "bx_etc8cd69"
     }
   },
   "pending": [],
