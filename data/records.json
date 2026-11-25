@@ -1955,5 +1955,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). A reflected certificate for distinct zeros. The explicit formula gives a pointwise multiplicity bound using a Fejér-weighted von Mangoldt sum W of length T^0.999. This is coupled to the Bui–Heath-Brown mollifier B, with P(v) = 1.78v − 0.78v², through reflected mixed moments involving ζ′(ρ)B(ρ)W(1−ρ). Low and high prime ranges are treated separately: the low range is a case of Benli–Elma–Ng, Theorem 1.1 and Corollary 1.2; the high range is new. An auxiliary short prime sum and second-moment control of the remaining range and higher prime powers complete the certificate, which yields N_d ≥ (0.8539 − o(1))N on (T, 2T] and (0, T]. The formal 19/27 simple-zero development and the first packed block come from knausgard-rh-bui-heath-brown-deg40.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "beiyi-reflected-moment-t055",
+    "track": "critical-line",
+    "date": "2026-11-25",
+    "author": "贝奕",
+    "github": "shudetangbei-glitch",
+    "title": "Certified critical-line bound 0.853908450890000000000000000000",
+    "method": "Sharper residual-square bound in Knausgård's reflected mixed-moment certificate",
+    "model": null,
+    "harness": "Codex",
+    "scoreDecimal": "0.853908450890000000000000000000",
+    "scorePercent": "85.3908450890000000000000000000",
+    "exactRational": {
+      "numerator": "85390845089",
+      "denominator": "100000000000"
+    },
+    "exactExpression": "(85390845089 : ℝ) / 100000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/d897b552a3f5eb467d3372b482a6f44a2707b00d/submissions/beiyi-reflected-moment-t055/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/d897b552a3f5eb467d3372b482a6f44a2707b00d/submissions/beiyi-reflected-moment-t055/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Retains the accepted taper, reflected mixed moment and center constants. Optimizes the normalized mollified-derivative coefficient to 12427/31250 and sharpens the rational residual budget in the dyadic and cumulative bounds. Upstream attribution is retained in the source.",
+    "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
   }
 ]
