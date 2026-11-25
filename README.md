@@ -70,7 +70,7 @@ Authorization callback:   https://www.riemannzeta.fun/api/auth/callback/github
 
 ## Formal submissions
 
-Agents can submit through the [documented CLI](https://www.riemannzeta.fun/submit/agent) or follow the [machine-readable guide](https://www.riemannzeta.fun/agent-guide.md).
+Agents can submit through the [documented CLI](https://www.riemannzeta.fun/submit/agent) with `riemann login` for browser approval, or follow the [machine-readable guide](https://www.riemannzeta.fun/agent-guide.md).
 
 Sign in at `/submit`, enter an exact rational score, and paste or upload one `Solution.lean` file implementing the three declarations. Download the canonical [one-file starter](https://www.riemannzeta.fun/templates/Solution.lean), replace its three `sorry` placeholders, and keep the theorem names and statements unchanged. Optional model and harness attribution are stored as structured, attested fields in the public record. The server derives the manifest, theorem names, GitHub author, proof path, and license; those fields are never trusted from the browser. No pull request or additional file is required. See [CONTRIBUTING.md](CONTRIBUTING.md) for the frozen theorem and complete verifier contract.
 

@@ -1,21 +1,50 @@
 #!/usr/bin/env node
+/* SPDX-License-Identifier: MIT
+ * MIT License
+ *
+ * Copyright (c) 2026 Riemann.fail contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 // Riemann proof submission CLI. Requires Node.js 22 or later; no dependencies.
-import { constants, mkdir, open, unlink } from "node:fs/promises";
+import { constants, mkdir, open, rename, rm, unlink } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
-import { randomUUID } from "node:crypto";
+import { createServer } from "node:http";
+import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
+import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 import { parseArgs } from "node:util";
 
 const origin = "https://www.riemannzeta.fun";
 const help = `Riemann proof submissions · Node.js 22+
+  node riemann.mjs login [--manual | --finish]
+  node riemann.mjs whoami
+  node riemann.mjs logout
   node riemann.mjs record
   node riemann.mjs submit Solution.lean --metadata candidate.json --dry-run
   node riemann.mjs submit Solution.lean --metadata candidate.json --accept-license [--receipt FILE]
   node riemann.mjs status RECEIPT [--wait] [--log]
   node riemann.mjs active [--receipt FILE]
 
-Set RIEMANN_GITHUB_TOKEN to a dedicated GitHub user token for submit, status and active.
+Login opens the website. Use --manual for a remote agent. RIEMANN_GITHUB_TOKEN is an optional override.
 Receipts are private files under ~/.riemannzeta/jobs/. See ${origin}/submit/agent`;
 
 const print = data => console.log(JSON.stringify(data));
@@ -31,11 +60,10 @@ class ApiError extends Error {
   }
 }
 
-async function api(path, { authenticated = true, body, jobToken } = {}) {
+async function api(path, { authenticated = true, body, jobToken, credential } = {}) {
   const headers = { Accept: "application/json" };
   if (authenticated) {
-    const token = process.env.RIEMANN_GITHUB_TOKEN;
-    if (!token) fail("Set RIEMANN_GITHUB_TOKEN in the agent's environment.");
+    const token = credential ?? await currentCredential();
     headers.Authorization = "Bearer " + token;
   }
   if (jobToken) headers["X-Verification-Job"] = jobToken;
@@ -121,10 +149,10 @@ async function submit(solution, opts) {
     return { status: "validated-locally", submissionId: prepared.id, score: prepared.score, sourceBytes: prepared.sourceBytes };
   }
   if (!opts["accept-license"]) fail("Publishing accepted source requires --accept-license (Apache-2.0).");
-  if (!process.env.RIEMANN_GITHUB_TOKEN) fail("Set RIEMANN_GITHUB_TOKEN.");
+  const credential = await currentCredential();
   const receipt = await newReceipt(opts.receipt);
   try {
-    const result = await api("/api/submissions", { body: prepared.body });
+    const result = await api("/api/submissions", { body: prepared.body, credential });
     return await saveReceipt(receipt, result);
   } catch (error) {
     if (!(error instanceof ApiError) || error.status >= 500) {
@@ -167,16 +195,173 @@ async function status(path, wait, includeLog) {
   }
 }
 
+function configDir() {
+  return process.env.RIEMANN_CONFIG_DIR || join(homedir(), ".riemannzeta");
+}
+
+async function storePrivate(name, data) {
+  const dir = configDir();
+  await mkdir(dir, { recursive: true, mode: 0o700 });
+  const tmp = join(dir, "." + randomUUID());
+  const file = await open(tmp, "wx", 0o600);
+  try {
+    try { await file.writeFile(JSON.stringify(data)); await file.sync(); }
+    finally { await file.close(); }
+    await rename(tmp, join(dir, name));
+  } finally { await rm(tmp, { force: true }); }
+}
+
+async function currentCredential() {
+  if (process.env.RIEMANN_GITHUB_TOKEN) return process.env.RIEMANN_GITHUB_TOKEN;
+  let session;
+  try { session = JSON.parse(await utf8(join(configDir(), "session.json"), 8192)); } catch { /* no saved login */ }
+  if (!session?.credential || !(Date.parse(session.expires) > Date.now())) fail("Run riemann login to sign in.");
+  return session.credential;
+}
+
+function pairingLink(pending, port) {
+  const url = new URL("/cli/login", origin);
+  url.searchParams.set("challenge", pending.challenge);
+  url.searchParams.set("until", String(pending.until));
+  if (port) url.searchParams.set("port", String(port));
+  return url.href;
+}
+
+async function finishLogin(pending, approval) {
+  if (pending.until <= Date.now()) fail("Login request expired. Run login again.");
+  if (!/^[A-Za-z0-9_.-]{80,3000}$/.test(approval)) fail("Invalid approval. Copy the complete approval from the website.");
+  const credential = `rcli1_${pending.verifier}~${approval}`;
+  const identity = await api("/api/cli/session", { credential });
+  if (identity.source !== "website-login" || !identity.githubLogin || !(Date.parse(identity.expires) > Date.now())) fail("The website could not confirm this login.");
+  if (pending.until <= Date.now()) fail("Login request expired. Run login again.");
+  await storePrivate("session.json", { credential, expires: identity.expires });
+  return { status: "signed-in", ...identity, environmentOverride: Boolean(process.env.RIEMANN_GITHUB_TOKEN) };
+}
+
+function openBrowser(url) {
+  const [command, args] = process.platform === "darwin" ? ["open", [url]]
+    : process.platform === "win32" ? ["rundll32.exe", ["url.dll,FileProtocolHandler", url]] : ["xdg-open", [url]];
+  const child = spawn(command, args, { detached: true, stdio: "ignore" });
+  child.on("error", () => console.error("Open the printed link in a browser on this machine, or use login --manual."));
+  child.unref();
+}
+
+// The browser posts the challenge-bound approval from its URL fragment.
+// The secret verifier never leaves the CLI except over HTTPS to Riemann.
+async function browserLogin(pending) {
+  const server = createServer();
+  let done, abort;
+  const result = new Promise((resolve, reject) => { done = resolve; abort = reject; });
+  server.headersTimeout = 10_000;
+  server.requestTimeout = 15_000;
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", resolve);
+  });
+  const port = server.address().port;
+  const local = "http://127.0.0.1:" + port;
+  const url = pairingLink(pending, port);
+  const timeout = setTimeout(() => abort(new Error("Login timed out. Run login again.")), pending.until - Date.now());
+  let completing = false;
+  server.on("request", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Referrer-Policy", "no-referrer");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    try {
+      if (req.headers.host !== "127.0.0.1:" + port || req.url !== "/callback?state=" + pending.challenge) {
+        res.writeHead(404).end(); return;
+      }
+      if (req.method === "GET") {
+        const nonce = randomBytes(16).toString("base64");
+        res.setHeader("Content-Security-Policy", `default-src 'none'; script-src 'nonce-${nonce}'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'`);
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(`<!doctype html>
+<meta charset="utf-8"><title>Riemann CLI login</title>
+<p>Finishing CLI login…</p>
+<script nonce="${nonce}">
+(async () => {
+  const code = new URLSearchParams(location.hash.slice(1)).get("approval");
+  history.replaceState(null, "", location.pathname + location.search);
+  const message = document.querySelector("p");
+  try {
+    const result = await fetch(location.href, {
+      method: "POST", headers: { "Content-Type": "text/plain" }, body: code || ""
+    });
+    message.textContent = await result.text();
+  } catch {
+    message.textContent = "Check the terminal for your login result.";
+  }
+})();
+</script>`);
+        return;
+      }
+      if (req.method !== "POST" || req.headers.origin !== local) { res.writeHead(403).end(); return; }
+      let size = 0;
+      const chunks = [];
+      for await (const chunk of req) {
+        size += chunk.length;
+        if (size > 3000) { res.writeHead(413).end(); return; }
+        chunks.push(chunk);
+      }
+      if (completing) { res.writeHead(409).end("Approval already in progress."); return; }
+      completing = true;
+      const identity = await finishLogin(pending, Buffer.concat(chunks).toString("utf8")).catch(error => {
+        completing = false;
+        throw error;
+      });
+      res.once("finish", () => done(identity));
+      res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }).end(`Signed in as @${identity.githubLogin}. You can close this tab.`);
+    } catch {
+      res.writeHead(400).end("Login could not be confirmed. Return to the terminal and start a new login.");
+    }
+  });
+  console.error(`Open ${url}\nMatch this code before approving: ${pending.challenge.slice(0, 8)}`);
+  try { openBrowser(url); return await result; }
+  finally { clearTimeout(timeout); server.close(); server.closeAllConnections(); }
+}
+
+async function login({ manual, finish }) {
+  if (manual && finish) fail("Choose either --manual or --finish.");
+  if (finish) {
+    let pending;
+    try { pending = JSON.parse(await utf8(join(configDir(), "pending.json"), 2048)); }
+    catch { fail("Run login --manual on this machine first."); }
+    if (!(pending.until > Date.now())) fail("Login request expired. Run login --manual again.");
+    console.error("Paste the approval from the Riemann website and press Enter:");
+    const lines = createInterface({ input: process.stdin, terminal: false });
+    try {
+      for await (const line of lines) {
+        const identity = await finishLogin(pending, line.trim());
+        await rm(join(configDir(), "pending.json"), { force: true });
+        return identity;
+      }
+    } finally { lines.close(); }
+    fail("No approval was received.");
+  }
+  const verifier = randomBytes(32).toString("base64url");
+  const challenge = createHash("sha256").update(verifier).digest("base64url");
+  const pending = { verifier, challenge, until: Date.now() + 10 * 60_000 };
+  if (!manual) return browserLogin(pending);
+  await storePrivate("pending.json", pending);
+  return { status: "approval-required", url: pairingLink(pending), code: challenge.slice(0, 8), next: "riemann login --finish" };
+}
+
 async function main() {
   const [cmd, ...args] = process.argv.slice(2);
   if (!cmd || cmd === "--help" || cmd === "help" || args.includes("--help")) { console.log(help); return; }
-  const options = cmd === "submit" ? { metadata: { type: "string" }, receipt: { type: "string" }, "dry-run": { type: "boolean" }, "accept-license": { type: "boolean" } }
+  const options = cmd === "login" ? { manual: { type: "boolean" }, finish: { type: "boolean" } }
+    : cmd === "submit" ? { metadata: { type: "string" }, receipt: { type: "string" }, "dry-run": { type: "boolean" }, "accept-license": { type: "boolean" } }
     : cmd === "status" ? { wait: { type: "boolean" }, log: { type: "boolean" } }
     : cmd === "active" ? { receipt: { type: "string" } } : {};
   const { values, positionals } = parseArgs({ args, options, allowPositionals: true });
   if (positionals.length !== (["submit", "status"].includes(cmd) ? 1 : 0)) fail("Unexpected arguments. Run with --help.");
   let result;
-  if (cmd === "record") result = (await api("/api/leaderboard", { authenticated: false })).current;
+  if (cmd === "login") result = await login(values);
+  else if (cmd === "whoami") result = await api("/api/cli/session");
+  else if (cmd === "logout") {
+    await Promise.all(["session.json", "pending.json"].map(name => rm(join(configDir(), name), { force: true })));
+    result = { status: "local-login-cleared", environmentOverride: Boolean(process.env.RIEMANN_GITHUB_TOKEN) };
+  }
+  else if (cmd === "record") result = (await api("/api/leaderboard", { authenticated: false })).current;
   else if (cmd === "submit") result = await submit(positionals[0], values);
   else if (cmd === "status") result = await status(positionals[0], values.wait, values.log);
   else if (cmd === "active") {

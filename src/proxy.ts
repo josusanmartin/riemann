@@ -37,7 +37,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/submit", "/submit/history", "/admin/:path*", "/signin",
+    "/submit", "/submit/history", "/admin/:path*", "/signin", "/cli/login",
     "/api/submissions/:path*", "/api/e2b/sweep", "/api/e2b/webhook", "/api/admin/submission-archive/:path*",
   ],
 };

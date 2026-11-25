@@ -1,6 +1,6 @@
 import { guardUserApi } from "@/lib/api-guard";
 import { boatMetadata,reconcileBoat } from "@/lib/boat-queue";
-import { getSession } from "@/auth";
+import { getSubmissionSession } from "@/lib/submission-session";
 import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
 import {
   describePromotionError,
@@ -136,7 +136,7 @@ async function recoveredJobCoordinates(
 export async function GET(request: Request): Promise<Response> {
   const denied = guardUserApi(request, "poll");
   if (denied) return denied;
-  const session = await getSession(request);
+  const session = await getSubmissionSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {

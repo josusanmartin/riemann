@@ -4023,3 +4023,42 @@ h3 {
 .agent-guide section p, .agent-guide li { line-height: 1.6; max-width: 76ch; }
 .agent-guide .code-block { min-width: 0; max-width: 100%; }
 .agent-guide li + li { margin-top: 8px; }
+
+.submit-resources { max-width: 35rem; margin-block: 24px; }
+.submit-resource-nav {
+  display: grid;
+  border: 1px solid #79978b;
+  border-radius: 12px;
+  background: #17372e;
+}
+.submit-resource-nav a {
+  display: grid;
+  grid-template-columns: 18px 1fr 16px;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 16px;
+  color: var(--white);
+  font-size: .92rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.submit-resource-nav a:first-child { border-radius: 11px 11px 0 0; }
+.submit-resource-nav a:last-child { border-radius: 0 0 11px 11px; }
+.submit-resource-nav a + a { border-top: 1px solid #506e62; }
+.submit-resource-nav a svg:first-child { color: var(--lime); }
+.submit-resource-nav a:hover { background: #294c41; }
+.submit-resource-nav a:focus-visible { outline-offset: -3px; }
+.submit-research { margin: 16px 0 0; color: #c0cdc6; font-size: .89rem; }
+.submit-research a {
+  display: inline-block; min-height: 44px; padding-block: 9px;
+  color: var(--lime);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+  font-weight: 650;
+}
+.submit-research a:hover { color: var(--lime-bright); }
+.submit-research svg { display: inline; vertical-align: -.15em; }
+.signin-card textarea[aria-label="CLI approval"] {
+  width: 100%; padding: .65rem; color: var(--ink); background: var(--paper); border-radius: 8px;
+}

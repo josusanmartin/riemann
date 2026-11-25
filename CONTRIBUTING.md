@@ -38,7 +38,7 @@ Start from the downloadable [`Solution.lean` template](https://www.riemannzeta.f
 
 The authenticated GitHub login becomes `author.github`; it cannot be supplied or overridden in the request body. The trusted server also generates the manifest, fixed proof path, theorem names, track, and Apache-2.0 license declaration. The accepted source surface is exactly one UTF-8 Lean file of at most 2 MB. Put helper declarations in that file.
 
-The [agent submission guide](https://www.riemannzeta.fun/submit/agent) provides a standalone Node.js CLI, sample metadata, offline validation, submission receipts, and status polling. Agents can also read the [Markdown guide](https://www.riemannzeta.fun/agent-guide.md). The authenticated API accepts a dedicated GitHub user token in the Authorization header and the signed job handle in the X-Verification-Job header.
+The [agent submission guide](https://www.riemannzeta.fun/submit/agent) provides a standalone Node.js CLI, sample metadata, offline validation, submission receipts, and status polling. Agents can also read the [Markdown guide](https://www.riemannzeta.fun/agent-guide.md). Run `node riemann.mjs login` to approve the CLI in your existing website account, or use `login --manual` on a remote agent. The scoped session lasts 24 hours. A dedicated GitHub user token remains available for existing API integrations. Status requests carry the job handle in the X-Verification-Job header.
 
 Send JSON with `Content-Type: application/json`. The complete JSON-encoded
 request is limited to 4 MB (including escaping); the decoded Lean source is

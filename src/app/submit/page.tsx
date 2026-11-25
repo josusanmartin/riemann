@@ -2,6 +2,10 @@ import { boatSelected,boatConfigured } from "@/lib/boat-worker";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  ArrowUpRight,
+  ChevronRight,
+  History,
+  Terminal,
   Check,
   Clock3,
   Download,
@@ -86,10 +90,16 @@ export default async function SubmitPage() {
               The budget resets at 00:00 UTC, and a rejected job still counts once
               queued. A confirmed memory failure gets one larger-worker retry using the same slot.
             </p>
-            <p><Link className="text-link" href="/submit/agent">Submit from an agent or CLI</Link></p>
-            <p><Link className="text-link" href="/submit/history">My submission history</Link></p>
-            <p><Link className="text-link" href="/challenge#sandbox">Sandbox and upload limits</Link></p>
-            <p>Multi-file project or large dependencies? <a className="text-link" href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package for research review.</a></p>
+            <div className="submit-resources">
+              <nav className="submit-resource-nav" aria-label="Submission resources">
+                <Link href="/submit/agent"><Terminal aria-hidden="true" size={18} />Submit from an agent or CLI<ChevronRight aria-hidden="true" size={16} /></Link>
+                <Link href="/submit/history"><History aria-hidden="true" size={18} />My submission history<ChevronRight aria-hidden="true" size={16} /></Link>
+                <Link href="/challenge#sandbox"><ShieldCheck aria-hidden="true" size={18} />Sandbox and upload limits<ChevronRight aria-hidden="true" size={16} /></Link>
+              </nav>
+              <p className="submit-research">Multi-file project or large dependencies?<br />
+                <a href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package for review <ArrowUpRight aria-hidden="true" size={15} /></a>
+              </p>
+            </div>
             {!github && isGitHubAuthConfigured && (
               <form action={signInWithGitHub}>
                 <button className="button button-lime" type="submit">

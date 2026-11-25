@@ -4,7 +4,7 @@ import { boatProgress } from "@/lib/boat-progress";
 import { reserveBoatJob } from "@/lib/boat-queue";
 import { ZodError } from "zod";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
-import { getSession } from "@/auth";
+import { getSubmissionSession } from "@/lib/submission-session";
 import { records } from "@/lib/records";
 import { prepareDirectSubmission } from "@/lib/direct-submission";
 import { stageE2BVerification } from "@/lib/e2b-queue";
@@ -69,7 +69,7 @@ export async function POST(request: Request): Promise<Response> {
         "Submissions are briefly paused for verifier maintenance. No daily slot was used; please try again shortly.",
     });
   }
-  const session = await getSession(request);
+  const session = await getSubmissionSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
     return noStore(401, {

@@ -1,3 +1,5 @@
+import { createHash, randomBytes } from "node:crypto";
+import { approveCli, cliBearerPrefix } from "@/lib/cli-login";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -71,6 +73,18 @@ describe("official submission admission", () => {
     mocks.session.mockResolvedValue(null);
     expect((await POST(request())).status).toBe(401);
     expect(mocks.stage).not.toHaveBeenCalled();
+  });
+  it("admits a browser-approved CLI session under its immutable account ID", async () => {
+    const verifier = randomBytes(32).toString("base64url");
+    const challenge = createHash("sha256").update(verifier).digest("base64url");
+    const approval = await approveCli({ challenge, until: String(Date.now() + 600000) }, {
+      githubId: "456", githubLogin: "cli-solver",
+    });
+    const req = request();
+    req.headers.set("Authorization", cliBearerPrefix + verifier + "~" + approval);
+    expect((await POST(req)).status).toBe(202);
+    expect(mocks.enqueue).toHaveBeenCalledWith(expect.anything(), "cli-solver", expect.anything(), { githubId: "456" });
+    expect(mocks.session).not.toHaveBeenCalled();
   });
   it("archives the exact submitted source before reporting admission", async () => {
     const response = await POST(request());
