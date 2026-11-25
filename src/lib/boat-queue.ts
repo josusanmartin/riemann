@@ -79,7 +79,10 @@ async function finishSetupFailure(job: QueuedVerificationJob, message: string, i
   const b = job.boat!;
   const feedback = describeVerifierRejection("", message);
   const log = [
+    `Queue admission: ${job.enqueuedAt}`,
     `Setup began: ${new Date(b.startedAt!).toISOString()}`,
+    ...(b.assignedAt ? [`Worker assigned: ${new Date(b.assignedAt).toISOString()}`] : []),
+    `Failure recorded: ${new Date().toISOString()}`,
     b.workerId ? "Worker assigned. Proof upload was not confirmed." : "No worker assignment was recorded.",
     issue ?? b.setupIssue ?? (b.lastProviderStatus ? `Boat API returned HTTP ${b.lastProviderStatus}` : "No provider response recorded."),
     message,
@@ -108,6 +111,7 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
     if (ready === current.proofDigest) return updateBoatJob(job.jobId, lease, { uploaded: true, setupIssue: undefined });
     return finishSetupFailure(current, "Boat proof upload timed out.");
   }
+  let operation = "Check worker allocation";
   try {
     if (!b.workerId) {
       let id;
@@ -121,19 +125,24 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
           });
         }
         if (b.retiredWorkerId) await stopBoatWorker(b.retiredWorkerId);
+        operation = "Create worker";
         id = await createBoatWorker(job.jobId, b.baseCommitSha, job.proofDigest, "competitive", Boolean(b.memoryReplayOf));
       }
+      operation = "Save worker assignment";
       current = await updateBoatJob(job.jobId, lease, { workerId: id, assignedAt: Date.now(), retryAt: Date.now() + 90_000, setupIssue: undefined, lastProviderStatus: undefined });
       b = current.boat!;
     }
+    operation = "Read archived proof";
     const entry = await archived(current);
+    operation = "Transfer proof files";
     await stageBoatFiles(b.workerId!, entry.payload.manifest, entry.payload.solution, job.proofDigest, {
       jobId: job.jobId,
       token: boatCompletionToken(job.jobId, job.proofDigest, process.env.AUTH_SECRET ?? ""),
     });
+    operation = "Confirm proof transfer";
     return await updateBoatJob(job.jobId, lease, { uploaded: true, stagedAt: Date.now(), setupIssue: undefined, lastProviderStatus: undefined });
   } catch (error) {
-    const issue = setupIssue(error);
+    const issue = `${operation}: ${setupIssue(error)}`;
     const permanent = error instanceof BoatError && [400, 401, 402, 403, 422].includes(error.status);
     if (permanent) return finishSetupFailure(current, "Boat declined worker setup.", issue);
     if (!b.workerId && Date.now() - b.startedAt! >= setupLimitMs) {

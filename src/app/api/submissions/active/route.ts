@@ -64,6 +64,7 @@ export async function GET(request: Request): Promise<Response> {
       submissionId: metadata.submissionId,
       proofDigest: metadata.proofDigest,
       jobToken,
+      jobId: queue.job.jobId,
       queuePosition: queue.position,
     });
   } catch (error) {

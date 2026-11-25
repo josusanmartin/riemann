@@ -11,14 +11,30 @@ kind="${2:?job kind}"
 memory_limit="${3:-12G}"
 [[ "$memory_limit" == 12G || "$memory_limit" == 28G ]]
 [[ "$digest" =~ ^[0-9a-f]{64}$ && "$kind" =~ ^(competitive|flow)$ ]]
+# This submitter-visible journal records only fixed phase names, UTC times,
+# and numeric exit statuses. Bootstrap command output stays with the operator.
+stage_file="$HOME/riemann-stages.tsv"
+(umask 077; : > "$stage_file") || true
+stage=workspace
+stage_event() {
+  printf '%s\t%s\t%s\n' "$(date -u +%FT%TZ)" "$stage" "$1" >> "$stage_file" || true
+}
+enter_stage() {
+  stage="$1"
+  stage_event start
+}
+trap 'stage_event "exit=$?"' EXIT
+enter_stage workspace
 sudo install -d -o "$(id -un)" -g "$(id -gn)" "$root"
 cp -R "$site" "$root/site"
 cd "$root/site"
 exec > "$HOME/riemann-bootstrap.log" 2>&1
 umask 077
 export LEAN_NUM_THREADS=2
+enter_stage lean-toolchain
 bash scripts/install-lean-toolchain.sh
 export PATH="$HOME/.elan/bin:$PATH"
+enter_stage foundation
 upstream="$(node -p "require('./challenge/contract.json').trustedUpstream.commit")"
 git init -q "$root/zeta"
 git -C "$root/zeta" fetch -q --depth=1 https://github.com/anthropics/formal-math.git "$upstream"
@@ -47,12 +63,16 @@ PY
   lake build +Zeta23.Unconditional:olean +Zeta23.ThmD.Mult:olean
 ) > "$HOME/riemann-zeta.log" 2>&1 &
 zeta_pid=$!
+enter_stage node-dependencies
 source "$HOME/.nvm/nvm.sh" --no-use
 nvm install 22
 nvm use 22
 npm ci --no-audit --no-fund
+enter_stage wait-verifier-tools
 wait "$tools_pid"
+enter_stage wait-zeta-runtime
 wait "$zeta_pid"
+enter_stage prepare-worker
 prefix="$(cd "$root/zeta" && lean --print-prefix)"
 mkdir -p "$root/bin"
 cp -a "$prefix" "$root/lean"
@@ -68,6 +88,7 @@ export PATH="$root/bin:$root/lean/bin:/usr/local/bin:/usr/bin:/bin"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
 # File content is data; no submission text appears in shell commands or Boat history.
 mkdir -p "$root/input/proof"
+enter_stage check-upload
 staged=false
 for _ in $(seq 1 90); do
   if [[ -f "$inbox/ready" ]] && cp "$inbox/manifest" "$root/input/submission.json" && cp "$inbox/solution" "$root/input/proof/Solution.lean"; then
@@ -82,6 +103,7 @@ if [[ "$kind" == flow ]]; then
 else
   ./node_modules/.bin/tsx -e 'import {records} from "./src/lib/records";process.stdout.write(JSON.stringify(records,null,2)+"\n")' > "$root/input/trusted-records.json"
 fi
+enter_stage isolate-proof
 # Keep the source, toolchain, and verifier immutable to the isolated proof account.
 sudo chown -R root:root "$root"
 sudo chmod -R a+rX,go-w "$root"
@@ -99,6 +121,7 @@ oom_count() {
     sudo awk '$1 == "oom_kill" { print $2 }' "/sys/fs/cgroup$proof_group/memory.events" 2>/dev/null || true
   fi
 }
+enter_stage check-proof
 oom_before="$(oom_count)"
 set +e
 sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
@@ -108,12 +131,14 @@ sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid"
   timeout -k 15s 5800s ./node_modules/.bin/tsx scripts/verify-submission.ts "$root/input" --mode=full --artifact=/home/proofcheck/attestation.json \
   > "$HOME/riemann-proof.log" 2>&1
 status=$?
+stage_event "exit=$status"
 set -e
 oom_after="$(oom_count)"
 kernel_oom=0
 if [[ "$status" != 0 && "$oom_before" =~ ^[0-9]+$ && "$oom_after" =~ ^[0-9]+$ ]] && (( oom_after > oom_before )); then
   kernel_oom=1
 fi
+enter_stage seal-receipt
 # Stop the proof account and its remaining processes before reading its artifact.
 sudo loginctl terminate-user proofcheck || true
 sudo pkill -KILL -u proofcheck 2>/dev/null || true

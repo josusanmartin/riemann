@@ -129,6 +129,13 @@ export async function advanceVerificationQueue(
   const advance = setupLease === undefined
     ? await completeVerificationJob(jobId, completion, {}, verifierLog)
     : await completeVerificationJob(jobId, completion, {}, verifierLog, setupLease);
+  if (advance.advanced && advance.receipt) {
+    const receipt = advance.receipt;
+    console.info("Verification completed", {
+      jobId: receipt.jobId, outcome: receipt.outcome, completedAt: receipt.completedAt,
+      stage: receipt.feedback?.stage, code: receipt.feedback?.code, logArchived: Boolean(receipt.logArchived),
+    });
+  }
   let next = advance.next;
   let publishedRecordId: string | null | undefined;
   for (let skippedJobs = 0; next && skippedJobs < 10; skippedJobs += 1) {

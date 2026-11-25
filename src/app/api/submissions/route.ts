@@ -102,11 +102,41 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const currentRecord = getCurrentRecord();
-    const prepared = prepareDirectSubmission(
-      await readBoundedJson(request),
-      github,
-      currentRecord,
-    );
+    let prepared;
+    try {
+      prepared = prepareDirectSubmission(await readBoundedJson(request), github, currentRecord);
+    } catch (error) {
+      if (error instanceof SyntaxError) return noStore(400, {
+        error: "invalid_submission_json", message: "Send valid UTF-8 JSON with Content-Type: application/json. No slot was used.",
+      });
+      if (error instanceof ZodError) {
+        const fields: Record<string, string> = {
+          id: "Use 1–80 lowercase letters, digits or hyphens, starting with a letter or digit.",
+          displayName: "Provide a display name of 1–100 characters.",
+          score: "Provide an exact numerator and denominator.",
+          "score.numerator": "Use a positive integer string of at most 200 digits.",
+          "score.denominator": "Use a positive integer string of at most 200 digits.",
+          method: "Describe your method in 3–200 characters.",
+          summary: "Describe your result in 20–1,000 characters.",
+          model: "Use 1–80 characters, null, or omit this field.",
+          harness: "Use 1–80 characters, null, or omit this field.",
+          solution: "Provide one non-empty UTF-8 Lean source file of at most 2 MB.",
+          acceptLicense: "Set acceptLicense to true to authorize publication under Apache-2.0.",
+        };
+        const issues = error.issues.slice(0, 12).map(issue => {
+          const path = issue.path.join(".");
+          const field = Object.hasOwn(fields, path) ? path : "request";
+          const message = issue.code === "unrecognized_keys" ? "Remove unsupported fields." :
+            fields[field] ?? "Send a submission object with the fields listed in the agent guide.";
+          return { field, message };
+        });
+        return noStore(400, {
+          error: "invalid_submission", issues,
+          message: issues.map(issue => `${issue.field}: ${issue.message}`).join(" ") + " No slot was used.",
+        });
+      }
+      throw error;
+    }
     if (records.some((record) => record.id === prepared.submission.id)) {
       return noStore(409, {
         error: "submission_exists",
@@ -192,7 +222,11 @@ export async function POST(request: Request): Promise<Response> {
       secret,
     );
 
+    console.info("Submission admitted", {
+      jobId: job.jobId, proofDigest: prepared.proofDigest, queuePosition: admission.position,
+    });
     return noStore(202, {
+      jobId: job.jobId,
       status: verificationRunning ? "running" : "queued",
       ...(verificationRunning && admission.job.boat ? boatProgress(admission.job) : {}),
       submissionId: prepared.submission.id,
@@ -226,15 +260,15 @@ export async function POST(request: Request): Promise<Response> {
     if (error instanceof SubmissionAlreadyQueuedError) {
       return noStore(409, { error: "submission_already_queued", message: error.message });
     }
-    if (error instanceof ZodError || error instanceof SyntaxError) {
+    const message = error instanceof Error ? error.message : "Verification could not start.";
+    if (message.includes("strictly exceed")) {
+      const current = getCurrentRecord();
       return noStore(400, {
-        error: "invalid_submission",
-        message: "The submission fields do not match the formal input schema.",
+        error: "invalid_submission", message: `${message}. Check record ${current.id} before submitting. No slot was used.`,
+        currentRecord: { id: current.id, score: current.exactRational },
       });
     }
-    const message = error instanceof Error ? error.message : "Verification could not start.";
     if (
-      message.includes("strictly exceed") ||
       message.includes("cannot exceed one") ||
       message.includes("2 MB")
     ) {

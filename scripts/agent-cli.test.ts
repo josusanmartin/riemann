@@ -113,3 +113,13 @@ it("keeps a headless website login private, uses it for whoami and clears it on 
   expect(command(["logout"]).status).toBe(0);
   expect(command(["whoami"]).status).toBe(1);
 });
+
+it("traces HTTP failures with field advice without logging credentials, signed handles or source", () => {
+  const error = { error: "invalid_submission", message: "Check the summary", issues: [{ field: "summary", message: "Too short" }] };
+  const result = run([...submitArgs(), "--accept-license", "--verbose"], "/api/submissions", error, 400);
+  const lines = result.stderr.trim().split("\n").map(line => JSON.parse(line));
+  expect(lines[0]).toMatchObject({ event: "request", method: "POST", path: "/api/submissions" });
+  expect(lines[1]).toMatchObject({ event: "response", httpStatus: 400, elapsedMs: expect.any(Number) });
+  expect(lines[2]).toMatchObject({ issues: error.issues });
+  expect(result.stderr).not.toMatch(/private-identity|private-job|UTF-8 fixture/);
+});

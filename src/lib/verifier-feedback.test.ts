@@ -82,6 +82,11 @@ describe("human-readable verifier feedback", () => {
     expect(serialized).not.toContain("Solution.lean:9:4");
   });
 
+  it("points to the compiler error when an earlier warning also cites a line", () => {
+    const diagnosis = describeVerifierRejection("warning: Solution.lean:3:1: unused variable\nerror: Solution.lean:19:4: unknown identifier 'fixture'", "Proof failed");
+    expect(diagnosis.location).toMatchObject({ line: 19, column: 4 });
+  });
+
   it("marks an unrecognized status-one failure without inventing a cause", () => {
     const diagnosis = describeVerifierRejection(
       "opaque failure text",

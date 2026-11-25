@@ -61,31 +61,43 @@ if (actualDigest !== expectedDigest) {
   throw new Error("The immutable uploaded source no longer matches its digest");
 }
 
-// Read from one open descriptor. The diagnostic tail is bounded even if the
-// checker wrote a very large log, and the attestation must fit its size limit.
-async function readVerifierFile(path: string, maxBytes: number, tail = false) {
+// Bound diagnostic reads even when the checker generated a very large file.
+async function readVerifierFile(path: string, maxBytes: number, mode: "file" | "tail" | "rejection" = "file") {
   const file = await open(resolve(path), constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
   try {
     const info = await file.stat();
-    if (!info.isFile() || (!tail && info.size > maxBytes)) throw new Error("Invalid verifier output file");
-    const buffer = Buffer.alloc(Math.min(info.size, maxBytes));
-    let read = 0;
-    const start = tail ? info.size - buffer.length : 0;
-    while (read < buffer.length) {
-      const { bytesRead } = await file.read(buffer, read, buffer.length - read, start + read);
-      if (!bytesRead) break;
-      read += bytesRead;
+    if (!info.isFile() || (mode === "file" && info.size > maxBytes)) throw new Error("Invalid verifier output file");
+    async function range(start: number, size: number) {
+      const buffer = Buffer.alloc(size);
+      let read = 0;
+      while (read < size) {
+        const { bytesRead } = await file.read(buffer, read, size - read, start + read);
+        if (!bytesRead) break;
+        read += bytesRead;
+      }
+      return buffer.toString("utf8", 0, read);
     }
-    return buffer.toString("utf8", 0, read);
+    if (mode === "file") return await range(0, info.size);
+    const clean = (value: string) => value.replace(/\u0000/g, "");
+    const size = Math.min(info.size, maxBytes);
+    const marker = "\n[... middle of verifier output omitted ...]\n";
+    if (mode === "rejection" && info.size > maxBytes) {
+      const first = clean(await range(0, 100_000)).slice(0, 20_000);
+      const last = clean(await range(info.size - 300_000, 300_000));
+      return first + marker + last.slice(-(100_000 - first.length - marker.length));
+    }
+    const output = clean(await range(info.size - size, size));
+    if (mode === "rejection" && output.length > 100_000) {
+      return output.slice(0, 20_000) + marker + output.slice(-(80_000 - marker.length));
+    }
+    return output.slice(-100_000);
   } finally {
     await file.close();
   }
 }
-const log = (await readVerifierFile(logArgument, 400_000, true).catch(() => ""))
-  .replace(/\u0000/g, "")
-  .slice(-100_000);
-const completedAt = new Date().toISOString();
 const exitCode = Number(exitCodeArgument);
+const log = await readVerifierFile(logArgument, 400_000, exitCode === 0 ? "tail" : "rejection").catch(() => "");
+const completedAt = new Date().toISOString();
 let result: object;
 
 if (exitCode === 0) {

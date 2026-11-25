@@ -116,6 +116,14 @@ describe("official submission admission", () => {
     expect(await response.json()).toMatchObject({ error: "verifier_template_stale" });
     expect(mocks.enqueue).not.toHaveBeenCalled();
   });
+  it("names each invalid input field without echoing the uploaded source", async () => {
+    const response = await POST(request({ ...input, solution: "private fixture", summary: "tiny", score: { numerator: 42, denominator: "0" } }));
+    const body = await response.json();
+    expect(response.status).toBe(400);
+    expect(body.issues.map((issue: { field: string }) => issue.field).sort()).toEqual(["score.denominator", "score.numerator", "summary"]);
+    expect(body.message).not.toContain("private fixture");
+    expect(mocks.enqueue).not.toHaveBeenCalled();
+  });
   it("rejects oversized unannounced bodies and forged manifest fields", async () => {
     expect((await POST(request({ ...input, solution: "x".repeat(4_000_001) }))).status).toBe(413);
     expect((await POST(request({ ...input, author: { github: "someone-else" } }))).status).toBe(400);

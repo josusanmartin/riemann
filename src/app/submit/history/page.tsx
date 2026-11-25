@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/auth";
 import { readOwnerHistory } from "@/lib/submission-archive-store";
+import { privateDiagnostic } from "@/lib/private-diagnostic";
 import { describeVerifierRejection } from "@/lib/verifier-feedback";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +24,10 @@ export default async function History({ searchParams }: { searchParams: Promise<
   });
   const detail = history?.detail;
   const receipt = detail?.receipt;
+  const finalLog = detail?.logs.find(log => log.jobId === receipt?.jobId)?.log;
+  const excerpt = receipt?.outcome === "rejected" ? privateDiagnostic(finalLog) : undefined;
   const diagnostic = receipt?.outcome === "rejected"
-    ? receipt.feedback ?? describeVerifierRejection("", receipt.message ?? "")
+    ? receipt.feedback ?? describeVerifierRejection(finalLog ?? "", receipt.message ?? "")
     : null;
   return (
     <main id="main-content" className="submission-history">
@@ -42,14 +45,18 @@ export default async function History({ searchParams }: { searchParams: Promise<
             {diagnostic && receipt.message && receipt.message !== diagnostic.detail && (
               <p>Recorded message: <code>{receipt.message}</code></p>
             )}
+            {diagnostic && <p>{diagnostic.stage} · <code>{diagnostic.code}</code></p>}
+            {diagnostic?.location && <p>Source location <code>{diagnostic.location.file}:{diagnostic.location.line}:{diagnostic.location.column}</code></p>}
+            {excerpt && <><h3>First diagnostic in the retained output</h3><pre>{excerpt}</pre></>}
             {diagnostic && <p>{diagnostic.action}</p>}
             <p>Proof SHA-256 <code>{receipt.proofDigest}</code></p>
             <p>Job <code>{receipt.jobId}</code></p>
-            {detail.logs.length ? detail.logs.map(log => <details key={log.jobId} open>
-              <summary>{log.jobId === receipt.jobId ? "Recorded output (last 100,000 characters)" : "First worker output"}</summary>
+            {detail.logs.length ? detail.logs.map(log => <details key={log.jobId} open={!excerpt}>
+              <summary>{log.jobId === receipt.jobId ? "Recorded verifier output" : "First worker output"}</summary>
               {log.omittedBytes > 0 && <p>{log.omittedBytes} earlier bytes were omitted.</p>}
               <pre>{log.log}</pre>
-            </details>) : <p>No worker output was retained for this attempt.</p>}
+            </details>) : !detail.unavailable && <p>No worker output was retained for this attempt.</p>}
+            {detail.unavailable && <p>Some archived output could not be retrieved. Refresh to retry, or share the job ID with the maintainers.</p>}
           </section>
         ) : attempt && <p>Attempt details are unavailable for this account.</p>}
         {history.active.length + history.completed.length ? <div className="archive-table-wrap">

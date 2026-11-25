@@ -101,3 +101,12 @@ it("allocates the larger worker and limit for an operator replay", async () => {
   expect(request.type).toBe("xlarge");
   expect(request.setupScript).toContain(`${digest} competitive 28G`);
 });
+
+it("retains fixed supervisor stages on failure without disclosing raw bootstrap content", async () => {
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, sandbox: { state: "error", setupStatus: "failed" } }));
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, content: "" }));
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, content: "2026-11-25T19:00:00Z\twait-zeta-runtime\texit=1\nprivate fixture text\n2026-11-25T19:00:00Z\tprivate-command\tstart" }));
+  const result = await boatResult(box, Date.now() + 10000, "test", digest);
+  expect(result?.log).toContain("wait-zeta-runtime  exit=1");
+  expect(result?.log).not.toContain("private");
+});

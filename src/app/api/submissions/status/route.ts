@@ -1,3 +1,4 @@
+import { privateDiagnostic } from "@/lib/private-diagnostic";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatMetadata,reconcileBoat } from "@/lib/boat-queue";
 import { getSubmissionSession } from "@/lib/submission-session";
@@ -44,17 +45,19 @@ function noStore(status: number, body: object): Response {
 // the retained encrypted copy instead. Callers have already checked that the
 // signed-in user owns this job. A missing or unreadable log never hides the
 // verdict itself.
-async function retainedLog(receipt: QueueCompletionReceipt): Promise<string | undefined> {
-  if (!receipt.logArchived) return undefined;
+async function retainedLog(receipt: QueueCompletionReceipt): Promise<{ log?: string; logState: "available" | "unavailable" | "none" }> {
+  if (!receipt.logArchived) return { logState: "none" };
   try {
     const retained = await readVerifierLog(receipt.jobId, receipt.proofDigest);
-    if (!retained) return undefined;
-    return retained.omittedBytes > 0
+    if (!retained) return { logState: "unavailable" };
+    if (!retained.log) return { logState: "none" };
+    const log = retained.omittedBytes > 0
       ? `[${retained.omittedBytes} earlier bytes of this log were not retained]\n${retained.log}`
       : retained.log;
-  } catch (error) {
-    console.error("Unable to read a retained verifier log", error);
-    return undefined;
+    return { log, logState: "available" };
+  } catch {
+    console.error("Unable to read a retained verifier log", { jobId: receipt.jobId });
+    return { logState: "unavailable" };
   }
 }
 
@@ -68,12 +71,12 @@ async function completedReceiptResponse(
       "The durable queue receipt does not match the verification job",
     );
   }
-  const log = await retainedLog(receipt);
+  const { log, logState } = await retainedLog(receipt);
   if (receipt.outcome === "rejected") {
     const feedback =
       receipt.feedback ??
       describeVerifierRejection(
-        "",
+        log ?? "",
         receipt.message ?? "The formal verifier rejected this candidate.",
       );
     return noStore(200, {
@@ -81,6 +84,7 @@ async function completedReceiptResponse(
       submissionId,
       proofDigest: receipt.proofDigest,
       completedAt: receipt.completedAt,
+      jobId: receipt.jobId, logState, diagnosticExcerpt: privateDiagnostic(log),
       message: feedback.detail,
       feedback,
       ...(log === undefined ? {} : { log }),
@@ -91,6 +95,7 @@ async function completedReceiptResponse(
     submissionId,
     proofDigest: receipt.proofDigest,
     completedAt: receipt.completedAt,
+    jobId: receipt.jobId, logState,
     ...(log === undefined ? {} : { log }),
     promotion:
       receipt.outcome === "superseded"
@@ -256,6 +261,7 @@ export async function GET(request: Request): Promise<Response> {
       await killE2BSandbox(job.sandboxId).catch(() => undefined);
       return noStore(200, {
         ...result,
+        jobId: job.jobId, diagnosticExcerpt: privateDiagnostic(result.log),
         message: feedback.detail,
         feedback,
       });

@@ -54,7 +54,10 @@ function feedback(value: VerifierFeedback): VerifierFeedback {
 }
 
 function candidateLocation(log: string): VerifierFeedback["location"] {
-  const match = log.match(
+  // Prefer a compiler error to an earlier warning about a different line.
+  const source = log.split("\n").find(line => /(?:^|[\s:])error:/i.test(line) &&
+    /Solution(?:[\\/]Candidate)?\.lean:\d+:\d+/i.test(line)) ?? log;
+  const match = source.match(
     /(?:^|[\\/\s])Solution(?:[\\/]Candidate)?\.lean:(\d+):(\d+)(?::|\b)/im,
   );
   if (!match) return undefined;

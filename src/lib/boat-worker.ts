@@ -165,6 +165,25 @@ export async function readBoatFile(id: string, file: string, timeoutMs = 75_000)
   return z.string().parse(data.content);
 }
 
+async function withWorkerTimeline(id: string, log: string) {
+  const raw = await readBoatFile(id, "riemann-stages.tsv", 5000).catch(() => "");
+  const phases = new Set(["workspace", "lean-toolchain", "foundation", "node-dependencies",
+    "wait-verifier-tools", "wait-zeta-runtime", "prepare-worker", "check-upload", "isolate-proof", "check-proof", "seal-receipt"]);
+  const entries = raw.slice(0, 4096).split("\n").flatMap(line => {
+    const parts = line.split("\t");
+    if (parts.length !== 3) return [];
+    const [time, phase, event] = parts;
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(time) || !phases.has(phase) || !/^(start|exit=\d{1,3})$/.test(event)) return [];
+    return [`${time}  ${phase}  ${event}`];
+  });
+  if (!entries.length) return log;
+  const timeline = "\n\nWorker stages (UTC)\n" + entries.join("\n");
+  const room = 100_000 - timeline.length;
+  if (log.length <= room) return log + timeline;
+  const marker = "\n[... verifier output omitted ...]\n";
+  return log.slice(0, 20_000) + marker + log.slice(-(room - 20_000 - marker.length)) + timeline;
+}
+
 export async function boatResult(
   id: string,
   expires: number,
@@ -191,17 +210,18 @@ export async function boatResult(
     throw error;
   }
   const stopped = info.setupStatus === "failed" || info.state === "error" || info.state === "archived";
-  if (!stopped && (receiptReady || info.setupStatus === "done"))
-    return e2bVerificationResultSchema.parse(
-      JSON.parse(await readBoatFile(id, "riemann-receipt.json")),
-    );
+  if (!stopped && (receiptReady || info.setupStatus === "done")) {
+    const result = e2bVerificationResultSchema.parse(JSON.parse(await readBoatFile(id, "riemann-receipt.json")));
+    if (result.status === "rejected") result.log = await withWorkerTimeline(id, result.log);
+    return result;
+  }
   if (stopped || Date.now() >= expires) {
     const message = stopped
       ? "The Boat worker stopped before sealing a verification result."
       : "The Boat worker reached its operational time limit.";
     // Only the isolated proof process output is suitable for submitters.
     const output = await readBoatFile(id, "riemann-proof.log").catch(() => "");
-    return unavailable(message, output ? output.slice(-100_000) : message);
+    return unavailable(message, await withWorkerTimeline(id, output ? output.slice(-100_000) : message));
   }
   return null;
 }

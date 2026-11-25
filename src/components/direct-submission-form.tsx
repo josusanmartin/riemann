@@ -1,5 +1,6 @@
 "use client";
 
+import { privateDiagnostic } from "@/lib/private-diagnostic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
@@ -44,6 +45,7 @@ type StatusPayload = {
   proofDigest?: string;
   message?: string;
   log?: string;
+  jobId?: string;
   jobToken?: string;
   queuePosition?: number;
   dailyUsed?: number;
@@ -138,10 +140,12 @@ export function DirectSubmissionForm({
   const [message, setMessage] = useState("");
   const [log, setLog] = useState("");
   const [feedback, setFeedback] = useState<VerifierFeedbackPayload | null>(null);
+  const [jobId, setJobId] = useState("");
   const [digest, setDigest] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const pollGeneration = useRef(0);
   const storageKey = `${ACTIVE_JOB_STORAGE_PREFIX}:${github.toLowerCase()}`;
+  const excerpt = phase === "rejected" ? privateDiagnostic(log) : undefined;
   const busy = ["starting", "queued", "allocation", "staging", "running"].includes(phase);
 
   function replaceEditorSource(nextSource: string, nextMessage: string): void {
@@ -151,6 +155,7 @@ export function DirectSubmissionForm({
     setLog("");
     setFeedback(null);
     setDigest("");
+    setJobId("");
     setEvidenceUrl("");
   }
 
@@ -161,12 +166,16 @@ export function DirectSubmissionForm({
     for (;;) {
       await new Promise((resolve) => window.setTimeout(resolve, delayMs));
       if (pollGeneration.current !== generation) return;
+      let lastCheck = "Could not connect to the status service.";
       try {
         const response = await fetch(
           "/api/submissions/status",
           { cache: "no-store", headers: { "X-Verification-Job": jobToken } },
         );
+        const requestId = response.headers.get("x-vercel-id");
+        lastCheck = `Status check returned HTTP ${response.status}.${requestId ? ` Request ID ${requestId}.` : ""}`;
         const payload = (await response.json()) as StatusPayload;
+        if (payload.jobId) setJobId(payload.jobId);
         if (response.status === 429) {
           delayMs = Math.max(10_000, Math.min(60_000, Number(response.headers.get("retry-after")) * 1000 || 60_000));
           setMessage("Status checks are briefly rate limited. Your saved job will reconnect automatically.");
@@ -177,7 +186,7 @@ export function DirectSubmissionForm({
             clearActiveJob(storageKey);
             setFeedback(payload.feedback ?? null);
             setPhase(payload.feedback ? "rejected" : "error");
-            setMessage(payload.message ?? "This verification job is no longer available.");
+            setMessage(`${payload.message ?? "This verification job is no longer available."} ${lastCheck}`);
             return;
           }
           throw new Error(payload.message ?? "Unable to read verifier status.");
@@ -234,11 +243,7 @@ export function DirectSubmissionForm({
       } catch {
         transientFailures += 1;
         delayMs = Math.min(60_000, 5_000 * 2 ** Math.min(transientFailures, 4));
-        setMessage(
-          transientFailures <= 6
-            ? "Waiting for a status update. Your upload is in the queue. This page will retry automatically."
-            : "The status service is still unreachable. Your job handle is saved. Check My submission history before uploading again.",
-        );
+        setMessage(`${lastCheck} Retrying in ${delayMs / 1000}s. Your job handle is saved.`);
       }
     }
   }, [storageKey]);
@@ -299,6 +304,7 @@ export function DirectSubmissionForm({
     setLog("");
     setFeedback(null);
     setDigest("");
+    setJobId("");
     setEvidenceUrl("");
     const normalizedSolution = solution.replace(/\r\n?/g, "\n").trim();
     const normalizedFlowTest = flowTestSource.replace(/\r\n?/g, "\n").trim();
@@ -361,11 +367,13 @@ export function DirectSubmissionForm({
       });
       const payload = (await response.json()) as StatusPayload;
       if (!response.ok || !payload.jobToken) {
-        throw new Error(payload.message ?? "The verifier could not start.");
+        const requestId = response.headers.get("x-vercel-id");
+        throw new Error(`${payload.message ?? "The verifier could not start."} (HTTP ${response.status})${requestId ? ` · Request ID ${requestId}` : ""}`);
       }
       const queued = payload.status === "queued";
       setPhase(queued ? "queued" : payload.stage === "allocation" ? "allocation" : "running");
       setDigest(payload.proofDigest ?? "");
+      setJobId(payload.jobId ?? "");
       const receipt = queued
         ? `Upload sealed · queue position ${payload.queuePosition ?? 1}.`
         : payload.message ?? "Upload sealed. Formal verification is running.";
@@ -501,6 +509,7 @@ export function DirectSubmissionForm({
         <div>
           <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "starting" ? "Saving your submission" : phase === "allocation" ? "Requesting a worker" : phase === "staging" ? "Transferring proof files" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? feedback?.title ?? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
           <p>{message || "Nothing is accepted until Lean and nanoda independently replay the proof."}</p>
+          {jobId && <code>Job {jobId}</code>}
           {digest && <code>sha256:{digest}</code>}
           {evidenceUrl && <a href={evidenceUrl} target="_blank" rel="noreferrer">Open immutable evidence</a>}
         </div>
@@ -520,6 +529,7 @@ export function DirectSubmissionForm({
             </span>
             <code>{feedback.code}</code>
           </div>
+          {excerpt && <><h4>First diagnostic in the retained output</h4><pre className="private-diagnostic">{excerpt}</pre></>}
           <h4>What to do next</h4>
           <p>{feedback.action}</p>
           <small>

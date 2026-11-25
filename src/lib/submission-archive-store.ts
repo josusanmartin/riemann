@@ -259,12 +259,15 @@ export async function readOwnerHistory(github: string, selectedId?: string, opti
   if (receipt.jobId !== selected.jobId || receipt.proofDigest !== selected.digest)
     throw new Error("Attempt history identity mismatch");
   const logIds = [receipt.firstAttemptLogId, receipt.logArchived ? receipt.jobId : undefined];
-  const logs = await Promise.all(logIds.flatMap(id => id ? [id] : []).map(async id => {
+  const attempts = await Promise.allSettled(logIds.flatMap(id => id ? [id] : []).map(async id => {
     const entry = tree.tree.find(item => item.path === verifierLogPath(id));
     if (!entry) return null;
     const log = openVerifierLog(await jsonBlob(entry.sha), options.archiveKey ?? requireSubmissionArchiveKey());
     if (log.jobId !== id || log.proofDigest !== receipt.proofDigest) throw new Error("Attempt log identity mismatch");
     return log;
   }));
-  return { active, completed, detail: { receipt, logs: logs.filter((log): log is VerifierLogPayload => log !== null && log.log.length > 0) } };
+  const unavailable = attempts.some(attempt => attempt.status === "rejected" || attempt.value === null);
+  if (unavailable) console.warn("Attempt has an unavailable log", { jobId: receipt.jobId });
+  const logs = attempts.flatMap(attempt => attempt.status === "fulfilled" && attempt.value?.log ? [attempt.value] : []);
+  return { active, completed, detail: { receipt, logs, unavailable } };
 }

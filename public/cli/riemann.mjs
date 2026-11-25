@@ -44,19 +44,33 @@ const help = `Riemann proof submissions · Node.js 22+
   node riemann.mjs status RECEIPT [--wait] [--log]
   node riemann.mjs active [--receipt FILE]
 
+Add --verbose to trace API calls and retry timing on stderr.
 Login opens the website. Use --manual for a remote agent. RIEMANN_GITHUB_TOKEN is an optional override.
 Receipts are private files under ~/.riemannzeta/jobs/. See ${origin}/submit/agent`;
+
+let verbose = false;
+function trace(event, fields) {
+  if (verbose) console.error(JSON.stringify({ time: new Date().toISOString(), event, ...fields }));
+}
 
 const print = data => console.log(JSON.stringify(data));
 const fail = message => { throw new Error(message); };
 
 class ApiError extends Error {
-  constructor(status, data, retryAfter) {
+  constructor(status, data, retryAfter, requestId) {
     super(data.message || data.error || `HTTP ${status}`);
     this.status = status;
-    this.code = data.error;
+    this.code = data.error ?? "http_error";
     this.retryAt = data.retryAt;
     this.retryAfter = retryAfter;
+    this.requestId = requestId || undefined;
+    this.issues = data.issues;
+    this.currentRecord = data.currentRecord;
+    this.dailyUsed = data.dailyUsed;
+    this.dailyLimit = data.dailyLimit;
+    if (status === 401) this.action = "Run riemann whoami and refresh your login if it expired.";
+    else if (["invalid_job", "job_expired", "job_not_admitted"].includes(data.error)) this.action = "Use riemann active to recover an in-flight job, or open your submission history.";
+    else if (data.error === "queue_admission_uncertain") this.action = "Check riemann active and your submission history before uploading again.";
   }
 }
 
@@ -68,12 +82,27 @@ async function api(path, { authenticated = true, body, jobToken, credential } = 
   }
   if (jobToken) headers["X-Verification-Job"] = jobToken;
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  const res = await fetch(origin + path, {
-    headers, method: body === undefined ? "GET" : "POST", body,
-    redirect: "error", signal: AbortSignal.timeout(300_000),
-  });
+  const method = body === undefined ? "GET" : "POST";
+  const started = Date.now();
+  trace("request", { method, path });
+  let res;
+  try {
+    res = await fetch(origin + path, { headers, method, body, redirect: "error", signal: AbortSignal.timeout(300_000) });
+  } catch (error) {
+    const timedOut = error.name === "TimeoutError";
+    const reason = /^[A-Z][A-Z_0-9]{1,60}$/.test(error.cause?.code ?? "") ? error.cause.code : undefined;
+    const code = timedOut ? "request_timeout" : "connection_failed";
+    trace(code, { method, path, elapsedMs: Date.now() - started, reason });
+    const networkError = new TypeError(timedOut
+      ? `${method} ${path} timed out after five minutes.`
+      : `Could not reach riemannzeta.fun for ${method} ${path}${reason ? " (" + reason + ")" : ""}.`);
+    networkError.code = code;
+    throw networkError;
+  }
+  const requestId = res.headers.get("x-vercel-id");
+  trace("response", { method, path, httpStatus: res.status, elapsedMs: Date.now() - started, requestId });
   const data = await res.json().catch(() => null);
-  if (!res.ok) throw new ApiError(res.status, data ?? {}, res.headers.get("retry-after"));
+  if (!res.ok) throw new ApiError(res.status, data ?? {}, res.headers.get("retry-after"), requestId);
   if (!data || typeof data !== "object") fail("The site returned an invalid API response.");
   return data;
 }
@@ -98,7 +127,9 @@ async function utf8(path, limit) {
 }
 
 async function buildSubmission(solutionFile, metadataFile) {
-  const m = JSON.parse(await utf8(metadataFile, 32_000));
+  const raw = await utf8(metadataFile, 32_000);
+  let m;
+  try { m = JSON.parse(raw); } catch { fail("The metadata file must contain valid JSON. Check its quotes, commas and brackets."); }
   const allowed = ["id", "displayName", "score", "summary", "method", "model", "harness"];
   if (!m || Array.isArray(m) || typeof m !== "object" || Object.keys(m).some(k => !allowed.includes(k))) fail("Unexpected metadata fields. See the agent guide.");
   if (typeof m.id !== "string" || !/^[a-z0-9][a-z0-9-]{0,79}$/.test(m.id)) fail("Invalid submission id.");
@@ -137,7 +168,7 @@ async function closeReceipt(receipt) {
 async function saveReceipt(receipt, result) {
   const { jobToken, ...summary } = result;
   if (typeof jobToken !== "string" || !jobToken) fail("No job handle returned. Use active or check your submission history.");
-  await receipt.file.writeFile(JSON.stringify({ submissionId: result.submissionId, proofDigest: result.proofDigest, jobToken }));
+  await receipt.file.writeFile(JSON.stringify({ jobId: result.jobId, submissionId: result.submissionId, proofDigest: result.proofDigest, jobToken }));
   await receipt.file.sync();
   return { ...summary, receipt: receipt.path };
 }
@@ -155,7 +186,9 @@ async function submit(solution, opts) {
     const result = await api("/api/submissions", { body: prepared.body, credential });
     return await saveReceipt(receipt, result);
   } catch (error) {
-    if (!(error instanceof ApiError) || error.status >= 500) {
+    const beforeAdmission = ["submissions_paused", "verifier_unavailable", "automation_unavailable",
+      "deployment_identity_unavailable", "job_signing_unavailable", "verifier_template_stale", "verification_queue_full"];
+    if (!(error instanceof ApiError) || (error.status >= 500 && !beforeAdmission.includes(error.code))) {
       console.error(JSON.stringify({ message: "Admission is uncertain. Check active and your submission history before trying again.", submissionId: prepared.id }));
     }
     throw error;
@@ -178,7 +211,7 @@ async function status(path, wait, includeLog) {
       if (!wait || !transient) throw error;
       const requested = Number(error.retryAfter) * 1000;
       const delay = Math.max(retry, Number.isFinite(requested) ? requested : 0);
-      console.error(JSON.stringify({ status: "reconnecting", retryInSeconds: Math.ceil(delay / 1000) }));
+      console.error(JSON.stringify({ time: new Date().toISOString(), status: "reconnecting", reason: error.code ?? error.name, httpStatus: error.status, requestId: error.requestId, retryInSeconds: Math.ceil(delay / 1000) }));
       await sleep(delay);
       retry = Math.min(60_000, retry * 2);
       continue;
@@ -190,7 +223,7 @@ async function status(path, wait, includeLog) {
       if (!includeLog) delete result.log;
       return result;
     }
-    console.error(JSON.stringify({ status: result.status, stage: result.stage, queuePosition: result.queuePosition, message: result.message }));
+    console.error(JSON.stringify({ time: new Date().toISOString(), status: result.status, stage: result.stage, stageStartedAt: result.stageStartedAt, submissionId, queuePosition: result.queuePosition, message: result.message }));
     await sleep(result.status === "queued" ? 30_000 : 10_000);
   }
 }
@@ -352,7 +385,8 @@ async function main() {
     : cmd === "submit" ? { metadata: { type: "string" }, receipt: { type: "string" }, "dry-run": { type: "boolean" }, "accept-license": { type: "boolean" } }
     : cmd === "status" ? { wait: { type: "boolean" }, log: { type: "boolean" } }
     : cmd === "active" ? { receipt: { type: "string" } } : {};
-  const { values, positionals } = parseArgs({ args, options, allowPositionals: true });
+  const { values, positionals } = parseArgs({ args, options: { ...options, verbose: { type: "boolean" } }, allowPositionals: true });
+  verbose = Boolean(values.verbose);
   if (positionals.length !== (["submit", "status"].includes(cmd) ? 1 : 0)) fail("Unexpected arguments. Run with --help.");
   let result;
   if (cmd === "login") result = await login(values);
@@ -376,6 +410,6 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error(JSON.stringify({ error: error.code ?? "cli_error", message: error.message, httpStatus: error.status, retryAt: error.retryAt, retryAfter: error.retryAfter }));
+  console.error(JSON.stringify({ error: error.code ?? "cli_error", message: error.message, httpStatus: error.status, issues: error.issues, currentRecord: error.currentRecord, action: error.action, requestId: error.requestId, dailyUsed: error.dailyUsed, dailyLimit: error.dailyLimit, retryAt: error.retryAt, retryAfter: error.retryAfter }));
   process.exitCode = 1;
 });

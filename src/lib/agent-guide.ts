@@ -53,6 +53,11 @@ curl -fsSLo Solution.lean ${host}/templates/Solution.lean`,
     code: 'riemann status "/path/from/receipt" --wait',
   },
   {
+    heading: "Diagnose a failed run",
+    text: "A rejection includes a diagnosis, the suggested next action, and the first identifiable error in the retained output when available. Add --log for the recorded output. On new failed Boat runs, the log can also include UTC worker stages and exit statuses. Use --verbose to send API paths, HTTP status, elapsed request time, and available Vercel request IDs to stderr. Keep verifier output private because it can contain your source. For support, share the job or request ID.",
+    code: `riemann status "/path/from/receipt" --log --verbose`,
+  },
+  {
     heading: "Recover an interrupted submission",
     text: "The private receipt under ~/.riemannzeta/jobs/ holds the signed job handle. Use --receipt FILE to choose a new private receipt file when submitting or recovering. Keep it out of chat and version control. If the upload response was interrupted or you changed machines, active looks up one active or queued attempt for your GitHub identity and saves a fresh receipt when found. Check its submissionId and digest. Your web submission history also includes completed attempts. Check both before resubmitting an uncertain upload.",
     code: "riemann active",
