@@ -1,23 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-8feed4da-3f8e-4569-89df-e8743a84b886",
-    "jobId": "8feed4da-3f8e-4569-89df-e8743a84b886",
-    "proofDigest": "5ee63052a2c0cbf469fbc19007f784ae6e33daf25c00eb96f41e895810555fda",
-    "ownerKey": "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238",
-    "submissionKey": "f86eb8a6673ba7cb378d60dfe1362dd14f731ae2bef30d1ba1b8a20ba30dbcd1",
-    "enqueuedAt": "2026-11-25T06:48:14.818Z",
-    "boat": {
-      "baseCommitSha": "919082eda3f96173c9b8ab89683ef1c87fe39b28",
-      "previousRecordId": "knausgard-rh-reflected-bhb-78",
-      "issuedAt": 1795589294818,
-      "startedAt": 1795589298579,
-      "workerId": "bx_etc8cd69",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8feed4da-3f8e-4569-89df-e8743a84b886",
+      "proofDigest": "5ee63052a2c0cbf469fbc19007f784ae6e33daf25c00eb96f41e895810555fda",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/d897b552a3f5eb467d3372b482a6f44a2707b00d/submissions/beiyi-reflected-moment-t055",
+      "completedAt": "2026-11-25T07:06:28.176Z",
+      "logArchived": true
+    },
     {
       "jobId": "1318f600-b07e-491a-a035-9fc783d3d641",
       "proofDigest": "f9496135c86eb6a3896ba9979c70821534d7f0e15ae650bf5ff88fd3ca061101",
