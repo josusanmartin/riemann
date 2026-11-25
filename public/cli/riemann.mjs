@@ -68,7 +68,8 @@ class ApiError extends Error {
     this.currentRecord = data.currentRecord;
     this.dailyUsed = data.dailyUsed;
     this.dailyLimit = data.dailyLimit;
-    if (status === 401) this.action = "Run riemann whoami and refresh your login if it expired.";
+    if (data.error === "github_identity_unavailable") this.action = "Check the environment token or unset RIEMANN_GITHUB_TOKEN to use the saved website login.";
+    else if (status === 401) this.action = "Run riemann login to refresh the website login.";
     else if (["invalid_job", "job_expired", "job_not_admitted"].includes(data.error)) this.action = "Use riemann active to recover an in-flight job, or open your submission history.";
     else if (data.error === "queue_admission_uncertain") this.action = "Check riemann active and your submission history before uploading again.";
   }
@@ -275,7 +276,9 @@ function openBrowser(url) {
   const [command, args] = process.platform === "darwin" ? ["open", [url]]
     : process.platform === "win32" ? ["rundll32.exe", ["url.dll,FileProtocolHandler", url]] : ["xdg-open", [url]];
   const child = spawn(command, args, { detached: true, stdio: "ignore" });
-  child.on("error", () => console.error("Open the printed link in a browser on this machine, or use login --manual."));
+  const manualHint = () => console.error("Could not open the browser. Open the printed link on this machine, or use riemann login --manual.");
+  child.on("error", manualHint);
+  child.on("exit", code => { if (code !== null && code !== 0) manualHint(); });
   child.unref();
 }
 
@@ -337,10 +340,15 @@ async function browserLogin(pending) {
       }
       if (completing) { res.writeHead(409).end("Approval already in progress."); return; }
       completing = true;
-      const identity = await finishLogin(pending, Buffer.concat(chunks).toString("utf8")).catch(error => {
-        completing = false;
-        throw error;
-      });
+      let identity;
+      try {
+        identity = await finishLogin(pending, Buffer.concat(chunks).toString("utf8"));
+      } catch (error) {
+        res.once("finish", () => abort(error));
+        res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" })
+          .end("CLI login failed. Check the terminal for the cause and next step.");
+        return;
+      }
       res.once("finish", () => done(identity));
       res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }).end(`Signed in as @${identity.githubLogin}. You can close this tab.`);
     } catch {
