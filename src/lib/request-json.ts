@@ -9,10 +9,10 @@ export class RequestBodyTooLargeError extends Error {
   }
 }
 
-export async function readBoundedJson(
-  request: Request,
-  limit = MAX_SUBMISSION_REQUEST_BYTES,
-): Promise<unknown> {
+export async function readBoundedText(
+  request: Request | Response,
+  limit: number,
+): Promise<string> {
   if (Number(request.headers.get("content-length")) > limit) {
     throw new RequestBodyTooLargeError();
   }
@@ -40,5 +40,9 @@ export async function readBoundedJson(
   } catch {
     throw new SyntaxError("Request body is not valid UTF-8");
   }
-  return JSON.parse(text);
+  return text;
+}
+
+export async function readBoundedJson(request: Request, limit = MAX_SUBMISSION_REQUEST_BYTES): Promise<unknown> {
+  return JSON.parse(await readBoundedText(request, limit));
 }

@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected,boatConfigured,activeBoatFlow,startBoatFlow,stopBoatWorker,flowWorkerId } from "@/lib/boat-worker";
 import { ZodError } from "zod";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
@@ -31,6 +32,8 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const denied = guardUserApi(request, "upload");
+  if (denied) return denied;
   const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
@@ -39,7 +42,7 @@ export async function POST(request: Request): Promise<Response> {
       message: "Sign in with GitHub before running the verifier flow test.",
     });
   }
-  if (!isFlowTestOperator(github)) {
+  if (!isFlowTestOperator(github, session?.user.githubId)) {
     return noStore(403, {
       error: "flow_test_operator_required",
       message: "The noncompetitive flow test is currently restricted to site operators.",

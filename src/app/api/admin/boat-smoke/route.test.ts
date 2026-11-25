@@ -12,11 +12,11 @@ const call = () => POST(new Request("https://example.com/api/admin/boat-smoke", 
 const fetchBoat = vi.fn();
 
 beforeEach(() => {
-  vi.stubEnv("RIEMANN_FLOW_TEST_GITHUB", "operator");
+  vi.stubEnv("RIEMANN_FLOW_TEST_GITHUB", "operator:123");
   vi.stubEnv("RIEMANN_BOAT_SANDBOX_ID", "bx_23456789");
   vi.stubEnv("BOAT_API_KEY", "fixture");
   vi.stubGlobal("fetch", fetchBoat);
-  getSession.mockResolvedValue({ user: { githubLogin: "operator" } });
+  getSession.mockResolvedValue({ user: { githubLogin: "operator", githubId: "123" } });
 });
 
 afterEach(() => {

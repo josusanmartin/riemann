@@ -33,3 +33,9 @@ Queue coordination uses an automation-only Git branch and non-forced compare-and
 ## Web application
 
 GitHub authentication requests read-only identity scopes. OAuth credentials, `AUTH_SECRET`, `E2B_API_KEY`, `E2B_WEBHOOK_SECRET`, `GITHUB_RECORDS_TOKEN`, and `SUBMISSION_ARCHIVE_KEY` belong only in encrypted deployment variables. The site uses signed JWT sessions, accepts one bounded Lean source upload, retains every admitted source under the disclosed encrypted policy, and publishes accepted exact bytes plus the two-kernel attestation as immutable Git evidence.
+
+The active production verifier uses a disposable Boat worker. The proof process runs under a separate account with systemd network, memory, task and time limits. The web service enforces a durable five-admission daily GitHub quota and a single competitive worker lane. Warm function instances also throttle upload and status bursts before GitHub authentication. The hosting provider handles distributed network traffic upstream.
+
+Private submission, sign-in and admin pages use per-response script nonces. Browser clients send verification handles in a request header. The legacy query parameter is supported for existing CLI clients. Maintainer access to the archive and the operator flow test requires a matching immutable GitHub account ID. Privileged users with older browser sessions can sign in again to refresh that claim. Additional authorized accounts use the format `login:numeric-id` in their role allowlist.
+
+Production deployment depends on the Linux application checks and high-severity dependency audit of both npm lockfiles.

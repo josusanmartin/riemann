@@ -120,6 +120,7 @@ sudo pkill -KILL -u proofcheck 2>/dev/null || true
 if [[ $status == 0 ]]; then
   sudo test -f /home/proofcheck/attestation.json
   sudo test ! -L /home/proofcheck/attestation.json
+  [[ "$(sudo stat -c %s /home/proofcheck/attestation.json)" -le 65536 ]]
   sudo install -m 0644 /home/proofcheck/attestation.json "$root/attestation.json"
 fi
 RIEMANN_KERNEL_OOM="$kernel_oom" ./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" "$root/attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"

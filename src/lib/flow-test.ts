@@ -1,3 +1,4 @@
+import { isPrivilegedIdentity } from "./privileged-identity";
 import {
   recordSchema,
   type RecordEntry,
@@ -67,13 +68,8 @@ end
 `;
 
 /** Keep the costly noncompetitive lane operator-only unless explicitly configured. */
-export function isFlowTestOperator(github: string): boolean {
+export function isFlowTestOperator(github: string, githubId?: string): boolean {
   const repositoryOwner = repository.split("/")[0] ?? "";
   const configured = process.env.RIEMANN_FLOW_TEST_GITHUB ?? repositoryOwner;
-  const login = github.toLowerCase();
-  return configured
-    .split(",")
-    .map((value) => value.trim().toLowerCase())
-    .filter(Boolean)
-    .includes(login);
+  return isPrivilegedIdentity(github, githubId, configured);
 }

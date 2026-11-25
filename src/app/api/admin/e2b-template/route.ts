@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { timingSafeEqual } from "node:crypto";
 import type { Sandbox as E2BSandbox } from "e2b";
 import { getE2BApiKey, getE2BTemplate } from "@/lib/e2b-config";
@@ -488,6 +489,8 @@ async function inspectExtendedSmokeTemplate(sandboxId: string, key: string) {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const denied = guardUserApi(request, "poll");
+  if (denied) return denied;
   if (!(await authorized(request))) return noStore(401, { error: "unauthorized" });
   const url = new URL(request.url);
   const action = url.searchParams.get("action");

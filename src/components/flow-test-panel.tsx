@@ -67,10 +67,14 @@ export function FlowTestPanel({
       if (pollGeneration.current !== generation) return;
       try {
         const response = await fetch(
-          `/api/submissions/flow-test/status?job=${encodeURIComponent(jobToken)}`,
-          { cache: "no-store" },
+          "/api/submissions/flow-test/status",
+          { cache: "no-store", headers: { "X-Verification-Job": jobToken } },
         );
         const payload = (await response.json()) as FlowTestPayload;
+        if (response.status === 429) {
+          await new Promise(resolve => window.setTimeout(resolve, 60_000));
+          continue;
+        }
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
             window.localStorage.removeItem(STORAGE_KEY);

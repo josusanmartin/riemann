@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { getSession } from "@/auth";
 import {
   isSubmissionArchiveMaintainer,
@@ -22,8 +23,10 @@ export async function GET(
   request: Request,
   { params }: RouteContext,
 ): Promise<Response> {
+  const denied = guardUserApi(request, "poll");
+  if (denied) return denied;
   const session = await getSession(request);
-  if (!isSubmissionArchiveMaintainer(session?.user.githubLogin)) {
+  if (!isSubmissionArchiveMaintainer(session?.user.githubLogin, session?.user.githubId)) {
     return json(404, { error: "not_found" });
   }
 

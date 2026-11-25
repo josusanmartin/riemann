@@ -1,6 +1,13 @@
 import { ImageResponse } from "next/og";
-import { getRecord } from "@/lib/records";
+import { getRecord, records } from "@/lib/records";
 import { recordPresentation } from "../presentation";
+
+// Each deployment has an immutable record set. Render share images once.
+export const dynamic = "force-static";
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return records.map(({ id }) => ({ id }));
+}
 
 export async function GET(
   _request: Request,

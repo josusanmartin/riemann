@@ -40,6 +40,8 @@ import {
   submissionStarterSource,
 } from "@/lib/submission-starter";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Submit a proof",
   description:
@@ -51,8 +53,8 @@ export default async function SubmitPage() {
   const github = session?.user.githubLogin;
   const current = getCurrentRecord();
   const queueConfigured = isSubmissionQueueConfigured();
-  const flowTestAllowed = github ? isFlowTestOperator(github) : false;
-  const archiveMaintainer = isSubmissionArchiveMaintainer(github);
+  const flowTestAllowed = github ? isFlowTestOperator(github, session?.user.githubId) : false;
+  const archiveMaintainer = isSubmissionArchiveMaintainer(github, session?.user.githubId);
   const verifierConfigured =
     (boatSelected() ? boatConfigured() : isE2BConfigured() && isE2BWebhookConfigured()) &&
     isGitHubPromotionConfigured() &&

@@ -8,6 +8,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       githubLogin?: string;
+      githubId?: string;
     } & DefaultSession["user"];
   }
 }
@@ -15,6 +16,7 @@ declare module "next-auth" {
 declare module "@auth/core/jwt" {
   interface JWT {
     githubLogin?: string;
+    githubId?: string;
   }
 }
 
@@ -42,15 +44,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     : undefined,
   session: { strategy: "jwt" },
   callbacks: {
-    jwt({ token, profile }) {
+    jwt({ token, profile, account }) {
       if (profile && "login" in profile && typeof profile.login === "string") {
         token.githubLogin = profile.login;
+        if (account?.provider === "github") token.githubId = account.providerAccountId;
       }
       return token;
     },
     session({ session, token }) {
       if (token.githubLogin) {
         session.user.githubLogin = token.githubLogin;
+        session.user.githubId = token.githubId;
       }
       return session;
     },
@@ -63,7 +67,7 @@ export async function getSession(request?: Request): Promise<Session | null> {
     const identity = await githubApiIdentity(request);
     if (!identity) return null;
     return {
-      user: { githubLogin: identity.login, name: identity.name ?? identity.login },
+      user: { githubId: String(identity.id), githubLogin: identity.login, name: identity.name ?? identity.login },
       expires: new Date(Date.now() + 60_000).toISOString(),
     };
   }

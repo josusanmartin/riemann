@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { boatMetadata } from "@/lib/boat-queue";
 import { getSession } from "@/auth";
 import { readQueuedE2BJobMetadata } from "@/lib/e2b-queue";
@@ -18,6 +19,8 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function GET(request: Request): Promise<Response> {
+  const denied = guardUserApi(request, "poll");
+  if (denied) return denied;
   const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {

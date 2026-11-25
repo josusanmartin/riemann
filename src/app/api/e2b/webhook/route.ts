@@ -1,3 +1,4 @@
+import { readBoundedText, RequestBodyTooLargeError } from "@/lib/request-json";
 import {
   e2bWebhookEventSchema,
   verifyE2BWebhookSignature,
@@ -33,13 +34,16 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > 65_536) {
-    return noStore(413, { error: "webhook_too_large" });
+  if (!request.headers.get("e2b-signature") || request.headers.get("e2b-signature-version") !== "v1") {
+    return noStore(401, { error: "invalid_webhook_signature" });
   }
-  const rawBody = await request.text();
-  if (Buffer.byteLength(rawBody, "utf8") > 65_536) {
-    return noStore(413, { error: "webhook_too_large" });
+  let rawBody: string;
+  try {
+    rawBody = await readBoundedText(request, 65_536);
+  } catch (error) {
+    return error instanceof RequestBodyTooLargeError
+      ? noStore(413, { error: "webhook_too_large" })
+      : noStore(400, { error: "invalid_webhook_body" });
   }
   if (
     !verifyE2BWebhookSignature(

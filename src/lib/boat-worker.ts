@@ -1,3 +1,4 @@
+import { readBoundedText } from "./request-json";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { e2bVerificationResultSchema } from "./e2b-verifier";
@@ -46,7 +47,11 @@ async function api(
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const data = await response.json().catch(() => null);
+  // File reads can contain output from the submitted proof. Cap the transfer
+  // before decoding JSON, including when the provider omits Content-Length.
+  const data = await readBoundedText(response, 1_500_000)
+    .then(text => JSON.parse(text))
+    .catch(() => null);
   if (!response.ok || data?.ok !== true)
     throw new BoatError(
       response.status,

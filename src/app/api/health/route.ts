@@ -8,6 +8,20 @@ import { isSubmissionQueueConfigured } from "@/lib/submission-queue";
 import { isSubmissionArchiveConfigured } from "@/lib/submission-archive";
 import { computeTrustedMaterialDigest, computeVerifierTemplateDigest } from "../../../../scripts/trusted-material";
 
+// Trusted files are immutable within a deployment. Share in-flight hash work
+// across probes, with a short retry interval if a filesystem check fails.
+let cachedChecks: { expires: number; value: Promise<[string | null, boolean]> } | undefined;
+function checkTrustedFiles() {
+  if (!cachedChecks || cachedChecks.expires <= Date.now()) {
+    const value = Promise.all([
+      computeVerifierTemplateDigest(process.cwd(), contract.trustedPaths).catch(() => null),
+      computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths).then(() => true, () => false),
+    ] as const);
+    cachedChecks = { expires: Date.now() + 60_000, value };
+  }
+  return cachedChecks.value;
+}
+
 export async function GET(): Promise<NextResponse> {
   const current = getCurrentRecord();
   const e2bConfigured = isE2BConfigured();
@@ -15,19 +29,11 @@ export async function GET(): Promise<NextResponse> {
   const promotionConfigured = isGitHubPromotionConfigured();
   const submissionQueueConfigured = isSubmissionQueueConfigured();
   const submissionArchiveConfigured = isSubmissionArchiveConfigured();
-  const expectedVerifierTemplateDigest = await computeVerifierTemplateDigest(
-    process.cwd(), contract.trustedPaths,
-  ).catch(() => null);
+  const [expectedVerifierTemplateDigest, trustedMaterialAvailable] = await checkTrustedFiles();
   const verifierTemplateIdentityConfigured = Boolean(
     expectedVerifierTemplateDigest &&
     process.env.E2B_TEMPLATE_DIGEST === expectedVerifierTemplateDigest,
   );
-  const trustedMaterialAvailable = await computeTrustedMaterialDigest(
-    process.cwd(),
-    contract.trustedPaths,
-  )
-    .then(() => true)
-    .catch(() => false);
   const deploymentIdentityConfigured = /^[0-9a-f]{40}$/.test(
     process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA ?? "",
   );
@@ -64,5 +70,5 @@ export async function GET(): Promise<NextResponse> {
     directSubmissionsConfigured,
     trustedMaterialAvailable,
     deploymentIdentityConfigured,
-  });
+  }, { headers: { "Cache-Control": "public, max-age=0, s-maxage=30" } });
 }

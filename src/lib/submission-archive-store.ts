@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { githubLoginSchema } from "@/lib/challenge";
+import { isPrivilegedIdentity } from "./privileged-identity";
 import { RECORDS_REPOSITORY } from "@/lib/github-promotion";
 import {
   openSubmissionArchive,
@@ -124,25 +124,9 @@ async function archiveClientAndTree(options: SubmissionArchiveStoreOptions) {
   return { client, tree };
 }
 
-export function isSubmissionArchiveMaintainer(github: string | undefined): boolean {
-  if (!github) return false;
-  let login: string;
-  try {
-    login = githubLoginSchema.parse(github).toLowerCase();
-  } catch {
-    return false;
-  }
-  const configured = process.env.SUBMISSION_ARCHIVE_ADMINS;
-  const rawAdmins = configured
-    ? configured.split(",").map((value) => value.trim()).filter(Boolean)
-    : [RECORDS_REPOSITORY.split("/")[0]];
-  try {
-    return rawAdmins
-      .map((value) => githubLoginSchema.parse(value).toLowerCase())
-      .includes(login);
-  } catch {
-    return false;
-  }
+export function isSubmissionArchiveMaintainer(github: string | undefined, githubId?: string): boolean {
+  const admins = process.env.SUBMISSION_ARCHIVE_ADMINS ?? RECORDS_REPOSITORY.split("/")[0];
+  return isPrivilegedIdentity(github, githubId, admins);
 }
 
 export async function listSubmissionArchive(

@@ -130,7 +130,9 @@ describe("maintainer submission archive store", () => {
         submission: { id: "store-proof", author: { github: "store-solver" } },
       },
     });
-    expect(isSubmissionArchiveMaintainer("josusanmartin")).toBe(true);
+    expect(isSubmissionArchiveMaintainer("josusanmartin", "5554649")).toBe(true);
+    expect(isSubmissionArchiveMaintainer("josusanmartin", "123")).toBe(false);
+    expect(isSubmissionArchiveMaintainer("josusanmartin")).toBe(false);
     expect(isSubmissionArchiveMaintainer("another-user")).toBe(false);
   });
 });

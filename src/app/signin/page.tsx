@@ -6,6 +6,8 @@ import { BrandMark } from "@/components/brand-mark";
 import { signInWithGitHub, signOutFromGitHub } from "@/lib/auth-actions";
 import { repositoryUrl } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Sign in" };
 
 function describeAuthError(code: string): string {

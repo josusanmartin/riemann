@@ -163,10 +163,15 @@ export function DirectSubmissionForm({
       if (pollGeneration.current !== generation) return;
       try {
         const response = await fetch(
-          `/api/submissions/status?job=${encodeURIComponent(jobToken)}`,
-          { cache: "no-store" },
+          "/api/submissions/status",
+          { cache: "no-store", headers: { "X-Verification-Job": jobToken } },
         );
         const payload = (await response.json()) as StatusPayload;
+        if (response.status === 429) {
+          delayMs = Math.max(10_000, Math.min(60_000, Number(response.headers.get("retry-after")) * 1000 || 60_000));
+          setMessage("Status checks are briefly rate limited. Your saved job will reconnect automatically.");
+          continue;
+        }
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
             clearActiveJob(storageKey);

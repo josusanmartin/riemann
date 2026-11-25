@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { getSession } from "@/auth";
 import { isFlowTestOperator } from "@/lib/flow-test";
 import { isBoatSmokeConfigured, runBoatSmoke } from "@/lib/boat-smoke";
@@ -10,14 +11,12 @@ function reply(status: number, message: string) {
 }
 
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return reply(403, "Invalid origin.");
-  if (request.headers.get("content-type")?.split(";")[0] !== "application/json") {
-    return reply(415, "Send a JSON request.");
-  }
-  const login = (await getSession(request))?.user.githubLogin;
+  const denied = guardUserApi(request, "upload");
+  if (denied) return denied;
+  const user = (await getSession(request))?.user;
+  const login = user?.githubLogin;
   if (!login) return reply(401, "Sign in to run this test.");
-  if (!isFlowTestOperator(login)) return reply(403, "Site operator access is required.");
+  if (!isFlowTestOperator(login, user?.githubId)) return reply(403, "Site operator access is required.");
   if (!isBoatSmokeConfigured()) return reply(503, "Boat smoke testing is not configured.");
   try {
     const result = await runBoatSmoke();

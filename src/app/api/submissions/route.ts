@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected, boatConfigured } from "@/lib/boat-worker";
 import { boatProgress } from "@/lib/boat-progress";
 import { reserveBoatJob } from "@/lib/boat-queue";
@@ -56,6 +57,8 @@ function noStore(status: number, body: object): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const denied = guardUserApi(request, "upload");
+  if (denied) return denied;
   // Operator switch for verifier upgrades: refuse new uploads before any
   // worker or daily slot is touched. In-flight proofs are unaffected.
   if (process.env.SUBMISSIONS_PAUSED === "1") {

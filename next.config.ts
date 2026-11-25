@@ -1,6 +1,11 @@
+import { contentPolicy } from "./src/lib/content-policy";
 import type { NextConfig } from "next";
 
 const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: contentPolicy(),
+  },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   { key: "Origin-Agent-Cluster", value: "?1" },

@@ -1,3 +1,4 @@
+import { guardUserApi } from "@/lib/api-guard";
 import { boatMetadata,reconcileBoat } from "@/lib/boat-queue";
 import { getSession } from "@/auth";
 import { killE2BSandbox, readE2BVerification } from "@/lib/e2b-verifier";
@@ -133,6 +134,8 @@ async function recoveredJobCoordinates(
 }
 
 export async function GET(request: Request): Promise<Response> {
+  const denied = guardUserApi(request, "poll");
+  if (denied) return denied;
   const session = await getSession(request);
   const github = session?.user.githubLogin;
   if (!github) {
@@ -146,8 +149,8 @@ export async function GET(request: Request): Promise<Response> {
     return noStore(503, { error: "job_signing_unavailable" });
   }
 
-  const token = new URL(request.url).searchParams.get("job");
-  if (!token) {
+  const token = request.headers.get("x-verification-job") ?? new URL(request.url).searchParams.get("job");
+  if (!token || token.length > 4096) {
     return noStore(400, {
       error: "job_required",
       message: "A signed verification job handle is required.",

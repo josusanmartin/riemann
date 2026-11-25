@@ -28,7 +28,7 @@ export default async function SubmissionArchivePage() {
     if (isGitHubAuthConfigured) redirect("/signin");
     notFound();
   }
-  if (!isSubmissionArchiveMaintainer(github)) notFound();
+  if (!isSubmissionArchiveMaintainer(github, session?.user.githubId)) notFound();
 
   let entries: SubmissionArchiveEntry[];
   let error: string | null = null;
