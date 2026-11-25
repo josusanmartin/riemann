@@ -5,58 +5,5 @@
       "path": "/api/submissions/sweep",
       "schedule": "17 3 * * *"
     }
-  ],
-  "routes": [
-    {
-      "src": "^/api/(?:e2b|submissions)/sweep/?$",
-      "methods": [
-        "GET"
-      ],
-      "missing": [
-        {
-          "type": "header",
-          "key": "authorization"
-        }
-      ],
-      "status": 401,
-      "headers": {
-        "Cache-Control": "private, no-store",
-        "X-Content-Type-Options": "nosniff"
-      }
-    },
-    {
-      "src": "^/api/submissions/boat/complete/?$",
-      "methods": [
-        "POST"
-      ],
-      "missing": [
-        {
-          "type": "header",
-          "key": "x-riemann-notification"
-        }
-      ],
-      "status": 401,
-      "headers": {
-        "Cache-Control": "private, no-store",
-        "X-Content-Type-Options": "nosniff"
-      }
-    },
-    {
-      "src": "^/api/e2b/webhook/?$",
-      "methods": [
-        "POST"
-      ],
-      "missing": [
-        {
-          "type": "header",
-          "key": "e2b-signature"
-        }
-      ],
-      "status": 401,
-      "headers": {
-        "Cache-Control": "private, no-store",
-        "X-Content-Type-Options": "nosniff"
-      }
-    }
   ]
 }
