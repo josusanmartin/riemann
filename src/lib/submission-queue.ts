@@ -210,6 +210,7 @@ export type QueueCompletionInput = Omit<
 
 type FetchImplementation = typeof fetch;
 type QueueOptions = {
+  githubId?: string;
   token?: string;
   ownerSecret?: string;
   archiveKey?: string;
@@ -289,7 +290,7 @@ function nextUtcDay(now: Date): string {
   return next.toISOString();
 }
 
-function hmacKey(kind: "owner" | "submission", value: string, secret: string): string {
+function hmacKey(kind: "owner" | "account" | "submission", value: string, secret: string): string {
   return createHmac("sha256", secret)
     .update(`riemann-fail-queue-${kind}-v1\0`)
     .update(value.toLowerCase())
@@ -298,6 +299,13 @@ function hmacKey(kind: "owner" | "submission", value: string, secret: string): s
 
 export function historyOwnerKey(github: string, secret = requiredOwnerSecret({})): string {
   return hmacKey("owner", githubLoginSchema.parse(github), secret);
+}
+
+export function historyOwnerKeys(github: string, githubId?: string, secret = requiredOwnerSecret({})): string[] {
+  const legacy = historyOwnerKey(github, secret);
+  if (!githubId) return [legacy];
+  const validId = z.string().regex(/^[1-9][0-9]{0,19}$/).parse(githubId);
+  return [legacy, hmacKey("account", validId, secret)];
 }
 
 export function createEmptyQueueState(day: string): SubmissionQueueState {
@@ -329,16 +337,18 @@ export function enqueueQueueState(
   github: string,
   ownerSecret: string,
   now: Date,
+  githubId?: string,
 ): QueueMutation<QueueAdmission> {
   const parsedState = submissionQueueStateSchema.parse(state);
   const login = githubLoginSchema.parse(github).toLowerCase();
   const day = utcDay(now);
   const next = copyForDay(parsedState, day);
-  const ownerKey = hmacKey("owner", login, ownerSecret);
+  const owners = historyOwnerKeys(login, githubId, ownerSecret);
+  const ownerKey = owners.at(-1)!;
   const submissionKey = hmacKey("submission", input.submissionId, ownerSecret);
   const existingJobs = next.active ? [next.active, ...next.pending] : next.pending;
   const existing = existingJobs.find((job) => job.jobId === input.jobId);
-  const used = next.daily.attempts[ownerKey] ?? 0;
+  const used = Math.max(...owners.map(key => next.daily.attempts[key] ?? 0));
   const dailyLimit = MAX_DAILY_SUBMISSIONS;
   if (existing) {
     if (
@@ -520,17 +530,14 @@ export function inspectOwnerQueueState(
   state: SubmissionQueueState,
   github: string,
   ownerSecret: string,
+  githubId?: string,
 ): OwnerQueueInspection {
   const parsed = submissionQueueStateSchema.parse(state);
-  const ownerKey = hmacKey(
-    "owner",
-    githubLoginSchema.parse(github),
-    ownerSecret,
-  );
-  if (parsed.active?.ownerKey === ownerKey) {
+  const owners = historyOwnerKeys(github, githubId, ownerSecret);
+  if (parsed.active && owners.includes(parsed.active.ownerKey)) {
     return { status: "active", position: 0, job: parsed.active };
   }
-  const index = parsed.pending.findIndex((job) => job.ownerKey === ownerKey);
+  const index = parsed.pending.findIndex((job) => owners.includes(job.ownerKey));
   return index >= 0
     ? { status: "queued", position: index + 1, job: parsed.pending[index] }
     : { status: "missing" };
@@ -852,13 +859,9 @@ export async function getDailySubmissionUsage(
   if (!state) {
     return { used: 0, limit, retryAt: nextUtcDay(now) };
   }
-  const ownerKey = hmacKey(
-    "owner",
-    githubLoginSchema.parse(github),
-    requiredOwnerSecret(options),
-  );
+  const owners = historyOwnerKeys(github, options.githubId, requiredOwnerSecret(options));
   return {
-    used: state.daily.day === utcDay(now) ? state.daily.attempts[ownerKey] ?? 0 : 0,
+    used: state.daily.day === utcDay(now) ? Math.max(...owners.map(key => state.daily.attempts[key] ?? 0)) : 0,
     limit,
     retryAt: nextUtcDay(now),
   };
@@ -894,7 +897,7 @@ export function enqueueVerificationJob(
   return mutateQueue(
     { ...options, now },
     "queue: enqueue formal verification",
-    (state) => enqueueQueueState(state, input, github, secret, now),
+    (state) => enqueueQueueState(state, input, github, secret, now, options.githubId),
     [
       {
         path: submissionArchivePath(
@@ -1023,6 +1026,7 @@ export async function inspectVerificationJobForOwner(
         state,
         github,
         requiredOwnerSecret(options),
+        options.githubId,
       )
     : { status: "missing" };
 }

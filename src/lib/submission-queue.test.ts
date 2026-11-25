@@ -448,6 +448,14 @@ describe("durable formal verification queue", () => {
       ),
     ).toThrow();
   });
+  it("binds new attempts to the numeric GitHub ID while honoring existing daily usage", () => {
+    const legacy = enqueueQueueState(createEmptyQueueState("2026-08-11"), input(1), "solver", ownerSecret, firstDay);
+    const first = enqueueQueueState(legacy.state, input(2), "solver", ownerSecret, firstDay, "123");
+    expect(first.result.dailyUsed).toBe(2);
+    const advanced = completeQueueState(first.state, input(1).jobId, { outcome: "rejected", promotionStatus: null, evidenceUrl: null, message: "test" });
+    expect(inspectOwnerQueueState(advanced.state, "solver", ownerSecret, "456").status).toBe("missing");
+    expect(inspectOwnerQueueState(advanced.state, "solver", ownerSecret, "123").status).toBe("active");
+  });
   it("enforces five admissions per GitHub account per UTC day", () => {
     let state = createEmptyQueueState("2026-08-11");
     for (let index = 1; index <= MAX_DAILY_SUBMISSIONS; index += 1) {

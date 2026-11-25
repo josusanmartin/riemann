@@ -118,7 +118,7 @@ export async function POST(request: Request): Promise<Response> {
         sandboxId: job.sandboxId,
         jobId: job.jobId,
         submissionId: prepared.submission.id,
-        github,
+        github, githubId: session?.user.githubId,
         proofDigest: prepared.proofDigest,
         baseCommitSha,
         previousRecordId: FLOW_TEST_BASELINE_ID,

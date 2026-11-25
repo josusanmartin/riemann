@@ -13,10 +13,11 @@ function time(iso: string) {
 }
 
 export default async function History({ searchParams }: { searchParams: Promise<{ attempt?: string }> }) {
-  const github = (await getSession())?.user.githubLogin;
+  const user = (await getSession())?.user;
+  const github = user?.githubLogin;
   if (!github) redirect("/signin");
   const { attempt } = await searchParams;
-  const history = await readOwnerHistory(github, attempt).catch(error => {
+  const history = await readOwnerHistory(github, attempt, { githubId: user?.githubId }).catch(error => {
     console.error("Unable to load submission history", error);
     return null;
   });

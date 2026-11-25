@@ -77,6 +77,11 @@ export async function POST(request: Request): Promise<Response> {
       message: "Sign in with GitHub before submitting a formal proof.",
     });
   }
+  const githubId = session?.user.githubId;
+  if (!githubId) return noStore(401, {
+    error: "sign_in_again",
+    message: "Refresh your GitHub sign-in on the submission page before uploading.",
+  });
   if (boatSelected() ? !boatConfigured() : !isE2BConfigured()) {
     return noStore(503, {
       error: "verifier_unavailable",
@@ -108,7 +113,7 @@ export async function POST(request: Request): Promise<Response> {
         message: "That submission identifier is already part of the public record.",
       });
     }
-    const dailyUsage = await getDailySubmissionUsage(github);
+    const dailyUsage = await getDailySubmissionUsage(github, { githubId });
     if (dailyUsage.used >= dailyUsage.limit) {
       return noStore(429, {
         error: "daily_submission_limit",
@@ -154,6 +159,7 @@ export async function POST(request: Request): Promise<Response> {
         },
         github,
         { manifest: prepared.manifest, solution: prepared.solution },
+        { githubId },
       );
     } catch (error) {
       if (!boatSelected() && !(error instanceof QueueCommitUncertainError)) {
@@ -176,7 +182,7 @@ export async function POST(request: Request): Promise<Response> {
         sandboxId: admission.job.sandboxId,
         jobId: admission.job.jobId,
         submissionId: prepared.submission.id,
-        github,
+        github, githubId,
         proofDigest: prepared.proofDigest,
         baseCommitSha,
         previousRecordId: currentRecord.id,

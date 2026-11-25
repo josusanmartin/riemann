@@ -96,7 +96,7 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     const job = verifySubmissionJob(token, secret);
-    if (job.github.toLowerCase() !== github.toLowerCase()) {
+    if (job.github.toLowerCase() !== github.toLowerCase() || (job.githubId && job.githubId !== session?.user.githubId)) {
       return noStore(403, {
         error: "job_owner_mismatch",
         message: "This flow test belongs to another GitHub account.",

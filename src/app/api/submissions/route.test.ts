@@ -45,7 +45,7 @@ beforeEach(() => {
   vi.stubEnv("AUTH_SECRET", "test-auth-secret");
   vi.stubEnv("RIEMANN_BASE_COMMIT_SHA", "a".repeat(40));
   vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "a".repeat(40));
-  mocks.session.mockResolvedValue({ user: { githubLogin: "solver" } });
+  mocks.session.mockResolvedValue({ user: { githubLogin: "solver", githubId: "123" } });
   mocks.stage.mockResolvedValue(job);
   mocks.kill.mockResolvedValue(undefined);
   mocks.usage.mockResolvedValue({ used: 4, limit: 5, retryAt: "2026-09-08T00:00:00.000Z" });
@@ -75,7 +75,7 @@ describe("official submission admission", () => {
   it("archives the exact submitted source before reporting admission", async () => {
     const response = await POST(request());
     expect(response.status).toBe(202);
-    expect(mocks.enqueue).toHaveBeenCalledWith(expect.objectContaining(job), "solver", expect.objectContaining({ solution: input.solution }));
+    expect(mocks.enqueue).toHaveBeenCalledWith(expect.objectContaining(job), "solver", expect.objectContaining({ solution: input.solution }), { githubId: "123" });
     expect(await response.json()).toMatchObject({ status: "running", dailyUsed: 5, dailyLimit: 5 });
   });
   it("does not allocate a worker for the sixth upload", async () => {

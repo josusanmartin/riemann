@@ -35,7 +35,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const queue = await inspectVerificationJobForOwner(github);
+    const queue = await inspectVerificationJobForOwner(github, { githubId: session?.user.githubId });
     if (queue.status === "missing") {
       return noStore(200, { status: "none" });
     }
@@ -50,7 +50,7 @@ export async function GET(request: Request): Promise<Response> {
         sandboxId: metadata.sandboxId,
         jobId: metadata.jobId,
         submissionId: metadata.submissionId,
-        github,
+        github, githubId: session?.user.githubId,
         proofDigest: metadata.proofDigest,
         baseCommitSha: metadata.baseCommitSha,
         previousRecordId: metadata.previousRecordId,

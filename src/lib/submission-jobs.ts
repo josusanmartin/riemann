@@ -27,6 +27,7 @@ export const submissionJobTokenSchema = z
     jobId: z.string().uuid(),
     submissionId: z.string().max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
     github: githubLoginSchema,
+    githubId: z.string().regex(/^[1-9][0-9]{0,19}$/).optional(),
     proofDigest: sha256Schema,
     baseCommitSha: z.string().regex(/^[0-9a-f]{40}$/),
     previousRecordId: z.string().min(1).max(160),

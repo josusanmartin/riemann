@@ -61,7 +61,7 @@ export default async function SubmitPage() {
     queueConfigured;
   const dailyUsage =
     github && queueConfigured
-      ? await getDailySubmissionUsage(github).catch((error) => {
+      ? await getDailySubmissionUsage(github, { githubId: session?.user.githubId }).catch((error) => {
           console.error("Unable to read the submitter's daily usage", error);
           return null;
         })
@@ -221,6 +221,12 @@ export default async function SubmitPage() {
           </div>
         </div>
 
+        {github && !session?.user.githubId && isGitHubAuthConfigured && (
+          <form action={signInWithGitHub} className="submission-locked-card">
+            <p>Refresh your GitHub sign-in to attach new submissions to your permanent account ID.</p>
+            <button className="button button-dark" type="submit"><Github size={17} /> Refresh GitHub sign-in</button>
+          </form>
+        )}
         {github ? (
           <DirectSubmissionForm
             github={github}

@@ -13,7 +13,7 @@ import {
   type SubmissionArchivePayload,
   type SubmissionArchiveSummary,
 } from "@/lib/submission-archive";
-import { historyOwnerKey, queueCompletionReceiptSchema, SUBMISSION_QUEUE_BRANCH, SUBMISSION_QUEUE_PATH, submissionQueueStateSchema } from "@/lib/submission-queue";
+import { historyOwnerKeys, queueCompletionReceiptSchema, SUBMISSION_QUEUE_BRANCH, SUBMISSION_QUEUE_PATH, submissionQueueStateSchema } from "@/lib/submission-queue";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
@@ -50,6 +50,7 @@ const blobSchema = z
 type FetchImplementation = typeof fetch;
 
 export type SubmissionArchiveStoreOptions = {
+  githubId?: string;
   token?: string;
   archiveKey?: string;
   fetchImplementation?: FetchImplementation;
@@ -231,23 +232,23 @@ export async function readVerifierLog(
 
 /** Scope the index to the authenticated login before resolving any requested attempt or log. */
 export async function readOwnerHistory(github: string, selectedId?: string, options: SubmissionArchiveStoreOptions = {}) {
-  const owner = historyOwnerKey(github);
-  const prefix = `runtime/history/${owner}/`;
+  const owners = historyOwnerKeys(github, options.githubId);
+  const prefixes = owners.map(owner => `runtime/history/${owner}/`);
   const { client, tree } = await archiveClientAndTree(options);
   async function jsonBlob(sha: string) {
     const blob = blobSchema.parse(await client.json(repositoryPath(`git/blobs/${sha}`)));
     return JSON.parse(Buffer.from(blob.content, "base64").toString("utf8"));
   }
-  const completed = tree.tree.filter(entry => entry.type === "blob" && entry.path.startsWith(prefix))
+  const completed = tree.tree.filter(entry => entry.type === "blob" && prefixes.some(prefix => entry.path.startsWith(prefix)))
     .map(entry => {
-      const [date, status, digest, jobId] = entry.path.slice(prefix.length, -5).split("_");
+      const [date, status, digest, jobId] = entry.path.slice(prefixes[0].length, -5).split("_");
       return { date, status, digest, jobId, sha: entry.sha };
     }).sort((a, b) => b.date.localeCompare(a.date));
   const stateEntry = tree.tree.find(entry => entry.path === SUBMISSION_QUEUE_PATH);
   if (!stateEntry) throw new Error("Submission queue state unavailable");
   const state = submissionQueueStateSchema.parse(await jsonBlob(stateEntry.sha));
   const active = [state.active, ...state.pending].flatMap((job, index) => {
-    if (!job || job.ownerKey !== owner) return [];
+    if (!job || !owners.includes(job.ownerKey)) return [];
     const status = index ? "Queued" : !job.boat ? "In progress" : job.boat.uploaded
       ? "Verifying" : job.boat.workerId ? "Transferring files" : "Requesting worker";
     return [{ jobId: job.jobId, date: job.enqueuedAt, digest: job.proofDigest, status }];
