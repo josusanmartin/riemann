@@ -10,7 +10,8 @@
     "boat": {
       "baseCommitSha": "4080f8b62bc291d5018e6827e8b237319f1b3c7a",
       "previousRecordId": "beiyi-reflected-moment-t055",
-      "issuedAt": 1795608927715
+      "issuedAt": 1795608927715,
+      "startedAt": 1795608932094
     }
   },
   "pending": [],
