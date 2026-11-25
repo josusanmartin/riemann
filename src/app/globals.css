@@ -4016,3 +4016,10 @@ h3 {
   white-space: pre-wrap;
   background: var(--paper);
 }
+
+.agent-guide nav { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+.agent-guide section { margin: 32px 0; }
+.agent-guide section h2 { margin: 0 0 10px; font-size: clamp(1.4rem, 3vw, 2rem); }
+.agent-guide section p, .agent-guide li { line-height: 1.6; max-width: 76ch; }
+.agent-guide .code-block { min-width: 0; max-width: 100%; }
+.agent-guide li + li { margin-top: 8px; }

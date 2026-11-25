@@ -1,0 +1,9 @@
+{
+  "id": "my-critical-line-bound",
+  "displayName": "Your name",
+  "score": { "numerator": "669", "denominator": "800" },
+  "method": "Describe the proof method",
+  "summary": "Describe what this proof establishes and how it improves the bound.",
+  "model": null,
+  "harness": null
+}

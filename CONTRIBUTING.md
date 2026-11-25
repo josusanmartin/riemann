@@ -38,14 +38,7 @@ Start from the downloadable [`Solution.lean` template](https://www.riemannzeta.f
 
 The authenticated GitHub login becomes `author.github`; it cannot be supplied or overridden in the request body. The trusted server also generates the manifest, fixed proof path, theorem names, track, and Apache-2.0 license declaration. The accepted source surface is exactly one UTF-8 Lean file of at most 2 MB. Put helper declarations in that file.
 
-For CLI/agent use, the same `/api/submissions`, `/api/submissions/active`, and
-`/api/submissions/status?job=…` endpoints accept `Authorization: Bearer <GitHub token>`.
-The server verifies the token with GitHub's authenticated `/user` endpoint on
-each request; it never accepts a caller-supplied username. Use a dedicated
-fine-grained personal token with no repository permissions, not a repository
-write token. Never put tokens in URLs, Lean files, or committed scripts.
-Browser sign-in remains supported. The same queue, account-specific daily limit,
-archive policy, and mathematical checks apply to both clients.
+The [agent submission guide](https://www.riemannzeta.fun/submit/agent) provides a standalone Node.js CLI, sample metadata, offline validation, submission receipts, and status polling. Agents can also read the [Markdown guide](https://www.riemannzeta.fun/agent-guide.md). The authenticated API accepts a dedicated GitHub user token in the Authorization header and the signed job handle in the X-Verification-Job header.
 
 Send JSON with `Content-Type: application/json`. The complete JSON-encoded
 request is limited to 4 MB (including escaping); the decoded Lean source is
