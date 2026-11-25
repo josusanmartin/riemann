@@ -43,6 +43,11 @@ const recoveredJobIdsSchema = z
 
 const boatJobSchema = z.object({
   memoryReplayOf: z.string().uuid().optional(),
+  setupLease: z.number().int().positive().optional(),
+  retryAt: z.number().int().nonnegative().optional(),
+  setupIssue: z.string().max(160).optional(),
+  assignedAt: z.number().int().positive().optional(),
+  stagedAt: z.number().int().positive().optional(),
   lastProviderStatus: z.number().int().min(100).max(599).optional(),
   retiredWorkerId: z.string().regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/).optional(),
   baseCommitSha: shaSchema,
@@ -908,6 +913,7 @@ export function completeVerificationJob(
   completion: QueueCompletionInput,
   options: QueueOptions = {},
   verifierLog?: string,
+  setupLease?: number,
 ): Promise<QueueAdvance> {
   z.string().uuid().parse(jobId);
   const now = options.now ?? new Date();
@@ -916,6 +922,10 @@ export function completeVerificationJob(
     { ...options, now },
     "queue: complete and advance formal verification FIFO",
     (state) => {
+      if (setupLease !== undefined && state.active?.jobId === jobId &&
+          (state.active.boat?.setupLease !== setupLease || state.active.boat.uploaded)) {
+        throw new Error("Boat setup has moved on");
+      }
       const mutation = completeQueueState(state, jobId, completion, now, archiveKey !== undefined);
       const receipt = mutation.result.receipt;
       if (!mutation.changed || archiveKey === undefined || !receipt) return mutation;
@@ -1052,14 +1062,32 @@ export async function getActiveVerificationJob(
   return (await readBranchState(client))?.active ?? null;
 }
 
-/** Persist provider coordinates only while the same submission owns the FIFO head. */
-export async function updateBoatJob(jobId: string, update: {startedAt?: number; workerId?: string; uploaded?: true; lastProviderStatus?: number}) {
-  return mutateQueue({}, "queue: bind Boat worker", state => {
+type BoatState = NonNullable<QueuedVerificationJob["boat"]>;
+
+export function claimBoatSetup(jobId: string, now = Date.now(), options: QueueOptions = {}) {
+  return mutateQueue(options, "queue: reserve Boat setup attempt", state => {
     const job = state.active;
     if (!job?.boat || job.jobId !== jobId) throw new Error("Boat job is no longer active");
+    if (job.boat.uploaded || (job.boat.retryAt ?? 0) > now) {
+      return { changed: false, state, result: { job, claimed: false } };
+    }
+    // The lease outlives a setup request. If its caller disappears another
+    // checker can resume with the job's original Boat idempotency key.
+    const boat = { ...job.boat, startedAt: job.boat.startedAt ?? now, setupLease: now, retryAt: now + 90_000 };
+    const active = { ...job, boat };
+    return { changed: true, state: { ...state, active }, result: { job: active, claimed: true } };
+  });
+}
+
+export function updateBoatJob(jobId: string, setupLease: number, update: Partial<Pick<BoatState,
+  "workerId" | "uploaded" | "assignedAt" | "stagedAt" | "lastProviderStatus" | "setupIssue" | "startedAt" | "retryAt"
+>>) {
+  return mutateQueue({}, "queue: update Boat setup", state => {
+    const job = state.active;
+    if (!job?.boat || job.jobId !== jobId || job.boat.setupLease !== setupLease) throw new Error("Boat setup has moved on");
     if (job.boat.workerId && update.workerId && job.boat.workerId !== update.workerId) throw new Error("Boat worker mismatch");
-    const boat = boatJobSchema.parse({...job.boat, ...update, startedAt:job.boat.startedAt ?? update.startedAt});
-    const active = {...job,boat};
-    return {changed:JSON.stringify(boat)!==JSON.stringify(job.boat),state:{...state,active},result:active};
+    const boat = boatJobSchema.parse({ ...job.boat, ...update });
+    const active = { ...job, boat };
+    return { changed: true, state: { ...state, active }, result: active };
   });
 }

@@ -8,6 +8,7 @@ import {
   verifierLogPath,
 } from "@/lib/submission-archive";
 import {
+  claimBoatSetup,
   completeQueueState,
   completeVerificationJob,
   createEmptyQueueState,
@@ -630,6 +631,24 @@ describe("durable formal verification queue", () => {
       status: "completed",
       receipt: { jobId: input(98).jobId, outcome: "promoted" },
     });
+  });
+
+  it("allows one setup caller at a time and prevents a stale timeout from rejecting the job", async () => {
+    const github = fakeQueueGitHub();
+    const options = { token: "fixture", ownerSecret, archiveKey, now: firstDay, fetchImplementation: github.fetchImplementation };
+    const archived = archivedInput(43, "Log-Solver", "log-record");
+    const boat = { baseCommitSha: "a".repeat(40), previousRecordId: "old", issuedAt: firstDay.getTime() };
+    await enqueueVerificationJob({ ...archived.input, boat }, "Log-Solver", archived.archive, options);
+    const id = archived.input.jobId, start = firstDay.getTime();
+    github.synchronizeNextPatches(2);
+    const claims = await Promise.all([claimBoatSetup(id, start, options), claimBoatSetup(id, start + 1, options)]);
+    expect(claims.filter(claim => claim.claimed)).toHaveLength(1);
+    const first = claims.find(claim => claim.claimed)!.job;
+    expect((await claimBoatSetup(id, start + 91_000, options)).claimed).toBe(true);
+    await expect(completeVerificationJob(id, {
+      outcome: "rejected", promotionStatus: null, message: "old timeout", evidenceUrl: null,
+    }, options, "setup failed", first.boat!.setupLease)).rejects.toThrow("setup has moved on");
+    expect(JSON.parse(github.latestState()).active.jobId).toBe(id);
   });
 
   it("commits the encrypted verifier log with its receipt", async () => {

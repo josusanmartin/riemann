@@ -30,6 +30,7 @@ async function api(
   method = "GET",
   body?: unknown,
   idempotencyKey?: string,
+  timeoutMs = 75_000,
 ) {
   const key = process.env.RIEMANN_BOAT_API_KEY;
   if (!key) throw new Error("Boat verification is not configured");
@@ -37,7 +38,7 @@ async function api(
     method,
     cache: "no-store",
     redirect: "error",
-    signal: AbortSignal.timeout(75_000),
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
@@ -45,11 +46,11 @@ async function api(
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const data = await response.json();
-  if (!response.ok || data.ok !== true)
+  const data = await response.json().catch(() => null);
+  if (!response.ok || data?.ok !== true)
     throw new BoatError(
       response.status,
-      String(data.code ?? "unknown").slice(0, 100),
+      String(data?.code ?? "unknown").slice(0, 100),
     );
   return data;
 }
@@ -87,8 +88,23 @@ exec bash riemann-site/boat/verify-job.sh ${proofDigest} ${kind} ${highMemory ? 
       setupScript,
     },
     jobId,
+    20_000,
   );
   return workerId.parse(data.sandbox?.id);
+}
+
+/** Recover an allocation whose POST response or queue commit was lost. */
+export async function findCompetitiveWorker(jobId: string) {
+  z.string().uuid().parse(jobId);
+  const label = encodeURIComponent(`job=${jobId}`);
+  const data = await api(`/sandboxes?label=${label}`, "GET", undefined, undefined, 15_000);
+  const matches = z.array(z.object({
+    id: workerId, state: z.string(), labels: z.record(z.string(), z.string()),
+  })).parse(data.sandboxes).filter(box => box.labels.job === jobId &&
+    box.labels.service === "riemann" && box.labels.kind === "competitive" &&
+    !["stopped", "archived", "deleted", "error"].includes(box.state));
+  if (matches.length > 1) throw new Error("Ambiguous Boat allocation");
+  return matches[0]?.id;
 }
 
 export async function stopBoatWorker(id: string) {
@@ -112,7 +128,7 @@ export async function stageBoatFiles(
   notification?: { jobId: string; token: string },
 ) {
   const worker = `/sandboxes/${workerId.parse(id)}`;
-  const info = (await api(worker)).sandbox;
+  const info = (await api(worker, "GET", undefined, undefined, 15_000)).sandbox;
   if (
     info.environment !== "riemann-production" ||
     info.holdsCreatorLogins !== false ||
@@ -132,13 +148,14 @@ export async function stageBoatFiles(
       path: `riemann-incoming/${file}`,
       content,
       encoding: "utf8",
-    });
+    }, undefined, 15_000);
   }
 }
 
-export async function readBoatFile(id: string, file: string): Promise<string> {
+export async function readBoatFile(id: string, file: string, timeoutMs = 75_000): Promise<string> {
   const data = await api(
     `/sandboxes/${workerId.parse(id)}/files?path=${encodeURIComponent(file)}&encoding=utf8`,
+    "GET", undefined, undefined, timeoutMs,
   );
   return z.string().parse(data.content);
 }
@@ -185,7 +202,7 @@ export async function boatResult(
 }
 
 export async function activeBoatFlow() {
-  const data = await api("/sandboxes?label=kind%3Dflow");
+  const data = await api("/sandboxes?label=kind%3Dflow", "GET", undefined, undefined, 15_000);
   return z
     .array(
       z.object({

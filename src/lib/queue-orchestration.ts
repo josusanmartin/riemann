@@ -1,4 +1,4 @@
-import { ensureBoatWorker } from "./boat-queue";
+import { scheduleBoatSetup } from "./boat-queue";
 import {
   launchQueuedE2BVerification,
   pauseQueuedE2BVerification,
@@ -53,7 +53,7 @@ export async function ensureQueuedJobRunning(
   job: QueuedVerificationJob,
 ): Promise<QueuedE2BRunnerState> {
   if (job.boat) {
-    await ensureBoatWorker(job);
+    scheduleBoatSetup(job);
     return "running";
   }
   const { hasActiveE2BFlowTest } = await import("@/lib/e2b-flow-test");
@@ -124,8 +124,11 @@ export async function advanceVerificationQueue(
   jobId: string,
   completion: QueueCompletionInput,
   verifierLog?: string,
+  setupLease?: number,
 ): Promise<QueueAdvance & { nextStarted: boolean }> {
-  const advance = await completeVerificationJob(jobId, completion, {}, verifierLog);
+  const advance = setupLease === undefined
+    ? await completeVerificationJob(jobId, completion, {}, verifierLog)
+    : await completeVerificationJob(jobId, completion, {}, verifierLog, setupLease);
   let next = advance.next;
   let publishedRecordId: string | null | undefined;
   for (let skippedJobs = 0; next && skippedJobs < 10; skippedJobs += 1) {

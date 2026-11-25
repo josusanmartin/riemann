@@ -1,12 +1,17 @@
 import { boatCompletionToken } from "./boat-completion-token";
+import { after } from "next/server";
+import { setTimeout as delay } from "node:timers/promises";
+import { setupLimitMs, setupRetryMs, boatProgress } from "./boat-progress";
 import { randomUUID } from "node:crypto";
 import { computeDirectProofDigest } from "./direct-submission";
 import { readSubmissionArchive } from "./submission-archive-store";
-import { retryBoatAfterOom, updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
+import { claimBoatSetup, getActiveVerificationJob, retryBoatAfterOom, updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
 import {
   BoatError,
   activeBoatFlow,
   createBoatWorker,
+  findCompetitiveWorker,
+  readBoatFile,
   stageBoatFiles,
   boatResult,
   stopBoatWorker,
@@ -19,7 +24,6 @@ import {
 import { describeVerifierRejection, kernelOomMessage } from "./verifier-feedback";
 import {
   advanceVerificationQueue,
-  VerifierOccupiedByFlowTestError,
 } from "./queue-orchestration";
 
 export function reserveBoatJob(
@@ -60,113 +64,132 @@ export async function boatMetadata(job: QueuedVerificationJob) {
   };
 }
 
+class BoatSetupFinished extends Error {}
+
+function setupIssue(error: unknown) {
+  if (error instanceof BoatError && error.status === 402) return "Boat requires payment (HTTP 402)";
+  if (error instanceof BoatError && [401, 403].includes(error.status)) return `Boat denied verifier access (HTTP ${error.status})`;
+  if (error instanceof BoatError) return `Boat API returned HTTP ${error.status}`;
+  if (error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name)) return "Boat request timed out";
+  if (error instanceof TypeError) return "Could not connect to Boat";
+  return "The service could not complete the setup step";
+}
+
+async function finishSetupFailure(job: QueuedVerificationJob, message: string, issue?: string): Promise<never> {
+  const b = job.boat!;
+  const feedback = describeVerifierRejection("", message);
+  const log = [
+    `Setup began: ${new Date(b.startedAt!).toISOString()}`,
+    b.workerId ? "Worker assigned. Proof upload was not confirmed." : "No worker assignment was recorded.",
+    issue ?? b.setupIssue ?? (b.lastProviderStatus ? `Boat API returned HTTP ${b.lastProviderStatus}` : "No provider response recorded."),
+    message,
+  ].join("\n");
+  await advanceVerificationQueue(job.jobId, {
+    outcome: "rejected", promotionStatus: null, message, feedback, evidenceUrl: null,
+  }, log, b.setupLease);
+  if (b.workerId) await stopBoatWorker(b.workerId).catch(() => undefined);
+  throw new BoatSetupFinished(message);
+}
+
 export async function ensureBoatWorker(job: QueuedVerificationJob) {
   if (!job.boat) throw new Error("Missing Boat coordinates");
   if (job.boat.uploaded && job.boat.workerId) return job;
-  if (!job.boat.startedAt && (await activeBoatFlow()))
-    throw new VerifierOccupiedByFlowTestError();
-  const reserved = job.boat.startedAt
-    ? job
-    : await updateBoatJob(job.jobId, { startedAt: Date.now() });
-  const b = reserved.boat!;
-  if (Date.now() - b.startedAt! >= workerLifetime)
-    throw new Error("Boat launch expired");
-  if (b.retiredWorkerId && !b.workerId) {
-    await stopBoatWorker(b.retiredWorkerId);
+  if ((job.boat.retryAt ?? 0) > Date.now()) return job;
+  const claim = await claimBoatSetup(job.jobId);
+  let current = claim.job;
+  if (!claim.claimed) return current;
+  let b = current.boat!;
+  const lease = b.setupLease!;
+  const allocationExpired = !b.workerId && Date.now() - b.startedAt! >= setupLimitMs;
+  if (b.workerId && Date.now() - b.startedAt! >= setupLimitMs) {
+    // A lost acknowledgement after writing the final ready marker must not
+    // turn a staged, potentially running proof into a setup failure.
+    const ready = await readBoatFile(b.workerId, "riemann-incoming/ready", 10_000).catch(() => null);
+    if (ready === current.proofDigest) return updateBoatJob(job.jobId, lease, { uploaded: true, setupIssue: undefined });
+    return finishSetupFailure(current, "Boat proof upload timed out.");
   }
-  const id =
-    b.workerId ??
-    (await createBoatWorker(
-      job.jobId,
-      b.baseCommitSha,
-      job.proofDigest,
-      "competitive",
-      Boolean(b.memoryReplayOf),
-    ));
-  if (!b.workerId) await updateBoatJob(job.jobId, { workerId: id });
-  const entry = await archived(job);
-  await stageBoatFiles(
-    id,
-    entry.payload.manifest,
-    entry.payload.solution,
-    job.proofDigest,
-    {
+  try {
+    if (!b.workerId) {
+      let id;
+      // Look up the original job before repeating an uncertain create.
+      if (b.startedAt !== lease || allocationExpired) id = await findCompetitiveWorker(job.jobId);
+      if (!id) {
+        if (allocationExpired) return finishSetupFailure(current, "Boat worker allocation timed out.");
+        if (await activeBoatFlow()) {
+          return await updateBoatJob(job.jobId, lease, {
+            startedAt: undefined, retryAt: Date.now() + setupRetryMs, setupIssue: "Waiting for an operator verification to finish",
+          });
+        }
+        if (b.retiredWorkerId) await stopBoatWorker(b.retiredWorkerId);
+        id = await createBoatWorker(job.jobId, b.baseCommitSha, job.proofDigest, "competitive", Boolean(b.memoryReplayOf));
+      }
+      current = await updateBoatJob(job.jobId, lease, { workerId: id, assignedAt: Date.now(), retryAt: Date.now() + 90_000, setupIssue: undefined, lastProviderStatus: undefined });
+      b = current.boat!;
+    }
+    const entry = await archived(current);
+    await stageBoatFiles(b.workerId!, entry.payload.manifest, entry.payload.solution, job.proofDigest, {
       jobId: job.jobId,
-      token: boatCompletionToken(
-        job.jobId,
-        job.proofDigest,
-        process.env.AUTH_SECRET ?? "",
-      ),
-    },
-  );
-  return updateBoatJob(job.jobId, { uploaded: true });
+      token: boatCompletionToken(job.jobId, job.proofDigest, process.env.AUTH_SECRET ?? ""),
+    });
+    return await updateBoatJob(job.jobId, lease, { uploaded: true, stagedAt: Date.now(), setupIssue: undefined, lastProviderStatus: undefined });
+  } catch (error) {
+    const issue = setupIssue(error);
+    const permanent = error instanceof BoatError && [400, 401, 402, 403, 422].includes(error.status);
+    if (permanent) return finishSetupFailure(current, "Boat declined worker setup.", issue);
+    if (!b.workerId && Date.now() - b.startedAt! >= setupLimitMs) {
+      return finishSetupFailure(current, "Boat worker allocation timed out.", issue);
+    }
+    console.warn("Retrying Boat setup", { jobId: job.jobId, issue });
+    return updateBoatJob(job.jobId, lease, {
+      setupIssue: issue, lastProviderStatus: error instanceof BoatError ? error.status : undefined,
+      retryAt: Date.now() + setupRetryMs,
+    });
+  }
 }
 
-export async function reconcileBoat(
-  job: QueuedVerificationJob,
-  receiptReady = false,
-) {
-  const b = job.boat!;
-  if (
-    !b.uploaded &&
-    b.startedAt &&
-    Date.now() - b.startedAt >= workerLifetime
-  ) {
-    const message = "Boat worker provisioning expired.";
-    const feedback = describeVerifierRejection("", message);
-    const log = [
-      `Setup began: ${new Date(b.startedAt).toISOString()}`,
-      b.workerId ? "Worker assigned. Upload staging was not confirmed." : "No worker assignment was recorded.",
-      ...(b.lastProviderStatus ? [`Last Boat API response during setup: HTTP ${b.lastProviderStatus}.`] : []),
-      "Setup deadline reached. No verifier receipt was returned.",
-    ].join("\n");
-    await advanceVerificationQueue(job.jobId, {
-      outcome: "rejected", message, feedback,
-      completedAt: new Date().toISOString(),
-      promotionStatus: null,
-      evidenceUrl: null,
-    }, log);
-    if (b.workerId) await stopBoatWorker(b.workerId).catch(() => undefined);
-    return {
-      status: "rejected" as const,
-      message: "Boat worker provisioning expired.",
-    };
-  }
+// The admitted upload already has a signed handle. Keep provisioning on the
+// server after replying, even when the submitter immediately closes the tab.
+export function scheduleBoatSetup(job: QueuedVerificationJob) {
+  after(async () => {
+    const stopAt = Date.now() + 225_000;
+    let current: QueuedVerificationJob | null = job;
+    while (current?.jobId === job.jobId && !current.boat?.uploaded && Date.now() < stopAt) {
+      try {
+        current = await ensureBoatWorker(current);
+        if (current.boat?.uploaded) return;
+      } catch (error) {
+        if (error instanceof BoatSetupFinished) return;
+        console.error("Unable to persist Boat setup progress", { jobId: job.jobId });
+      }
+      await delay(setupRetryMs);
+      try {
+        current = await getActiveVerificationJob();
+      } catch {
+        // The next claim checks the live queue before touching the worker.
+        console.warn("Unable to refresh Boat setup state", { jobId: job.jobId });
+      }
+    }
+  });
+}
+
+export async function reconcileBoat(job: QueuedVerificationJob, receiptReady = false) {
   let active;
   try {
     active = await ensureBoatWorker(job);
   } catch (error) {
-    if (error instanceof VerifierOccupiedByFlowTestError)
-      return { status: "running" as const, proofDigest: job.proofDigest };
-    if (error instanceof BoatError && error.status >= 100 && error.status <= 599) {
-      if (b.lastProviderStatus !== error.status) await updateBoatJob(job.jobId, { lastProviderStatus: error.status });
-      return {
-        status: "running" as const, proofDigest: job.proofDigest,
-        message: `Worker setup is waiting on Boat (HTTP ${error.status}). Your upload is saved. Status checks retry automatically.`,
-      };
-    }
+    if (error instanceof BoatSetupFinished) return { status: "rejected" as const, message: error.message };
     throw error;
   }
-  const { workerId, startedAt, previousRecordId, baseCommitSha, issuedAt } =
-    active.boat!;
+  if (!active.boat?.uploaded) return boatProgress(active);
+  const { workerId, assignedAt, startedAt, previousRecordId, baseCommitSha, issuedAt } = active.boat;
   const result = await boatResult(
     workerId!,
-    startedAt! + workerLifetime,
+    (assignedAt ?? startedAt!) + workerLifetime,
     async () => (await archived(active)).summary.submission.id,
     job.proofDigest,
     receiptReady,
   );
-  if (!result)
-    return {
-      status: "running" as const,
-      proofDigest: job.proofDigest,
-      ...(active.boat?.memoryReplayOf
-        ? {
-            message:
-              "Verification is running on the 32 GB memory-retry worker.",
-          }
-        : {}),
-    };
+  if (!result) return boatProgress(active);
   const entry = await archived(active);
   const submission = entry.summary.submission;
   if (
@@ -185,7 +208,7 @@ export async function reconcileBoat(
       result.log,
       result.completedAt,
     );
-    await ensureBoatWorker(retry);
+    scheduleBoatSetup(retry);
     return {
       status: "running" as const,
       proofDigest: job.proofDigest,

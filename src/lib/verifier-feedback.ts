@@ -104,6 +104,16 @@ export function describeVerifierRejection(
   const diagnostic = `${fallbackMessage}\n${log}`.toLowerCase();
   const location = candidateLocation(log);
 
+  if (["Boat worker allocation timed out.", "Boat proof upload timed out.", "Boat declined worker setup."].includes(fallbackMessage)) {
+    return feedback({
+      code: "verifier-infrastructure", stage: "infrastructure", title: fallbackMessage.slice(0, -1),
+      detail: fallbackMessage === "Boat declined worker setup."
+        ? "The provider declined a setup request. No proof verdict was recorded."
+        : "The verifier could not finish this setup step within the three-minute setup window. No proof verdict was recorded.",
+      action: "Open the recorded setup log for the last available error and share the job ID with the maintainers.",
+      retryable: true,
+    });
+  }
   if (fallbackMessage === "Boat worker provisioning expired.") {
     return feedback({
       code: "verifier-infrastructure", stage: "infrastructure",

@@ -207,6 +207,7 @@ export default async function SubmitPage() {
               <code> 1/3 → 2/3 </code> test proof belongs in the noncompetitive
               flow-test lane above, not here.
             </p>
+            {boatSelected() && <p>On 21 accepted Boat runs, the median time from proof transfer to verdict was 16 minutes. Queue time is additional.</p>}
           </div>
           <div className="current-record-chip">
             <span>Current formal record</span>

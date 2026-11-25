@@ -1,4 +1,5 @@
 import { boatSelected, boatConfigured } from "@/lib/boat-worker";
+import { boatProgress } from "@/lib/boat-progress";
 import { reserveBoatJob } from "@/lib/boat-queue";
 import { ZodError } from "zod";
 import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
@@ -184,6 +185,7 @@ export async function POST(request: Request): Promise<Response> {
 
     return noStore(202, {
       status: verificationRunning ? "running" : "queued",
+      ...(verificationRunning && admission.job.boat ? boatProgress(admission.job) : {}),
       submissionId: prepared.submission.id,
       proofDigest: prepared.proofDigest,
       jobToken,

@@ -262,11 +262,12 @@ export async function readOwnerHistory(github: string, selectedId?: string, opti
   const stateEntry = tree.tree.find(entry => entry.path === SUBMISSION_QUEUE_PATH);
   if (!stateEntry) throw new Error("Submission queue state unavailable");
   const state = submissionQueueStateSchema.parse(await jsonBlob(stateEntry.sha));
-  const active = [state.active, ...state.pending].flatMap((job, index) =>
-    job?.ownerKey === owner ? [{
-      jobId: job.jobId, date: job.enqueuedAt, digest: job.proofDigest,
-      status: index > 0 ? "Queued" : job.boat && !job.boat.uploaded ? (job.boat.lastProviderStatus ? `Preparing worker (Boat HTTP ${job.boat.lastProviderStatus})` : "Preparing worker") : "In progress",
-    }] : []);
+  const active = [state.active, ...state.pending].flatMap((job, index) => {
+    if (!job || job.ownerKey !== owner) return [];
+    const status = index ? "Queued" : !job.boat ? "In progress" : job.boat.uploaded
+      ? "Verifying" : job.boat.workerId ? "Transferring files" : "Requesting worker";
+    return [{ jobId: job.jobId, date: job.enqueuedAt, digest: job.proofDigest, status }];
+  });
   const selected = completed.find(row => row.jobId === selectedId);
   if (!selected) return { active, completed, detail: null };
   const receipt = queueCompletionReceiptSchema.parse(await jsonBlob(selected.sha));
