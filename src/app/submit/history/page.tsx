@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/auth";
 import { readOwnerHistory } from "@/lib/submission-archive-store";
@@ -25,10 +26,12 @@ export default async function History({ searchParams }: { searchParams: Promise<
     ? receipt.feedback ?? describeVerifierRejection("", receipt.message ?? "")
     : null;
   return (
-    <main id="main-content" className="shell section-space archive-section">
-      <Link className="text-link" href="/submit">← Submit a proof</Link>
-      <h1>My submission history</h1>
-      <p>Attempts for @{github}. All times are UTC.</p>
+    <main id="main-content" className="submission-history">
+      <header className="history-heading">
+        <Link className="history-back" href="/submit"><ArrowLeft size={15} aria-hidden="true" /> Submit a proof</Link>
+        <h1>My submission history</h1>
+        <p>@{github}</p>
+      </header>
       {history ? <>
         {detail && receipt ? (
           <section className="history-detail" aria-label="Attempt details">
@@ -50,14 +53,13 @@ export default async function History({ searchParams }: { searchParams: Promise<
         ) : attempt && <p>Attempt details are unavailable for this account.</p>}
         {history.active.length + history.completed.length ? <div className="archive-table-wrap">
           <table className="archive-table">
-            <thead><tr><th>Time (UTC)</th><th>Result</th><th>SHA-256</th><th>Attempt</th></tr></thead>
+            <thead><tr><th scope="col">Attempt (UTC)</th><th scope="col">Result</th><th scope="col"><span className="sr-only">Details</span></th></tr></thead>
             <tbody>
-              {history.active.map(row => <tr key={row.jobId}><td>{time(row.date)}</td><td>{row.status}</td>
-                <td><code>{row.digest.slice(0, 12)}</code></td><td>In queue</td></tr>)}
-              {history.completed.map(row => <tr key={row.jobId}><td>{time(row.date)}</td>
+              {history.active.map(row => <tr key={row.jobId}><td><time dateTime={row.date}>{time(row.date)}</time><code title={row.digest} aria-label={`Proof SHA-256 prefix ${row.digest.slice(0, 12)}`}>{row.digest.slice(0, 12)}</code></td><td>{row.status}</td>
+                <td></td></tr>)}
+              {history.completed.map(row => <tr key={row.jobId}><td><time dateTime={row.date}>{time(row.date)}</time><code title={row.digest} aria-label={`Proof SHA-256 prefix ${row.digest.slice(0, 12)}`}>{row.digest.slice(0, 12)}</code></td>
                 <td>{row.status === "promoted" ? "Published" : row.status === "rejected" ? "Unsuccessful" : "Superseded"}</td>
-                <td><code>{row.digest.slice(0, 12)}</code></td>
-                <td><Link className="text-link" prefetch={false} href={`/submit/history?attempt=${row.jobId}`}>View details</Link></td>
+                <td><Link className="text-link" prefetch={false} href={`/submit/history?attempt=${row.jobId}`}>Details</Link></td>
               </tr>)}
             </tbody>
           </table>
