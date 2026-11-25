@@ -4058,7 +4058,42 @@ h3 {
   font-weight: 650;
 }
 .submit-research a:hover { color: var(--lime-bright); }
+.submit-research a span { white-space: nowrap; }
 .submit-research svg { display: inline; vertical-align: -.15em; }
 .signin-card textarea[aria-label="CLI approval"] {
   width: 100%; padding: .65rem; color: var(--ink); background: var(--paper); border-radius: 8px;
 }
+
+.submit-agent-panel {
+  padding: clamp(16px, 2vw, 22px);
+  margin-bottom: 12px;
+  background: #183d31;
+  border: 1px solid #829d73;
+  border-radius: 14px;
+}
+.submit-agent-panel h2, .agent-form-shortcut > span {
+  display: flex; align-items: center; gap: 10px;
+}
+.submit-agent-panel h2 { font-size: clamp(1.45rem, 2.6vw, 1.9rem); margin: 0 0 8px; }
+.submit-agent-panel h2 svg { flex: none; color: var(--lime); }
+.submit-agent-panel p { color: #d4e1d9; margin: 0 0 14px; font-size: .92rem; }
+.agent-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.agent-copy, .agent-guide-link {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px;
+  font-size: .88rem; font-weight: 700;
+}
+.agent-copy { padding: 7px 15px; border: 0; border-radius: 8px; background: var(--lime); color: var(--ink-deep); cursor: pointer; }
+.agent-copy:hover { background: var(--lime-bright); }
+.agent-guide-link { color: var(--white); text-decoration: underline; text-underline-offset: .2em; }
+.agent-guide-link:hover { color: var(--lime); }
+.agent-copy-fallback { flex-basis: 100%; font-size: .85rem; }
+.agent-copy-fallback textarea { display: block; width: 100%; padding: 8px; background: var(--paper); color: var(--ink); }
+.agent-form-shortcut {
+  display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 12px;
+  margin: 0 0 18px; padding: 12px 16px;
+  background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+}
+.agent-form-shortcut > span { font-weight: 650; }
+.agent-form-shortcut .agent-guide-link { color: var(--forest); }
+.agent-form-shortcut .agent-copy { background: var(--forest); color: var(--white); }
+.agent-form-shortcut .agent-copy:hover { background: var(--ink-deep); }

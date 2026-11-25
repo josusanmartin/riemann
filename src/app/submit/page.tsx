@@ -16,6 +16,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import { getSession, isGitHubAuthConfigured } from "@/auth";
+import { CopyAgentInstructions } from "@/components/copy-agent-instructions";
 import { CodeBlock } from "@/components/code-block";
 import { DirectSubmissionForm } from "@/components/direct-submission-form";
 import { BoatSmokeButton } from "@/components/boat-smoke-button";
@@ -81,23 +82,23 @@ export default async function SubmitPage() {
         <div className="shell inner-hero-grid">
           <div>
             <span className="eyebrow">Submit a formal improvement</span>
-            <h1>Upload a Lean proof for verification.</h1>
-            <p>
-              Enter an exact rational and paste or upload your Lean source. A
-              private {boatSelected() ? "Boat" : "E2B"} sandbox rechecks the fixed theorem with Comparator, the
-              Lean kernel, and nanoda. Jobs run one at a time in submission order,
-              with a daily allowance of five uploads per GitHub account.
-              The budget resets at 00:00 UTC, and a rejected job still counts once
-              queued. A confirmed memory failure gets one larger-worker retry using the same slot.
-            </p>
+            <h1>Submit a Lean proof</h1>
+            <p>Enter an exact rational bound and upload your Lean source. The web form and CLI use the same queue and formal verifier.</p>
             <div className="submit-resources">
+              <section className="submit-agent-panel" aria-labelledby="agent-option">
+                <h2 id="agent-option"><Terminal aria-hidden="true" size={21} />Submit with your AI agent</h2>
+                <p>Give your agent the open-source Riemann CLI instructions to submit your proof and track the verdict.</p>
+                <div className="agent-actions">
+                  <CopyAgentInstructions />
+                  <Link className="agent-guide-link" href="/submit/agent">Open CLI guide <ChevronRight aria-hidden="true" size={16} /></Link>
+                </div>
+              </section>
               <nav className="submit-resource-nav" aria-label="Submission resources">
-                <Link href="/submit/agent"><Terminal aria-hidden="true" size={18} />Submit from an agent or CLI<ChevronRight aria-hidden="true" size={16} /></Link>
                 <Link href="/submit/history"><History aria-hidden="true" size={18} />My submission history<ChevronRight aria-hidden="true" size={16} /></Link>
                 <Link href="/challenge#sandbox"><ShieldCheck aria-hidden="true" size={18} />Sandbox and upload limits<ChevronRight aria-hidden="true" size={16} /></Link>
               </nav>
               <p className="submit-research">Multi-file project or large dependencies?<br />
-                <a href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package for review <ArrowUpRight aria-hidden="true" size={15} /></a>
+                <a href={`${repositoryUrl}/issues/new?template=research-evidence.yml`}>Share a pinned source package <span>for review <ArrowUpRight aria-hidden="true" size={15} /></span></a>
               </p>
             </div>
             {!github && isGitHubAuthConfigured && (
@@ -189,7 +190,7 @@ export default async function SubmitPage() {
             that point every outcome counts—including Lean errors, statement or
             axiom mismatch, kernel rejection, timeout, and sandbox expiration.
             Requests rejected before queue admission do not consume a slot, and
-            admitted slots are not automatically refunded.
+            admitted slots are not automatically refunded. A confirmed memory failure gets one larger-worker retry using the same slot.
           </p>
         </div>
         <dl className="rate-limit-facts">
@@ -229,6 +230,14 @@ export default async function SubmitPage() {
                 ? `${current.exactRational.numerator}/${current.exactRational.denominator}`
                 : current.exactExpression}
             </code>
+          </div>
+        </div>
+
+        <div className="agent-form-shortcut">
+          <span><Terminal aria-hidden="true" size={18} />Prefer to submit with your agent?</span>
+          <div className="agent-actions">
+            <CopyAgentInstructions />
+            <Link className="agent-guide-link" href="/submit/agent">CLI guide <ChevronRight aria-hidden="true" size={15} /></Link>
           </div>
         </div>
 

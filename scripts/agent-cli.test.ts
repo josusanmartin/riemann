@@ -78,3 +78,38 @@ it("recovers an active receipt and distinguishes rejection from an API error", (
   expect(limited.status).toBe(1);
   expect(JSON.parse(limited.stderr)).toMatchObject({ httpStatus: 429, retryAt: "00:00 UTC" });
 });
+
+it("keeps a headless website login private, uses it for whoami and clears it on logout", () => {
+  const preload = join(dir, "login-service.mjs");
+  const approval = "a".repeat(120);
+  writeFileSync(preload, `
+    import assert from "node:assert/strict";
+    import { createHash } from "node:crypto";
+    import { readFileSync } from "node:fs";
+    globalThis.fetch = async (url, init) => {
+      assert.equal(url, "https://www.riemannzeta.fun/api/cli/session");
+      const [verifier, approval] = init.headers.Authorization.slice("Bearer rcli1_".length).split("~");
+      assert.equal(approval, ${JSON.stringify(approval)});
+      const challenge = createHash("sha256").update(verifier).digest("base64url");
+      assert.equal(challenge, readFileSync(${JSON.stringify(join(dir, "challenge"))}, "utf8"));
+      return Response.json({ githubLogin: "cli-solver", source: "website-login", expires: new Date(Date.now() + 86400000).toISOString() });
+    };
+  `);
+  function command(args: string[], input?: string) {
+    return spawnSync(process.execPath, ["--import", preload, cli, ...args], {
+      input, encoding: "utf8", env: { ...process.env, RIEMANN_CONFIG_DIR: dir, RIEMANN_GITHUB_TOKEN: "" },
+    });
+  }
+  const start = JSON.parse(command(["login", "--manual"]).stdout);
+  const challenge = new URL(start.url).searchParams.get("challenge")!;
+  expect(start.code).toBe(challenge.slice(0, 8));
+  expect(start.verifier).toBeUndefined();
+  writeFileSync(join(dir, "challenge"), challenge);
+  const finish = command(["login", "--finish"], approval + "\n");
+  expect(finish.status, finish.stderr).toBe(0);
+  expect(finish.stdout + finish.stderr).not.toContain(approval);
+  expect(statSync(join(dir, "session.json")).mode & 0o777).toBe(0o600);
+  expect(JSON.parse(command(["whoami"]).stdout).githubLogin).toBe("cli-solver");
+  expect(command(["logout"]).status).toBe(0);
+  expect(command(["whoami"]).status).toBe(1);
+});
