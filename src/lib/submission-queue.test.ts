@@ -664,7 +664,7 @@ describe("durable formal verification queue", () => {
     expect(github.latestState()).not.toContain("secretLemma");
   });
 
-  it("prunes a retained log when its receipt rotates out of the ledger", () => {
+  it("keeps a durable history entry while bounding the live receipt ledger", () => {
     const admission = enqueueQueueState(
       createEmptyQueueState("2026-08-11"),
       input(1),
@@ -695,20 +695,12 @@ describe("durable formal verification queue", () => {
     );
 
     expect(mutation.state.completed).toHaveLength(MAX_COMPLETED_RECEIPTS);
-    expect(mutation.deletePaths).toEqual([verifierLogPath(completed.at(-1)!.jobId), verifierLogPath(input(42).jobId)]);
+    expect(mutation.files?.[0].path).toContain(`runtime/history/${admission.state.active!.ownerKey}/`);
+    expect(JSON.parse(mutation.files![0].content).jobId).toBe(input(1).jobId);
 
-    // Receipts from before log retention carry no log, so nothing is deleted.
-    const legacy = completeQueueState(
-      { ...admission.state, completed: completed.map((item) => receipt(Number(item.jobId.slice(-12)), false)) },
-      input(1).jobId,
-      { outcome: "rejected", promotionStatus: null, message: "rejected", evidenceUrl: null },
-      firstDay,
-      true,
-    );
-    expect(legacy.deletePaths).toBeUndefined();
   });
 
-  it("still completes a job when a log due for pruning is already missing", async () => {
+  it("still completes a job when an older log is missing", async () => {
     const github = fakeQueueGitHub();
     const options = {
       token: "test-token",

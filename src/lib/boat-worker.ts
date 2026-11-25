@@ -16,7 +16,7 @@ export const workerLifetime = 2 * 60 * 60 * 1000;
 const commit = z.string().regex(/^[0-9a-f]{40}$/);
 const digest = z.string().regex(/^[0-9a-f]{64}$/);
 
-class BoatError extends Error {
+export class BoatError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
@@ -150,14 +150,14 @@ export async function boatResult(
   proofDigest: string,
   receiptReady = false,
 ) {
-  const unavailable = async (message: string) => ({
+  const unavailable = async (message: string, log = "") => ({
     schemaVersion: 1 as const,
     status: "rejected" as const,
     submissionId:
       typeof submissionId === "string" ? submissionId : await submissionId(),
     proofDigest,
     completedAt: new Date().toISOString(),
-    log: "",
+    log,
     message,
   });
   let info;
@@ -168,20 +168,19 @@ export async function boatResult(
       return unavailable("The Boat worker expired before returning a receipt.");
     throw error;
   }
-  if (
-    info.setupStatus === "failed" ||
-    info.state === "error" ||
-    info.state === "archived"
-  )
-    return unavailable(
-      "The Boat worker stopped before sealing a verification result.",
-    );
-  if (receiptReady || info.setupStatus === "done")
+  const stopped = info.setupStatus === "failed" || info.state === "error" || info.state === "archived";
+  if (!stopped && (receiptReady || info.setupStatus === "done"))
     return e2bVerificationResultSchema.parse(
       JSON.parse(await readBoatFile(id, "riemann-receipt.json")),
     );
-  if (Date.now() >= expires)
-    return unavailable("The Boat worker reached its operational time limit.");
+  if (stopped || Date.now() >= expires) {
+    const message = stopped
+      ? "The Boat worker stopped before sealing a verification result."
+      : "The Boat worker reached its operational time limit.";
+    // Only the isolated proof process output is suitable for submitters.
+    const output = await readBoatFile(id, "riemann-proof.log").catch(() => "");
+    return unavailable(message, output ? output.slice(-100_000) : message);
+  }
   return null;
 }
 

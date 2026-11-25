@@ -4,6 +4,7 @@ import { computeDirectProofDigest } from "./direct-submission";
 import { readSubmissionArchive } from "./submission-archive-store";
 import { retryBoatAfterOom, updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
 import {
+  BoatError,
   activeBoatFlow,
   createBoatWorker,
   stageBoatFiles,
@@ -111,13 +112,20 @@ export async function reconcileBoat(
     b.startedAt &&
     Date.now() - b.startedAt >= workerLifetime
   ) {
+    const message = "Boat worker provisioning expired.";
+    const feedback = describeVerifierRejection("", message);
+    const log = [
+      `Setup began: ${new Date(b.startedAt).toISOString()}`,
+      b.workerId ? "Worker assigned. Upload staging was not confirmed." : "No worker assignment was recorded.",
+      ...(b.lastProviderStatus ? [`Last Boat API response during setup: HTTP ${b.lastProviderStatus}.`] : []),
+      "Setup deadline reached. No verifier receipt was returned.",
+    ].join("\n");
     await advanceVerificationQueue(job.jobId, {
-      outcome: "rejected",
-      message: "Boat worker provisioning expired.",
+      outcome: "rejected", message, feedback,
       completedAt: new Date().toISOString(),
       promotionStatus: null,
       evidenceUrl: null,
-    });
+    }, log);
     if (b.workerId) await stopBoatWorker(b.workerId).catch(() => undefined);
     return {
       status: "rejected" as const,
@@ -130,6 +138,13 @@ export async function reconcileBoat(
   } catch (error) {
     if (error instanceof VerifierOccupiedByFlowTestError)
       return { status: "running" as const, proofDigest: job.proofDigest };
+    if (error instanceof BoatError && error.status >= 100 && error.status <= 599) {
+      if (b.lastProviderStatus !== error.status) await updateBoatJob(job.jobId, { lastProviderStatus: error.status });
+      return {
+        status: "running" as const, proofDigest: job.proofDigest,
+        message: `Worker setup is waiting on Boat (HTTP ${error.status}). Your upload is saved. Status checks retry automatically.`,
+      };
+    }
     throw error;
   }
   const { workerId, startedAt, previousRecordId, baseCommitSha, issuedAt } =

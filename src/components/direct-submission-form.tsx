@@ -230,8 +230,8 @@ export function DirectSubmissionForm({
         setPhase("running");
         setMessage(
           transientFailures <= 6
-            ? "Verifier status is temporarily unavailable; retrying automatically."
-            : "The verification is still saved in this browser; reconnecting automatically.",
+            ? "Waiting for a status update. Your upload is in the queue. This page will retry automatically."
+            : "The status service is still unreachable. Your job handle is saved. Check My submission history before uploading again.",
         );
       }
     }

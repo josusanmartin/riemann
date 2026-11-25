@@ -21,6 +21,7 @@ vi.mock("./submission-archive-store", () => ({
   readSubmissionArchive: m.archive,
 }));
 vi.mock("./boat-worker", () => ({
+  BoatError: class extends Error {},
   activeBoatFlow: m.flow,
   createBoatWorker: m.create,
   stageBoatFiles: m.upload,
@@ -81,6 +82,15 @@ describe("competitive Boat queue", () => {
       { jobId: job.jobId, token: expect.stringMatching(/^[0-9a-f]{64}$/) },
     );
     expect(job.boat?.uploaded).toBe(true);
+  });
+  it("records a setup expiry with its phase and last provider status", async () => {
+    job.boat!.startedAt = Date.now() - 7_200_001;
+    job.boat!.lastProviderStatus = 503;
+    await reconcileBoat(job);
+    expect(m.advance).toHaveBeenCalledWith(job.jobId, expect.objectContaining({
+      feedback: expect.objectContaining({ stage: "infrastructure", retryable: true }),
+    }), expect.stringContaining("HTTP 503"));
+    expect(m.result).not.toHaveBeenCalled();
   });
   it("recovers a failed upload on the same worker", async () => {
     m.upload.mockRejectedValueOnce(new Error("network"));

@@ -3971,3 +3971,19 @@ h3 {
 body:has(.submission-sheet) .contributor-notice { padding-block: 5px; }
 body:has(.submission-sheet) .contributor-notice p { display: none; }
 body:has(.submission-sheet) .contributor-notice .compact-record-notice { display: block; margin: 0 auto; font-size: .75rem; }
+
+.history-detail {
+  margin-block: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  overflow-wrap: anywhere;
+}
+.history-detail pre {
+  max-height: 28rem;
+  overflow: auto;
+  padding: 1rem;
+  white-space: pre-wrap;
+  background: var(--paper);
+}

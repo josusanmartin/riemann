@@ -43,6 +43,7 @@ const recoveredJobIdsSchema = z
 
 const boatJobSchema = z.object({
   memoryReplayOf: z.string().uuid().optional(),
+  lastProviderStatus: z.number().int().min(100).max(599).optional(),
   retiredWorkerId: z.string().regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/).optional(),
   baseCommitSha: shaSchema,
   previousRecordId: z.string().min(1).max(160),
@@ -222,7 +223,6 @@ type QueueMutation<T> = {
   changed: boolean;
   // Extra files written, and paths removed, in the same commit as the state.
   files?: CommitFile[];
-  deletePaths?: string[];
 };
 
 export class DailySubmissionLimitError extends Error {
@@ -289,6 +289,10 @@ function hmacKey(kind: "owner" | "submission", value: string, secret: string): s
     .update(`riemann-fail-queue-${kind}-v1\0`)
     .update(value.toLowerCase())
     .digest("hex");
+}
+
+export function historyOwnerKey(github: string, secret = requiredOwnerSecret({})): string {
+  return hmacKey("owner", githubLoginSchema.parse(github), secret);
 }
 
 export function createEmptyQueueState(day: string): SubmissionQueueState {
@@ -442,18 +446,14 @@ export function completeQueueState(
     pending,
     completed: [receipt, ...parsed.completed].slice(0, MAX_COMPLETED_RECEIPTS),
   });
-  // Logs are retained only while their receipt is: prune those that rotate out.
-  const deletePaths = [receipt, ...parsed.completed]
-    .slice(MAX_COMPLETED_RECEIPTS)
-    .flatMap((dropped) => [
-      ...(dropped.logArchived ? [verifierLogPath(dropped.jobId)] : []),
-      ...(dropped.firstAttemptLogId ? [verifierLogPath(dropped.firstAttemptLogId)] : []),
-    ]);
   return {
     state: updated,
     changed: true,
     result: { advanced: true, next, receipt },
-    ...(deletePaths.length > 0 ? { deletePaths } : {}),
+    files: [{
+      path: `runtime/history/${parsed.active.ownerKey}/${receipt.completedAt}_${receipt.outcome}_${receipt.proofDigest}_${jobId}.json`,
+      content: JSON.stringify(receipt),
+    }],
   };
 }
 
@@ -651,23 +651,18 @@ async function createTree(
   client: QueueGitHubClient,
   baseTree: string,
   files: Array<{ path: string; blob: string }>,
-  deletePaths: string[] = [],
 ): Promise<string> {
   return objectShaSchema.parse(
     await client.json(repositoryPath("git/trees"), {
       method: "POST",
       body: JSON.stringify({
         base_tree: baseTree,
-        tree: [
-          ...files.map((file) => ({
-            path: file.path,
-            mode: "100644",
-            type: "blob",
-            sha: file.blob,
-          })),
-          // A null sha removes the path from the new tree.
-          ...deletePaths.map((path) => ({ path, mode: "100644", type: "blob", sha: null })),
-        ],
+        tree: files.map((file) => ({
+          path: file.path,
+          mode: "100644",
+          type: "blob",
+          sha: file.blob,
+        })),
       }),
     }),
   ).sha;
@@ -706,7 +701,6 @@ async function writeStateCommit(
   message: string,
   now: Date,
   additionalFiles: CommitFile[] = [],
-  deletePaths: string[] = [],
 ): Promise<string> {
   const commit = await getCommit(client, head);
   const files = [
@@ -725,25 +719,7 @@ async function writeStateCommit(
       blob: await createBlob(client, file.content),
     })),
   );
-  if (deletePaths.some((path) => files.some((file) => file.path === path))) {
-    throw new Error("A queue commit cannot write and delete the same path");
-  }
-  // GitHub rejects the whole tree if it is asked to delete a missing path, and
-  // a commit that can never be written would wedge the queue. Prune only what
-  // is actually there.
-  const present = await Promise.all(
-    deletePaths.map(async (path) =>
-      (
-        await client.request(
-          repositoryPath(`contents/${path}?ref=${encodeURIComponent(head)}`),
-          { method: "HEAD" },
-          [404],
-        )
-      ).status !== 404,
-    ),
-  );
-  const removable = deletePaths.filter((_, index) => present[index]);
-  const tree = await createTree(client, commit.tree.sha, blobs, removable);
+  const tree = await createTree(client, commit.tree.sha, blobs);
   return createCommit(client, tree, head, message, now);
 }
 
@@ -813,7 +789,6 @@ async function mutateQueue<T>(
       message,
       now,
       [...additionalFiles, ...(mutation.files ?? [])],
-      mutation.deletePaths,
     );
     try {
       await client.json(
@@ -951,7 +926,7 @@ export function completeVerificationJob(
       );
       return {
         ...mutation,
-        files: [{ path: verifierLogPath(receipt.jobId), content: `${JSON.stringify(envelope, null, 2)}\n` }],
+        files: [...(mutation.files ?? []), { path: verifierLogPath(receipt.jobId), content: `${JSON.stringify(envelope, null, 2)}\n` }],
       };
     },
   );
@@ -1078,7 +1053,7 @@ export async function getActiveVerificationJob(
 }
 
 /** Persist provider coordinates only while the same submission owns the FIFO head. */
-export async function updateBoatJob(jobId: string, update: {startedAt?: number; workerId?: string; uploaded?: true}) {
+export async function updateBoatJob(jobId: string, update: {startedAt?: number; workerId?: string; uploaded?: true; lastProviderStatus?: number}) {
   return mutateQueue({}, "queue: bind Boat worker", state => {
     const job = state.active;
     if (!job?.boat || job.jobId !== jobId) throw new Error("Boat job is no longer active");

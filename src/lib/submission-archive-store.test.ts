@@ -1,12 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { createEmptyQueueState, historyOwnerKey } from "./submission-queue";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { computeDirectProofDigest } from "@/lib/direct-submission";
 import {
   sealSubmissionArchive,
+  sealVerifierLog, verifierLogPath,
   submissionArchivePath,
 } from "@/lib/submission-archive";
 import {
   isSubmissionArchiveMaintainer,
   listSubmissionArchive,
+  readOwnerHistory,
   readSubmissionArchive,
 } from "@/lib/submission-archive-store";
 
@@ -130,4 +133,33 @@ describe("maintainer submission archive store", () => {
     expect(isSubmissionArchiveMaintainer("josusanmartin")).toBe(true);
     expect(isSubmissionArchiveMaintainer("another-user")).toBe(false);
   });
+});
+
+afterEach(() => vi.unstubAllEnvs());
+
+it("exposes retained output only to the GitHub account that admitted the job", async () => {
+  vi.stubEnv("AUTH_SECRET", "fixture-owner-key");
+  const receipt = {
+    jobId, proofDigest, completedAt: submittedAt, outcome: "rejected",
+    promotionStatus: null, evidenceUrl: null, message: "Worker failed", logArchived: true,
+  };
+  const log = sealVerifierLog({ jobId, proofDigest, completedAt: submittedAt, log: "private diagnostic" }, archiveKey);
+  const files = [
+    { path: "runtime/submission-queue.json", value: createEmptyQueueState("2026-08-13") },
+    { path: `runtime/history/${historyOwnerKey("store-solver")}/${submittedAt}_rejected_${proofDigest}_${jobId}.json`, value: receipt },
+    { path: verifierLogPath(jobId), value: log },
+  ].map((file, index) => ({ ...file, sha: String(index + 1).repeat(40), type: "blob" }));
+  const fetchImplementation: typeof fetch = async (request) => {
+    const url = String(request);
+    if (url.includes("/git/ref/")) return Response.json({ object: { sha: "a".repeat(40) } });
+    if (url.includes("/git/commits/")) return Response.json({ tree: { sha: "b".repeat(40) } });
+    if (url.includes("/git/trees/")) return Response.json({ tree: files.map(({ path, sha, type }) => ({ path, sha, type })) });
+    const file = files.find(entry => url.endsWith("/git/blobs/" + entry.sha));
+    if (!file) throw new Error("Unexpected history request");
+    return Response.json({ encoding: "base64", content: Buffer.from(JSON.stringify(file.value)).toString("base64") });
+  };
+  const options = { fetchImplementation, archiveKey, token: "fixture" };
+  const own = await readOwnerHistory("Store-Solver", jobId, options);
+  expect(own.detail?.logs.map(entry => entry.log)).toEqual(["private diagnostic"]);
+  expect(await readOwnerHistory("another-solver", jobId, options)).toEqual({ active: [], completed: [], detail: null });
 });

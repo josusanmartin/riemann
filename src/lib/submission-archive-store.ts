@@ -13,7 +13,7 @@ import {
   type SubmissionArchivePayload,
   type SubmissionArchiveSummary,
 } from "@/lib/submission-archive";
-import { SUBMISSION_QUEUE_BRANCH } from "@/lib/submission-queue";
+import { historyOwnerKey, queueCompletionReceiptSchema, SUBMISSION_QUEUE_BRANCH, SUBMISSION_QUEUE_PATH, submissionQueueStateSchema } from "@/lib/submission-queue";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
@@ -243,4 +243,42 @@ export async function readVerifierLog(
     throw new Error("The retained verifier log belongs to a different job");
   }
   return payload;
+}
+
+/** Scope the index to the authenticated login before resolving any requested attempt or log. */
+export async function readOwnerHistory(github: string, selectedId?: string, options: SubmissionArchiveStoreOptions = {}) {
+  const owner = historyOwnerKey(github);
+  const prefix = `runtime/history/${owner}/`;
+  const { client, tree } = await archiveClientAndTree(options);
+  async function jsonBlob(sha: string) {
+    const blob = blobSchema.parse(await client.json(repositoryPath(`git/blobs/${sha}`)));
+    return JSON.parse(Buffer.from(blob.content, "base64").toString("utf8"));
+  }
+  const completed = tree.tree.filter(entry => entry.type === "blob" && entry.path.startsWith(prefix))
+    .map(entry => {
+      const [date, status, digest, jobId] = entry.path.slice(prefix.length, -5).split("_");
+      return { date, status, digest, jobId, sha: entry.sha };
+    }).sort((a, b) => b.date.localeCompare(a.date));
+  const stateEntry = tree.tree.find(entry => entry.path === SUBMISSION_QUEUE_PATH);
+  if (!stateEntry) throw new Error("Submission queue state unavailable");
+  const state = submissionQueueStateSchema.parse(await jsonBlob(stateEntry.sha));
+  const active = [state.active, ...state.pending].flatMap((job, index) =>
+    job?.ownerKey === owner ? [{
+      jobId: job.jobId, date: job.enqueuedAt, digest: job.proofDigest,
+      status: index > 0 ? "Queued" : job.boat && !job.boat.uploaded ? (job.boat.lastProviderStatus ? `Preparing worker (Boat HTTP ${job.boat.lastProviderStatus})` : "Preparing worker") : "In progress",
+    }] : []);
+  const selected = completed.find(row => row.jobId === selectedId);
+  if (!selected) return { active, completed, detail: null };
+  const receipt = queueCompletionReceiptSchema.parse(await jsonBlob(selected.sha));
+  if (receipt.jobId !== selected.jobId || receipt.proofDigest !== selected.digest)
+    throw new Error("Attempt history identity mismatch");
+  const logIds = [receipt.firstAttemptLogId, receipt.logArchived ? receipt.jobId : undefined];
+  const logs = await Promise.all(logIds.flatMap(id => id ? [id] : []).map(async id => {
+    const entry = tree.tree.find(item => item.path === verifierLogPath(id));
+    if (!entry) return null;
+    const log = openVerifierLog(await jsonBlob(entry.sha), options.archiveKey ?? requireSubmissionArchiveKey());
+    if (log.jobId !== id || log.proofDigest !== receipt.proofDigest) throw new Error("Attempt log identity mismatch");
+    return log;
+  }));
+  return { active, completed, detail: { receipt, logs: logs.filter((log): log is VerifierLogPayload => log !== null && log.log.length > 0) } };
 }

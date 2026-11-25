@@ -104,6 +104,25 @@ export function describeVerifierRejection(
   const diagnostic = `${fallbackMessage}\n${log}`.toLowerCase();
   const location = candidateLocation(log);
 
+  if (fallbackMessage === "Boat worker provisioning expired.") {
+    return feedback({
+      code: "verifier-infrastructure", stage: "infrastructure",
+      title: "Worker setup timed out",
+      detail: "The service reached its two-hour limit while preparing a worker. No Lean or kernel verdict was recorded.",
+      action: "Check your submission history for an existing retry. Please contact the maintainers if worker setup fails again.",
+      retryable: true,
+    });
+  }
+  if (fallbackMessage.startsWith("The Boat worker ")) {
+    return feedback({
+      code: "verifier-infrastructure", stage: "infrastructure",
+      title: "Worker stopped before returning a verdict",
+      detail: "The verifier worker ended without a sealed result. Its last available diagnostics are shown below when available.",
+      action: "Check the recorded output or send the proof digest to the maintainers.",
+      retryable: true,
+    });
+  }
+
   if (fallbackMessage === kernelOomMessage) {
     return feedback({
       code: "verification-out-of-memory",
