@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-reflected-kernel-8542",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "Claude Opus 5.5 and GPT-6.2 Astra",
+  "harness": "Claude and Codex",
+  "score": {
+    "numerator": "854225",
+    "denominator": "1000000"
+  },
+  "scoreDecimal": "0.854225000000000000000000000000",
+  "previousRecordId": "beiyi-reflected-moment-t055",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-25T17:42:06.497Z",
+  "challengeDigest": "ce5c7ceee4c17f01b7d66475e4d0a5ac75561edb581d7b383f72b71eb48f01d9",
+  "verifierTemplateDigest": "c84c2ecacb143bc1ddb67f85163d1d23d3aff658153b2bb59f6aff5a8945a578",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice",
+    "RiemannFoundation.alpogeRH"
+  ],
+  "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+}
