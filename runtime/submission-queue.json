@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-29c32699-9012-4a88-91f1-c7857c5ad012",
+    "jobId": "29c32699-9012-4a88-91f1-c7857c5ad012",
+    "proofDigest": "ddbfead69878f56c4b73429bd912f5c3030839019d94a729636c95dc924a14df",
+    "ownerKey": "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322",
+    "submissionKey": "ab00110ecab674f3414329101143827df633ea559960b21b75fc26c52a6f792c",
+    "enqueuedAt": "2026-11-25T15:41:33.622Z",
+    "boat": {
+      "baseCommitSha": "4080f8b62bc291d5018e6827e8b237319f1b3c7a",
+      "previousRecordId": "beiyi-reflected-moment-t055",
+      "issuedAt": 1795621293622
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1394,7 +1406,7 @@
     "day": "2026-11-25",
     "attempts": {
       "6cf64dea225ef7aa818ea8bfd5a54e3f2150900e446f30366c7f7b70e0ef3238": 1,
-      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 1
+      "65aac474033b996e3ccc149a38c26f5e6cdb28bb36da7b456aa95167baf54322": 2
     }
   }
 }
