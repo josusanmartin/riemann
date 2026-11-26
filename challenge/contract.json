@@ -85,6 +85,8 @@
     "challenge/foundation/lake-manifest.json",
     "boat/compact",
     ".github/workflows/build-compact-runtime.yml",
-    "challenge/compact-runtime.json"
+    "challenge/compact-runtime.json",
+    "src/lib/compact-runtime.ts",
+    "src/lib/verifier-identity.ts"
   ]
 }
