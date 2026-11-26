@@ -1,3 +1,4 @@
+import { compactCertificateUrl } from "@/lib/compact-replay";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, BookOpen, UploadCloud, UserCheck } from "lucide-react";
@@ -38,7 +39,7 @@ export default function SubmissionsIndexPage() {
                 <span className="submissions-badges">
                   <span className={record.formalVerification ? "submissions-badge verified" : "submissions-badge"}>
                     {record.formalVerification ? <BadgeCheck size={15} /> : <BookOpen size={15} />}
-                    {record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
+                    {compactCertificateUrl(record) ? "Kernel · RH replayed" : record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
                   </span>
                   {record.independentReview && (
                     <span className="submissions-badge expert"><UserCheck size={15} /> Expert</span>

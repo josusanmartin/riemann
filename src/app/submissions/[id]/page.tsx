@@ -8,8 +8,8 @@ import {
   BookOpen,
   ChevronDown,
 } from "lucide-react";
-import { compactReplay } from "@/lib/compact-replay";
-import { contract, getRecord, getRecords } from "@/lib/records";
+import { compactReplay, compactCertificateUrl } from "@/lib/compact-replay";
+import { getRecord, getRecords } from "@/lib/records";
 import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 import { recordPresentation } from "./presentation";
 import styles from "./record.module.css";
@@ -66,6 +66,7 @@ export default async function SubmissionPage({ params }: PageProps) {
   const powerOfTen = fraction && /^10{7,}$/.test(fraction.denominator)
     ? fraction.denominator.length - 1
     : null;
+  const certificateUrl = compactCertificateUrl(record);
   const sourceIsManifest = record.sourceUrl.endsWith("/submission.json");
 
   return (
@@ -136,18 +137,18 @@ export default async function SubmissionPage({ params }: PageProps) {
             </div>
             {record.rhFoundationCommit && (
               <div>
-                <dt>Foundation</dt>
+                <dt>Admission foundation</dt>
                 <dd>
-                  <Link href="/methodology">{record.rhFoundationCommit === contract.trustedUpstream.rh.commit ? "Compact RH proof replayed" : "Published RH premise"}</Link>
+                  <Link href="/methodology">{record.rhFoundationCommit === compactReplay.foundationCommit ? "Compact RH proof replayed" : "Published RH premise"}</Link>
                 </dd>
               </div>
             )}
-            {record.id === compactReplay.recordId && (
+            {certificateUrl && (
               <div>
                 <dt>Compact RH replay</dt>
                 <dd>
                   Lean and nanoda checked both bounds with the proof of RH included.
-                  {" "}<a href={compactReplay.releaseUrl}>Certificate and replay instructions</a>
+                  {" "}<a href={certificateUrl}>{record.id === compactReplay.recordId ? "Certificate and replay instructions" : "Verification receipt"}</a>
                 </dd>
               </div>
             )}
