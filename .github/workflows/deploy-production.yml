@@ -71,7 +71,8 @@ jobs:
           maintenance=()
           if [[ "$PAUSE_ADMISSIONS" == "true" ]]; then
             maintenance+=(--env SUBMISSIONS_PAUSED=1)
-            maintenance+=(--env 'SITE_NOTICE=The verifier is being upgraded. Jobs already admitted will finish. New uploads will reopen after the switch.')
+            notice='The verifier is being upgraded. Jobs already admitted will finish. New uploads will reopen after the switch.'
+            maintenance+=(--env "SITE_NOTICE=$notice" --build-env "SITE_NOTICE=$notice")
           fi
           npx --yes vercel@54.7.1 deploy \
             --prod \
