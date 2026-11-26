@@ -8,6 +8,7 @@ import {
   BookOpen,
   ChevronDown,
 } from "lucide-react";
+import { compactReplay } from "@/lib/compact-replay";
 import { getRecord, getRecords } from "@/lib/records";
 import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 import { recordPresentation } from "./presentation";
@@ -138,6 +139,15 @@ export default async function SubmissionPage({ params }: PageProps) {
                 <dt>Foundation</dt>
                 <dd>
                   <Link href="/methodology">Published RH premise</Link>
+                </dd>
+              </div>
+            )}
+            {record.id === compactReplay.recordId && (
+              <div>
+                <dt>Compact RH replay</dt>
+                <dd>
+                  Lean and nanoda checked both bounds with the proof of RH included.
+                  {" "}<a href={compactReplay.releaseUrl}>Certificate and replay instructions</a>
                 </dd>
               </div>
             )}

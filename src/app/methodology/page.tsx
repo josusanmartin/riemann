@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CodeBlock } from "@/components/code-block";
 import { VerificationPipeline } from "@/components/verification-pipeline";
+import { compactReplay } from "@/lib/compact-replay";
 import { contract } from "@/lib/records";
 
 export const metadata: Metadata = {
@@ -89,7 +90,7 @@ export default function MethodologyPage() {
           <p>Lean {contract.trustedUpstream.leanToolchain.split(":v")[1]} uses a pinned interface to Alpöge’s published proof. The verifier accepts the exact Mathlib statement <code>RiemannHypothesis</code> as a foundation axiom. Comparator checks its type and both kernels replay the candidate. The upstream proof body is checked externally.</p>
           <p><a className="text-link" href={contract.trustedUpstream.rh.verificationUrl}>Independent verification of the RH release</a></p>
           <p><a className="text-link" href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>Pinned release</a> · Reference export SHA-256 <code style={{ overflowWrap: "anywhere" }}>{contract.trustedUpstream.rh.referenceExportSha256}</code></p>
-          <p>Records checked under this policy carry the RH foundation label. Earlier records retain their original evidence.</p>
+          <p>The <Link href={`/submissions/${compactReplay.recordId}`}>85.4225% record</Link> also has a separate Lean 4.35 certificate. Lean and nanoda checked both bounds with the compact RH proof included, using only <code>propext</code>, <code>Classical.choice</code>, and <code>Quot.sound</code>.</p>
         </article>
       </section>
 
