@@ -43,7 +43,12 @@ git init -q judge
 git -C judge fetch -q --depth=1 https://github.com/josusanmartin/riemann.git {revision}
 git -C judge checkout -q --detach FETCH_HEAD
 test "$(git -C judge rev-parse HEAD)" = {revision}
-bash judge/boat/compact/qualify.sh > qualification.log 2>&1"""
+status=0
+bash judge/boat/compact/qualify.sh > qualification.log 2>&1 || status=$?
+for file in qualification.log riemann-bootstrap.log riemann-proof.log; do
+    if test -f "$file"; then tail -c 2000 "$file"; fi
+done > qualification-diagnostic.txt
+exit "$status" """
 request = {"type": "large", "name": "Compact RH qualification", "org": "personal",
            "environment": "riemann-production", "visibility": "private", "noEnv": True,
            "snapshots": False, "monitoring": False, "ttlSeconds": 7200,
@@ -60,10 +65,12 @@ try:
             raise RuntimeError("Qualification worker isolation differs from production")
         if box["state"] in ("stopped", "archived", "error") or box.get("setupStatus") == "failed":
             # Read the trusted setup log tail. Keep it bounded and print raw output as plain text.
-            diagnostic = api(endpoint + "/commands", "POST", {
-                "command": "tail -c 2000 qualification.log; tail -c 2000 riemann-bootstrap.log; tail -c 2000 riemann-proof.log", "timeoutSeconds": 10})
-            for line in diagnostic.get("stdout", "").splitlines():
-                print("worker |", line[:400], flush=True)
+            try:
+                diagnostic = api(endpoint + "/files?path=qualification-diagnostic.txt&encoding=utf8")
+                for line in diagnostic.get("content", "").splitlines():
+                    print("worker |", line[:400], flush=True)
+            except urllib.error.HTTPError:
+                pass
             raise RuntimeError("Qualification failed before issuing a receipt")
         if box.get("setupStatus") == "done":
             raw = api(endpoint + "/files?path=canary-attestation.json&encoding=utf8")["content"]

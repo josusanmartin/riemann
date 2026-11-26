@@ -80,13 +80,7 @@ Every admitted server-generated manifest and exact `Solution.lean` is gzip-compr
 
 The durable queue is also the finalization authority. Each Boat launch uses the admitted job UUID as its idempotency key, and the queue persists the worker ID before the source is staged. Competitive starts defer while the operator-only production flow test is active, and the flow-test route stops its sandbox if a competitive entry wins the admission race.
 
-For local development, copy `submissions/example`, replace every placeholder in `proof/Solution.lean`, update the exact rational in `submission.json`, and prepare the candidate against the pinned Zeta23 tree:
-
-```bash
-npx tsx scripts/verify-submission.ts submissions/your-id --mode=prepare
-```
-
-`--mode=quick` performs a local Lean build without an adversarial sandbox and is only appropriate for code you trust. Authoritative verification uses `--mode=full`, `leanprover/comparator`, `landrun`, and the independent `nanoda` kernel at the commits pinned in `challenge/contract.json`. The CI bootstrap pins Elan 4.1.2 by archive digest; a local full run also needs Linux with Go, Rust, and systemd user services.
+For your own candidate, put the manifest and one-file source in the layout used by `submissions/example`. The methodology page and the [worker replay guide](boat/compact/README.md) describe the same Linux verification path used for leaderboard submissions.
 
 ## Deployment
 
@@ -97,7 +91,7 @@ vercel
 vercel --prod
 ```
 
-Configure the OAuth, public URL, verifier, GitHub promotion and submission archive variables from `.env.example` in the Vercel project. Follow [On-demand Boat verification](CONTRIBUTING.md#on-demand-boat-verification) for the production worker. For legacy E2B deployments, build the pinned E2B image with `npm run e2b:template:build`, smoke the exact build, then set its immutable `riemann-fail-verifier:<build-id>` reference as `E2B_TEMPLATE_ID`; a bare family ID is mutable and must not be activated. If the E2B key exists only in Vercel, the authenticated `/api/admin/e2b-template` endpoint can start, inspect, and smoke the same background build using a temporary `E2B_TEMPLATE_ADMIN_SECRET`; remove that secret after bootstrap. Lean runs asynchronously inside E2B rather than a Vercel function because elaboration is long-running and executes hostile contributor code.
+Configure the OAuth, public URL, verifier, GitHub promotion and submission archive variables from `.env.example` in the Vercel project. Follow [On-demand Boat verification](CONTRIBUTING.md#on-demand-boat-verification) for the production worker. Historical E2B releases can be replayed from the revision recorded on their receipts.
 
 `GITHUB_RECORDS_TOKEN` must be a fine-grained credential limited to this repository with only **Contents: read and write**. It is held by Vercel and never sent to a proof worker. It updates the opaque queue-control branch and, only after the server has re-read and rehashed a passing result, publishes evidence. Promotion writes an evidence commit and a ledger commit, then publishes both with one non-forced update of `main`; a race cannot overwrite another record.
 

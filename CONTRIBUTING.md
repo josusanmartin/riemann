@@ -45,7 +45,7 @@ request is limited to 4 MB (including escaping); the decoded Lean source is
 separately limited to 2 MB. Both limits are enforced on actual bytes, including
 requests without a `Content-Length` header.
 
-The service accepts at most **five admitted uploads per GitHub account per UTC calendar day**, resetting at **00:00 UTC**. An input rejected before durable queue admission does not count and is not retained. Once admitted, the slot is consumed regardless of the result: syntax and elaboration errors, theorem or axiom mismatch, Lean or nanoda rejection, timeout, sandbox expiration, and successful verification all count. Slots are not automatically refunded, so validate locally before submitting when possible. Competitive Boat jobs start on a 16 GB worker with a 12 GiB verifier limit. A kernel-confirmed out-of-memory kill triggers one retry on a 32 GB worker with a 28 GiB limit. The retry keeps the same proof, queue position and daily slot. Admitted uploads enter a durable first-in, first-out queue, and only its head runs the formal verifier. Other uploads remain sealed in paused no-egress sandboxes until their turn; refreshing the page does not change order or reset the limit.
+The service accepts at most **five admitted uploads per GitHub account per UTC calendar day**, resetting at **00:00 UTC**. An input rejected before durable queue admission does not count and is not retained. Once admitted, the slot is consumed regardless of the result: syntax and elaboration errors, theorem or axiom mismatch, Lean or nanoda rejection, timeout, sandbox expiration, and successful verification all count. Slots are not automatically refunded, so validate locally before submitting when possible. Competitive Boat jobs start on a 16 GB worker with a 12 GiB verifier limit. A kernel-confirmed out-of-memory kill triggers one retry on a 32 GB worker with a 28 GiB limit. The retry keeps the same proof, queue position and daily slot. Admitted uploads enter a durable first-in, first-out queue, and only its head runs the formal verifier. Other uploads remain in the encrypted queue until their turn. Refreshing the page does not change order or reset the limit.
 
 Every admitted manifest and exact Lean source is retained indefinitely in a gzip-compressed, AES-256-GCM encrypted maintainer archive, including rejected, timed-out, and infrastructure-failed attempts. Archive ciphertext is committed atomically with queue admission; plaintext rejected source is not published. A proof that passes is also published under Apache-2.0 as immutable public evidence. The form states this retention boundary before submission.
 
@@ -57,7 +57,7 @@ A submission becomes a formal record when all of the following hold automaticall
 
 1. Its authenticated fields and server-generated manifest validate.
 2. Comparator proves exact equality with the trusted generated statements.
-3. Its transitive axiom set is a subset of the three standard axioms and the fixed external premise `RiemannFoundation.alpogeRH : RiemannHypothesis`. Comparator matches the premise and its dependencies to the trusted declarations.
+3. The worker links the proof of RH, checks the exact Mathlib RH statement and audits all four targets for the three permitted axioms `propext`, `Classical.choice` and `Quot.sound`.
 4. Lean accepts the exported proof.
 5. The independent nanoda kernel accepts the proof.
 6. `candidate_strict_improvement` proves the rational exceeds the exact current record.
@@ -73,29 +73,11 @@ Review metadata is a separate infrastructure change. It is never accepted from t
 
 ## Security
 
-Lean elaboration executes contributor-controlled metaprograms. Never run an unfamiliar proof directly on a workstation with credentials. Authoritative verification runs without repository secrets or network access in a resource-limited E2B sandbox. See [SECURITY.md](SECURITY.md).
+Lean elaboration executes contributor-controlled metaprograms. Never run an unfamiliar proof directly on a workstation with credentials. Authoritative verification runs without repository secrets or network access in a resource-limited Boat worker. See [SECURITY.md](SECURITY.md).
 
 ## Test the verifier on Boat
 
-The Submit page offers a Boat test to accounts listed in `RIEMANN_FLOW_TEST_GITHUB` when both Boat settings are present. It runs the repository’s arithmetic fixture through Comparator, Lean and nanoda, then tests that Comparator rejects a valid Lean proof of a different statement. The sandbox runs fixed test fixtures. Competitive uploads continue through the E2B queue.
-
-Use a fresh x86-64 Ubuntu Boat sandbox with **No env** enabled and a short auto-stop. Check out the revision of this site that you are testing at `~/.local/share/riemann-boat/site` on that sandbox. As its normal user, prepare the verifier once:
-
-```bash
-set -eu
-cd "$HOME/.local/share/riemann-boat/site"
-bash scripts/install-lean-toolchain.sh
-export PATH="$HOME/.elan/bin:$PATH"
-elan toolchain install "$(cat challenge/smoke/lean-toolchain)"
-bash scripts/install-native-build-toolchains.sh
-export CARGO_HOME="$HOME/.riemann-build-toolchains/cargo"
-export RUSTUP_HOME="$HOME/.riemann-build-toolchains/rustup"
-export PATH="$HOME/.riemann-build-toolchains/go/bin:$CARGO_HOME/bin:$PATH"
-bash scripts/install-verifier-tools.sh "$HOME/.local/share/riemann-boat/tools"
-bash scripts/boat-smoke.sh
-```
-
-Set `RIEMANN_BOAT_SANDBOX_ID` and `BOAT_API_KEY` on the website server. Use an expiring key restricted to that sandbox with the `exec` action. Sign in as an operator and choose **Run Boat test** on `/submit`. The endpoint also accepts an authenticated GitHub user token via a JSON POST to `/api/admin/boat-smoke`. Stop the sandbox and revoke the test key when finished.
+The operator flow test submits the fixed 2/3 proof against the 1/3 test incumbent through the same production worker. Its receipt stays outside the competitive ranking. To qualify a new runtime against the archived 85.4225% upload, use the **Qualify the compact verifier on Boat** workflow. Each launch creates a paid worker with a two-hour auto-stop. [Worker build and local replay](boat/compact/README.md).
 
 ## Research evidence
 
@@ -107,6 +89,6 @@ Promotion to the competitive leaderboard requires an official verification of th
 
 The deployment setting `RIEMANN_VERIFIER_PROVIDER=boat` selects disposable Boat workers for new submissions and the operator flow test. The website and the encrypted Git-backed FIFO remain on their existing services. A waiting competitive proof has a logical job ID. Only the head of the FIFO can provision a VM. A job-specific signed notification wakes the website when a competitive receipt is ready. The website fetches that receipt directly from Boat. Status polling and the scheduled sweep resume interrupted provisioning and recover missed notifications. A two-hour auto-stop bounds an orphaned worker's lifetime.
 
-Create the Boat environment `riemann-production` with **Safe for third parties** enabled. Restrict its expiring API key to this environment and the actions `sandbox.create`, `sandbox.read`, `sandbox.stop`, `file.read`, and `file.write`. Set the GitHub Actions secret `RIEMANN_BOAT_API_KEY` and the repository variable `RIEMANN_VERIFIER_PROVIDER`. Dispatch **Deploy production website** on main with `sync_boat_key` enabled to put the key in the production project's sensitive environment. Rotate the key before expiry. Selecting `e2b` on a subsequent deployment routes new submissions back to the legacy verifier; already admitted jobs retain their provider.
+Create the Boat environment `riemann-production` with **Safe for third parties** enabled. Restrict its expiring API key to this environment and the actions `sandbox.create`, `sandbox.read`, `sandbox.stop`, `file.read`, and `file.write`. Set the GitHub Actions secret `RIEMANN_BOAT_API_KEY` and the repository variable `RIEMANN_VERIFIER_PROVIDER`. Dispatch **Deploy production website** on main with `sync_boat_key` enabled to put the key in the production project's sensitive environment. Rotate the key before expiry. Policy v3 requires Boat for new admissions. Historical receipts identify the provider and revision that checked them.
 
-Each worker boots from a fixed site commit and fetches the pinned toolchains and libraries. It receives only the submitted files, with snapshots and provider monitoring disabled. A separate unprivileged account runs the verifier, with the nested Comparator process under the repository's filesystem and network restrictions. The supervisor seals the receipt, and the website checks the archived source digest, statement, axiom and kernel evidence before promotion.
+Each worker boots from a fixed site commit and fetches the pinned toolchains and libraries. It receives only the submitted files, with snapshots and provider monitoring disabled. One isolated account compiles and exports the submission. A separate checker account compares the sealed export with the trusted reference and runs both kernels. The supervisor seals the receipt, and the website checks the archived source digest, statement, axiom and kernel evidence before promotion.
