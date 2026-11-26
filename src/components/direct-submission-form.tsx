@@ -419,7 +419,7 @@ export function DirectSubmissionForm({
       <div className="submission-fields">
         <label>
           <span>Record name</span>
-          <input name="id" required maxLength={80} pattern="[a-z0-9][a-z0-9-]*" placeholder="your-bound-2026" disabled={busy} />
+          <input name="id" required maxLength={80} pattern="[a-z0-9]([a-z0-9]|-)*" placeholder="your-bound-2026" disabled={busy} />
           <small>A short identifier for this record — lowercase letters, digits, and hyphens. It becomes the record’s URL and its entry in the public ledger, so pick something recognizable.</small>
         </label>
         <label>
