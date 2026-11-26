@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      pause_admissions:
+        description: Pause new competitive uploads on this deployment while admitted jobs finish
+        type: boolean
+        default: false
       sync_boat_key:
         description: Copy the scoped verifier key into the production project's sensitive environment
         type: boolean
@@ -55,6 +59,7 @@ jobs:
       - name: Deploy the exact main commit
         if: github.ref == 'refs/heads/main'
         env:
+          PAUSE_ADMISSIONS: ${{ github.event_name == 'workflow_dispatch' && inputs.pause_admissions }}
           PROVIDER: ${{ vars.RIEMANN_VERIFIER_PROVIDER || 'e2b' }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
@@ -63,10 +68,16 @@ jobs:
           test -n "$VERCEL_TOKEN"
           test -n "$VERCEL_ORG_ID"
           test -n "$VERCEL_PROJECT_ID"
+          maintenance=()
+          if [[ "$PAUSE_ADMISSIONS" == "true" ]]; then
+            maintenance+=(--env SUBMISSIONS_PAUSED=1)
+            maintenance+=(--env 'SITE_NOTICE=The verifier is being upgraded. Jobs already admitted will finish. New uploads will reopen after the switch.')
+          fi
           npx --yes vercel@54.7.1 deploy \
             --prod \
             --yes \
             --archive=tgz \
+            "${maintenance[@]}" \
             --env RIEMANN_VERIFIER_PROVIDER="$PROVIDER" \
             --build-env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
             --env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
