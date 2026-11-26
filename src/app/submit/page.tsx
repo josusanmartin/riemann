@@ -1,3 +1,4 @@
+import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { boatSelected,boatConfigured } from "@/lib/boat-worker";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -25,8 +26,6 @@ import { FlowTestPanel } from "@/components/flow-test-panel";
 import { signInWithGitHub } from "@/lib/auth-actions";
 import { repositoryUrl } from "@/lib/site";
 import { getCurrentRecord } from "@/lib/records";
-import { isE2BConfigured } from "@/lib/e2b-config";
-import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
   FLOW_TEST_DOWNLOAD_PATH,
@@ -61,7 +60,7 @@ export default async function SubmitPage() {
   const flowTestAllowed = github ? isFlowTestOperator(github, session?.user.githubId) : false;
   const archiveMaintainer = isSubmissionArchiveMaintainer(github, session?.user.githubId);
   const verifierConfigured =
-    (boatSelected() ? boatConfigured() : isE2BConfigured() && isE2BWebhookConfigured()) &&
+    (boatSelected() && boatConfigured() && compactRuntimePinned()) &&
     isGitHubPromotionConfigured() &&
     queueConfigured;
   const dailyUsage =
@@ -207,7 +206,7 @@ export default async function SubmitPage() {
           officialSource={flowTestSolutionSource}
           downloadPath={FLOW_TEST_DOWNLOAD_PATH}
           gistUrl={FLOW_TEST_GIST_URL}
-          verifierConfigured={boatSelected() ? boatConfigured() : isE2BConfigured()}
+          verifierConfigured={boatSelected() && boatConfigured() && compactRuntimePinned()}
         />
       )}
 

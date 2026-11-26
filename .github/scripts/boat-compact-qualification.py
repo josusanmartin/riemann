@@ -51,7 +51,7 @@ try:
         if box["state"] in ("stopped", "archived", "error") or box.get("setupStatus") == "failed":
             # Read the trusted setup log tail. Keep it bounded and print raw output as plain text.
             diagnostic = api(endpoint + "/commands", "POST", {
-                "command": "tail -c 4000 qualification.log", "timeoutSeconds": 10})
+                "command": "tail -c 2000 qualification.log; tail -c 2000 riemann-bootstrap.log; tail -c 2000 riemann-proof.log", "timeoutSeconds": 10})
             for line in diagnostic.get("stdout", "").splitlines():
                 print("worker |", line[:400], flush=True)
             raise RuntimeError("Qualification failed before issuing a receipt")

@@ -1,3 +1,4 @@
+import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected, boatConfigured } from "@/lib/boat-worker";
@@ -10,7 +11,6 @@ import { records } from "@/lib/records";
 import { prepareDirectSubmission } from "@/lib/direct-submission";
 import { stageE2BVerification } from "@/lib/e2b-queue";
 import { killE2BSandbox } from "@/lib/e2b-verifier";
-import { isE2BConfigured } from "@/lib/e2b-config";
 import {
   ensureE2BWebhook,
   isE2BWebhookConfigured,
@@ -83,7 +83,7 @@ export async function POST(request: Request): Promise<Response> {
     error: "sign_in_again",
     message: "Refresh your GitHub sign-in on the submission page before uploading.",
   });
-  if (boatSelected() ? !boatConfigured() : !isE2BConfigured()) {
+  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned()) {
     return noStore(503, {
       error: "verifier_unavailable",
       message: "The verifier is not configured for this deployment.",

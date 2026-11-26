@@ -10,7 +10,7 @@ digest="${1:?proof digest}"
 kind="${2:?job kind}"
 memory_limit="${3:-12G}"
 [[ "$memory_limit" == 12G || "$memory_limit" == 28G ]]
-[[ "$digest" =~ ^[0-9a-f]{64}$ && "$kind" =~ ^(competitive|flow)$ ]]
+[[ "$digest" =~ ^[0-9a-f]{64}$ && "$kind" =~ ^(competitive|flow|qualification)$ ]]
 # This submitter-visible journal records only fixed phase names, UTC times,
 # and numeric exit statuses. Bootstrap command output stays with the operator.
 stage_file="$HOME/riemann-stages.tsv"
@@ -55,7 +55,9 @@ for _ in $(seq 1 90); do
   sleep 2
 done
 [[ "$staged" == true ]]
-if [[ "$kind" == flow ]]; then
+if [[ "$kind" == qualification ]]; then
+  python3 boat/compact/records-at-admission.py knausgard-rh-reflected-kernel-8542 "$root/input/trusted-records.json"
+elif [[ "$kind" == flow ]]; then
   cp challenge/flow-test-records.json "$root/input/trusted-records.json"
 else
   ./node_modules/.bin/tsx -e 'import {records} from "./src/lib/records";process.stdout.write(JSON.stringify(records,null,2)+"\n")' > "$root/input/trusted-records.json"

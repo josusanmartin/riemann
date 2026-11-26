@@ -1,3 +1,4 @@
+import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected,boatConfigured,activeBoatFlow,startBoatFlow,stopBoatWorker,flowWorkerId } from "@/lib/boat-worker";
@@ -9,7 +10,6 @@ import {
   hasActiveE2BFlowTest,
   startE2BFlowTest,
 } from "@/lib/e2b-flow-test";
-import { isE2BConfigured } from "@/lib/e2b-config";
 import { hasActiveE2BJob, killE2BSandbox } from "@/lib/e2b-verifier";
 import {
   FLOW_TEST_BASELINE_ID,
@@ -49,10 +49,10 @@ export async function POST(request: Request): Promise<Response> {
       message: "The noncompetitive flow test is currently restricted to site operators.",
     });
   }
-  if (boatSelected() ? !boatConfigured() : !isE2BConfigured()) {
+  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned()) {
     return noStore(503, {
       error: "verifier_unavailable",
-      message: "The E2B verifier is not configured for this deployment.",
+      message: "The compact Boat verifier is unavailable on this deployment.",
     });
   }
 
