@@ -26,21 +26,13 @@ else
   compact="$work/grh/grh-compact"
   (cd "$compact" && python3 "$here/fetch-deps.py" && lake exe cache get && lake --no-ansi build +Main:olean)
 fi
-fetch zeta https://github.com/anthropics/formal-math.git 3635e74826a4c1fcece7d1cd2b6fa75e43a00510
-git -C zeta apply "$here/zeta35.patch"
-mkdir -p zeta/Zeta23/Compat zeta/.lake
-cp "$here/LinearCombinationPrime.lean" zeta/Zeta23/Compat/
-ln -s "$compact/.lake/packages" zeta/.lake/packages
-cp "$compact/lean-toolchain" "$compact/lake-manifest.json" zeta/
-sed -i 's/51e6992efd06126df61a496bebf8f49482a4e129/56a005855ea17e0b0958f73ec801ae140b0a1679/' zeta/lakefile.toml
-# Build every upstream module. Some previously accepted entries import modules outside the aggregate root.
-(cd zeta && python3 - <<'PYTHON'
-import pathlib
-import subprocess
-modules = sorted("+" + ".".join(p.with_suffix("").parts) + ":olean" for p in pathlib.Path("Zeta23").rglob("*.lean"))
-subprocess.run(["lake", "--no-ansi", "build", "+ChallengeDeps:olean", "+Zeta23:olean", *modules], check=True)
-PYTHON
-)
+if [[ ${RIEMANN_EXTERNAL_ZETA:-0} == 1 ]]; then
+  # Production installs the separately pinned Zeta23 library into deps/zeta.
+  fetch zeta https://github.com/anthropics/formal-math.git 3635e74826a4c1fcece7d1cd2b6fa75e43a00510
+  git -C zeta apply --check "$here/zeta35.patch"
+else
+  bash "$here/build-zeta.sh" "$work/zeta" "$compact/.lake/packages"
+fi
 mkdir -p "$out"/{interface,foundation,compat,deps,licenses,checker}
 cp "$compact"/{LICENSE,NOTICE,ATTRIBUTION.md} "$out/licenses/"
 cp zeta/NOTICE "$out/licenses/Zeta23-NOTICE"
@@ -55,7 +47,9 @@ for pkg in Cli batteries Qq aesop proofwidgets importGraph LeanSearchClient plau
   path="$compact/.lake/packages/$pkg/.lake/build/lib/lean"
   [[ ! -d "$path" ]] || modules "$path" "$out/deps/$pkg"
 done
-modules "$work/zeta/.lake/build/lib/lean" "$out/deps/zeta"
+if [[ ${RIEMANN_EXTERNAL_ZETA:-0} != 1 ]]; then
+  modules "$work/zeta/.lake/build/lib/lean" "$out/deps/zeta"
+fi
 modules "$compact/.lake/build/lib/lean" "$out/deps/compact"
 prefix=$(lean --print-prefix)
 export LEAN_PATH=$(find "$out/deps" -mindepth 1 -maxdepth 1 -type d | sort | paste -sd:):"$prefix/lib/lean"
