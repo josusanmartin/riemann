@@ -1,0 +1,55 @@
+name: Qualify the compact verifier on Boat
+on:
+  workflow_dispatch:
+  push:
+    tags: ['compact-boat-qualification-*']
+permissions:
+  contents: read
+jobs:
+  qualify:
+    if: github.repository == 'josusanmartin/riemann'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check runtime pins before allocating
+        run: |
+          jq -e '.parts | length > 0' challenge/compact-runtime.json
+          test "$(jq -r '.schemaVersion' challenge/contract.json)" = 3
+      - name: Verify the released cache before using Boat
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/local/lib/android
+          bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
+          bash boat/compact/install-runtime.sh "$RUNNER_TEMP/runtime" "$GITHUB_WORKSPACE/challenge/compact-runtime.json"
+          export PATH="$RUNNER_TEMP/lean/bin:$PATH"
+          runtime="$RUNNER_TEMP/runtime"
+          export LEAN_PATH="$runtime/interface:$runtime/compat:$(find "$runtime/deps" -mindepth 1 -maxdepth 1 -type d | sort | paste -sd:)"
+          cat > "$RUNNER_TEMP/Smoke.lean" <<'LEAN'
+          import Main
+          import LegacyFinsetSyntax
+          import ChallengeDeps
+          import Zeta23.Unconditional
+          import Zeta23.ThmD.Mult
+          example : RiemannHypothesis := riemannHypothesis
+          LEAN
+          (cd "$RUNNER_TEMP" && lean -j1 Smoke.lean)
+      - name: Replay the archived record
+        env:
+          BOAT_TEST_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: python3 .github/scripts/boat-compact-qualification.py
+      - name: Add certificate details to the run summary
+        run: |
+          jq '{submissionId,score,permittedAxioms,kernels,rhFoundationCommit,compactReplay}' canary-attestation.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve the full worker receipt
+        if: always() && hashFiles('canary-attestation.json') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: compact-boat-qualification
+          path: |
+            canary-attestation.json
+            canary-stages.tsv
+            canary-usage.json
+          if-no-files-found: error

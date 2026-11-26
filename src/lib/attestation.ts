@@ -29,6 +29,9 @@ export function assertValidAttestation(
   ) {
     throw new Error("Attested model or harness differs from the submission");
   }
+  if (contract.schemaVersion === 3 && !attestation.compactReplay) {
+    throw new Error("The compact RH policy requires a sealed dual-kernel replay");
+  }
   if (attestation.rhFoundationCommit !== contract.trustedUpstream.rh.commit) {
     throw new Error("Attestation used a different RH foundation");
   }

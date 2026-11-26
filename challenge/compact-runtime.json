@@ -1,0 +1,12 @@
+{
+  "release": "compact-runtime-build-435-03",
+  "parts": [
+    "a8e86a24c279182b8ff1ffe6e0680cf665ef8298df23f0e2709757f2cfcb1086",
+    "0c08c626c8c1dbdd6cfac55eb85fa3216a574afb1c00fe86cf9dc177fd603fac",
+    "2bd5116679ab387ec6bdf53eaa26765853e5b18f34043aaab1cab631a204eafa"
+  ],
+  "zeta": {
+    "release": "compact-zeta-build-435-01",
+    "sha256": "762c64a22b084ef00a150b3b7145b153dff320e762eb5a378fc0ba9a8cf5e4fe"
+  }
+}

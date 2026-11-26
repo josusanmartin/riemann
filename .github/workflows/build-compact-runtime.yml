@@ -1,0 +1,76 @@
+name: Build compact RH worker runtime
+on:
+  push:
+    tags: ['compact-runtime-build-*']
+permissions:
+  contents: read
+jobs:
+  build:
+    if: "!endsWith(github.ref_name, '-foundation')"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install pinned Lean
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
+          echo "$RUNNER_TEMP/lean/bin" >> "$GITHUB_PATH"
+      - name: Restore the pinned compact foundation
+        if: hashFiles('boat/compact/foundation-cache.sha256') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          gh release download compact-runtime-build-435-02-foundation --repo "$GITHUB_REPOSITORY" --pattern 'foundation.tar.zst.part*'
+          sha256sum -c "$GITHUB_WORKSPACE/boat/compact/foundation-cache.sha256"
+          # Extract exactly the verified parts, in the pinned order.
+          awk '{print $2}' "$GITHUB_WORKSPACE/boat/compact/foundation-cache.sha256" | xargs cat | zstd -dc | tar -xf -
+          test "$(git -C grh rev-parse HEAD)" = 72fead102f663d5c7a407964a13dc0cf9d977207
+          rm -- foundation.tar.zst.part*
+      - name: Build the compact foundation
+        if: hashFiles('boat/compact/foundation-cache.sha256') == ''
+        run: |
+          set -euo pipefail
+          source="$RUNNER_TEMP/grh"
+          git init -q "$source"
+          git -C "$source" fetch -q --depth=1 https://github.com/lsernau/grh-lean.git 72fead102f663d5c7a407964a13dc0cf9d977207
+          git -C "$source" checkout -q --detach FETCH_HEAD
+          cd "$source/grh-compact"
+          python3 "$GITHUB_WORKSPACE/boat/compact/fetch-deps.py"
+          lake exe cache get
+          LEAN_NUM_THREADS=2 lake --no-ansi build +Main:olean
+      - name: Save the verified foundation build for follow-up port tests
+        if: hashFiles('boat/compact/foundation-cache.sha256') == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          tar --exclude='*/.git/objects/pack/*.keep' -cf - grh | zstd -T2 -3 | split --bytes=1000M -d -a2 - foundation.tar.zst.part
+          sha256sum foundation.tar.zst.part* > foundation-checksums.txt
+          gh release create "$GITHUB_REF_NAME-foundation" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false \
+            --title "Compact RH foundation build (${GITHUB_SHA:0:10})" \
+            --notes "Pinned Lean 4.35 build inputs and compiled foundation for reproducing the worker runtime." \
+            foundation.tar.zst.part* foundation-checksums.txt
+          rm -- foundation.tar.zst.part* foundation-checksums.txt
+      - name: Package the foundation and native checker
+        run: RIEMANN_EXTERNAL_ZETA=1 RIEMANN_COMPACT_SOURCE="$RUNNER_TEMP/grh/grh-compact" bash boat/compact/build-runtime.sh "$RUNNER_TEMP/runtime"
+      - name: Publish the build cache and its checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          tar -cf - -C runtime . | zstd -T2 -3 | split --bytes=1000M -d -a2 - compact-runtime.tar.zst.part
+          sha256sum compact-runtime.tar.zst.part* > checksums.txt
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease --latest=false \
+            --title "Compact verifier runtime (${GITHUB_SHA:0:10})" \
+            --notes "Linux x86-64 build cache for Lean 4.35.0. Source and build recipe are pinned by this tag." \
+            compact-runtime.tar.zst.part* checksums.txt

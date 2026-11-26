@@ -8,7 +8,7 @@ import {
   BookOpen,
   ChevronDown,
 } from "lucide-react";
-import { compactReplay } from "@/lib/compact-replay";
+import { compactReplay, compactCertificateUrl } from "@/lib/compact-replay";
 import { getRecord, getRecords } from "@/lib/records";
 import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 import { recordPresentation } from "./presentation";
@@ -30,7 +30,7 @@ export async function generateMetadata({
   const description = `${record.author} · ${status}. ${record.method}`;
   const url = `/submissions/${record.id}`;
   const image = {
-    url: `${url}/share-image?v=2`,
+    url: `${url}/share-image?v=${compactCertificateUrl(record) ? 3 : 2}`,
     width: 1200,
     height: 630,
     alt: `${title} · ${record.author}`,
@@ -66,6 +66,7 @@ export default async function SubmissionPage({ params }: PageProps) {
   const powerOfTen = fraction && /^10{7,}$/.test(fraction.denominator)
     ? fraction.denominator.length - 1
     : null;
+  const certificateUrl = compactCertificateUrl(record);
   const sourceIsManifest = record.sourceUrl.endsWith("/submission.json");
 
   return (
@@ -136,18 +137,18 @@ export default async function SubmissionPage({ params }: PageProps) {
             </div>
             {record.rhFoundationCommit && (
               <div>
-                <dt>Foundation</dt>
+                <dt>Admission foundation</dt>
                 <dd>
-                  <Link href="/methodology">Published RH premise</Link>
+                  <Link href="/methodology">{record.rhFoundationCommit === compactReplay.foundationCommit ? "Compact RH proof replayed" : "Published RH premise"}</Link>
                 </dd>
               </div>
             )}
-            {record.id === compactReplay.recordId && (
+            {certificateUrl && (
               <div>
                 <dt>Compact RH replay</dt>
                 <dd>
                   Lean and nanoda checked both bounds with the proof of RH included.
-                  {" "}<a href={compactReplay.releaseUrl}>Certificate and replay instructions</a>
+                  {" "}<a href={certificateUrl}>{record.id === compactReplay.recordId ? "Certificate and replay instructions" : "Verification receipt"}</a>
                 </dd>
               </div>
             )}

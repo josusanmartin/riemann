@@ -1,30 +1,28 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "name": "Riemann.fail critical-line bound",
   "track": "critical-line",
   "direction": "higher",
   "trustedUpstream": {
     "repository": "anthropics/zeta-23-lean",
     "commit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
-    "leanToolchain": "leanprover/lean4:v4.33.1",
-    "mathlibCommit": "0df444a360eaa60ab8c11dca51a86af692955474",
+    "leanToolchain": "leanprover/lean4:v4.35.0",
+    "mathlibCommit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
     "rh": {
-      "repository": "leanprover-community/riemann-hypothesis",
-      "commit": "2f097b744a6460c73f3e4cc550baa83698409876",
-      "sourceTree": "24df20b62d9976ccd20da819bc20b16f808f0fdd",
-      "dependencyManifestSha256": "fee57ee9ed399d0a638ca955e5ad40a37a36eeb9b6dfd9f5964114fa7bbe4774",
+      "repository": "lsernau/grh-lean",
+      "commit": "72fead102f663d5c7a407964a13dc0cf9d977207",
+      "sourceTree": "dba7a002d3863a6fdeeefe0528b1a232e732b8d5",
+      "dependencyManifestSha256": "1390a02c1729c30db51ee0b19ea7199a129ed899ac571a48956da719573590ae",
       "interfaceAxiom": "RiemannFoundation.alpogeRH",
       "releaseTheorem": "riemannHypothesis",
-      "referenceExportSha256": "bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9",
-      "publishedProofExportSha256": "5ea74b912147c5c93cc2b6d70cc727cf908df2f62ac6a20480a3fa02f6be244e",
-      "verificationUrl": "https://math.mit.edu/~drew/grh/"
+      "referenceExportSha256": "20eb99a04b40f6afe1b44931e7ee82b15208542517dc588ace9634acffc41694",
+      "publishedProofExportSha256": "ab7b4223b9bd748a1aa68bdb63afb6d6264121fc834aadba7ba3d3796c32115b",
+      "verificationUrl": "https://math.mit.edu/~drew/shortgrh/"
     }
   },
   "verifier": {
-    "comparatorCommit": "273294467ce06429e6667ece7f5699f8678c9f4e",
-    "landrunCommit": "811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
-    "lean4exportCommit": "b18d673bd29b476466a51a3be1012df2ed322b10",
-    "nanodaCommit": "418320295890faed83a96fd97907b12a3b6728c2"
+    "leanReleaseCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+    "linuxArchiveSha256": "7289597a44543246c9227b8cae501767e095ce17f6d448b95fc4a8dc97268f6d"
   },
   "baseline": {
     "recordId": "anthropic-2026-montgomery-taylor",
@@ -40,8 +38,7 @@
   "permittedAxioms": [
     "propext",
     "Quot.sound",
-    "Classical.choice",
-    "RiemannFoundation.alpogeRH"
+    "Classical.choice"
   ],
   "trustedPaths": [
     ".github/workflows/build-e2b-template.yml",
@@ -85,6 +82,11 @@
     "src/lib/submission-jobs.ts",
     "scripts/prepare-rh-foundation.py",
     "boat/verify-job.sh",
-    "challenge/foundation/lake-manifest.json"
+    "challenge/foundation/lake-manifest.json",
+    "boat/compact",
+    ".github/workflows/build-compact-runtime.yml",
+    "challenge/compact-runtime.json",
+    "src/lib/compact-runtime.ts",
+    "src/lib/verifier-identity.ts"
   ]
 }

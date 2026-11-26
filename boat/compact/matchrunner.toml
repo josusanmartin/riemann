@@ -1,0 +1,6 @@
+name = "matchrunner"
+defaultTargets = ["matchrunner"]
+[[lean_exe]]
+name = "matchrunner"
+root = "CompareOnly"
+moreLinkArgs = ["-lLake_shared"]

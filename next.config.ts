@@ -29,6 +29,8 @@ const trustedPromotionRuntimeFiles = [
   ".github/workflows/verifier-smoke.yml",
   "challenge/**/*",
   "boat/verify-job.sh",
+  "boat/compact/**/*",
+  ".github/workflows/build-compact-runtime.yml",
   "data/**/*",
   "e2b/**/*",
   "package.json",

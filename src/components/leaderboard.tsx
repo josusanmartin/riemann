@@ -1,3 +1,4 @@
+import { compactCertificateUrl } from "@/lib/compact-replay";
 import Link from "next/link";
 import { ArrowUpRight, BadgeCheck, BookOpen, UserCheck } from "lucide-react";
 import type { RecordEntry } from "@/lib/challenge";
@@ -53,9 +54,9 @@ export function Leaderboard({ records }: { records: RecordEntry[] }) {
                 </td>
                 <td>
                   <div className="evidence-links">
-                    <a className="evidence-link" href={record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">
+                    <a className="evidence-link" href={compactCertificateUrl(record) ?? record.proofUrl ?? record.sourceUrl} target="_blank" rel="noreferrer">
                       {record.formalVerification ? <BadgeCheck size={17} /> : <BookOpen size={17} />}
-                      {record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
+                      {compactCertificateUrl(record) ? "Kernel · RH replayed" : record.rhFoundationCommit ? "Kernel · RH foundation" : record.formalVerification ? "Kernel" : "Paper"}
                       <ArrowUpRight size={13} />
                     </a>
                     {record.independentReview && (

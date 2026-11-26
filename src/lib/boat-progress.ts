@@ -11,7 +11,7 @@ export function boatProgress(job: QueuedVerificationJob) {
   const info = {
     allocation: "Requesting a Boat worker. The median assignment took 3 seconds. Worker setup has a 3-minute retry window.",
     staging: "Sending the saved proof to the assigned worker. The median upload took 4 seconds.",
-    checking: "The worker is preparing the Lean environment and checking the proof. Accepted runs took a median of 16 minutes from upload to verdict. Larger proofs can take longer.",
+    checking: "The worker checks the submitted source, links the compact RH proof, then replays the exported certificate in two kernels. Replay time depends on the proof.",
   };
   const diagnostic = !b.uploaded && b.setupIssue ? ` Last setup issue: ${b.setupIssue}.` : "";
   return {

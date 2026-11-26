@@ -155,6 +155,7 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
     ),
     kernels: ["lean", "nanoda"],
     permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
+        compactReplay: { policyVersion: 3, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
   };
   const result: Extract<E2BVerificationResult, { status: "verified" }> = {
     schemaVersion: 1,

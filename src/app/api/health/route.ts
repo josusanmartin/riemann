@@ -1,3 +1,4 @@
+import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit, e2bTemplatePinMatches } from "@/lib/verifier-identity";
 import { boatSelected, boatConfigured } from "@/lib/boat-worker";
 import { NextResponse } from "next/server";
@@ -41,7 +42,7 @@ export async function GET(): Promise<NextResponse> {
     : { provider: "e2b", pinType: "template-digest", expectedDigest: expectedVerifierTemplateDigest,
         configured: e2bTemplateIdentityConfigured };
   const directSubmissionsConfigured = Boolean(
-    (isBoat ? boatConfigured() : e2bConfigured && e2bWebhookConfigured) && verifierIdentity.configured &&
+    isBoat && boatConfigured() && compactRuntimePinned() && verifierIdentity.configured &&
     promotionConfigured && submissionQueueConfigured && trustedMaterialAvailable &&
     deploymentIdentityConfigured && process.env.AUTH_SECRET,
   );
@@ -53,6 +54,8 @@ export async function GET(): Promise<NextResponse> {
     service: "riemann-fail",
     verificationPolicyVersion: contract.schemaVersion,
     leanToolchain: contract.trustedUpstream.leanToolchain,
+    compactRuntimePinned: compactRuntimePinned(),
+    permittedAxioms: contract.permittedAxioms,
     rhFoundationCommit: contract.trustedUpstream.rh.commit,
     recordId: current.id,
     record: current.scoreDecimal,

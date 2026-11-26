@@ -10,21 +10,20 @@ All submission files are hostile input. Lean macros, elaborators, tactics, build
 
 - no secrets are exposed to the proof-verification job;
 - outbound network access is disabled during the untrusted build;
-- E2B disables sandbox internet and public traffic before source is uploaded, and the job fails closed unless a live outbound probe confirms that boundary;
-- Comparator's Landlock layer is independently probed before the proof runs; local full-verifier runs add systemd socket-family, syscall, and private-network restrictions;
-- the challenge import closure and toolchain come from a root-owned, non-writable, pinned E2B template whose runtime artifacts remain readable by the unprivileged verifier;
-- a root-owned system Git configuration enumerates the pinned checkout and each sealed dependency repository exactly, permitting Lake to inspect trusted metadata after ownership sealing without trusting arbitrary repositories;
+- independent filesystem and socket probes confirm the readonly mounts and disabled IPv4 and Unix sockets before source elaboration;
+- the worker checks SHA-256 digests for the Lean toolchain and all runtime cache parts, which become root-owned before the submission runs;
+- the proof account sees the toolchain, dependency cache and its per-job workspace inside a restricted filesystem root;
 - candidate source cannot supply compiled `.olean` files;
 - CPU, memory, disk, process count, and wall time are bounded;
 - Comparator builds and exports the trusted challenge before the candidate solution;
 - accepted theorems are replayed by Lean and nanoda;
-- record promotion occurs outside E2B in a separate credentialed server path.
+- record promotion occurs outside the Boat worker in a separate credentialed server path.
 
-Before promotion, the server downloads the exact manifest and `Solution.lean` from the sandbox, recomputes their signed digest, validates the attestation against both the deployed contract and a separate immutable verifier-template digest, and reads the record ledger at the signed `main` commit. It creates immutable evidence and ledger commits but exposes them through one `force: false` reference update. A changed record therefore fails closed without overwriting or displaying a stale result, while an outdated E2B template produces an explicit rebuild error.
+Before promotion, the server downloads the exact manifest and `Solution.lean` from the sandbox, recomputes their signed digest, validates the attestation against both the deployed contract and a separate immutable verifier-template digest, and reads the record ledger at the signed `main` commit. It creates immutable evidence and ledger commits but exposes them through one `force: false` reference update. A changed record therefore fails closed without overwriting or displaying a stale result, and a receipt for a different verifier revision cannot authorize promotion.
 
-The E2B sandbox receives no OAuth, session-signing, webhook, GitHub, Vercel, or E2B API credential. The browser receives only an HMAC-signed opaque job handle. The GitHub write credential is fine-grained to repository Contents and exists only in trusted promotion and queue-coordination functions.
+The Boat proof account receives no OAuth, session-signing, webhook, GitHub, Vercel, or E2B API credential. The browser receives only an HMAC-signed opaque job handle. The GitHub write credential is fine-grained to repository Contents and exists only in trusted promotion and queue-coordination functions.
 
-Queue coordination uses an automation-only Git branch and non-forced compare-and-swap updates, so only one proof job is active at a time. Its public control ledger contains HMAC-pseudonymous ownership counters, sandbox/job identifiers, digests, and bounded terminal receipts. Every admitted manifest and Lean source is additionally gzip-compressed and sealed with AES-256-GCM in the same compare-and-swap commit. The branch therefore contains encrypted source ciphertext but never GitHub usernames, rejected Lean source, or rejected verifier logs in plaintext. Waiting source also remains inside paused, no-egress E2B filesystems until verification.
+Queue coordination uses an automation-only Git branch and non-forced compare-and-swap updates, so only one proof job is active at a time. Its public control ledger contains HMAC-pseudonymous ownership counters, sandbox/job identifiers, digests, and bounded terminal receipts. Every admitted manifest and Lean source is additionally gzip-compressed and sealed with AES-256-GCM in the same compare-and-swap commit. The branch therefore contains encrypted source ciphertext but never GitHub usernames, rejected Lean source, or rejected verifier logs in plaintext. The FIFO head receives its disposable worker when verification begins.
 
 `SUBMISSION_ARCHIVE_KEY` is a dedicated 32-byte server-only key and must never be sent to E2B, the browser, GitHub Actions, or application logs. The maintainer archive route requires both a configured allowlisted GitHub identity and the deployment-held key, returns `no-store` responses, and rechecks the authenticated envelope, immutable path metadata, manifest, and proof digest before releasing source. Losing or rotating the key without migration makes prior ciphertext unrecoverable.
 

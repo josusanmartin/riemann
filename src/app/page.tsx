@@ -5,7 +5,8 @@ import { BoundChart } from "@/components/bound-chart";
 import { Leaderboard } from "@/components/leaderboard";
 import { VerificationPipeline } from "@/components/verification-pipeline";
 import { contract, getCurrentRecord, getRecords } from "@/lib/records";
-import { repository, repositoryUrl, siteUrl } from "@/lib/site";
+import { compactCertificateUrl } from "@/lib/compact-replay";
+import { repository, repositoryUrl } from "@/lib/site";
 import { truncateDecimalString } from "@/components/format";
 import { CodeBlock } from "@/components/code-block";
 
@@ -14,12 +15,10 @@ export default function Home() {
   const history = getRecords();
   const repoName = repository.split("/").at(-1) ?? "riemann";
   const quickstart = `git clone ${repositoryUrl}.git
-cd ${repoName} && npm install
-
-# add submissions/<name>/submission.json + proof/Solution.lean
-npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
-
-# then upload proof/Solution.lean at ${siteUrl}/submit`;
+cd ${repoName}
+node public/cli/riemann.mjs login
+node public/cli/riemann.mjs record
+node public/cli/riemann.mjs submit Solution.lean --metadata candidate.json --dry-run`;
   // The starting point for this arena is the Anthropic paper; improvement is
   // measured against that fixed baseline, so it reads 0 until a record beats it.
   const currentPercent = Number(current.scorePercent);
@@ -58,7 +57,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <div className="hero-metrics">
             <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the Anthropic 2026 starting record</p></div>
             <div><span>Verification</span><strong>2<small> kernels</small></strong><p>the Lean kernel and an independent nanoda replay</p></div>
-            <div><span>Record foundation</span><strong>{current.rhFoundationCommit ? "RH" : "Original"}</strong><p>{current.rhFoundationCommit ? "published RH theorem accepted as a premise" : "checked under the earlier rules without an RH premise"}</p></div>
+            <div><span>Record foundation</span><strong>{current.rhFoundationCommit ? "RH" : "Original"}</strong><p>{compactCertificateUrl(current) ? "compact RH proof replayed with the record" : current.rhFoundationCommit ? "published RH theorem accepted as a premise" : "checked under the earlier rules without an RH premise"}</p></div>
           </div>
         </div>
       </section>
@@ -69,7 +68,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">
-          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Under the site’s RH premise, a score of 100% would prove that almost all zeros are simple.</p>
+          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Using RH, a score of 100% would prove that almost all zeros are simple.</p>
           <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
           <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the starting point. <Link className="text-link" href="/challenge#baseline">Why the board started at 67.25%</Link></p>
         </div>
@@ -86,8 +85,8 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
       <section className="shell section-space participate">
         <div className="participate-intro">
           <span className="eyebrow">Participate</span>
-          <h2>Submit from the site, or run the verifier yourself.</h2>
-          <p>Sign in and upload a Lean proof, or clone the repository and check it locally. A coding agent can drive the whole loop.</p>
+          <h2>Submit from the site or the CLI.</h2>
+          <p>Both use your GitHub account and the same two-kernel verifier.</p>
         </div>
         <div className="participate-paths">
           <div className="participate-card">
@@ -98,7 +97,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <div className="participate-card">
             <h3>Locally, or with a coding agent</h3>
             <CodeBlock label="terminal">{quickstart}</CodeBlock>
-            <p className="participate-note">Point a coding agent at the repository and its <code>CONTRIBUTING.md</code> to run clone → improve → verify. Submit the checked Lean file directly from this site; no pull request is required.</p>
+            <p className="participate-note">Dry-run validates the upload locally. <Link href="/submit/agent">CLI setup, submission and status commands</Link></p>
           </div>
         </div>
       </section>

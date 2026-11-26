@@ -1,0 +1,432 @@
+--- a/Zeta23/FromPNTPlus/Tactic/AdditiveCombination.lean
++++ b/Zeta23/FromPNTPlus/Tactic/AdditiveCombination.lean
+@@ -16,7 +16,7 @@
+ Authors: Abby J. Goldberg, Mario Carneiro, Heather Macbeth
+ -/
+ import Mathlib.Tactic.Abel
+-import Mathlib.Tactic.LinearCombinationPrime
++import Zeta23.Compat.LinearCombinationPrime
+ 
+ /-!
+ # additive_combination Tactic
+--- a/Zeta23/FromPNTPlus/EulerMaclaurin.lean
++++ b/Zeta23/FromPNTPlus/EulerMaclaurin.lean
+@@ -15,6 +15,7 @@
+ module
+ 
+ public import Mathlib.NumberTheory.AbelSummation
++public import Mathlib.MeasureTheory.Function.Floor
+ 
+ /-! We prove the 1st order Euler-Maclaurin formula by specialising Abel summation and manipulating integrals. -/
+ 
+--- a/Zeta23/FromPNTPlus/StrongPNTPrefix.lean
++++ b/Zeta23/FromPNTPlus/StrongPNTPrefix.lean
+@@ -113,7 +113,10 @@
+     (hyp_z : z ∈ Metric.closedBall 0 r) :
+     ‖deriv f z‖ ≤ 16 * M * R ^ 2 / (R - r) ^ 3 := by
+   have hr' : 2 * M * ((R + r) / 2) ^ 2 / ((R - (R + r) / 2) * ((R + r) / 2 - r) ^ 2) =
+-      4 * M * (R + r) ^ 2 / (R - r) ^ 3 := by field_simp; ring
++      4 * M * (R + r) ^ 2 / (R - r) ^ 3 := by
++    rw [show R - (R + r) / 2 = (R - r) / 2 by ring,
++        show (R + r) / 2 - r = (R - r) / 2 by ring]
++    field_simp [ne_of_gt (sub_pos.mpr hyp_r)] <;> ring
+   calc ‖deriv f z‖
+       _ ≤ 4 * M * (R + r) ^ 2 / (R - r) ^ 3 := hr' ▸
+           DerivativeBound Mpos rpos (by linarith) (by linarith) analytic_f zeroAtZero realPartBounded hyp_z
+@@ -361,7 +364,7 @@
+   rw [BlaschkeOfZero r_pos r_lt_one r_lt_R finiteZeros hf_neq_zero_at_zero, ← mul_one ‖f 0‖]
+   refine mul_le_mul (by rw[mul_one]) ?_ (zero_le_one) (mul_nonneg (norm_nonneg (f 0)) zero_le_one)
+   rw [← Finset.prod_const_one (s := (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset)]
+-  apply Finset.prod_le_prod
++  apply Finset.prod_le_prod₀
+   · intro ρ hρ
+     exact zero_le_one
+   · intro ρ hρ
+@@ -466,7 +469,7 @@
+       = ∏ ρ ∈ (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset, (R / r) ^ analyticOrderNatAt f ρ := by
+         rw [Finset.prod_pow_eq_pow_sum]
+     _ ≤ ∏ ρ ∈ (finiteSetOfZeros_mono r_lt_one finiteZeros).toFinset, (R / ‖ρ‖) ^ analyticOrderNatAt f ρ := by
+-      apply Finset.prod_le_prod
++      apply Finset.prod_le_prod₀
+       · intro ρ _
+         exact pow_nonneg (div_nonneg (le_of_lt R_pos) (le_of_lt r_pos)) _
+       · intro ρ hρ
+--- a/Zeta23/Analytic/RectangleLogDeriv.lean
++++ b/Zeta23/Analytic/RectangleLogDeriv.lean
+@@ -254,7 +254,7 @@
+           have e1 : logDeriv f s
+               = logDeriv (fun s => (s - q) ^ analyticOrderNatAt f q * h s) s := by
+             simp only [logDeriv_apply, hfs.deriv_eq, hfs.self_of_nhds, smul_eq_mul]
+-          rw [e1, logDeriv_mul (f := fun s : ℂ => (s - q) ^ analyticOrderNatAt f q) (g := h) s
++          erw [e1, logDeriv_mul (f := fun s : ℂ => (s - q) ^ analyticOrderNatAt f q) (g := h) s
+             (pow_ne_zero _ hsq) hhs (by fun_prop) hhas.differentiableAt]
+           have e2 : logDeriv (fun s : ℂ => (s - q) ^ analyticOrderNatAt f q) s
+               = (analyticOrderNatAt f q : ℂ) / (s - q) := by
+@@ -318,7 +318,7 @@
+         have hfs : f s ≠ 0 := fun h => hFs (by simp [hF, h])
+         have hfd : DifferentiableAt ℂ f s := (hf s hsRP).differentiableAt
+         have hldF : logDeriv F s = (m q : ℂ) / (s - q) + logDeriv f s := by
+-          rw [hF, logDeriv_mul (f := fun s : ℂ => (s - q) ^ m q) (g := f) s
++          erw [hF, logDeriv_mul (f := fun s : ℂ => (s - q) ^ m q) (g := f) s
+             (pow_ne_zero _ hsq') hfs (by fun_prop) hfd]
+           have e2 : logDeriv (fun s : ℂ => (s - q) ^ m q) s = (m q : ℂ) / (s - q) := by
+             rw [show (fun s : ℂ => (s - q) ^ m q) = (fun x : ℂ => x ^ m q) ∘ (fun s => s - q)
+--- a/Zeta23/RvM/GammaSide.lean
++++ b/Zeta23/RvM/GammaSide.lean
+@@ -80,7 +80,7 @@
+     DifferentiableAt.const_cpow (by fun_prop) (Or.inl hπ)
+   have hdg : DifferentiableAt ℂ (fun s : ℂ => Complex.Gamma (s / 2)) s :=
+     (Gamma_half_differentiableAt hs).comp s (by fun_prop)
+-  rw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) (g := fun s : ℂ => Complex.Gamma (s / 2)) s hf hg hdf hdg]
++  erw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) (g := fun s : ℂ => Complex.Gamma (s / 2)) s hf hg hdf hdg]
+   -- first factor
+   have h1 : logDeriv (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) s = -(Real.log Real.pi : ℂ) / 2 := by
+     have hder : HasDerivAt (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
+--- a/Zeta23/WeilEF/GammaRBracket.lean
++++ b/Zeta23/WeilEF/GammaRBracket.lean
+@@ -79,7 +79,7 @@
+     linarith
+   have hhalf : DifferentiableAt ℂ (fun s : ℂ => s / 2) s := differentiableAt_id.div_const 2
+   have hdiff_G : DifferentiableAt ℂ (Complex.Gamma ∘ fun s : ℂ => s / 2) s := hΓdiff.comp s hhalf
+-  rw [hfun, logDeriv_mul s hpow_ne (by exact hGne) hdiff_pow hdiff_G,
++  erw [hfun, logDeriv_mul s hpow_ne (by exact hGne) hdiff_pow hdiff_G,
+     logDeriv_comp (g := fun s : ℂ => s / 2) (x := s) hΓdiff hhalf, ← Complex.digamma_def]
+   -- the power factor's logDeriv
+   have h1 : logDeriv (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) s = Complex.log Real.pi * (-1 / 2) := by
+--- a/Zeta23/GammaFacts/IntMu.lean
++++ b/Zeta23/GammaFacts/IntMu.lean
+@@ -70,8 +70,8 @@
+     refine ContinuousOn.mul continuousOn_const ?_
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT hτ.1
+-    exact ((Real.continuousAt_log (by positivity)).comp
+-      (continuousAt_id.div_const _)).continuousWithinAt
++    exact ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 by positivity)).comp (f := fun x : ℝ => x / (2 * Real.pi)) (x := τ)
++      (continuousAt_id.div_const (2 * Real.pi))).continuousWithinAt
+   rw [integral_eq_sub_of_hasDerivAt hftc hcont]
+   have h2T : Real.log (2 * T / (2 * Real.pi)) = Real.log 2 + Real.log (T / (2 * Real.pi)) := by
+     rw [show 2 * T / (2 * Real.pi) = 2 * (T / (2 * Real.pi)) by ring,
+@@ -103,8 +103,8 @@
+     refine ContinuousOn.mul continuousOn_const ?_
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((Real.continuousAt_log (by positivity)).comp
+-      (continuousAt_id.div_const _)).continuousWithinAt
++    exact ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 by positivity)).comp (f := fun x : ℝ => x / (2 * Real.pi)) (x := τ)
++      (continuousAt_id.div_const (2 * Real.pi))).continuousWithinAt
+   have hsplit : (∫ τ in T..(2 * T), Zeta23.mu τ)
+       = (∫ τ in T..(2 * T), (1 / (2 * Real.pi)) * Real.log (τ / (2 * Real.pi)))
+         + ∫ τ in T..(2 * T),
+@@ -212,8 +212,8 @@
+     rw [Set.uIcc_of_le (by linarith)]
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT hτ.1
+-    exact (((Real.continuousAt_log (by positivity)).comp
+-      (continuousAt_id.div_const _)).pow 2).continuousWithinAt
++    exact (((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 by positivity)).comp (f := fun x : ℝ => x / (2 * Real.pi)) (x := τ)
++      (continuousAt_id.div_const (2 * Real.pi))).pow 2).continuousWithinAt
+   rw [integral_eq_sub_of_hasDerivAt hftc hcont]
+   have h2T : Real.log (2 * T / (2 * Real.pi)) = Real.log 2 + Real.log (T / (2 * Real.pi)) := by
+     rw [show 2 * T / (2 * Real.pi) = 2 * (T / (2 * Real.pi)) by ring,
+@@ -343,8 +343,8 @@
+     rw [Set.uIcc_of_le (by linarith)]
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((continuousAt_const.mul ((Real.continuousAt_log (by positivity)).comp
+-      (continuousAt_id.div_const _))).pow 2).continuousWithinAt
++    exact ((continuousAt_const.mul ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 by positivity)).comp (f := fun x : ℝ => x / (2 * Real.pi)) (x := τ)
++      (continuousAt_id.div_const (2 * Real.pi)))).pow 2).continuousWithinAt
+   have hCtau2 : IntervalIntegrable
+       (fun τ : ℝ => C / τ ^ 2 * (2 * ((L + m) / (2 * Real.pi)) + C)) volume T (2 * T) := by
+     apply ContinuousOn.intervalIntegrable
+--- a/Zeta23/WeilEF/Landau.lean
++++ b/Zeta23/WeilEF/Landau.lean
+@@ -76,7 +76,10 @@
+ (Mathlib's `logDeriv_prod` + `logDeriv_fun_pow`). -/
+ lemma logDeriv_zero_prod {s : Finset ℂ} {m : ℂ → ℕ} {z : ℂ} (hz : ∀ ρ ∈ s, z ≠ ρ) :
+     logDeriv (fun w => ∏ ρ ∈ s, (w - ρ) ^ m ρ) z = ∑ ρ ∈ s, (m ρ : ℂ) / (z - ρ) := by
+-  rw [logDeriv_prod (f := fun ρ w => (w - ρ) ^ m ρ)
++  have hp : (fun w : ℂ => ∏ ρ ∈ s, (w - ρ) ^ m ρ) = ∏ ρ ∈ s, (fun w : ℂ => (w - ρ) ^ m ρ) := by
++    ext w
++    simp
++  rw [hp, logDeriv_prod (f := fun ρ w => (w - ρ) ^ m ρ)
+     (fun ρ hρ => pow_ne_zero _ (sub_ne_zero.mpr (hz ρ hρ))) (fun ρ _ => by fun_prop)]
+   refine Finset.sum_congr rfl fun ρ _ => ?_
+   have hd : HasDerivAt (fun w : ℂ => w - ρ) 1 z := (hasDerivAt_id z).sub_const ρ
+@@ -162,7 +165,7 @@
+         _ ≤ ‖w - ρ‖ := norm_sub_norm_le w ρ
+     have hprod_lb : ((2/25 : ℝ)) ^ K ≤ ‖∏ ρ ∈ hfinr34.toFinset, (w - ρ) ^ analyticOrderNatAt f ρ‖ := by
+       rw [norm_prod, hK, ← Finset.prod_pow_eq_pow_sum]
+-      refine Finset.prod_le_prod (fun ρ _ => by positivity) (fun ρ hρ => ?_)
++      refine Finset.prod_le_prod₀ (fun ρ _ => by positivity) (fun ρ hρ => ?_)
+       rw [norm_pow]
+       exact pow_le_pow_left₀ (by norm_num) (hdist ρ hρ) _
+     unfold Cf
+@@ -197,7 +200,7 @@
+     rw [dif_pos hfinr34, dif_neg h0mem, norm_div, hf0, norm_one]
+     rw [le_div_iff₀]
+     · rw [one_mul, norm_prod]
+-      refine Finset.prod_le_one (fun ρ _ => by positivity) (fun ρ hρ => ?_)
++      refine Finset.prod_le_one₀ (fun ρ _ => by positivity) (fun ρ hρ => ?_)
+       have hρ' := hfinr34.mem_toFinset.mp hρ
+       rw [norm_pow]
+       refine pow_le_one₀ (norm_nonneg _) ?_
+--- a/Zeta23/ThmD/Window.lean
++++ b/Zeta23/ThmD/Window.lean
+@@ -1071,12 +1071,12 @@
+             apply add_nonneg <;> exact Set.indicator_nonneg (fun _ _ => zero_le_one) u)
+     _ = 2 * w := by
+         rw [hmaj]
+-        rw [MeasureTheory.integral_add
++        erw [MeasureTheory.integral_add
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))]
+-        rw [MeasureTheory.integral_indicator_one measurableSet_Icc,
++        erw [MeasureTheory.integral_indicator_one measurableSet_Icc,
+           MeasureTheory.integral_indicator_one measurableSet_Icc,
+           MeasureTheory.measureReal_def, MeasureTheory.measureReal_def,
+           Real.volume_Icc, Real.volume_Icc,
+@@ -1462,7 +1462,7 @@
+           (MeasureTheory.ae_of_all _ hpt)
+     _ = 2 * w := by
+         rw [hmaj]
+-        rw [MeasureTheory.integral_add
++        erw [MeasureTheory.integral_add
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+--- a/Zeta23/XiPrime/QuarticWindow/Moments.lean
++++ b/Zeta23/XiPrime/QuarticWindow/Moments.lean
+@@ -115,12 +115,12 @@
+             apply add_nonneg <;> exact Set.indicator_nonneg (fun _ _ => zero_le_one) u)
+     _ = 2 * w := by
+         rw [hmaj]
+-        rw [MeasureTheory.integral_add
++        erw [MeasureTheory.integral_add
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))]
+-        rw [MeasureTheory.integral_indicator_one measurableSet_Icc,
++        erw [MeasureTheory.integral_indicator_one measurableSet_Icc,
+           MeasureTheory.integral_indicator_one measurableSet_Icc,
+           MeasureTheory.measureReal_def, MeasureTheory.measureReal_def,
+           Real.volume_Icc, Real.volume_Icc,
+@@ -353,7 +353,7 @@
+           (MeasureTheory.ae_of_all _ hpt)
+     _ = 2 * w := by
+         rw [hmaj]
+-        rw [MeasureTheory.integral_add
++        erw [MeasureTheory.integral_add
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+             (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))
+           ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+--- a/Zeta23/ThmE/GammaSideChi.lean
++++ b/Zeta23/ThmE/GammaSideChi.lean
+@@ -96,7 +96,7 @@
+     have hcomp : DifferentiableAt ℂ (Complex.Gammaℝ ∘ fun z : ℂ => z + (κ:ℂ)) s :=
+       DifferentiableAt.comp s hG haff
+     exact hcomp
+-  rw [e, logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2))
++  erw [e, logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2))
+     (g := fun s : ℂ => Complex.Gammaℝ (s + κ)) s hf hg hdf hdg]
+   have h1 : logDeriv (fun s : ℂ => (q : ℂ) ^ (s / 2)) s = (Real.log q : ℂ) / 2 := by
+     have hder : HasDerivAt (fun s : ℂ => (q : ℂ) ^ (s / 2))
+--- a/Zeta23/ThmE/CountByIntegralChi.lean
++++ b/Zeta23/ThmE/CountByIntegralChi.lean
+@@ -62,7 +62,7 @@
+ lemma logDeriv_completedLSym (hχ1 : χ ≠ 1) {s : ℂ} (hΛ : completedLFunction χ s ≠ 0) :
+     logDeriv (completedLSym χ) s = Real.log q / 2 + logDeriv (completedLFunction χ) s := by
+   unfold completedLSym
+-  rw [logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2)) (g := completedLFunction χ) s
++  erw [logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2)) (g := completedLFunction χ) s
+     (qpow_ne_zero s) hΛ (differentiable_qpow s) (differentiable_completedLFunction hχ1 s), logDeriv_qpow]
+ 
+ /-- **Functional equation for Λ_sym**: Λ_sym(1−w,χ) = W(χ)·Λ_sym(w,χ⁻¹). -/
+@@ -165,7 +165,7 @@
+   have e1 : logDeriv (completedLSym χ) s
+       = logDeriv (fun z => ((q : ℂ) ^ (z / 2) * gammaFactor χ z) * χ.LFunction z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.eq_of_nhds]
+-  rw [e1, logDeriv_mul (f := fun z => (q : ℂ) ^ (z / 2) * gammaFactor χ z) (g := χ.LFunction) s
++  erw [e1, logDeriv_mul (f := fun z => (q : ℂ) ^ (z / 2) * gammaFactor χ z) (g := χ.LFunction) s
+     hAne hL hA ((differentiable_LFunction hχ1) s), add_comm]
+ 
+ /-! ## The count -/
+--- a/Zeta23/ThmE/IntMuChi.lean
++++ b/Zeta23/ThmE/IntMuChi.lean
+@@ -52,7 +52,7 @@
+     refine ContinuousOn.mul continuousOn_const ?_
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((Real.continuousAt_log (by positivity)).comp
++    exact ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 from ne_of_gt (by positivity))).comp (f := fun t : ℝ => t / (2 * Real.pi))
+       (continuousAt_id.div_const _)).continuousWithinAt
+   have hsplit : (∫ τ in T..(2 * T), g τ)
+       = (∫ τ in T..(2 * T), (1 / (2 * Real.pi)) * Real.log (τ / (2 * Real.pi)))
+@@ -235,7 +235,7 @@
+     rw [Set.uIcc_of_le (by linarith)]
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((continuousAt_const.mul ((Real.continuousAt_log (by positivity)).comp
++    exact ((continuousAt_const.mul ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 from ne_of_gt (by positivity))).comp (f := fun t : ℝ => t / (2 * Real.pi))
+       (continuousAt_id.div_const _))).pow 2).continuousWithinAt
+   have hCtau2 : IntervalIntegrable
+       (fun τ : ℝ => C / τ ^ 2 * (2 * ((L + m) / (2 * Real.pi)) + C)) volume T (2 * T) := by
+--- a/Zeta23/FromPNTPlus/MellinCalculus.lean
++++ b/Zeta23/FromPNTPlus/MellinCalculus.lean
+@@ -844,12 +844,13 @@
+         have hy : y ∉ Icc (2 ^ (-ε)) (2 ^ ε) := by
+           simp only [mem_Icc, not_and, not_le]; exact hS hz.1 <| (div_le_one hz.2).mp hxy
+         simp [DeltaSpikeSupport εpos hz.2.le suppν hy]
+-    · apply Integrable.piecewise Smeas ?_ integrableOn_zero
++    · apply Integrable.piecewise Smeas.nullMeasurableSet ?_ integrableOn_zero
+       simp only [IntegrableOn, Measure.restrict_restrict_of_subset SsubI]
+       apply MeasureTheory.Integrable.mono_measure ?_
+       · apply MeasureTheory.Measure.restrict_mono' SsubT.eventuallyLE le_rfl
+       have : volume.restrict (Tx ×ˢ Ty) = (volume.restrict Tx).prod (volume.restrict Ty) := by
+         rw [Measure.prod_restrict, MeasureTheory.Measure.volume_eq_prod]
++      change Integrable _ (volume.restrict (Tx ×ˢ Ty))
+       conv => rw [this]; lhs; intro; rw [mul_comm]
+       apply MeasureTheory.Integrable.mul_prod (f := fun x ↦ (x : ℂ) ^ (s - 1))
+         (μ := Measure.restrict volume Tx)
+--- a/Zeta23/XiPrime/ExplicitFormula/Expansion.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/Expansion.lean
+@@ -148,7 +148,7 @@
+   have hE : Efn s ≠ 0 := Efn_ne_zero hs hne
+   have e1 : logDeriv xiDeriv s = logDeriv (fun z => xi z * Efn z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.self_of_nhds]
+-  rw [e1, logDeriv_mul (f := xi) (g := Efn) s hxi hE (xi_differentiable s) (differentiableAt_Efn hs)]
++  erw [e1, logDeriv_mul (f := xi) (g := Efn) s hxi hE (xi_differentiable s) (differentiableAt_Efn hs)]
+   rw [logDeriv_xi_eq hpos hs1 hζ, logDeriv_apply]
+   rfl
+ 
+--- a/Zeta23/XiPrime/ExplicitFormula/LitCorr.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/LitCorr.lean
+@@ -44,7 +44,7 @@
+ theorem logDeriv_mul_sub_one {s : ℂ} (h0 : s ≠ 0) (h1 : s ≠ 1) :
+     logDeriv (fun w : ℂ => w * (w - 1)) s = 1 / s + 1 / (s - 1) := by
+   have h1' : s - 1 ≠ 0 := sub_ne_zero.mpr h1
+-  rw [logDeriv_mul (f := fun w : ℂ => w) (g := fun w : ℂ => w - 1) s h0 h1'
++  erw [logDeriv_mul (f := fun w : ℂ => w) (g := fun w : ℂ => w - 1) s h0 h1'
+     differentiableAt_id (differentiableAt_id.sub_const 1)]
+   have e1 : logDeriv (fun w : ℂ => w) s = 1 / s := by
+     rw [logDeriv_apply]; simp
+--- a/Zeta23/XiPrime/ExplicitFormula/TestWeight.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/TestWeight.lean
+@@ -942,7 +942,7 @@
+           K * (1 / ((1 + (t - P.tau T k) ^ 2) * (1 + (t - P.tau T l) ^ 2))) :=
+         setIntegral_mono_set hg.integrableOn
+           (Eventually.of_forall fun t => by simp only [Pi.zero_apply]; positivity)
+-          (HasSubset.Subset.eventuallyLE (by unfold Params.tauStar; exact hsub))
++          (by unfold Params.tauStar; exact hsub.eventuallyLE)
+     _ = K * ∫ t in {t : ℝ | T / 4 ≤ |t - P.tau T k|},
+           1 / ((1 + (t - P.tau T k) ^ 2) * (1 + (t - P.tau T l) ^ 2)) := integral_const_mul _ _
+     _ ≤ K * (Real.pi / (T / 4) ^ 2) :=
+@@ -980,7 +980,7 @@
+           K * (1 / ((1 + (t - -P.tau T k) ^ 2) * (1 + (t - -P.tau T l) ^ 2))) :=
+         setIntegral_mono_set hg.integrableOn
+           (Eventually.of_forall fun t => by simp only [Pi.zero_apply]; positivity)
+-          (HasSubset.Subset.eventuallyLE (by unfold Params.tauStar; exact hsub))
++          (by unfold Params.tauStar; exact hsub.eventuallyLE)
+     _ = K * ∫ t in {t : ℝ | T / 4 ≤ |t - -P.tau T k|},
+           1 / ((1 + (t - -P.tau T k) ^ 2) * (1 + (t - -P.tau T l) ^ 2)) := integral_const_mul _ _
+     _ ≤ K * (Real.pi / (T / 4) ^ 2) :=
+--- a/Zeta23/XiPrime/ExplicitFormula/ZeroFree.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/ZeroFree.lean
+@@ -75,7 +75,7 @@
+     have hld : logDeriv f s = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) + logDeriv h s := by
+       have e1 : logDeriv f s = logDeriv (fun s => (s - ρ) ^ analyticOrderNatAt f ρ * h s) s := by
+         simp only [logDeriv_apply, hfs.deriv_eq, hfs.self_of_nhds, smul_eq_mul]
+-      rw [e1, logDeriv_mul (f := fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) (g := h) s
++      erw [e1, logDeriv_mul (f := fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) (g := h) s
+         (pow_ne_zero _ hsρ) hhs (by fun_prop) hhas.differentiableAt]
+       have e2 : logDeriv (fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) s
+           = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) := by
+--- a/Zeta23/XiPrime/Hardy/Basic.lean
++++ b/Zeta23/XiPrime/Hardy/Basic.lean
+@@ -101,7 +101,7 @@
+   have hd1 : DifferentiableAt ℂ (fun z : ℂ => Gammaℝ (1 - z)) s :=
+     (differentiableAt_Gammaℝ_of_im_ne_zero (im_one_sub_ne_zero hs)).comp s
+       ((differentiableAt_const (1:ℂ)).sub differentiableAt_id)
+-  rw [e, logDeriv_div _ (by simpa using hG1) hG hd1 (differentiableAt_Gammaℝ_of_im_ne_zero hs)]
++  erw [e, logDeriv_div _ (by simpa using hG1) hG hd1 (differentiableAt_Gammaℝ_of_im_ne_zero hs)]
+   congr 1
+   -- logDeriv (Γℝ ∘ (1 − ·)) s = −(logDeriv Γℝ)(1 − s)
+   rw [logDeriv_apply, logDeriv_apply]
+--- a/Zeta23/XiPrime/Hardy/Count.lean
++++ b/Zeta23/XiPrime/Hardy/Count.lean
+@@ -56,7 +56,7 @@
+     exact hardyW_eq_zeta_mul hz
+   have h1 : logDeriv hardyW s = logDeriv (fun z => riemannZeta z * Gw z) s := by
+     rw [logDeriv_apply, logDeriv_apply, hev.deriv_eq, hev.eq_of_nhds]
+-  rw [h1, logDeriv_mul s hζ hG (differentiableAt_riemannZeta hs1) (Gw_analyticAt hs hζ).differentiableAt]
++  erw [h1, logDeriv_mul s hζ hG (differentiableAt_riemannZeta hs1) (Gw_analyticAt hs hζ).differentiableAt]
+ 
+ /-- **the vertical side**: for t₁ from hardyW_two_line_lower and t₁ ≤ T₁ ≤ T₂,
+ |Im ∫_{T₁}^{T₂} (W′/W)(2+it)·i dt| ≤ 2π. -/
+--- a/Zeta23/XiPrime/Hardy/EFBasic.lean
++++ b/Zeta23/XiPrime/Hardy/EFBasic.lean
+@@ -167,7 +167,7 @@
+   have hE : E2fn s ≠ 0 := E2fn_ne_zero hs.1 hW
+   have e1 : logDeriv hardyW s = logDeriv (fun z => riemannZeta z * E2fn z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.self_of_nhds]
+-  rw [FZfn, e1, logDeriv_mul (f := riemannZeta) (g := E2fn) s hζ hE
++  erw [FZfn, e1, logDeriv_mul (f := riemannZeta) (g := E2fn) s hζ hE
+     (differentiableAt_riemannZeta (goodStrip_ne_one hs)) (differentiableAt_E2fn hs), logDeriv_apply (f := E2fn)]
+   rw [E2fn]; ring
+ 
+--- a/Zeta23/XiPrime/Hardy/EFContour/Analytic.lean
++++ b/Zeta23/XiPrime/Hardy/EFContour/Analytic.lean
+@@ -168,7 +168,7 @@
+   have hev : ∀ᶠ s in 𝓝[≠] (0:ℂ), s * logDeriv invGammaℝ s = 1 + s * logDeriv invGammaℝCof s := by
+     have h1 : ∀ᶠ s in 𝓝[≠] (0:ℂ), s ≠ 0 := self_mem_nhdsWithin
+     filter_upwards [h1, mem_nhdsWithin_of_mem_nhds hne] with s hs hhs
+-    rw [invGammaℝ_eq_id_mul, logDeriv_mul s (by simpa using hs) hhs differentiableAt_id (differentiable_invGammaℝCof s)]
++    erw [invGammaℝ_eq_id_mul, logDeriv_mul s (by simpa using hs) hhs differentiableAt_id (differentiable_invGammaℝCof s)]
+     rw [logDeriv_id]
+     field_simp
+   have hlim : Tendsto (fun s : ℂ => 1 + s * logDeriv invGammaℝCof s) (𝓝[≠] 0) (𝓝 1) := by
+@@ -199,7 +199,7 @@
+ /-- logDeriv χ = logDeriv (Γℝ∘(1−·)) + logDeriv G wherever both factors are nonzero. -/
+ theorem logDeriv_chiFE_eq {s : ℂ} (h1 : Gammaℝ (1 - s) ≠ 0) (h0 : Gammaℝ s ≠ 0) :
+     logDeriv chiFE s = logDeriv (fun z => Gammaℝ (1 - z)) s + logDeriv invGammaℝ s := by
+-  rw [chiFE_eq_mul, logDeriv_mul s h1 (invGammaℝ_ne_zero_iff.mpr h0)
++  erw [chiFE_eq_mul, logDeriv_mul s h1 (invGammaℝ_ne_zero_iff.mpr h0)
+     (analyticAt_Gammaℝ_one_sub h1).differentiableAt (differentiable_invGammaℝ s)]
+ 
+ /-- logDeriv (Γℝ∘(1−·)) = −logDeriv (G∘(1−·)) wherever Γℝ(1−s) ≠ 0. -/
+--- a/Zeta23/XiPrime/Hardy/Omega.lean
++++ b/Zeta23/XiPrime/Hardy/Omega.lean
+@@ -94,7 +94,7 @@
+ theorem logDeriv_omegaW_eq {s : ℂ} (hs : s.im ≠ 0) (hW : hardyW s ≠ 0) :
+     logDeriv omegaW s = logDeriv Gammaℝ s + logDeriv hardyW s := by
+   have e : omegaW = fun z => Gammaℝ z * hardyW z := funext fun z => rfl
+-  rw [e, logDeriv_mul s (Gammaℝ_ne_zero_of_im_ne_zero hs) hW (differentiableAt_Gammaℝ_of_im_ne_zero hs)
++  erw [e, logDeriv_mul s (Gammaℝ_ne_zero_of_im_ne_zero hs) hW (differentiableAt_Gammaℝ_of_im_ne_zero hs)
+     (hardyW_differentiableAt hs)]
+ 
+ end Hardy
+--- a/Zeta23/XiPrime/Hardy/TwoLine.lean
++++ b/Zeta23/XiPrime/Hardy/TwoLine.lean
+@@ -44,7 +44,7 @@
+   have hlin : DifferentiableAt ℂ (fun z : ℂ => z / 2 / (Real.pi : ℂ)) u := by fun_prop
+   have hπ : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
+   have hR : logDeriv (fun z => Gammaℝ z * (z / 2 / (Real.pi : ℂ))) u = logDeriv Gammaℝ u + 1 / u := by
+-    rw [logDeriv_mul u (Gammaℝ_ne_zero_of_im_ne_zero hu) (by simp [hu0, hπ]) hdu hlin]
++    erw [logDeriv_mul u (Gammaℝ_ne_zero_of_im_ne_zero hu) (by simp [hu0, hπ]) hdu hlin]
+     congr 1
+     rw [logDeriv_apply]
+     have : deriv (fun z : ℂ => z / 2 / (Real.pi : ℂ)) u = 1 / 2 / (Real.pi : ℂ) := by
+--- a/Zeta23/XiPrime/Hardy/ZeroFree.lean
++++ b/Zeta23/XiPrime/Hardy/ZeroFree.lean
+@@ -41,7 +41,7 @@
+   have hΓ : DifferentiableAt ℂ Complex.Gamma (s / 2) :=
+     Complex.differentiableAt_Gamma _ (Hardy.half_ne_neg_nat hs)
+   have hdg : DifferentiableAt ℂ (fun s : ℂ => Complex.Gamma (s / 2)) s := hΓ.comp s (by fun_prop)
+-  rw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
++  erw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
+     (g := fun s : ℂ => Complex.Gamma (s / 2)) s hf hg hdf hdg]
+   have h1 : logDeriv (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) s = -(Real.log Real.pi : ℂ) / 2 := by
+     have hder : HasDerivAt (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))

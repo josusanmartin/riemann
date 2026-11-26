@@ -21,14 +21,15 @@ export const metadata: Metadata = {
     "How untrusted Lean code is isolated, how statements are compared, how two kernels replay the proof, and how records are promoted.",
 };
 
-const command = `npm ci
-tools_dir="$(mktemp -d)"
-bash scripts/install-verifier-tools.sh "$tools_dir"
-export COMPARATOR_BIN="$tools_dir/comparator/.lake/build/bin/comparator"
-export COMPARATOR_LANDRUN="$tools_dir/landrun/landrun"
-export COMPARATOR_LEAN4EXPORT="$tools_dir/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export"
-export COMPARATOR_NANODA="$tools_dir/nanoda/target/release/nanoda_bin"
-npx tsx scripts/verify-submission.ts submissions/<id> --mode=full`;
+const command = `# In a fresh Linux x86-64 VM with Node 22 and systemd
+npm ci
+bash boat/compact/install-toolchain.sh /opt/riemann-lean
+bash boat/compact/install-runtime.sh /opt/riemann-runtime "$PWD/challenge/compact-runtime.json"
+sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
+sudo useradd --create-home --shell /usr/sbin/nologin referee
+python3 boat/compact/records-at-admission.py <id> /opt/incumbent.json
+RIEMANN_RECORDS_PATH=/opt/incumbent.json bash boat/compact/prepare-job.sh submissions/<id> /opt/prepared
+sudo bash boat/compact/run-job.sh /opt/prepared /opt/riemann-runtime /opt/riemann-lean 12G /opt/replay.json`;
 
 export default function MethodologyPage() {
   return (
@@ -87,7 +88,7 @@ export default function MethodologyPage() {
           <ul>
             {contract.permittedAxioms.map((axiom) => <li key={axiom}><CheckCircle2 size={16} /><code>{axiom}</code></li>)}
           </ul>
-          <p>Lean {contract.trustedUpstream.leanToolchain.split(":v")[1]} uses a pinned interface to Alpöge’s published proof. The verifier accepts the exact Mathlib statement <code>RiemannHypothesis</code> as a foundation axiom. Comparator checks its type and both kernels replay the candidate. The upstream proof body is checked externally.</p>
+          <p>On Lean {contract.trustedUpstream.leanToolchain.split(":v")[1]}, submissions can import <code>Main</code> to use <code>riemannHypothesis</code>. Before either kernel replays the submission, the worker links that declaration to the compact proof of RH. Comparator checks the RH statement, the strict improvement and both interval bounds. Every dependency of those theorems must satisfy the three-axiom policy.</p>
           <p><a className="text-link" href={contract.trustedUpstream.rh.verificationUrl}>Independent verification of the RH release</a></p>
           <p><a className="text-link" href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>Pinned release</a> · Reference export SHA-256 <code style={{ overflowWrap: "anywhere" }}>{contract.trustedUpstream.rh.referenceExportSha256}</code></p>
           <p>The <Link href={`/submissions/${compactReplay.recordId}`}>85.4225% record</Link> also has a separate Lean 4.35 certificate. Lean and nanoda checked both bounds with the compact RH proof included, using only <code>propext</code>, <code>Classical.choice</code>, and <code>Quot.sound</code>.</p>

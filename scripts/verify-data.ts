@@ -45,17 +45,14 @@ if (!baseline.formalVerification || baseline.status !== "kernel-verified") {
   throw new Error("Baseline must remain kernel verified");
 }
 
-const verifierInstaller = await readFile(
-  resolve("scripts/install-verifier-tools.sh"),
-  "utf8",
-);
-for (const name of Object.keys(contract.verifier)) {
-  if (!verifierInstaller.includes(`contract.verifier.${name}`)) {
-    throw new Error(`The verifier installer does not read contract.verifier.${name}`);
-  }
+const installer = await readFile(resolve("boat/compact/install-toolchain.sh"), "utf8");
+for (const pin of Object.values(contract.verifier)) {
+  if (!installer.includes(pin)) throw new Error("The compact installer differs from the release pins");
 }
-if (!verifierInstaller.includes("contract.trustedUpstream.leanToolchain")) {
-  throw new Error("The verifier installer does not read the pinned Lean toolchain");
+const judge = await readFile(resolve("boat/compact/run-job.sh"), "utf8");
+for (const boundary of ["ProtectSystem=strict", "PrivateNetwork=yes", "SystemCallArchitectures=native",
+  "SystemCallFilter=~@network-io", "NoNewPrivileges=yes", "MemorySwapMax=0", "isolated referee"]) {
+  if (!judge.includes(boundary)) throw new Error(`Missing compact worker boundary ${boundary}`);
 }
 
 for (const [sandboxEntrypoint, addressFamilyAllowList] of [

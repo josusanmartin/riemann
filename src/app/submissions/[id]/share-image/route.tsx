@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { compactCertificateUrl } from "@/lib/compact-replay";
 import { getRecord, records } from "@/lib/records";
 import { recordPresentation } from "../presentation";
 
@@ -56,7 +57,7 @@ export async function GET(
           <span style={{ fontSize: 50, letterSpacing: -1 }}>{heading}</span>
           {record.rhFoundationCommit && (
             <span style={{ marginTop: 12, fontSize: 25, color: "#b9c9c2" }}>
-              Under the published RH premise
+              {compactCertificateUrl(record) ? "Compact RH proof replayed" : "Under the published RH premise"}
             </span>
           )}
         </div>
