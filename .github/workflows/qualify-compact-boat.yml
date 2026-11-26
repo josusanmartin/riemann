@@ -25,3 +25,9 @@ jobs:
       - name: Add certificate details to the run summary
         run: |
           jq '{submissionId,score,permittedAxioms,kernels,rhFoundationCommit,compactReplay}' canary-attestation.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve the full worker receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: compact-boat-qualification
+          path: canary-attestation.json
+          if-no-files-found: error
