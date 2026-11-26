@@ -67,6 +67,28 @@ isolated() {
   active_unit=
   return "$status"
 }
+# Exercise the same mount and syscall policy used for source elaboration.
+# The probe file is writable by its Unix permissions, so the mount itself must deny the open.
+touch "$work/spec/write-probe"
+chmod 666 "$work/spec/write-probe"
+isolated proofcheck "$work/input" -p "BindPaths=$work/candidate" -p "ReadWritePaths=$work/candidate" -- \
+  /usr/bin/python3 -c '
+import errno, os, socket, sys
+for create in (lambda: socket.socket(socket.AF_INET, socket.SOCK_STREAM), socket.socketpair):
+    try:
+        create()
+    except PermissionError:
+        continue
+    raise SystemExit("Worker network filter is inactive")
+try:
+    os.close(os.open(sys.argv[1], os.O_WRONLY))
+except OSError as error:
+    if error.errno != errno.EROFS:
+        raise
+else:
+    raise SystemExit("Worker mount is writable")
+' "$work/spec/write-probe"
+rm "$work/spec/write-probe"
 # This directory is the only persistent write destination of the submitted Lean program.
 echo 'Compiling the submitted source against the RH interface.'
 isolated proofcheck "$work/input" -p "BindPaths=$work/candidate" -p "ReadWritePaths=$work/candidate" -- \
