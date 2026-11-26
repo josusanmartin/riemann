@@ -19,8 +19,18 @@ def api(path, method="GET", data=None, idempotency=None):
         headers["Idempotency-Key"] = idempotency
     request = urllib.request.Request(base + path, method=method, headers=headers,
                                      data=None if data is None else json.dumps(data).encode())
-    with urllib.request.urlopen(request, timeout=45) as response:
-        result = json.load(response)
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(request, timeout=45) as response:
+                result = json.load(response)
+            break
+        except urllib.error.HTTPError as error:
+            if error.code not in (429, 500, 502, 503, 504) or attempt == 3:
+                raise
+        except (TimeoutError, urllib.error.URLError):
+            if attempt == 3:
+                raise
+        time.sleep(2 ** attempt)
     if result.get("ok") is not True:
         raise RuntimeError("Boat did not confirm " + path)
     return result
@@ -75,4 +85,15 @@ finally:
         usage = api(endpoint + "/usage")
         print("Boat reported machine usage in dollars:", usage.get("dollars"), flush=True)
     finally:
-        api(endpoint + "/stop", "POST", {})
+        try:
+            api(endpoint + "/stop", "POST", {})
+        except urllib.error.HTTPError as error:
+            if error.code != 409:
+                raise
+        for _ in range(12):
+            if api(endpoint)["sandbox"]["state"] in ("stopped", "archived", "deleted"):
+                print("Boat shutdown confirmed", flush=True)
+                break
+            time.sleep(5)
+        else:
+            raise RuntimeError("Boat shutdown has not yet been confirmed")
