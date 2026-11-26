@@ -21,6 +21,10 @@ jobs:
                   return json.load(response)
           result = get("/sandboxes?label=kind%3Dqualification")
           targets = [b for b in result["sandboxes"] if b.get("labels",{}).get("revision")=="cf0723dcf839c626c26dff50aaf0ce9c434042fb" and b["labels"].get("service")=="riemann"]
+          if not targets:
+              stopped = get("/sandboxes/bx_zxh2m9bt")["sandbox"]
+              if stopped.get("labels", {}).get("revision") == "cf0723dcf839c626c26dff50aaf0ce9c434042fb" and stopped.get("labels",{}).get("kind") == "qualification":
+                  targets=[stopped]
           for b in targets:
               assert re.fullmatch(r"bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}", b["id"])
               print({k:b.get(k) for k in ("id","state","setupStatus","environment","createdAt")})
@@ -35,6 +39,8 @@ jobs:
                               if re.fullmatch(r"[0-9TZ:-]+\t[a-z-]+\t(start|exit=\d+)",line):print(line)
                   except urllib.error.HTTPError as e:
                       print(name, e.code)
+              if b.get("state") in ("stopped", "archived", "deleted"):
+                  continue
               try:
                   req=urllib.request.Request(base+endpoint+"/files?path=riemann-proof.log&encoding=utf8", headers=headers)
                   with urllib.request.urlopen(req,timeout=20) as prooflog:
