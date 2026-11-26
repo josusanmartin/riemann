@@ -10,7 +10,10 @@
     "boat": {
       "baseCommitSha": "d102c8fed2bd6a745cf4da23f2557759995a64a9",
       "previousRecordId": "knausgard-rh-reflected-kernel-8542",
-      "issuedAt": 1795686746475
+      "issuedAt": 1795686746475,
+      "startedAt": 1795686750259,
+      "setupLease": 1795686750259,
+      "retryAt": 1795686840259
     }
   },
   "pending": [],
