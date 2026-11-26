@@ -35,7 +35,7 @@ def api(path, method="GET", data=None, idempotency=None):
         raise RuntimeError("Boat did not confirm " + path)
     return result
 
-# Two hours on the normal 16 GB worker at $0.10/hour plus one start surcharge of at most $0.07.
+# Two hours on the normal 16 GB worker at $0.072/hour plus one start surcharge of at most $0.07.
 # No API key, organization environment, snapshot or forwarding is copied into the guest.
 setup = f"""set -euo pipefail
 cd "$HOME"
