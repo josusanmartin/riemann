@@ -189,6 +189,8 @@ h3 {
   text-transform: uppercase;
 }
 
+.inner-hero .eyebrow,
+.signin-card .eyebrow,
 .eyebrow-light {
   color: var(--lime);
 }
