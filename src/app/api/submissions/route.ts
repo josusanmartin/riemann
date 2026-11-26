@@ -5,21 +5,13 @@ import { boatSelected, boatConfigured } from "@/lib/boat-worker";
 import { boatProgress } from "@/lib/boat-progress";
 import { reserveBoatJob } from "@/lib/boat-queue";
 import { ZodError } from "zod";
-import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { getSubmissionSession } from "@/lib/submission-session";
-import { records } from "@/lib/records";
 import { prepareDirectSubmission } from "@/lib/direct-submission";
-import { stageE2BVerification } from "@/lib/e2b-queue";
-import { killE2BSandbox } from "@/lib/e2b-verifier";
-import {
-  ensureE2BWebhook,
-  isE2BWebhookConfigured,
-} from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
   applyInitialQueueTransition,
 } from "@/lib/queue-orchestration";
-import { getCurrentRecord } from "@/lib/records";
+import { getCurrentRecord, records } from "@/lib/records";
 import { signSubmissionJob } from "@/lib/submission-jobs";
 import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import {
@@ -34,20 +26,6 @@ import {
 
 export const runtime = "nodejs";
 
-// ensureE2BWebhook lists and re-PATCHes the project-wide webhook (secret
-// included). Doing that on every upload adds two E2B calls to admission and
-// races concurrent uploads, so repeat it at most every half hour per warm
-// instance. Failures are not remembered, so the next upload retries.
-const WEBHOOK_REFRESH_MS = 30 * 60 * 1_000;
-let webhookEnsuredAt = 0;
-
-async function ensureE2BWebhookRecently(): Promise<void> {
-  if (Date.now() - webhookEnsuredAt < WEBHOOK_REFRESH_MS) return;
-  await ensureE2BWebhook();
-  webhookEnsuredAt = Date.now();
-}
-// Staging may itself spend 60s uploading a maximum-size source, followed by
-// several durable Git API writes. Do not terminate admission halfway through.
 export const maxDuration = 300;
 
 function noStore(status: number, body: object): Response {
@@ -91,7 +69,6 @@ export async function POST(request: Request): Promise<Response> {
   }
   if (
     !isGitHubPromotionConfigured() ||
-    (!boatSelected() && !isE2BWebhookConfigured()) ||
     !isSubmissionQueueConfigured()
   ) {
     return noStore(503, {
@@ -170,33 +147,14 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
-    if (!boatSelected()) await ensureE2BWebhookRecently();
     const issuedAt = Date.now();
-    const job = boatSelected() ? reserveBoatJob(baseCommitSha,currentRecord.id,issuedAt) : await stageE2BVerification({
-      ...prepared,
-      recordsSnapshot: `${JSON.stringify(records, null, 2)}\n`,
-      baseCommitSha,
-      previousRecordId: currentRecord.id,
-      issuedAt,
-    });
-    let admission;
-    try {
-      admission = await enqueueVerificationJob(
-        {
-          ...job,
-          proofDigest: prepared.proofDigest,
-          submissionId: prepared.submission.id,
-        },
-        github,
-        { manifest: prepared.manifest, solution: prepared.solution },
-        { githubId },
-      );
-    } catch (error) {
-      if (!boatSelected() && !(error instanceof QueueCommitUncertainError)) {
-        await killE2BSandbox(job.sandboxId).catch(() => undefined);
-      }
-      throw error;
-    }
+    const job = reserveBoatJob(baseCommitSha, currentRecord.id, issuedAt);
+    const admission = await enqueueVerificationJob(
+      { ...job, proofDigest: prepared.proofDigest, submissionId: prepared.submission.id },
+      github,
+      { manifest: prepared.manifest, solution: prepared.solution },
+      { githubId },
+    );
 
     let verificationRunning = false;
     try {
@@ -237,9 +195,6 @@ export async function POST(request: Request): Promise<Response> {
       dailyLimit: admission.dailyLimit,
     });
   } catch (error) {
-    if (error instanceof VerifierTemplateMismatchError) {
-      return noStore(503, { error: "verifier_template_stale", message: error.message });
-    }
     if (error instanceof RequestBodyTooLargeError) {
       return noStore(413, { error: "submission_too_large", message: error.message });
     }

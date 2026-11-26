@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # The supervisor owns inputs and both exports. Only the independent data checker can authorize success.
 set -euo pipefail
+umask 022
 [[ $EUID == 0 ]]
 prepared=$(realpath "${1:?prepared submission workspace}")
 runtime=$(realpath "${2:?immutable worker runtime}")
@@ -12,7 +13,21 @@ here=$(cd "$(dirname "$0")" && pwd)
 export PATH="$prefix/bin:/usr/bin:/bin"
 [[ $(lean --githash) == eb6cafb7290e8bd5f2937522d8d804f58f02bafc ]]
 work=$(mktemp -d /var/lib/riemann-compact.XXXXXXXX)
-trap 'rm -rf -- "$work"' EXIT
+jail=$(mktemp -d /var/lib/riemann-compact-root.XXXXXXXX)
+active_unit=
+cleanup() {
+  if [[ -n "$active_unit" ]]; then systemctl stop "$active_unit.service" 2>/dev/null || true; fi
+  rm -rf -- "$jail" "$work"
+}
+trap cleanup EXIT
+trap 'exit 124' TERM INT
+chmod 755 "$jail"
+mkdir -p "$jail"/{dev,etc,proc,run,sys,tmp,usr,var/tmp}
+chmod 1777 "$jail"/{tmp,var/tmp}
+# Preserve the host's merged-/usr layout for the dynamic loader and shell.
+for name in bin sbin lib lib64; do
+  if [[ -L "/$name" ]]; then ln -s "$(readlink "/$name")" "$jail/$name"; fi
+done
 chmod 755 "$work"
 install -d -m 755 "$work"/{spec/ChallengeDeps,ref,input/Solution}
 install -d -m 700 -o proofcheck "$work/candidate"
@@ -35,22 +50,26 @@ isolated() {
   shift 2
   local unit="riemann-compact-$(cat /proc/sys/kernel/random/uuid)"
   local status=0
+  active_unit=$unit
   systemd-run --unit="$unit" --quiet --wait --pipe --service-type=exec --uid="$user" \
     --working-directory="$directory" --setenv=PATH="$PATH" --setenv=LEAN_NUM_THREADS=2 --setenv=LEAN_ABORT_ON_PANIC=1 \
+    -p "RootDirectory=$jail" -p MountAPIVFS=yes \
+    -p "BindReadOnlyPaths=/usr -/etc/ld.so.cache $prefix $runtime $here $work" \
     -p PrivateNetwork=yes -p RestrictAddressFamilies=AF_UNIX -p 'SystemCallFilter=~@network-io' \
     -p SystemCallArchitectures=native -p SystemCallErrorNumber=EPERM -p NoNewPrivileges=yes -p ProtectSystem=strict -p ProtectHome=yes \
     -p PrivateTmp=yes -p PrivateDevices=yes -p ProtectProc=invisible -p ProtectControlGroups=yes \
     -p ProtectKernelTunables=yes -p RestrictSUIDSGID=yes -p KillMode=control-group -p UMask=0077 \
     -p "MemoryMax=$memory" -p MemorySwapMax=0 -p TasksMax=512 -p LimitFSIZE=8589934592 -p LimitSTACK=infinity \
-    -p OOMPolicy=kill "$@" || status=$?
+    -p RuntimeMaxSec=5800 -p OOMPolicy=kill "$@" || status=$?
   if (( status != 0 )) && [[ $(systemctl show "$unit.service" -p Result --value) == oom-kill ]]; then
     touch "$receipt.oom"
   fi
+  active_unit=
   return "$status"
 }
 # This directory is the only persistent write destination of the submitted Lean program.
 echo 'Compiling the submitted source against the RH interface.'
-isolated proofcheck "$work/input" -p "ReadWritePaths=$work/candidate" -- \
+isolated proofcheck "$work/input" -p "BindPaths=$work/candidate" -p "ReadWritePaths=$work/candidate" -- \
   env LEAN_PATH="$clean" lean -j2 --tstack=400000 -o "$work/candidate/Uploaded.olean" Solution/Candidate.lean
 # lean encodes the input module name in its olean. Keep its name and expose only that regular file.
 install -d -m 755 "$work/link/Solution"
@@ -61,7 +80,7 @@ printf 'import Main\nimport Solution.Candidate\n' > "$work/link/Bundle.lean"
 install -d -m 700 -o proofcheck "$work/bundle"
 linked="$runtime/foundation:$work/link:$work/spec:$base"
 echo 'Linking the compact proof of RH.'
-isolated proofcheck "$work/link" -p "ReadWritePaths=$work/bundle" -- \
+isolated proofcheck "$work/link" -p "BindPaths=$work/bundle" -p "ReadWritePaths=$work/bundle" -- \
   env LEAN_PATH="$linked" lean -j1 -o "$work/bundle/Bundle.olean" Bundle.lean
 [[ -f "$work/bundle/Bundle.olean" && ! -L "$work/bundle/Bundle.olean" ]]
 install -m 444 "$work/bundle/Bundle.olean" "$work/link/Bundle.olean"

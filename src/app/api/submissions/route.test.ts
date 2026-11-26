@@ -3,13 +3,11 @@ import { approveCli, cliBearerPrefix } from "@/lib/cli-login";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  session: vi.fn(), stage: vi.fn(), kill: vi.fn(), enqueue: vi.fn(), usage: vi.fn(), start: vi.fn(),
+  session: vi.fn(), stage: vi.fn(), pinned: vi.fn(), enqueue: vi.fn(), usage: vi.fn(), start: vi.fn(),
 }));
 vi.mock("@/auth", () => ({ getSession: mocks.session }));
-vi.mock("@/lib/e2b-config", () => ({ isE2BConfigured: () => true }));
-vi.mock("@/lib/e2b-queue", () => ({ stageE2BVerification: mocks.stage }));
-vi.mock("@/lib/e2b-verifier", () => ({ killE2BSandbox: mocks.kill }));
-vi.mock("@/lib/e2b-webhooks", () => ({ isE2BWebhookConfigured: () => true, ensureE2BWebhook: vi.fn() }));
+vi.mock("@/lib/compact-runtime", () => ({ compactRuntimePinned: mocks.pinned }));
+vi.mock("@/lib/boat-queue", () => ({ reserveBoatJob: mocks.stage }));
 vi.mock("@/lib/queue-orchestration", () => ({ applyInitialQueueTransition: mocks.start }));
 vi.mock("@/lib/submission-queue", async (original) => ({
   ...await original<typeof import("@/lib/submission-queue")>(),
@@ -19,7 +17,6 @@ vi.mock("@/lib/submission-queue", async (original) => ({
 }));
 import { POST } from "./route";
 import { QueueCommitUncertainError, DailySubmissionLimitError } from "@/lib/submission-queue";
-import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { getCurrentRecord } from "@/lib/records";
 
 const job = { jobId: "00000000-0000-4000-8000-000000000001", sandboxId: "sandbox-1234567890" };
@@ -48,8 +45,10 @@ beforeEach(() => {
   vi.stubEnv("RIEMANN_BASE_COMMIT_SHA", "a".repeat(40));
   vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "a".repeat(40));
   mocks.session.mockResolvedValue({ user: { githubLogin: "solver", githubId: "123" } });
-  mocks.stage.mockResolvedValue(job);
-  mocks.kill.mockResolvedValue(undefined);
+  vi.stubEnv("RIEMANN_VERIFIER_PROVIDER", "boat");
+  vi.stubEnv("RIEMANN_BOAT_API_KEY", "test-key");
+  mocks.stage.mockReturnValue(job);
+  mocks.pinned.mockReturnValue(true);
   mocks.usage.mockResolvedValue({ used: 4, limit: 5, retryAt: "2026-09-08T00:00:00.000Z" });
   mocks.enqueue.mockResolvedValue({ job, position: 0, dailyUsed: 5, dailyLimit: 5, shouldStart: true });
   mocks.start.mockResolvedValue(true);
@@ -97,23 +96,23 @@ describe("official submission admission", () => {
     expect((await POST(request())).status).toBe(429);
     expect(mocks.stage).not.toHaveBeenCalled();
   });
-  it("preserves the sandbox after an uncertain queue commit", async () => {
+  it("leaves an uncertain queue commit to recovery", async () => {
     mocks.enqueue.mockRejectedValueOnce(new QueueCommitUncertainError());
     const response = await POST(request());
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ error: "queue_admission_uncertain" });
-    expect(mocks.kill).not.toHaveBeenCalled();
+    expect(mocks.start).not.toHaveBeenCalled();
   });
-  it("cleans up a definitively rejected concurrent admission", async () => {
+  it("returns the quota error without starting a worker on a concurrent admission", async () => {
     mocks.enqueue.mockRejectedValueOnce(new DailySubmissionLimitError("2026-09-08T00:00:00.000Z", 5));
     expect((await POST(request())).status).toBe(429);
-    expect(mocks.kill).toHaveBeenCalledWith(job.sandboxId);
+    expect(mocks.start).not.toHaveBeenCalled();
   });
-  it("rejects an incompatible image before queue admission", async () => {
-    mocks.stage.mockRejectedValueOnce(new VerifierTemplateMismatchError());
+  it("rejects a missing runtime pin before queue admission", async () => {
+    mocks.pinned.mockReturnValue(false);
     const response = await POST(request());
     expect(response.status).toBe(503);
-    expect(await response.json()).toMatchObject({ error: "verifier_template_stale" });
+    expect(await response.json()).toMatchObject({ error: "verifier_unavailable" });
     expect(mocks.enqueue).not.toHaveBeenCalled();
   });
   it("names each invalid input field without echoing the uploaded source", async () => {
