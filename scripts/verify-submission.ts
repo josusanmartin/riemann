@@ -37,6 +37,9 @@ if (!submissionArgument || !["prepare", "quick", "full"].includes(mode)) {
 }
 
 const contract = contractSchema.parse(contractJson);
+if (contract.schemaVersion === 3 && mode === "full") {
+  throw new Error("Policy v3 full checks run through boat/compact/run-job.sh");
+}
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const submissionDirectory = resolve(submissionArgument);
 const prebuiltZetaWorkspace = process.env.RIEMANN_PREBUILT_ZETA23

@@ -7,10 +7,11 @@ runtime=$(realpath "${2:?immutable worker runtime}")
 prefix=$(realpath "${3:?Lean installation}")
 memory=${4:?memory ceiling}
 [[ "$memory" == 12G || "$memory" == 28G ]]
+receipt=$(realpath -m "${5:?supervisor-owned receipt destination}")
 here=$(cd "$(dirname "$0")" && pwd)
 export PATH="$prefix/bin:/usr/bin:/bin"
 [[ $(lean --githash) == eb6cafb7290e8bd5f2937522d8d804f58f02bafc ]]
-work=$(mktemp -d /var/tmp/riemann-compact.XXXXXXXX)
+work=$(mktemp -d /var/lib/riemann-compact.XXXXXXXX)
 trap 'rm -rf -- "$work"' EXIT
 chmod 755 "$work"
 install -d -m 755 "$work"/{spec/ChallengeDeps,ref,input/Solution}
@@ -32,14 +33,20 @@ targets=(riemannHypothesis candidate_strict_improvement candidate_critical_line_
 isolated() {
   local user=$1 directory=$2
   shift 2
-  systemd-run --quiet --wait --pipe --collect --service-type=exec --uid="$user" \
+  local unit="riemann-compact-$(cat /proc/sys/kernel/random/uuid)"
+  local status=0
+  systemd-run --unit="$unit" --quiet --wait --pipe --service-type=exec --uid="$user" \
     --working-directory="$directory" --setenv=PATH="$PATH" --setenv=LEAN_NUM_THREADS=2 --setenv=LEAN_ABORT_ON_PANIC=1 \
     -p PrivateNetwork=yes -p RestrictAddressFamilies=AF_UNIX -p 'SystemCallFilter=~@network-io' \
     -p SystemCallArchitectures=native -p SystemCallErrorNumber=EPERM -p NoNewPrivileges=yes -p ProtectSystem=strict -p ProtectHome=yes \
     -p PrivateTmp=yes -p PrivateDevices=yes -p ProtectProc=invisible -p ProtectControlGroups=yes \
     -p ProtectKernelTunables=yes -p RestrictSUIDSGID=yes -p KillMode=control-group -p UMask=0077 \
     -p "MemoryMax=$memory" -p MemorySwapMax=0 -p TasksMax=512 -p LimitFSIZE=8589934592 -p LimitSTACK=infinity \
-    "$@"
+    -p OOMPolicy=kill "$@" || status=$?
+  if (( status != 0 )) && [[ $(systemctl show "$unit.service" -p Result --value) == oom-kill ]]; then
+    touch "$receipt.oom"
+  fi
+  return "$status"
 }
 # This directory is the only persistent write destination of the submitted Lean program.
 echo 'Compiling the submitted source against the RH interface.'
@@ -64,3 +71,16 @@ chmod 444 "$work"/*.ndjson
 echo 'Comparing both interval statements and replaying the sealed proof with nanoda and Lean.'
 isolated referee "$work" -- /bin/bash "$here/check-export.sh" \
   "$work/reference.ndjson" "$work/solution.ndjson" "$runtime/checker/matchrunner"
+python3 - "$work" "$receipt" <<'PYTHON'
+import hashlib, json, pathlib, sys
+work = pathlib.Path(sys.argv[1])
+def digest(name):
+    with (work / name).open("rb") as file:
+        checksum = hashlib.sha256()
+        while block := file.read(1024 * 1024):
+            checksum.update(block)
+        return checksum.hexdigest()
+with open(sys.argv[2], "x") as out:
+    json.dump({"policyVersion": 3, "referenceSha256": digest("reference.ndjson"),
+               "solutionSha256": digest("solution.ndjson")}, out)
+PYTHON

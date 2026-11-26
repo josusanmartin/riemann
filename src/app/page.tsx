@@ -58,7 +58,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <div className="hero-metrics">
             <div><span>Increase</span><strong>+{improvement.toFixed(2)}<small> pts</small></strong><p>over the Anthropic 2026 starting record</p></div>
             <div><span>Verification</span><strong>2<small> kernels</small></strong><p>the Lean kernel and an independent nanoda replay</p></div>
-            <div><span>Record foundation</span><strong>{current.rhFoundationCommit ? "RH" : "Original"}</strong><p>{current.rhFoundationCommit ? "published RH theorem accepted as a premise" : "checked under the earlier rules without an RH premise"}</p></div>
+            <div><span>Record foundation</span><strong>{current.rhFoundationCommit ? "RH" : "Original"}</strong><p>{current.rhFoundationCommit === contract.trustedUpstream.rh.commit ? "compact RH proof replayed with the record" : current.rhFoundationCommit ? "published RH theorem accepted as a premise" : "checked under the earlier rules without an RH premise"}</p></div>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ npx tsx scripts/verify-submission.ts submissions/<name> --mode=quick
           <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">
-          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Under the site’s RH premise, a score of 100% would prove that almost all zeros are simple.</p>
+          <p>The score κ is the proven lower bound for the count of distinct nontrivial zeros on the critical line, divided by all nontrivial zeros counted with multiplicity. Using RH, a score of 100% would prove that almost all zeros are simple.</p>
           <p>Each candidate is an exact rational. Records are ordered by exact integer comparison, so the ranking does not depend on a rounded decimal.</p>
           <p>Riemann.fail uses <a className="text-link" href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noreferrer">Anthropic’s 2026 research article</a> and its Zeta23 formalization as the starting point. <Link className="text-link" href="/challenge#baseline">Why the board started at 67.25%</Link></p>
         </div>

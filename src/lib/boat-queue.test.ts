@@ -139,7 +139,7 @@ describe("competitive Boat queue", () => {
     expect(await reconcileBoat(job)).toMatchObject({ stage: "staging" });
     expect(m.result).not.toHaveBeenCalled();
     job.boat!.uploaded = true;
-    expect(await reconcileBoat(job)).toMatchObject({ stage: "checking", message: expect.stringContaining("16 minutes") });
+    expect(await reconcileBoat(job)).toMatchObject({ stage: "checking", message: expect.stringContaining("compact RH proof") });
   });
   it("recovers a failed upload on the same worker", async () => {
     m.upload.mockRejectedValueOnce(new Error("network"));

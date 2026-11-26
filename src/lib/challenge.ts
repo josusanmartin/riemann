@@ -101,7 +101,7 @@ export type RecordEntry = z.infer<typeof recordSchema>;
 export const recordsSchema = z.array(recordSchema).min(1);
 
 export const contractSchema = z.object({
-  schemaVersion: z.literal(2),
+  schemaVersion: z.union([z.literal(2), z.literal(3)]),
   name: z.string().min(1),
   track: z.literal("critical-line"),
   direction: z.literal("higher"),
@@ -123,10 +123,8 @@ export const contractSchema = z.object({
     }),
   }),
   verifier: z.object({
-    comparatorCommit: z.string().regex(/^[0-9a-f]{40}$/),
-    landrunCommit: z.string().regex(/^[0-9a-f]{40}$/),
-    lean4exportCommit: z.string().regex(/^[0-9a-f]{40}$/),
-    nanodaCommit: z.string().regex(/^[0-9a-f]{40}$/),
+    leanReleaseCommit: z.string().regex(/^[0-9a-f]{40}$/),
+    linuxArchiveSha256: z.string().regex(/^[0-9a-f]{64}$/),
   }),
   baseline: z.object({
     recordId: z.string().min(1),
@@ -221,6 +219,11 @@ export const verificationAttestationSchema = z
     challengeDigest: z.string().regex(/^[0-9a-f]{64}$/),
     verifierTemplateDigest: z.string().regex(/^[0-9a-f]{64}$/),
     kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
+    compactReplay: z.object({
+      policyVersion: z.literal(3),
+      referenceSha256: z.string().regex(/^[0-9a-f]{64}$/),
+      solutionSha256: z.string().regex(/^[0-9a-f]{64}$/),
+    }).strict().optional(),
     permittedAxioms: z.array(z.string()),
     rhFoundationCommit: z.string().regex(/^[0-9a-f]{40}$/).optional(),
   })

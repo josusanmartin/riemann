@@ -9,7 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { compactReplay } from "@/lib/compact-replay";
-import { getRecord, getRecords } from "@/lib/records";
+import { contract, getRecord, getRecords } from "@/lib/records";
 import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 import { recordPresentation } from "./presentation";
 import styles from "./record.module.css";
@@ -138,7 +138,7 @@ export default async function SubmissionPage({ params }: PageProps) {
               <div>
                 <dt>Foundation</dt>
                 <dd>
-                  <Link href="/methodology">Published RH premise</Link>
+                  <Link href="/methodology">{record.rhFoundationCommit === contract.trustedUpstream.rh.commit ? "Compact RH proof replayed" : "Published RH premise"}</Link>
                 </dd>
               </div>
             )}

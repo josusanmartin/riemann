@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/verifier-smoke.yml"
       - "challenge/**"
+      - "boat/compact/**"
       - "scripts/install-lean-toolchain.sh"
       - "scripts/install-native-build-toolchains.sh"
       - "scripts/install-verifier-tools.sh"
@@ -17,6 +18,7 @@ on:
     paths:
       - ".github/workflows/verifier-smoke.yml"
       - "challenge/**"
+      - "boat/compact/**"
       - "scripts/install-lean-toolchain.sh"
       - "scripts/install-native-build-toolchains.sh"
       - "scripts/install-verifier-tools.sh"
@@ -36,18 +38,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 22
-
-      - name: Install pinned Lean toolchain manager
-        run: ./scripts/install-lean-toolchain.sh
-
-      - name: Install pinned native build toolchains
-        run: ./scripts/install-native-build-toolchains.sh
-
-      - name: Install pinned formal verifier
-        run: ./scripts/install-verifier-tools.sh "$RUNNER_TEMP/riemann-tools"
-
-      - name: Replay a known proof through both kernels
-        run: ./scripts/smoke-verifier.sh "$RUNNER_TEMP/riemann-tools"
+      - name: Replay accepted and rejected controls through the compact worker
+        run: |
+          set -euo pipefail
+          sudo bash boat/compact/install-toolchain.sh /opt/lean435
+          sudo install -d /opt/riemann-controls
+          sudo cp -R boat/compact /opt/riemann-controls/
+          sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
+          sudo useradd --create-home --shell /usr/sbin/nologin referee
+          sudo env PATH=/opt/lean435/bin:/usr/bin:/bin bash /opt/riemann-controls/compact/control.sh

@@ -1,10 +1,9 @@
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 
 /-!
-Leaderboard interface to Alpöge's published RH theorem. The release and its
-independent verification evidence are pinned in challenge/contract.json.
-The verifier trusts this one external proposition. Candidate proofs and the
-type of the permitted axiom are compared with the trusted contract.
+The submission elaborator exposes this narrow interface. During export, the
+worker loads the checked implementation from boat/compact/Main.lean. Both
+kernels replay the linked proof under the three-axiom allowlist.
 -/
 axiom RiemannFoundation.alpogeRH : RiemannHypothesis
 

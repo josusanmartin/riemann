@@ -1,0 +1,27 @@
+name: Qualify the compact verifier on Boat
+on:
+  workflow_dispatch:
+  push:
+    tags: ['compact-boat-qualification-*']
+permissions:
+  contents: read
+jobs:
+  qualify:
+    if: github.repository == 'josusanmartin/riemann'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 125
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check runtime pins before allocating
+        run: |
+          jq -e '.parts | length > 0' challenge/compact-runtime.json
+          test "$(jq -r '.schemaVersion' challenge/contract.json)" = 3
+      - name: Replay the archived record
+        env:
+          BOAT_TEST_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: python3 .github/scripts/boat-compact-qualification.py
+      - name: Add certificate details to the run summary
+        run: |
+          jq '{submissionId,score,permittedAxioms,kernels,rhFoundationCommit,compactReplay}' canary-attestation.json >> "$GITHUB_STEP_SUMMARY"

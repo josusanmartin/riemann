@@ -32,60 +32,17 @@ exec > "$HOME/riemann-bootstrap.log" 2>&1
 umask 077
 export LEAN_NUM_THREADS=2
 enter_stage lean-toolchain
-bash scripts/install-lean-toolchain.sh
-export PATH="$HOME/.elan/bin:$PATH"
+bash boat/compact/install-toolchain.sh "$root/lean"
 enter_stage foundation
-upstream="$(node -p "require('./challenge/contract.json').trustedUpstream.commit")"
-git init -q "$root/zeta"
-git -C "$root/zeta" fetch -q --depth=1 https://github.com/anthropics/formal-math.git "$upstream"
-git -C "$root/zeta" checkout -q --detach FETCH_HEAD
-python3 scripts/prepare-rh-foundation.py "$root/zeta"
-(cd "$root/zeta" && lean --version)
-(
-  bash scripts/install-native-build-toolchains.sh
-  export CARGO_HOME="$HOME/.riemann-build-toolchains/cargo" RUSTUP_HOME="$HOME/.riemann-build-toolchains/rustup"
-  export PATH="$HOME/.riemann-build-toolchains/go/bin:$CARGO_HOME/bin:$PATH"
-  bash scripts/install-verifier-tools.sh "$root/tools"
-) > "$HOME/riemann-tools.log" 2>&1 &
-tools_pid=$!
-(
-  cd "$root/zeta"
-  python3 - <<'PY'
-import concurrent.futures, pathlib, subprocess, json
-def checkout(p):
-    path=pathlib.Path('.lake/packages')/p['name'];path.mkdir(parents=True,exist_ok=True)
-    for args in [['init','-q'],['remote','add','origin',p['url']],['fetch','-q','--depth=1','origin',p['rev']],['checkout','-q','--detach','FETCH_HEAD']]:
-        subprocess.run(['git','-C',str(path),*args],check=True)
-with concurrent.futures.ThreadPoolExecutor(4) as pool:
-    list(pool.map(checkout,json.load(open('lake-manifest.json'))['packages']))
-PY
-  lake exe cache get
-  lake build +Zeta23.Unconditional:olean +Zeta23.ThmD.Mult:olean
-) > "$HOME/riemann-zeta.log" 2>&1 &
-zeta_pid=$!
+bash boat/compact/install-runtime.sh "$root/runtime" "$root/site/challenge/compact-runtime.json"
 enter_stage node-dependencies
 source "$HOME/.nvm/nvm.sh" --no-use
 nvm install 22
 nvm use 22
 npm ci --no-audit --no-fund
-enter_stage wait-verifier-tools
-wait "$tools_pid"
-enter_stage wait-zeta-runtime
-wait "$zeta_pid"
 enter_stage prepare-worker
-prefix="$(cd "$root/zeta" && lean --print-prefix)"
-mkdir -p "$root/bin"
-cp -a "$prefix" "$root/lean"
-install -m 0755 "$(command -v node)" "$root/bin/node"
-# NSS may try a socket while Bash starts. Return EPERM for denied network
-# syscalls so the shell can fall back. Both network-denial probes still run.
-cat > "$root/bin/systemd-run" <<'WRAPPER'
-#!/bin/sh
-exec /usr/bin/systemd-run --property=SystemCallErrorNumber=EPERM "$@"
-WRAPPER
-chmod 0755 "$root/bin/systemd-run"
-export PATH="$root/bin:$root/lean/bin:/usr/local/bin:/usr/bin:/bin"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
+sudo useradd --create-home --shell /usr/sbin/nologin referee
 # File content is data; no submission text appears in shell commands or Boat history.
 mkdir -p "$root/input/proof"
 enter_stage check-upload
@@ -104,51 +61,27 @@ else
   ./node_modules/.bin/tsx -e 'import {records} from "./src/lib/records";process.stdout.write(JSON.stringify(records,null,2)+"\n")' > "$root/input/trusted-records.json"
 fi
 enter_stage isolate-proof
-# Keep the source, toolchain, and verifier immutable to the isolated proof account.
+export RIEMANN_RECORDS_PATH="$root/input/trusted-records.json"
+bash boat/compact/prepare-job.sh "$root/input" "$root/prepared"
+id=$(node -p "require('$root/input/submission.json').id")
+[[ $id =~ ^[a-z0-9][a-z0-9-]{0,79}$ ]]
 sudo chown -R root:root "$root"
 sudo chmod -R a+rX,go-w "$root"
 sudo chmod 0700 "$HOME"
-sudo git config --system --add safe.directory "$root/zeta"
-find "$root/zeta/.lake/packages" -mindepth 2 -maxdepth 2 -name .git -type d -printf '%h\n' | while read -r repo; do sudo git config --system --add safe.directory "$repo"; done
-sudo loginctl enable-linger proofcheck
-uid="$(id -u proofcheck)"
-sudo systemctl start "user@$uid.service"
-# A new account in this disposable VM owns only this verification run. Read
-# hierarchical kernel counters outside the proof account and its stdout.
-proof_group="$(sudo systemctl show "user-$uid.slice" -p ControlGroup --value)"
-oom_count() {
-  if [[ -n "$proof_group" ]]; then
-    sudo awk '$1 == "oom_kill" { print $2 }' "/sys/fs/cgroup$proof_group/memory.events" 2>/dev/null || true
-  fi
-}
 enter_stage check-proof
-oom_before="$(oom_count)"
-set +e
-sudo -u proofcheck env -i HOME=/home/proofcheck XDG_RUNTIME_DIR="/run/user/$uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-  PATH="$PATH" RIEMANN_BOAT_MEMORY_LIMIT="$memory_limit" LEAN_NUM_THREADS=2 RIEMANN_PREBUILT_ZETA23="$root/zeta" RIEMANN_RECORDS_PATH="$root/input/trusted-records.json" \
-  COMPARATOR_BIN="$root/tools/comparator/.lake/build/bin/comparator" COMPARATOR_LANDRUN="$root/tools/landrun/landrun" \
-  COMPARATOR_LEAN4EXPORT="$root/tools/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export" COMPARATOR_NANODA="$root/tools/nanoda/target/release/nanoda_bin" \
-  timeout -k 15s 5800s ./node_modules/.bin/tsx scripts/verify-submission.ts "$root/input" --mode=full --artifact=/home/proofcheck/attestation.json \
-  > "$HOME/riemann-proof.log" 2>&1
-status=$?
+status=0
+sudo timeout -k 15s 5800s bash boat/compact/run-job.sh "$root/prepared" "$root/runtime" "$root/lean" \
+  "$memory_limit" "$root/kernel-receipt.json" > "$HOME/riemann-proof.log" 2>&1 || status=$?
 stage_event "exit=$status"
-set -e
-oom_after="$(oom_count)"
-kernel_oom=0
-if [[ "$status" != 0 && "$oom_before" =~ ^[0-9]+$ && "$oom_after" =~ ^[0-9]+$ ]] && (( oom_after > oom_before )); then
-  kernel_oom=1
-fi
 enter_stage seal-receipt
-# Stop the proof account and its remaining processes before reading its artifact.
-sudo loginctl terminate-user proofcheck || true
-sudo pkill -KILL -u proofcheck 2>/dev/null || true
-if [[ $status == 0 ]]; then
-  sudo test -f /home/proofcheck/attestation.json
-  sudo test ! -L /home/proofcheck/attestation.json
-  [[ "$(sudo stat -c %s /home/proofcheck/attestation.json)" -le 65536 ]]
-  sudo install -m 0644 /home/proofcheck/attestation.json "$root/attestation.json"
+if (( status == 0 )); then
+  ./node_modules/.bin/tsx boat/compact/seal-attestation.ts "$root/prepared/verification-artifacts/$id.prepared.json" \
+    "$root/kernel-receipt.json" "$RIEMANN_RECORDS_PATH" "$HOME/compact-attestation.json"
 fi
-RIEMANN_KERNEL_OOM="$kernel_oom" ./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" "$root/attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"
+kernel_oom=0
+if sudo test -f "$root/kernel-receipt.json.oom"; then kernel_oom=1; fi
+RIEMANN_KERNEL_OOM="$kernel_oom" ./node_modules/.bin/tsx scripts/finalize-e2b-job.ts "$root/input" \
+  "$HOME/compact-attestation.json" "$HOME/riemann-proof.log" "$receipt" "$digest" "$status"
 
 # Only the supervisor can read this job-specific wake-up token. A notification
 # never supplies a verdict. The website fetches the receipt using its own key.

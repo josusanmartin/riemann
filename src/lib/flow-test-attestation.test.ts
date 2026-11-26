@@ -20,6 +20,7 @@ describe("flow-test publication gate", () => {
         previousRecordId: flowTestRecord.id, upstreamCommit: contract.trustedUpstream.commit,
         theoremNames: [contract.theorems.strictImprovement, contract.theorems.dyadicBound, contract.theorems.cumulativeBound],
         verifiedAt: new Date().toISOString(), kernels: ["lean", "nanoda"], permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
+        compactReplay: { policyVersion: 3, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
         challengeDigest: await computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths, {
           "data/records.json": `${JSON.stringify([flowTestRecord], null, 2)}\n`,
         }),
@@ -27,6 +28,7 @@ describe("flow-test publication gate", () => {
       },
     };
     await expect(validateFlowTestAttestation(result, prepared)).resolves.toBeUndefined();
+    await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, compactReplay: undefined } }, prepared)).rejects.toThrow("sealed dual-kernel replay");
     await expect(validateFlowTestAttestation(result, { ...prepared, solution: prepared.solution + "\n" })).rejects.toThrow("digest");
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, verifierTemplateDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("stale");
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, challengeDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("changed");

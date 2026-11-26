@@ -57,7 +57,7 @@ export default function ChallengePage() {
             <li><strong>Count each location once.</strong> The numerator counts distinct nontrivial zeros on Re(s) = ½. The denominator counts all nontrivial zeros with multiplicity. A double zero on the line adds one to the numerator and two to the denominator.</li>
             <li><strong>Beat the current bound.</strong> Submit κ = p/q with positive integers p and q and κ ≤ 1. Lean must prove that κ strictly exceeds the current exact record. The displayed percentage is truncated.</li>
             <li><strong>Prove the same κ in both intervals.</strong> For every ε &gt; 0 and all sufficiently large T, the proportion must be at least κ − ε in (T, 2T] and in (0, T]. The first counts zeros between heights T and 2T. The second counts all zeros up to height T.</li>
-            <li><strong>Use the pinned foundation.</strong> The verifier supplies Alpöge’s RH theorem. Further mathematical inputs need proofs in the pinned environment. The other permitted axioms are <code>propext</code>, <code>Classical.choice</code> and <code>Quot.sound</code>. You may reuse proved lemmas from its libraries.</li>
+            <li><strong>Use the pinned foundation.</strong> The verifier links the compact proof of RH into the certificate. Further mathematical inputs need proofs in the pinned environment. The permitted axioms are <code>propext</code>, <code>Classical.choice</code> and <code>Quot.sound</code>. You may reuse proved lemmas from its libraries.</li>
             <li><strong>Supply all three declarations.</strong> Your single Lean file must prove strict improvement, the dyadic bound, and the cumulative bound with the signatures in the starter. You may derive the cumulative result from the dyadic one in that file.</li>
             <li><strong>Pass official replay.</strong> Comparator matches the statements and checks the axiom dependencies. Lean and nanoda must both accept the exported proof before the score enters the leaderboard.</li>
           </ol>
@@ -146,8 +146,7 @@ export default function ChallengePage() {
           <div><dt>Lean</dt><dd>{contract.trustedUpstream.leanToolchain}</dd></div>
           <div><dt>Accepted RH proof</dt><dd><a href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>{contract.trustedUpstream.rh.commit.slice(0,12)}</a></dd></div>
           <div><dt>Mathlib</dt><dd>{contract.trustedUpstream.mathlibCommit.slice(0, 12)}</dd></div>
-          <div><dt>Comparator</dt><dd>{contract.verifier.comparatorCommit.slice(0, 12)}</dd></div>
-          <div><dt>nanoda</dt><dd>{contract.verifier.nanodaCommit.slice(0, 12)}</dd></div>
+          <div><dt>Comparator and kernels</dt><dd><a href={`https://github.com/leanprover/lean4/tree/${contract.verifier.leanReleaseCommit}`}>Lean release {contract.verifier.leanReleaseCommit.slice(0, 12)}</a></dd></div>
         </dl>
         <Link className="text-link" href="/methodology">See the complete trust model <ArrowRight size={16} /></Link>
       </section>

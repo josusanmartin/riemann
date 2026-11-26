@@ -19,7 +19,8 @@ describe("published RH foundation", () => {
     const source = readFileSync("challenge/templates/Main.lean","utf8");
     expect(source.match(/^axiom .*$/gm)).toEqual([`axiom ${interfaceAxiom} : RiemannHypothesis`]);
     expect(source).toContain(`theorem ${releaseTheorem} : RiemannHypothesis := ${interfaceAxiom}`);
-    expect(contract.permittedAxioms).toEqual(["propext","Quot.sound","Classical.choice",interfaceAxiom]);
+    expect(contract.permittedAxioms).toEqual(["propext","Quot.sound","Classical.choice"]);
+    expect(readFileSync("boat/compact/Main.lean","utf8")).toContain("New.zeta_zeros_on_line New.grh");
     expect(readFileSync("challenge/templates/CandidateSpec.lean.tmpl","utf8")).toContain("import Main\n");
   });
 });
