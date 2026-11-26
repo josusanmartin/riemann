@@ -1,0 +1,38 @@
+name: Inspect the current compact qualification
+on:
+  push:
+    tags: ['compact-qualification-status-*']
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Read public-fixture worker progress and usage
+        env:
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, urllib.request, urllib.error
+          base = "https://boat.dev/api/v1"
+          headers = {"Authorization":"Bearer "+os.environ["BOAT_KEY"]}
+          def get(path):
+              with urllib.request.urlopen(urllib.request.Request(base+path, headers=headers),timeout=25) as response:
+                  return json.load(response)
+          result = get("/sandboxes?label=kind%3Dqualification")
+          targets = [b for b in result["sandboxes"] if b.get("labels",{}).get("revision")=="cf0723dcf839c626c26dff50aaf0ce9c434042fb" and b["labels"].get("service")=="riemann"]
+          for b in targets:
+              assert re.fullmatch(r"bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}", b["id"])
+              print({k:b.get(k) for k in ("id","state","setupStatus","environment","createdAt")})
+              endpoint="/sandboxes/"+b["id"]
+              for name,path in (("usage", "/usage"),("stages","/files?path=riemann-stages.tsv&encoding=utf8")):
+                  try:
+                      obj=get(endpoint+path)
+                      if name=="usage":
+                          print({k:obj.get(k) for k in ("sandboxType","seconds","dollars","running")})
+                      else:
+                          for line in obj.get("content","").splitlines():
+                              if re.fullmatch(r"[0-9TZ:-]+\t[a-z-]+\t(start|exit=\d+)",line):print(line)
+                  except urllib.error.HTTPError as e:
+                      print(name, e.code)
+          PY
