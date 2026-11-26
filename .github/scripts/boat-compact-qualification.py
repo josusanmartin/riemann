@@ -109,7 +109,15 @@ finally:
             if error.code != 409:
                 raise
         for _ in range(12):
-            if api(endpoint)["sandbox"]["state"] in ("stopped", "archived", "deleted"):
+            try:
+                stopped = api(endpoint)["sandbox"]["state"] in ("stopped", "archived", "deleted")
+            except urllib.error.HTTPError as error:
+                if error.code != 404:
+                    raise
+                # Environment-scoped keys can lose direct visibility immediately after a successful stop.
+                boxes = api("/sandboxes?label=kind%3Dqualification")["sandboxes"]
+                stopped = not any(box["id"] == worker and box.get("state") not in ("archived", "stopped", "deleted") for box in boxes)
+            if stopped:
                 print("Boat shutdown confirmed", flush=True)
                 break
             time.sleep(5)
