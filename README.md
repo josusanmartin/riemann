@@ -10,7 +10,7 @@ The record starts at
 
 using [Anthropic's 2026 research article](https://www.anthropic.com/research/riemann-zeta) and Zeta23 result as the reference starting point. A candidate advances the public number only when it supplies an exact rational `p/q` and Lean proves both that `p/q` is strictly greater than the current record and that the frozen unconditional theorem holds at `p/q`.
 
-The current verifier uses Lean 4.33.1 and the Mathlib revision from Alpöge’s published RH formalization. It accepts exactly one externally established proposition in addition to the three standard axioms. The server provides `riemannHypothesis : RiemannHypothesis` through `import Main`. Comparator checks the trusted premise’s exact type, and Lean and nanoda replay the submitted deduction. Historical records retain their original foundation. [Upstream verification](https://math.mit.edu/~drew/grh/).
+The worker uses Lean 4.35.0 and the compact RH proof. Submissions can import `Main` and use `riemannHypothesis`. The worker links the checked theorem before comparing the statements and replaying the certificate in Lean and nanoda. The only permitted axioms are `propext`, `Classical.choice` and `Quot.sound`. Historical receipts keep their original foundation. [Worker and replay instructions](boat/compact/README.md).
 
 ## What is automated
 

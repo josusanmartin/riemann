@@ -15,13 +15,7 @@ bash boat/compact/install-toolchain.sh "$root/lean"
 bash boat/compact/install-runtime.sh "$root/runtime" "$root/site/challenge/compact-runtime.json"
 record=knausgard-rh-reflected-kernel-8542
 echo "57ee6e4def6c05145ce8196f49ce6302b211a24fa4feb091afbd732db93a12f3  submissions/$record/proof/Solution.lean" | sha256sum -c -
-python3 - "$record" "$root/incumbent.json" <<'PY'
-import json, pathlib, sys
-entries = json.loads(pathlib.Path("data/records.json").read_text())
-receipt = json.loads(pathlib.Path(f"submissions/{sys.argv[1]}/verification/attestation.json").read_text())
-index = next(i for i, entry in enumerate(entries) if entry["id"] == receipt["previousRecordId"])
-pathlib.Path(sys.argv[2]).write_text(json.dumps(entries[:index+1], indent=2, ensure_ascii=False) + "\n")
-PY
+python3 boat/compact/records-at-admission.py "$record" "$root/incumbent.json"
 export RIEMANN_RECORDS_PATH="$root/incumbent.json"
 bash boat/compact/prepare-job.sh "submissions/$record" "$root/prepared"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck

@@ -27,7 +27,8 @@ bash boat/compact/install-toolchain.sh /opt/riemann-lean
 bash boat/compact/install-runtime.sh /opt/riemann-runtime "$PWD/challenge/compact-runtime.json"
 sudo useradd --create-home --shell /usr/sbin/nologin proofcheck
 sudo useradd --create-home --shell /usr/sbin/nologin referee
-bash boat/compact/prepare-job.sh submissions/<id> /opt/prepared
+python3 boat/compact/records-at-admission.py <id> /opt/incumbent.json
+RIEMANN_RECORDS_PATH=/opt/incumbent.json bash boat/compact/prepare-job.sh submissions/<id> /opt/prepared
 sudo bash boat/compact/run-job.sh /opt/prepared /opt/riemann-runtime /opt/riemann-lean 12G /opt/replay.json`;
 
 export default function MethodologyPage() {

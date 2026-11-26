@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getRecord, records } from "@/lib/records";
+import { contract, getRecord, records } from "@/lib/records";
 import { recordPresentation } from "../presentation";
 
 // Each deployment has an immutable record set. Render share images once.
@@ -56,7 +56,7 @@ export async function GET(
           <span style={{ fontSize: 50, letterSpacing: -1 }}>{heading}</span>
           {record.rhFoundationCommit && (
             <span style={{ marginTop: 12, fontSize: 25, color: "#b9c9c2" }}>
-              Under the published RH premise
+              {record.rhFoundationCommit === contract.trustedUpstream.rh.commit ? "Compact RH proof replayed" : "Under the published RH premise"}
             </span>
           )}
         </div>
