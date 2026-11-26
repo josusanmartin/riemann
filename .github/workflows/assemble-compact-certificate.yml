@@ -1,0 +1,27 @@
+name: Assemble the archived compact RH certificate
+on:
+  push:
+    tags: ['compact-certificate-assemble-*']
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Verify and attach the complete certificate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha=bbb6c92e4c08dbe90296e21aa0912febadb70ec388c811ebc8cab57c2598d4ad
+          file=riemann-854225-compact-replay.zip
+          release=compact-rh-854225-v1
+          existing=$(gh release view "$release" --repo "$GITHUB_REPOSITORY" --json assets --jq ".assets[]|select(.name==\"$file\")|.digest")
+          if [[ -n "$existing" ]]; then test "$existing" = "sha256:$sha"; exit; fi
+          mkdir parts
+          gh release download compact-rh-854225-transfer --repo "$GITHUB_REPOSITORY" --pattern 'part-*' --dir parts
+          test "$(find parts -type f | wc -l)" -eq 52
+          cat parts/part-* > "$file"
+          echo "$sha  $file" | sha256sum -c -
+          gh release upload "$release" "$file" --repo "$GITHUB_REPOSITORY"
