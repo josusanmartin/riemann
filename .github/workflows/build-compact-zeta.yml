@@ -1,0 +1,44 @@
+name: Build Zeta23 for the compact verifier
+on:
+  push:
+    tags: ['compact-zeta-build-*']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned Mathlib
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
+          export PATH="$RUNNER_TEMP/lean/bin:$PATH"
+          echo "$RUNNER_TEMP/lean/bin" >> "$GITHUB_PATH"
+          mkdir "$RUNNER_TEMP/mathenv"
+          cd "$RUNNER_TEMP/mathenv"
+          printf 'name = "VerifierDependencies"\n[[require]]\nname = "mathlib"\ngit = "https://github.com/leanprover-community/mathlib4"\nrev = "56a005855ea17e0b0958f73ec801ae140b0a1679"\n' > lakefile.toml
+          cp "$GITHUB_WORKSPACE/challenge/foundation/lake-manifest.json" lake-manifest.json
+          cp "$GITHUB_WORKSPACE/challenge/smoke/lean-toolchain" lean-toolchain
+          python3 "$GITHUB_WORKSPACE/boat/compact/fetch-deps.py"
+          lake exe cache get
+      - name: Compile the full Zeta23 library
+        run: LEAN_NUM_THREADS=3 bash boat/compact/build-zeta.sh "$RUNNER_TEMP/zeta" "$RUNNER_TEMP/mathenv/.lake/packages"
+      - name: Attach compiled library and provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/zeta"
+          git rev-parse HEAD > "$RUNNER_TEMP/zeta-revision"
+          cd .lake/build/lib/lean
+          find . -type f \( -name '*.olean' -o -name '*.olean.private' -o -name '*.olean.server' -o -name '*.ir' -o -name '*.ir.sig' \) -print0 | tar --null -T - -cf - | zstd -T2 -3 > "$RUNNER_TEMP/zeta-objects.tar.zst"
+          cd "$RUNNER_TEMP"
+          sha256sum zeta-objects.tar.zst > zeta-checksums.txt
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease --latest=false \
+            --title "Zeta23 on Lean 4.35 (${GITHUB_SHA:0:10})" --notes "Built from the pinned Zeta23 source and compatibility patch in this revision." \
+            zeta-objects.tar.zst zeta-checksums.txt zeta-revision

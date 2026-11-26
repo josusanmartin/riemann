@@ -274,3 +274,159 @@
        (continuousAt_id.div_const _))).pow 2).continuousWithinAt
    have hCtau2 : IntervalIntegrable
        (fun τ : ℝ => C / τ ^ 2 * (2 * ((L + m) / (2 * Real.pi)) + C)) volume T (2 * T) := by
+--- a/Zeta23/FromPNTPlus/MellinCalculus.lean
++++ b/Zeta23/FromPNTPlus/MellinCalculus.lean
+@@ -844,12 +844,13 @@
+         have hy : y ∉ Icc (2 ^ (-ε)) (2 ^ ε) := by
+           simp only [mem_Icc, not_and, not_le]; exact hS hz.1 <| (div_le_one hz.2).mp hxy
+         simp [DeltaSpikeSupport εpos hz.2.le suppν hy]
+-    · apply Integrable.piecewise Smeas ?_ integrableOn_zero
++    · apply Integrable.piecewise Smeas.nullMeasurableSet ?_ integrableOn_zero
+       simp only [IntegrableOn, Measure.restrict_restrict_of_subset SsubI]
+       apply MeasureTheory.Integrable.mono_measure ?_
+       · apply MeasureTheory.Measure.restrict_mono' SsubT.eventuallyLE le_rfl
+       have : volume.restrict (Tx ×ˢ Ty) = (volume.restrict Tx).prod (volume.restrict Ty) := by
+         rw [Measure.prod_restrict, MeasureTheory.Measure.volume_eq_prod]
++      change Integrable _ (volume.restrict (Tx ×ˢ Ty))
+       conv => rw [this]; lhs; intro; rw [mul_comm]
+       apply MeasureTheory.Integrable.mul_prod (f := fun x ↦ (x : ℂ) ^ (s - 1))
+         (μ := Measure.restrict volume Tx)
+--- a/Zeta23/XiPrime/ExplicitFormula/Expansion.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/Expansion.lean
+@@ -148,7 +148,7 @@
+   have hE : Efn s ≠ 0 := Efn_ne_zero hs hne
+   have e1 : logDeriv xiDeriv s = logDeriv (fun z => xi z * Efn z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.self_of_nhds]
+-  rw [e1, logDeriv_mul (f := xi) (g := Efn) s hxi hE (xi_differentiable s) (differentiableAt_Efn hs)]
++  erw [e1, logDeriv_mul (f := xi) (g := Efn) s hxi hE (xi_differentiable s) (differentiableAt_Efn hs)]
+   rw [logDeriv_xi_eq hpos hs1 hζ, logDeriv_apply]
+   rfl
+ 
+--- a/Zeta23/XiPrime/ExplicitFormula/LitCorr.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/LitCorr.lean
+@@ -44,7 +44,7 @@
+ theorem logDeriv_mul_sub_one {s : ℂ} (h0 : s ≠ 0) (h1 : s ≠ 1) :
+     logDeriv (fun w : ℂ => w * (w - 1)) s = 1 / s + 1 / (s - 1) := by
+   have h1' : s - 1 ≠ 0 := sub_ne_zero.mpr h1
+-  rw [logDeriv_mul (f := fun w : ℂ => w) (g := fun w : ℂ => w - 1) s h0 h1'
++  erw [logDeriv_mul (f := fun w : ℂ => w) (g := fun w : ℂ => w - 1) s h0 h1'
+     differentiableAt_id (differentiableAt_id.sub_const 1)]
+   have e1 : logDeriv (fun w : ℂ => w) s = 1 / s := by
+     rw [logDeriv_apply]; simp
+--- a/Zeta23/XiPrime/ExplicitFormula/TestWeight.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/TestWeight.lean
+@@ -942,7 +942,7 @@
+           K * (1 / ((1 + (t - P.tau T k) ^ 2) * (1 + (t - P.tau T l) ^ 2))) :=
+         setIntegral_mono_set hg.integrableOn
+           (Eventually.of_forall fun t => by simp only [Pi.zero_apply]; positivity)
+-          (HasSubset.Subset.eventuallyLE (by unfold Params.tauStar; exact hsub))
++          (by unfold Params.tauStar; exact hsub.eventuallyLE)
+     _ = K * ∫ t in {t : ℝ | T / 4 ≤ |t - P.tau T k|},
+           1 / ((1 + (t - P.tau T k) ^ 2) * (1 + (t - P.tau T l) ^ 2)) := integral_const_mul _ _
+     _ ≤ K * (Real.pi / (T / 4) ^ 2) :=
+@@ -980,7 +980,7 @@
+           K * (1 / ((1 + (t - -P.tau T k) ^ 2) * (1 + (t - -P.tau T l) ^ 2))) :=
+         setIntegral_mono_set hg.integrableOn
+           (Eventually.of_forall fun t => by simp only [Pi.zero_apply]; positivity)
+-          (HasSubset.Subset.eventuallyLE (by unfold Params.tauStar; exact hsub))
++          (by unfold Params.tauStar; exact hsub.eventuallyLE)
+     _ = K * ∫ t in {t : ℝ | T / 4 ≤ |t - -P.tau T k|},
+           1 / ((1 + (t - -P.tau T k) ^ 2) * (1 + (t - -P.tau T l) ^ 2)) := integral_const_mul _ _
+     _ ≤ K * (Real.pi / (T / 4) ^ 2) :=
+--- a/Zeta23/XiPrime/ExplicitFormula/ZeroFree.lean
++++ b/Zeta23/XiPrime/ExplicitFormula/ZeroFree.lean
+@@ -75,7 +75,7 @@
+     have hld : logDeriv f s = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) + logDeriv h s := by
+       have e1 : logDeriv f s = logDeriv (fun s => (s - ρ) ^ analyticOrderNatAt f ρ * h s) s := by
+         simp only [logDeriv_apply, hfs.deriv_eq, hfs.self_of_nhds, smul_eq_mul]
+-      rw [e1, logDeriv_mul (f := fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) (g := h) s
++      erw [e1, logDeriv_mul (f := fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) (g := h) s
+         (pow_ne_zero _ hsρ) hhs (by fun_prop) hhas.differentiableAt]
+       have e2 : logDeriv (fun s : ℂ => (s - ρ) ^ analyticOrderNatAt f ρ) s
+           = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) := by
+--- a/Zeta23/XiPrime/Hardy/Basic.lean
++++ b/Zeta23/XiPrime/Hardy/Basic.lean
+@@ -101,7 +101,7 @@
+   have hd1 : DifferentiableAt ℂ (fun z : ℂ => Gammaℝ (1 - z)) s :=
+     (differentiableAt_Gammaℝ_of_im_ne_zero (im_one_sub_ne_zero hs)).comp s
+       ((differentiableAt_const (1:ℂ)).sub differentiableAt_id)
+-  rw [e, logDeriv_div _ (by simpa using hG1) hG hd1 (differentiableAt_Gammaℝ_of_im_ne_zero hs)]
++  erw [e, logDeriv_div _ (by simpa using hG1) hG hd1 (differentiableAt_Gammaℝ_of_im_ne_zero hs)]
+   congr 1
+   -- logDeriv (Γℝ ∘ (1 − ·)) s = −(logDeriv Γℝ)(1 − s)
+   rw [logDeriv_apply, logDeriv_apply]
+--- a/Zeta23/XiPrime/Hardy/Count.lean
++++ b/Zeta23/XiPrime/Hardy/Count.lean
+@@ -56,7 +56,7 @@
+     exact hardyW_eq_zeta_mul hz
+   have h1 : logDeriv hardyW s = logDeriv (fun z => riemannZeta z * Gw z) s := by
+     rw [logDeriv_apply, logDeriv_apply, hev.deriv_eq, hev.eq_of_nhds]
+-  rw [h1, logDeriv_mul s hζ hG (differentiableAt_riemannZeta hs1) (Gw_analyticAt hs hζ).differentiableAt]
++  erw [h1, logDeriv_mul s hζ hG (differentiableAt_riemannZeta hs1) (Gw_analyticAt hs hζ).differentiableAt]
+ 
+ /-- **the vertical side**: for t₁ from hardyW_two_line_lower and t₁ ≤ T₁ ≤ T₂,
+ |Im ∫_{T₁}^{T₂} (W′/W)(2+it)·i dt| ≤ 2π. -/
+--- a/Zeta23/XiPrime/Hardy/EFBasic.lean
++++ b/Zeta23/XiPrime/Hardy/EFBasic.lean
+@@ -167,7 +167,7 @@
+   have hE : E2fn s ≠ 0 := E2fn_ne_zero hs.1 hW
+   have e1 : logDeriv hardyW s = logDeriv (fun z => riemannZeta z * E2fn z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.self_of_nhds]
+-  rw [FZfn, e1, logDeriv_mul (f := riemannZeta) (g := E2fn) s hζ hE
++  erw [FZfn, e1, logDeriv_mul (f := riemannZeta) (g := E2fn) s hζ hE
+     (differentiableAt_riemannZeta (goodStrip_ne_one hs)) (differentiableAt_E2fn hs), logDeriv_apply (f := E2fn)]
+   rw [E2fn]; ring
+ 
+--- a/Zeta23/XiPrime/Hardy/EFContour/Analytic.lean
++++ b/Zeta23/XiPrime/Hardy/EFContour/Analytic.lean
+@@ -168,7 +168,7 @@
+   have hev : ∀ᶠ s in 𝓝[≠] (0:ℂ), s * logDeriv invGammaℝ s = 1 + s * logDeriv invGammaℝCof s := by
+     have h1 : ∀ᶠ s in 𝓝[≠] (0:ℂ), s ≠ 0 := self_mem_nhdsWithin
+     filter_upwards [h1, mem_nhdsWithin_of_mem_nhds hne] with s hs hhs
+-    rw [invGammaℝ_eq_id_mul, logDeriv_mul s (by simpa using hs) hhs differentiableAt_id (differentiable_invGammaℝCof s)]
++    erw [invGammaℝ_eq_id_mul, logDeriv_mul s (by simpa using hs) hhs differentiableAt_id (differentiable_invGammaℝCof s)]
+     rw [logDeriv_id]
+     field_simp
+   have hlim : Tendsto (fun s : ℂ => 1 + s * logDeriv invGammaℝCof s) (𝓝[≠] 0) (𝓝 1) := by
+@@ -199,7 +199,7 @@
+ /-- logDeriv χ = logDeriv (Γℝ∘(1−·)) + logDeriv G wherever both factors are nonzero. -/
+ theorem logDeriv_chiFE_eq {s : ℂ} (h1 : Gammaℝ (1 - s) ≠ 0) (h0 : Gammaℝ s ≠ 0) :
+     logDeriv chiFE s = logDeriv (fun z => Gammaℝ (1 - z)) s + logDeriv invGammaℝ s := by
+-  rw [chiFE_eq_mul, logDeriv_mul s h1 (invGammaℝ_ne_zero_iff.mpr h0)
++  erw [chiFE_eq_mul, logDeriv_mul s h1 (invGammaℝ_ne_zero_iff.mpr h0)
+     (analyticAt_Gammaℝ_one_sub h1).differentiableAt (differentiable_invGammaℝ s)]
+ 
+ /-- logDeriv (Γℝ∘(1−·)) = −logDeriv (G∘(1−·)) wherever Γℝ(1−s) ≠ 0. -/
+--- a/Zeta23/XiPrime/Hardy/Omega.lean
++++ b/Zeta23/XiPrime/Hardy/Omega.lean
+@@ -94,7 +94,7 @@
+ theorem logDeriv_omegaW_eq {s : ℂ} (hs : s.im ≠ 0) (hW : hardyW s ≠ 0) :
+     logDeriv omegaW s = logDeriv Gammaℝ s + logDeriv hardyW s := by
+   have e : omegaW = fun z => Gammaℝ z * hardyW z := funext fun z => rfl
+-  rw [e, logDeriv_mul s (Gammaℝ_ne_zero_of_im_ne_zero hs) hW (differentiableAt_Gammaℝ_of_im_ne_zero hs)
++  erw [e, logDeriv_mul s (Gammaℝ_ne_zero_of_im_ne_zero hs) hW (differentiableAt_Gammaℝ_of_im_ne_zero hs)
+     (hardyW_differentiableAt hs)]
+ 
+ end Hardy
+--- a/Zeta23/XiPrime/Hardy/TwoLine.lean
++++ b/Zeta23/XiPrime/Hardy/TwoLine.lean
+@@ -44,7 +44,7 @@
+   have hlin : DifferentiableAt ℂ (fun z : ℂ => z / 2 / (Real.pi : ℂ)) u := by fun_prop
+   have hπ : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
+   have hR : logDeriv (fun z => Gammaℝ z * (z / 2 / (Real.pi : ℂ))) u = logDeriv Gammaℝ u + 1 / u := by
+-    rw [logDeriv_mul u (Gammaℝ_ne_zero_of_im_ne_zero hu) (by simp [hu0, hπ]) hdu hlin]
++    erw [logDeriv_mul u (Gammaℝ_ne_zero_of_im_ne_zero hu) (by simp [hu0, hπ]) hdu hlin]
+     congr 1
+     rw [logDeriv_apply]
+     have : deriv (fun z : ℂ => z / 2 / (Real.pi : ℂ)) u = 1 / 2 / (Real.pi : ℂ) := by
+--- a/Zeta23/XiPrime/Hardy/ZeroFree.lean
++++ b/Zeta23/XiPrime/Hardy/ZeroFree.lean
+@@ -41,7 +41,7 @@
+   have hΓ : DifferentiableAt ℂ Complex.Gamma (s / 2) :=
+     Complex.differentiableAt_Gamma _ (Hardy.half_ne_neg_nat hs)
+   have hdg : DifferentiableAt ℂ (fun s : ℂ => Complex.Gamma (s / 2)) s := hΓ.comp s (by fun_prop)
+-  rw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
++  erw [e, logDeriv_mul (f := fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
+     (g := fun s : ℂ => Complex.Gamma (s / 2)) s hf hg hdf hdg]
+   have h1 : logDeriv (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2)) s = -(Real.log Real.pi : ℂ) / 2 := by
+     have hder : HasDerivAt (fun s : ℂ => (Real.pi : ℂ) ^ (-s / 2))
