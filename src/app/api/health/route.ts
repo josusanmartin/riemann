@@ -48,6 +48,8 @@ export async function GET(): Promise<NextResponse> {
   );
   return NextResponse.json({
     status: directSubmissionsConfigured ? "ok" : "degraded",
+    admissionsPaused: process.env.SUBMISSIONS_PAUSED === "1",
+    acceptingSubmissions: directSubmissionsConfigured && process.env.SUBMISSIONS_PAUSED !== "1",
     checkScope: isBoat ? "configuration-only; each Boat job checks its worker identity and checked-out source revision before proof transfer, and its attestation digest before publication" : "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
     verificationPolicyVersion: contract.schemaVersion,
