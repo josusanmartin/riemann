@@ -35,7 +35,7 @@ def api(path, method="GET", data=None, idempotency=None):
         raise RuntimeError("Boat did not confirm " + path)
     return result
 
-# Two hours at $0.20/hour plus one start surcharge of at most $0.07.
+# Two hours on the normal 16 GB worker at $0.10/hour plus one start surcharge of at most $0.07.
 # No API key, organization environment, snapshot or forwarding is copied into the guest.
 setup = f"""set -euo pipefail
 cd "$HOME"
@@ -44,7 +44,7 @@ git -C judge fetch -q --depth=1 https://github.com/josusanmartin/riemann.git {re
 git -C judge checkout -q --detach FETCH_HEAD
 test "$(git -C judge rev-parse HEAD)" = {revision}
 bash judge/boat/compact/qualify.sh > qualification.log 2>&1"""
-request = {"type": "xlarge", "name": "Compact RH qualification", "org": "personal",
+request = {"type": "large", "name": "Compact RH qualification", "org": "personal",
            "environment": "riemann-production", "visibility": "private", "noEnv": True,
            "snapshots": False, "monitoring": False, "ttlSeconds": 7200,
            "labels": {"service": "riemann", "kind": "qualification", "revision": revision}, "setupScript": setup}

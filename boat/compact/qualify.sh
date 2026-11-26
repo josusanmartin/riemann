@@ -12,7 +12,7 @@ cp "submissions/$record/submission.json" "$inbox/manifest"
 cp "$file" "$inbox/solution"
 digest=$({ printf 'submission.json\0'; cat "$inbox/manifest"; printf 'proof/Solution.lean\0'; cat "$inbox/solution"; } | sha256sum | cut -d' ' -f1)
 printf '%s\n' "$digest" > "$inbox/ready"
-bash boat/verify-job.sh "$digest" qualification 28G
+bash boat/verify-job.sh "$digest" qualification 12G
 python3 - "$HOME/riemann-receipt.json" "$HOME/canary-attestation.json" "$digest" <<'PY'
 import json
 from pathlib import Path
