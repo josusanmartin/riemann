@@ -14,14 +14,38 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Build pinned theorem libraries
+      - name: Install pinned Lean
         run: |
           set -euo pipefail
-          # These SDKs are unused on this disposable hosted runner.
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
           bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
-          export PATH="$RUNNER_TEMP/lean/bin:$PATH"
-          bash boat/compact/build-runtime.sh "$RUNNER_TEMP/runtime"
+          echo "$RUNNER_TEMP/lean/bin" >> "$GITHUB_PATH"
+      - name: Build the compact foundation
+        run: |
+          set -euo pipefail
+          source="$RUNNER_TEMP/grh"
+          git init -q "$source"
+          git -C "$source" fetch -q --depth=1 https://github.com/lsernau/grh-lean.git 72fead102f663d5c7a407964a13dc0cf9d977207
+          git -C "$source" checkout -q --detach FETCH_HEAD
+          cd "$source/grh-compact"
+          python3 "$GITHUB_WORKSPACE/boat/compact/fetch-deps.py"
+          lake exe cache get
+          LEAN_NUM_THREADS=2 lake --no-ansi build +Main:olean
+      - name: Save the verified foundation build for follow-up port tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          tar --exclude='*/.git/objects/pack/*.keep' -cf - grh | zstd -T2 -3 | split --bytes=1000M -d -a2 - foundation.tar.zst.part
+          sha256sum foundation.tar.zst.part* > foundation-checksums.txt
+          gh release create "$GITHUB_REF_NAME-foundation" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false \
+            --title "Compact RH foundation build (${GITHUB_SHA:0:10})" \
+            --notes "Pinned Lean 4.35 build inputs and compiled foundation for reproducing the worker runtime." \
+            foundation.tar.zst.part* foundation-checksums.txt
+          rm -- foundation.tar.zst.part* foundation-checksums.txt
+      - name: Build the submission libraries and checker
+        run: RIEMANN_COMPACT_SOURCE="$RUNNER_TEMP/grh/grh-compact" bash boat/compact/build-runtime.sh "$RUNNER_TEMP/runtime"
       - name: Publish the build cache and its checksums
         env:
           GH_TOKEN: ${{ github.token }}

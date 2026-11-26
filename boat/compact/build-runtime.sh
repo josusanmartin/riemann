@@ -17,17 +17,30 @@ fetch() {
   git -C "$1" checkout --quiet --detach FETCH_HEAD
   [[ $(git -C "$1" rev-parse HEAD) == "$3" ]]
 }
-fetch grh https://github.com/lsernau/grh-lean.git 72fead102f663d5c7a407964a13dc0cf9d977207
+if [[ -n ${RIEMANN_COMPACT_SOURCE:-} ]]; then
+  compact=$(realpath "$RIEMANN_COMPACT_SOURCE")
+  [[ $(git -C "$compact" rev-parse HEAD) == 72fead102f663d5c7a407964a13dc0cf9d977207 ]]
+  test -s "$compact/.lake/build/lib/lean/Main.olean"
+else
+  fetch grh https://github.com/lsernau/grh-lean.git 72fead102f663d5c7a407964a13dc0cf9d977207
+  compact="$work/grh/grh-compact"
+  (cd "$compact" && python3 "$here/fetch-deps.py" && lake exe cache get && lake --no-ansi build +Main:olean)
+fi
 fetch zeta https://github.com/anthropics/formal-math.git 3635e74826a4c1fcece7d1cd2b6fa75e43a00510
-compact="$work/grh/grh-compact"
-(cd "$compact" && python3 "$here/fetch-deps.py" && lake exe cache get && lake --no-ansi build +Main:olean)
 git -C zeta apply "$here/zeta35.patch"
 mkdir -p zeta/Zeta23/Compat zeta/.lake
 cp "$here/LinearCombinationPrime.lean" zeta/Zeta23/Compat/
 ln -s "$compact/.lake/packages" zeta/.lake/packages
 cp "$compact/lean-toolchain" "$compact/lake-manifest.json" zeta/
 sed -i 's/51e6992efd06126df61a496bebf8f49482a4e129/56a005855ea17e0b0958f73ec801ae140b0a1679/' zeta/lakefile.toml
-(cd zeta && lake --no-ansi build +ChallengeDeps:olean +Zeta23:olean)
+# Build every upstream module. Some previously accepted entries import modules outside the aggregate root.
+(cd zeta && python3 - <<'PYTHON'
+import pathlib
+import subprocess
+modules = sorted("+" + ".".join(p.with_suffix("").parts) + ":olean" for p in pathlib.Path("Zeta23").rglob("*.lean"))
+subprocess.run(["lake", "--no-ansi", "build", "+ChallengeDeps:olean", "+Zeta23:olean", *modules], check=True)
+PYTHON
+)
 mkdir -p "$out"/{interface,foundation,compat,deps,licenses,checker}
 cp "$compact"/{LICENSE,NOTICE,ATTRIBUTION.md} "$out/licenses/"
 cp zeta/NOTICE "$out/licenses/Zeta23-NOTICE"

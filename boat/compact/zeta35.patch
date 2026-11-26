@@ -223,3 +223,54 @@
            ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
              (MeasureTheory.integrableOn_const (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)))
            ((MeasureTheory.integrable_indicator_iff measurableSet_Icc).mpr
+--- a/Zeta23/ThmE/GammaSideChi.lean
++++ b/Zeta23/ThmE/GammaSideChi.lean
+@@ -96,7 +96,7 @@
+     have hcomp : DifferentiableAt ℂ (Complex.Gammaℝ ∘ fun z : ℂ => z + (κ:ℂ)) s :=
+       DifferentiableAt.comp s hG haff
+     exact hcomp
+-  rw [e, logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2))
++  erw [e, logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2))
+     (g := fun s : ℂ => Complex.Gammaℝ (s + κ)) s hf hg hdf hdg]
+   have h1 : logDeriv (fun s : ℂ => (q : ℂ) ^ (s / 2)) s = (Real.log q : ℂ) / 2 := by
+     have hder : HasDerivAt (fun s : ℂ => (q : ℂ) ^ (s / 2))
+--- a/Zeta23/ThmE/CountByIntegralChi.lean
++++ b/Zeta23/ThmE/CountByIntegralChi.lean
+@@ -62,7 +62,7 @@
+ lemma logDeriv_completedLSym (hχ1 : χ ≠ 1) {s : ℂ} (hΛ : completedLFunction χ s ≠ 0) :
+     logDeriv (completedLSym χ) s = Real.log q / 2 + logDeriv (completedLFunction χ) s := by
+   unfold completedLSym
+-  rw [logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2)) (g := completedLFunction χ) s
++  erw [logDeriv_mul (f := fun s : ℂ => (q : ℂ) ^ (s / 2)) (g := completedLFunction χ) s
+     (qpow_ne_zero s) hΛ (differentiable_qpow s) (differentiable_completedLFunction hχ1 s), logDeriv_qpow]
+ 
+ /-- **Functional equation for Λ_sym**: Λ_sym(1−w,χ) = W(χ)·Λ_sym(w,χ⁻¹). -/
+@@ -165,7 +165,7 @@
+   have e1 : logDeriv (completedLSym χ) s
+       = logDeriv (fun z => ((q : ℂ) ^ (z / 2) * gammaFactor χ z) * χ.LFunction z) s := by
+     simp only [logDeriv_apply, hev.deriv_eq, hev.eq_of_nhds]
+-  rw [e1, logDeriv_mul (f := fun z => (q : ℂ) ^ (z / 2) * gammaFactor χ z) (g := χ.LFunction) s
++  erw [e1, logDeriv_mul (f := fun z => (q : ℂ) ^ (z / 2) * gammaFactor χ z) (g := χ.LFunction) s
+     hAne hL hA ((differentiable_LFunction hχ1) s), add_comm]
+ 
+ /-! ## The count -/
+--- a/Zeta23/ThmE/IntMuChi.lean
++++ b/Zeta23/ThmE/IntMuChi.lean
+@@ -52,7 +52,7 @@
+     refine ContinuousOn.mul continuousOn_const ?_
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((Real.continuousAt_log (by positivity)).comp
++    exact ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 from ne_of_gt (by positivity))).comp (f := fun t : ℝ => t / (2 * Real.pi))
+       (continuousAt_id.div_const _)).continuousWithinAt
+   have hsplit : (∫ τ in T..(2 * T), g τ)
+       = (∫ τ in T..(2 * T), (1 / (2 * Real.pi)) * Real.log (τ / (2 * Real.pi)))
+@@ -235,7 +235,7 @@
+     rw [Set.uIcc_of_le (by linarith)]
+     intro τ hτ
+     have hτ0 : (0 : ℝ) < τ := lt_of_lt_of_le hT0 hτ.1
+-    exact ((continuousAt_const.mul ((Real.continuousAt_log (by positivity)).comp
++    exact ((continuousAt_const.mul ((Real.continuousAt_log (show τ / (2 * Real.pi) ≠ 0 from ne_of_gt (by positivity))).comp (f := fun t : ℝ => t / (2 * Real.pi))
+       (continuousAt_id.div_const _))).pow 2).continuousWithinAt
+   have hCtau2 : IntervalIntegrable
+       (fun τ : ℝ => C / τ ^ 2 * (2 * ((L + m) / (2 * Real.pi)) + C)) volume T (2 * T) := by
