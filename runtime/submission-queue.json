@@ -1,27 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-031b9d37-8877-4893-a439-84d1b5845d66",
-    "jobId": "031b9d37-8877-4893-a439-84d1b5845d66",
-    "proofDigest": "895c19f2be7947862e3d5070502856519c02c169c103d670f65b76ece48336ed",
-    "ownerKey": "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78",
-    "submissionKey": "5289155a49c49d8a903275c368045e8779bc67b689573f3793b2b6071257deb4",
-    "enqueuedAt": "2026-11-26T21:39:21.857Z",
-    "boat": {
-      "setupLease": 1795729165332,
-      "retryAt": 1795729264752,
-      "assignedAt": 1795729174752,
-      "stagedAt": 1795729179642,
-      "baseCommitSha": "8fe8b05bfc83783294a083196f039aaf69159f8b",
-      "previousRecordId": "knausgard-rh-reflected-kernel-8542",
-      "issuedAt": 1795729161857,
-      "startedAt": 1795729165332,
-      "workerId": "bx_w566646q",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "031b9d37-8877-4893-a439-84d1b5845d66",
+      "proofDigest": "895c19f2be7947862e3d5070502856519c02c169c103d670f65b76ece48336ed",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+      "feedback": {
+        "code": "verification-timeout",
+        "stage": "runtime",
+        "title": "Verification timed out",
+        "detail": "The checker reached its runtime limit before Lean and both kernels completed. No accepted mathematical verdict was produced.",
+        "action": "Reduce elaboration cost, replace expensive tactics with smaller explicit lemmas, and test the source locally before submitting again.",
+        "retryable": false
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-26T23:18:47.310Z",
+      "logArchived": true
+    },
     {
       "jobId": "a773e46d-bafa-46ac-aa21-a57aba443697",
       "proofDigest": "ca9ed96c4054ab5fb2eb2d97ad817d8e3bf4e202c62cba3f7a49f9f7d796f1d7",
