@@ -35,4 +35,14 @@ jobs:
                               if re.fullmatch(r"[0-9TZ:-]+\t[a-z-]+\t(start|exit=\d+)",line):print(line)
                   except urllib.error.HTTPError as e:
                       print(name, e.code)
+              try:
+                  req=urllib.request.Request(base+endpoint+"/files?path=riemann-proof.log&encoding=utf8", headers=headers)
+                  with urllib.request.urlopen(req,timeout=20) as prooflog:
+                      data=prooflog.read(4_000_000)
+                  for marker in ("Compiling the submitted source", "Linking the compact proof",
+                                 "Comparing both interval statements", "Matched target declarations",
+                                 "Checked 216945 declarations", "Lean default kernel accepts"):
+                      if marker.encode() in data: print("observed-stage",marker)
+              except urllib.error.HTTPError as e:
+                  print("proof stages",e.code)
           PY
