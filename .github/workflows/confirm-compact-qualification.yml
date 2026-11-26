@@ -1,0 +1,78 @@
+name: Confirm the completed compact qualification
+on:
+  push:
+    tags: ['compact-qualification-receipt-*']
+permissions:
+  actions: read
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Confirm the published proof identity and worker shutdown without starting a VM
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          set -euo pipefail
+          gh run view 45769660518 --repo "$GITHUB_REPOSITORY" --json headSha,conclusion > original-run.json
+          gh run view 45769660518 --repo "$GITHUB_REPOSITORY" --log-failed > original.log
+          python3 - <<'PY'
+          import ast, datetime, json, os, pathlib, re, urllib.request, urllib.error
+          worker="bx_zxh2m9bt"
+          sha="cf0723dcf839c626c26dff50aaf0ce9c434042fb"
+          r=json.loads(pathlib.Path("original-run.json").read_text())
+          assert r=={"headSha":sha,"conclusion":"failure"}
+          logs=pathlib.Path("original.log").read_text()
+          assert "Qualification worker "+worker in logs and 'if api(endpoint)["sandbox"]["state"]' in logs and 'HTTP Error 404' in logs
+          match=re.search(r"([0-9TZ:.\-]+) Verified (\{[^\n]+\})",logs)
+          verified,receipt=match.group(1),ast.literal_eval(match.group(2))
+          evidence=json.load(urllib.request.urlopen("https://github.com/josusanmartin/riemann/releases/download/compact-rh-854225-v1/exact-source-replay.json",timeout=25))
+          assert receipt["policyVersion"]==3 and evidence["solutionSha256"]==receipt["solutionSha256"]
+          assert re.fullmatch("[0-9a-f]{64}",receipt["referenceSha256"])
+          meter=re.search(r"Boat reported machine usage in dollars: ([0-9.]+)",logs).group(1)
+          assert 0 < float(meter) <= 0.50
+          def get(path):
+              req=urllib.request.Request("https://boat.dev/api/v1"+path,headers={"Authorization":"Bearer "+os.environ["BOAT_KEY"]})
+              with urllib.request.urlopen(req,timeout=25) as f:return json.load(f)
+          boxes=get("/sandboxes?label=kind%3Dqualification")["sandboxes"]
+          assert not any(b["id"]==worker and b.get("state") not in ("archived","stopped","deleted") for b in boxes)
+          try:
+              state=get("/sandboxes/"+worker)["sandbox"]["state"]
+              assert state in ("archived","stopped","deleted")
+          except urllib.error.HTTPError as e:
+              if e.code!=404:raise
+              state="absent after acknowledged stop"
+          try:
+              u=get("/sandboxes/"+worker+"/usage")
+              assert u["running"] is False
+              settled=u["dollars"]
+          except urllib.error.HTTPError as e:
+              if e.code not in (403,404,409):raise
+              settled=None
+          try:
+              raw=get("/sandboxes/"+worker+"/files?path=canary-attestation.json&encoding=utf8")["content"]
+              original=json.loads(raw)
+              assert original["compactReplay"]==receipt
+              pathlib.Path("boat-worker-attestation.json").write_text(raw)
+          except urllib.error.HTTPError as e:
+              if e.code not in (403,404,409):raise
+          summary={"evidenceKind":"Verified worker verdict recorded by the original qualification controller",
+                   "qualificationRun":"https://github.com/josusanmartin/riemann/actions/runs/45769660518",
+                   "qualifiedRevision":sha,"recordId":evidence["recordId"],"score":evidence["score"],
+                   "sourceSha256":evidence["sourceSha256"],"permittedAxioms":evidence["permittedAxioms"],
+                   "kernels":["lean","nanoda"],"compactReplay":receipt,"verifiedAt":verified,
+                   "worker":{"size":"large","memoryGB":16,"verifierMemoryGiB":12,"state":state,
+                             "meterBeforeStopUSD":meter,"settledMeterUSD":settled},
+                   "originalControllerExit":"The proof passed. A post-stop GET returned 404 and the original CI job exited with an error."}
+          pathlib.Path("boat-qualification-summary.json").write_text(json.dumps(summary,indent=2)+"\n")
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: confirmed-boat-qualification
+          path: |
+            boat-qualification-summary.json
+            boat-worker-attestation.json
+          if-no-files-found: error
