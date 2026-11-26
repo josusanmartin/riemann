@@ -1,25 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-d314ac5f-1fab-43e5-aabd-e4c5daf21bba",
-    "jobId": "d314ac5f-1fab-43e5-aabd-e4c5daf21bba",
-    "proofDigest": "91fb08487a69e43b742d5bd174c8803fbf6ef807bfbd3ec0611052f28c5f7bc1",
-    "ownerKey": "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631",
-    "submissionKey": "d9e527f03f4237d3bbc4f3fde96aa2cfc925ad40e2edff65cffab64978a61506",
-    "enqueuedAt": "2026-11-26T09:52:26.476Z",
-    "boat": {
-      "setupLease": 1795686750259,
-      "retryAt": 1795686843499,
-      "assignedAt": 1795686753499,
-      "baseCommitSha": "d102c8fed2bd6a745cf4da23f2557759995a64a9",
-      "previousRecordId": "knausgard-rh-reflected-kernel-8542",
-      "issuedAt": 1795686746475,
-      "startedAt": 1795686750259,
-      "workerId": "bx_e3g38x4y"
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "d314ac5f-1fab-43e5-aabd-e4c5daf21bba",
+      "proofDigest": "91fb08487a69e43b742d5bd174c8803fbf6ef807bfbd3ec0611052f28c5f7bc1",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Boat declined worker setup.",
+      "feedback": {
+        "code": "verifier-infrastructure",
+        "stage": "infrastructure",
+        "title": "Boat declined worker setup",
+        "detail": "The provider declined a setup request. No proof verdict was recorded.",
+        "action": "Open the recorded setup log for the last available error and share the job ID with the maintainers.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-26T09:52:37.573Z",
+      "logArchived": true
+    },
     {
       "jobId": "880b2c7e-9f6e-4452-9472-665e0c03ad48",
       "proofDigest": "c72b054c6f013a1a445ce53f034c78ede109cf1458d3e2570d340f0f04433a5f",
