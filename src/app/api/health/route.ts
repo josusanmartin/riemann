@@ -1,4 +1,5 @@
-import { boatSelected,boatConfigured } from "@/lib/boat-worker";
+import { deploymentVerifierCommit, e2bTemplatePinMatches } from "@/lib/verifier-identity";
+import { boatSelected, boatConfigured } from "@/lib/boat-worker";
 import { NextResponse } from "next/server";
 import { contract, getCurrentRecord } from "@/lib/records";
 import { getE2BTemplate, isE2BConfigured } from "@/lib/e2b-config";
@@ -30,21 +31,23 @@ export async function GET(): Promise<NextResponse> {
   const submissionQueueConfigured = isSubmissionQueueConfigured();
   const submissionArchiveConfigured = isSubmissionArchiveConfigured();
   const [expectedVerifierTemplateDigest, trustedMaterialAvailable] = await checkTrustedFiles();
-  const verifierTemplateIdentityConfigured = Boolean(
-    expectedVerifierTemplateDigest &&
-    process.env.E2B_TEMPLATE_DIGEST === expectedVerifierTemplateDigest,
-  );
-  const deploymentIdentityConfigured = /^[0-9a-f]{40}$/.test(
-    process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA ?? "",
-  );
+  const isBoat = boatSelected();
+  const sourceCommit = deploymentVerifierCommit();
+  const deploymentIdentityConfigured = sourceCommit !== null;
+  const e2bTemplateIdentityConfigured = e2bTemplatePinMatches(expectedVerifierTemplateDigest);
+  const verifierIdentity = isBoat
+    ? { provider: "boat", pinType: "git-commit", expectedCommit: sourceCommit,
+        configured: Boolean(sourceCommit && expectedVerifierTemplateDigest && trustedMaterialAvailable) }
+    : { provider: "e2b", pinType: "template-digest", expectedDigest: expectedVerifierTemplateDigest,
+        configured: e2bTemplateIdentityConfigured };
   const directSubmissionsConfigured = Boolean(
-    (boatSelected() ? boatConfigured() : e2bConfigured && e2bWebhookConfigured && verifierTemplateIdentityConfigured) && promotionConfigured &&
-    submissionQueueConfigured && trustedMaterialAvailable &&
+    (isBoat ? boatConfigured() : e2bConfigured && e2bWebhookConfigured) && verifierIdentity.configured &&
+    promotionConfigured && submissionQueueConfigured && trustedMaterialAvailable &&
     deploymentIdentityConfigured && process.env.AUTH_SECRET,
   );
   return NextResponse.json({
     status: directSubmissionsConfigured ? "ok" : "degraded",
-    checkScope: boatSelected() ? "configuration-only; the active FIFO job checks its Boat worker before source transfer" : "configuration-only; each upload checks the actual sandbox identity before admission",
+    checkScope: isBoat ? "configuration-only; each Boat job checks its worker identity and checked-out source revision before proof transfer, and its attestation digest before publication" : "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
     verificationPolicyVersion: contract.schemaVersion,
     leanToolchain: contract.trustedUpstream.leanToolchain,
@@ -61,7 +64,10 @@ export async function GET(): Promise<NextResponse> {
     e2bConfigured,
     e2bTemplate: getE2BTemplate(),
     expectedVerifierTemplateDigest,
-    verifierTemplateIdentityConfigured,
+    verifierIdentity,
+    // Backward-compatible active-provider signal for existing monitors.
+    verifierTemplateIdentityConfigured: verifierIdentity.configured,
+    e2bTemplateIdentityConfigured,
     e2bWebhookConfigured,
     promotionConfigured,
     submissionQueueConfigured,

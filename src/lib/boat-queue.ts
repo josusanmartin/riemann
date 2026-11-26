@@ -8,6 +8,8 @@ import { readSubmissionArchive } from "./submission-archive-store";
 import { claimBoatSetup, getActiveVerificationJob, retryBoatAfterOom, updateBoatJob, type QueuedVerificationJob } from "./submission-queue";
 import {
   BoatError,
+  BoatIdentityMismatchError,
+  assertBoatWorkerIdentity,
   activeBoatFlow,
   createBoatWorker,
   findCompetitiveWorker,
@@ -67,6 +69,8 @@ export async function boatMetadata(job: QueuedVerificationJob) {
 class BoatSetupFinished extends Error {}
 
 function setupIssue(error: unknown) {
+  if (error instanceof BoatIdentityMismatchError) return "The worker did not match the pinned job, role or source revision";
+  if (error instanceof Error && error.message === "Boat verifier checkout is still preparing") return "Waiting for the pinned verifier checkout";
   if (error instanceof BoatError && error.status === 402) return "Boat requires payment (HTTP 402)";
   if (error instanceof BoatError && [401, 403].includes(error.status)) return `Boat denied verifier access (HTTP ${error.status})`;
   if (error instanceof BoatError) return `Boat API returned HTTP ${error.status}`;
@@ -108,7 +112,14 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
     // A lost acknowledgement after writing the final ready marker must not
     // turn a staged, potentially running proof into a setup failure.
     const ready = await readBoatFile(b.workerId, "riemann-incoming/ready", 10_000).catch(() => null);
-    if (ready === current.proofDigest) return updateBoatJob(job.jobId, lease, { uploaded: true, setupIssue: undefined });
+    if (ready === current.proofDigest) {
+      try {
+        await assertBoatWorkerIdentity(b.workerId, { jobId: job.jobId, kind: "competitive", sha: b.baseCommitSha });
+      } catch (error) {
+        return finishSetupFailure(current, "Boat worker identity mismatch.", setupIssue(error));
+      }
+      return updateBoatJob(job.jobId, lease, { uploaded: true, setupIssue: undefined });
+    }
     return finishSetupFailure(current, "Boat proof upload timed out.");
   }
   let operation = "Check worker allocation";
@@ -135,13 +146,15 @@ export async function ensureBoatWorker(job: QueuedVerificationJob) {
     operation = "Read archived proof";
     const entry = await archived(current);
     operation = "Transfer proof files";
-    await stageBoatFiles(b.workerId!, entry.payload.manifest, entry.payload.solution, job.proofDigest, {
+    await stageBoatFiles(b.workerId!, entry.payload.manifest, entry.payload.solution, job.proofDigest,
+      { jobId: job.jobId, kind: "competitive", sha: b.baseCommitSha }, {
       jobId: job.jobId,
       token: boatCompletionToken(job.jobId, job.proofDigest, process.env.AUTH_SECRET ?? ""),
     });
     operation = "Confirm proof transfer";
     return await updateBoatJob(job.jobId, lease, { uploaded: true, stagedAt: Date.now(), setupIssue: undefined, lastProviderStatus: undefined });
   } catch (error) {
+    if (error instanceof BoatIdentityMismatchError) return finishSetupFailure(current, "Boat worker identity mismatch.", "The worker did not match the pinned job, role or source revision.");
     const issue = `${operation}: ${setupIssue(error)}`;
     const permanent = error instanceof BoatError && [400, 401, 402, 403, 422].includes(error.status);
     if (permanent) return finishSetupFailure(current, "Boat declined worker setup.", issue);

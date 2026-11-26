@@ -15,7 +15,7 @@ const m = vi.hoisted(() => ({
   stop: vi.fn(),
   advance: vi.fn(),
   promote: vi.fn(),
-  flow: vi.fn(), read: vi.fn(),
+  flow: vi.fn(), read: vi.fn(), identity: vi.fn(),
 }));
 vi.mock("node:timers/promises", () => ({ setTimeout: m.wait }));
 vi.mock("next/server", () => ({ after: m.after }));
@@ -24,6 +24,8 @@ vi.mock("./submission-archive-store", () => ({
   readSubmissionArchive: m.archive,
 }));
 vi.mock("./boat-worker", () => ({
+  BoatIdentityMismatchError: class extends Error {},
+  assertBoatWorkerIdentity: m.identity,
   BoatError: class extends Error { constructor(readonly status: number, readonly code: string) { super(code); } },
   findCompetitiveWorker: m.find,
   readBoatFile: m.read,
@@ -91,6 +93,7 @@ describe("competitive Boat queue", () => {
       manifest,
       solution,
       proofDigest,
+      { jobId: job.jobId, kind: "competitive", sha: "a".repeat(40) },
       { jobId: job.jobId, token: expect.stringMatching(/^[0-9a-f]{64}$/) },
     );
     expect(job.boat?.uploaded).toBe(true);
@@ -150,6 +153,7 @@ describe("competitive Boat queue", () => {
     Object.assign(job.boat!, { startedAt: Date.now() - 181_000, assignedAt: Date.now() - 179_000, workerId: id });
     m.read.mockResolvedValue(proofDigest);
     expect((await ensureBoatWorker(job)).boat?.uploaded).toBe(true);
+    expect(m.identity).toHaveBeenCalledWith(id, { jobId: job.jobId, kind: "competitive", sha: job.boat!.baseCommitSha });
     expect(m.advance).not.toHaveBeenCalled();
     expect(m.create).not.toHaveBeenCalled();
   });

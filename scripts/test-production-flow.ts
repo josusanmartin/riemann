@@ -81,8 +81,9 @@ const negativeControlScore = currentRational
   }
   : { numerator: "672500704", denominator: "1000000000" };
 const health = await request("/api/health");
-if (!health.verifierTemplateIdentityConfigured) {
-  throw new Error("The matching verifier image has not been pinned; do not consume a submission slot");
+const identity = health.verifierIdentity as { configured?: boolean } | undefined;
+if (health.directSubmissionsConfigured !== true || identity?.configured !== true) {
+  throw new Error("The active verifier is not ready with its identity pin; do not consume a submission slot");
 }
 const output = await mkdtemp(join(tmpdir(), "riemann-production-e2e-"));
 console.log(`Private test receipts: ${output}`);

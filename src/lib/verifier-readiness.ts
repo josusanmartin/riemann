@@ -1,4 +1,5 @@
 import type { Sandbox } from "e2b";
+import { e2bTemplatePinMatches } from "./verifier-identity";
 import { contract } from "./records";
 import { computeVerifierTemplateDigest, verifierTemplateTrustedPaths } from "../../scripts/trusted-material";
 
@@ -51,5 +52,5 @@ export async function inspectVerifierReadiness(sandbox: Pick<Sandbox, "commands"
 
 export async function assertVerifierReady(sandbox: Pick<Sandbox, "commands">) {
   const readiness = await inspectVerifierReadiness(sandbox);
-  if (!readiness.matches) throw new VerifierTemplateMismatchError();
+  if (!readiness.matches || !e2bTemplatePinMatches(readiness.expected)) throw new VerifierTemplateMismatchError();
 }

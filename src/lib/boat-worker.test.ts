@@ -32,7 +32,8 @@ it("uses one idempotency key per reserved job and isolates account data", async 
     environment: "riemann-production",
     ttlSeconds: 7200,
   });
-  expect(JSON.parse(init.body).setupScript).toContain(sha);
+  expect(JSON.parse(init.body).labels).toMatchObject({ job, kind: "competitive", revision: sha });
+  expect(JSON.parse(init.body).setupScript).toContain('test "$actual" = ' + sha);
 });
 
 it("validates the commit before issuing a provider request", async () => {
@@ -49,14 +50,15 @@ it("publishes the ready marker only after both files have been uploaded", async 
         environment: "riemann-production",
         holdsCreatorLogins: false,
         snapshots: false,
-        labels: { service: "riemann" },
+        labels: { service: "riemann", job, kind: "competitive", revision: sha },
       },
     }),
   );
-  await stageBoatFiles(box, "manifest", "solution", digest);
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, content: sha + "\n" }));
+  await stageBoatFiles(box, "manifest", "solution", digest, { jobId: job, kind: "competitive", sha });
   expect(
     mockedFetch.mock.calls
-      .slice(1)
+      .slice(2)
       .map(([, init]) => JSON.parse(init.body).path),
   ).toEqual([
     "riemann-incoming/manifest",
@@ -89,7 +91,7 @@ it("does not transfer sources if the workspace received creator logins", async (
     }),
   );
   await expect(
-    stageBoatFiles(box, "manifest", "solution", digest),
+    stageBoatFiles(box, "manifest", "solution", digest, { jobId: job, kind: "competitive", sha }),
   ).rejects.toThrow("isolation");
   expect(mockedFetch).toHaveBeenCalledTimes(1);
 });
@@ -109,4 +111,15 @@ it("retains fixed supervisor stages on failure without disclosing raw bootstrap 
   const result = await boatResult(box, Date.now() + 10000, "test", digest);
   expect(result?.log).toContain("wait-zeta-runtime  exit=1");
   expect(result?.log).not.toContain("private");
+});
+
+it.each(["job", "kind", "revision", "checkout", "legacy-checkout"])("refuses to transfer source on a %s mismatch", async field => {
+  const labels: Record<string, string> = { service: "riemann", job, kind: "competitive", revision: sha };
+  if (field === "legacy-checkout") delete labels.revision;
+  else if (field !== "checkout") labels[field] = "different";
+  mockedFetch.mockResolvedValueOnce(Response.json({ ok: true, sandbox: {
+    environment: "riemann-production", holdsCreatorLogins: false, snapshots: false, labels,
+  } })).mockResolvedValueOnce(Response.json({ ok: true, content: "e".repeat(40) }));
+  await expect(stageBoatFiles(box, "manifest", "solution", digest, { jobId: job, kind: "competitive", sha })).rejects.toThrow("identity");
+  expect(mockedFetch.mock.calls.some(([, init]) => init.method === "PUT")).toBe(false);
 });

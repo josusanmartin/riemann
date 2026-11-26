@@ -1,3 +1,4 @@
+import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { timingSafeEqual } from "node:crypto";
 import { submissionSchema } from "@/lib/challenge";
 import { computeDirectProofDigest } from "@/lib/direct-submission";
@@ -61,9 +62,8 @@ export async function POST(request: Request): Promise<Response> {
     if (proofDigest !== active.proofDigest) {
       throw new Error("The recovered source does not match its immutable digest");
     }
-    const baseCommitSha =
-      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA;
-    if (!baseCommitSha || !/^[0-9a-f]{40}$/.test(baseCommitSha)) {
+    const baseCommitSha = deploymentVerifierCommit();
+    if (!baseCommitSha) {
       throw new Error("The recovery deployment has no immutable Git identity");
     }
 

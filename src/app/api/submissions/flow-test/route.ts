@@ -1,3 +1,4 @@
+import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected,boatConfigured,activeBoatFlow,startBoatFlow,stopBoatWorker,flowWorkerId } from "@/lib/boat-worker";
 import { ZodError } from "zod";
@@ -70,9 +71,8 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
-    const baseCommitSha =
-      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.RIEMANN_BASE_COMMIT_SHA;
-    if (!baseCommitSha || !/^[0-9a-f]{40}$/.test(baseCommitSha)) {
+    const baseCommitSha = deploymentVerifierCommit();
+    if (!baseCommitSha) {
       return noStore(503, {
         error: "deployment_identity_unavailable",
         message: "The flow test cannot bind this run to an immutable deployment.",

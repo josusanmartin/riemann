@@ -17,6 +17,11 @@ export const workerLifetime = 2 * 60 * 60 * 1000;
 const commit = z.string().regex(/^[0-9a-f]{40}$/);
 const digest = z.string().regex(/^[0-9a-f]{64}$/);
 
+export class BoatIdentityMismatchError extends Error {
+  constructor() { super("Boat worker identity does not match the admitted job"); }
+}
+type WorkerPin = { jobId: string; kind: "flow" | "competitive"; sha: string };
+
 export class BoatError extends Error {
   constructor(
     readonly status: number,
@@ -75,6 +80,10 @@ cd "$HOME"
 git init -q riemann-site
 git -C riemann-site fetch --quiet --depth=1 https://github.com/josusanmartin/riemann.git ${sha}
 git -C riemann-site checkout --quiet --detach FETCH_HEAD
+actual=$(git -C riemann-site rev-parse HEAD)
+test "$actual" = ${sha}
+printf '%s\\n' "$actual" > "$HOME/riemann-source-revision.tmp"
+mv "$HOME/riemann-source-revision.tmp" "$HOME/riemann-source-revision"
 exec bash riemann-site/boat/verify-job.sh ${proofDigest} ${kind} ${highMemory ? "28G" : "12G"}`;
   const data = await api(
     "/sandboxes",
@@ -89,7 +98,7 @@ exec bash riemann-site/boat/verify-job.sh ${proofDigest} ${kind} ${highMemory ? 
       snapshots: false,
       monitoring: false,
       ttlSeconds: workerLifetime / 1000,
-      labels: { service: "riemann", kind, job: jobId },
+      labels: { service: "riemann", kind, job: jobId, revision: sha },
       setupScript,
     },
     jobId,
@@ -125,13 +134,9 @@ export async function stopBoatWorker(id: string) {
   }
 }
 
-export async function stageBoatFiles(
-  id: string,
-  manifest: string,
-  solution: string,
-  proofDigest: string,
-  notification?: { jobId: string; token: string },
-) {
+export async function assertBoatWorkerIdentity(id: string, pin: WorkerPin) {
+  commit.parse(pin.sha);
+  z.string().uuid().parse(pin.jobId);
   const worker = `/sandboxes/${workerId.parse(id)}`;
   const info = (await api(worker, "GET", undefined, undefined, 15_000)).sandbox;
   if (
@@ -142,6 +147,40 @@ export async function stageBoatFiles(
   ) {
     throw new Error("Boat worker isolation check failed");
   }
+  if (info.labels.job !== pin.jobId || info.labels.kind !== pin.kind ||
+      (info.labels.revision !== undefined && info.labels.revision !== pin.sha)) throw new BoatIdentityMismatchError();
+
+  // Older in-flight workers predate the explicit marker. Their detached HEAD
+  // proves the same commit. A matching provider label alone is insufficient.
+  const legacy = info.labels.revision === undefined;
+  const marker = legacy ? "riemann-site/.git/HEAD" : "riemann-source-revision";
+  const deadline = Date.now() + (pin.kind === "flow" ? 90_000 : 0);
+  for (;;) {
+    let revision: string | undefined;
+    try { revision = (await readBoatFile(id, marker, 5_000)).trim(); }
+    catch (error) {
+      const pending = error instanceof BoatError && (error.status === 404 ||
+        ([400, 409].includes(error.status) && ["not_found", "file_not_found", "ENOENT"].includes(error.code)));
+      if (!pending) throw error;
+    }
+    if (revision === pin.sha) break;
+    if (revision !== undefined && !(legacy && /^ref: refs\/heads\//.test(revision))) throw new BoatIdentityMismatchError();
+    if (Date.now() >= deadline) throw new Error("Boat verifier checkout is still preparing");
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
+
+export async function stageBoatFiles(
+  id: string,
+  manifest: string,
+  solution: string,
+  proofDigest: string,
+  pin: WorkerPin,
+  notification?: { jobId: string; token: string },
+) {
+  if (notification && notification.jobId !== pin.jobId) throw new BoatIdentityMismatchError();
+  await assertBoatWorkerIdentity(id, pin);
+  const worker = `/sandboxes/${workerId.parse(id)}`;
   const path = `${worker}/files`;
   for (const [file, content] of [
     ["manifest", manifest],
@@ -258,7 +297,7 @@ export async function startBoatFlow(
     "flow",
   );
   try {
-    await stageBoatFiles(id, input.manifest, input.solution, input.proofDigest);
+    await stageBoatFiles(id, input.manifest, input.solution, input.proofDigest, { jobId, kind: "flow", sha: input.baseCommitSha });
   } catch (error) {
     await stopBoatWorker(id).catch(() => undefined);
     throw error;

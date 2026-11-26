@@ -107,6 +107,14 @@ export function describeVerifierRejection(
   const diagnostic = `${fallbackMessage}\n${log}`.toLowerCase();
   const location = candidateLocation(log);
 
+  if (fallbackMessage === "Boat worker identity mismatch.") {
+    return feedback({
+      code: "verifier-infrastructure", stage: "infrastructure", title: "Worker identity mismatch",
+      detail: "The worker identity or source revision differed from the admitted job. Verification stopped before proof transfer.",
+      action: "Share the job ID with the maintainers so they can check the worker configuration.",
+      retryable: true,
+    });
+  }
   if (["Boat worker allocation timed out.", "Boat proof upload timed out.", "Boat declined worker setup."].includes(fallbackMessage)) {
     return feedback({
       code: "verifier-infrastructure", stage: "infrastructure", title: fallbackMessage.slice(0, -1),
