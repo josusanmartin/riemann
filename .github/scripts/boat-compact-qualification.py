@@ -89,7 +89,14 @@ try:
         raise TimeoutError("Boat qualification reached its time limit")
 finally:
     try:
+        try:
+            journal = api(endpoint + "/files?path=riemann-stages.tsv&encoding=utf8")["content"]
+            Path("canary-stages.tsv").write_text(journal[:8192])
+        except (KeyError, urllib.error.HTTPError):
+            pass
         usage = api(endpoint + "/usage")
+        fields = ("sandboxType", "since", "until", "seconds", "secondsPerDollar", "billingMultiplier", "dollars", "running")
+        Path("canary-usage.json").write_text(json.dumps({k: usage.get(k) for k in fields}, indent=2) + "\n")
         print("Boat reported machine usage in dollars:", usage.get("dollars"), flush=True)
     except urllib.error.HTTPError as error:
         if error.code not in (403, 404):
