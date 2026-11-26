@@ -1,27 +1,31 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-e23e39bc-52e6-4e52-9ad9-51b6831c0e95",
-    "jobId": "e23e39bc-52e6-4e52-9ad9-51b6831c0e95",
-    "proofDigest": "97f7244bb771e0fdde25251a66f9729d52bc59a298989c1b36a5e3350ffb65b8",
-    "ownerKey": "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631",
-    "submissionKey": "8d8973d4d19d1a6cda7f8fd86dcb50fc93b5fd1a6a44c4420e4d90b2f6a26289",
-    "enqueuedAt": "2026-11-26T03:28:11.835Z",
-    "boat": {
-      "setupLease": 1795663695716,
-      "retryAt": 1795663789541,
-      "assignedAt": 1795663699541,
-      "stagedAt": 1795663704346,
-      "baseCommitSha": "98943e09e9c54e0dca6fa5cee77167166e659be2",
-      "previousRecordId": "knausgard-rh-reflected-kernel-8542",
-      "issuedAt": 1795663691827,
-      "startedAt": 1795663695716,
-      "workerId": "bx_7j97fw44",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "e23e39bc-52e6-4e52-9ad9-51b6831c0e95",
+      "proofDigest": "97f7244bb771e0fdde25251a66f9729d52bc59a298989c1b36a5e3350ffb65b8",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false,
+        "location": {
+          "file": "Solution.lean",
+          "line": 18441,
+          "column": 4
+        }
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-26T03:50:54.617Z",
+      "logArchived": true
+    },
     {
       "jobId": "29c32699-9012-4a88-91f1-c7857c5ad012",
       "proofDigest": "ddbfead69878f56c4b73429bd912f5c3030839019d94a729636c95dc924a14df",
