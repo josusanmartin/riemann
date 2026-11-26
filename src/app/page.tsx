@@ -33,7 +33,7 @@ node public/cli/riemann.mjs submit Solution.lean --metadata candidate.json --dry
           <div className="hero-content">
             <div className="status-pill"><span className="pulse-dot" /> Open for submissions <span>·</span> Verified in Lean</div>
             <h1>How many zeros are <em>distinct</em> and on the critical line?</h1>
-            <p className="hero-lede">This site ranks verified lower bounds for distinct critical-line zeros. The current rules accept Alpöge’s published RH theorem as a foundation. Lean and nanoda check each submitted deduction.</p>
+            <p className="hero-lede">This site ranks verified lower bounds for distinct critical-line zeros. The verifier links the compact proof of the Riemann hypothesis. Lean and nanoda check it together with each submission.</p>
             <div className="hero-actions">
               <Link className="button button-lime" href="/submit">Submit a result <ArrowRight size={17} /></Link>
               <a className="button button-ghost-light" href={repositoryUrl} target="_blank" rel="noreferrer"><Github size={17} /> View source</a>

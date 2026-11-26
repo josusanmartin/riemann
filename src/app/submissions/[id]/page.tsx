@@ -30,7 +30,7 @@ export async function generateMetadata({
   const description = `${record.author} · ${status}. ${record.method}`;
   const url = `/submissions/${record.id}`;
   const image = {
-    url: `${url}/share-image?v=${compactCertificateUrl(record) ? 3 : 2}`,
+    url: `${url}/share-image?v=${compactCertificateUrl(record) ? 4 : 3}`,
     width: 1200,
     height: 630,
     alt: `${title} · ${record.author}`,

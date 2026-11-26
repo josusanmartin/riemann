@@ -10,7 +10,7 @@ Before submitting:
 1. Keep all three theorem names and statements exactly as written.
 2. Replace every sorry with a complete proof. Any remaining sorry is rejected.
 3. Put any helper declarations and additional imports in this same file.
-4. The provided riemannHypothesis proves the pinned RH premise under the leaderboard foundation policy. Use only the published allowlist.
+4. You may use riemannHypothesis. The verifier links its compact proof before both kernels replay the certificate.
 
 Rate limit: five admitted uploads per GitHub account per UTC calendar day,
 resetting at 00:00 UTC. Once an upload enters the verification queue, it uses

@@ -2,6 +2,7 @@ import { compactCertificateUrl } from "@/lib/compact-replay";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, BookOpen, UploadCloud, UserCheck } from "lucide-react";
+import { displayRecordTitle } from "@/lib/record-times";
 import { getRecords } from "@/lib/records";
 import { truncateDecimalString } from "@/components/format";
 
@@ -30,7 +31,7 @@ export default function SubmissionsIndexPage() {
               <Link href={`/submissions/${record.id}`} className="submissions-item">
                 <span className="submissions-year">{record.date.slice(0, 4)}</span>
                 <span className="submissions-main">
-                  <strong>{record.title}</strong>
+                  <strong>{displayRecordTitle(record)}</strong>
                   <small>{record.author} · {record.method}</small>
                 </span>
                 <span className="submissions-score">

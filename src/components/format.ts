@@ -7,5 +7,6 @@ export function truncateDecimalString(value: string, places: number): string {
   const dot = value.indexOf(".");
   if (dot === -1) return value;
   if (places <= 0) return value.slice(0, dot);
-  return value.slice(0, dot + 1 + places);
+  const fraction = value.slice(dot + 1).replace(/0+$/, "").slice(0, places);
+  return fraction ? value.slice(0, dot + 1) + fraction : value.slice(0, dot);
 }
