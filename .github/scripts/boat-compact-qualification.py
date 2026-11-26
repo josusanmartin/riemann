@@ -91,6 +91,10 @@ finally:
     try:
         usage = api(endpoint + "/usage")
         print("Boat reported machine usage in dollars:", usage.get("dollars"), flush=True)
+    except urllib.error.HTTPError as error:
+        if error.code not in (403, 404):
+            raise
+        print("Usage is unavailable to the scoped key. The two-hour worker TTL applies.", flush=True)
     finally:
         try:
             api(endpoint + "/stop", "POST", {})
