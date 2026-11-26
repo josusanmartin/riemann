@@ -3,24 +3,17 @@ import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatSelected,boatConfigured,activeBoatFlow,startBoatFlow,stopBoatWorker,flowWorkerId } from "@/lib/boat-worker";
 import { ZodError } from "zod";
-import { VerifierTemplateMismatchError } from "@/lib/verifier-readiness";
 import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import { getSession } from "@/auth";
 import {
-  hasActiveE2BFlowTest,
-  startE2BFlowTest,
-} from "@/lib/e2b-flow-test";
-import { hasActiveE2BJob, killE2BSandbox } from "@/lib/e2b-verifier";
-import {
   FLOW_TEST_BASELINE_ID,
-  flowTestRecord,
   isFlowTestOperator,
 } from "@/lib/flow-test";
 import { prepareFlowTestSubmission } from "@/lib/flow-test-server";
 import { signSubmissionJob } from "@/lib/submission-jobs";
 import { getActiveVerificationJob } from "@/lib/submission-queue";
 
-function stopFlow(handle:string) { return handle.startsWith("boat-") ? stopBoatWorker(flowWorkerId(handle)) : killE2BSandbox(handle); }
+function stopFlow(handle: string) { return stopBoatWorker(flowWorkerId(handle)); }
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -58,12 +51,11 @@ export async function POST(request: Request): Promise<Response> {
 
   let startedSandboxId: string | undefined;
   try {
-    const [competitiveJob, flowTestActive, ownerJobActive] = await Promise.all([
+    const [competitiveJob, flowTestActive] = await Promise.all([
       getActiveVerificationJob(),
-      boatSelected() ? activeBoatFlow() : hasActiveE2BFlowTest(),
-      boatSelected() ? false : hasActiveE2BJob(github),
+      activeBoatFlow(),
     ]);
-    if (competitiveJob || flowTestActive || ownerJobActive) {
+    if (competitiveJob || flowTestActive) {
       return noStore(409, {
         error: "verifier_busy",
         message:
@@ -93,14 +85,7 @@ export async function POST(request: Request): Promise<Response> {
       session.user.name ?? github,
       issuedAt,
     );
-    const start = boatSelected() ? startBoatFlow : startE2BFlowTest;
-    const job = await start({
-      ...prepared,
-      recordsSnapshot: `${JSON.stringify([flowTestRecord], null, 2)}\n`,
-      baseCommitSha,
-      previousRecordId: FLOW_TEST_BASELINE_ID,
-      issuedAt,
-    });
+    const job = await startBoatFlow({ ...prepared, baseCommitSha });
     startedSandboxId = job.sandboxId;
     const competitiveJobAfterStart = await getActiveVerificationJob();
     if (competitiveJobAfterStart) {
@@ -139,9 +124,6 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     if (startedSandboxId) {
       await stopFlow(startedSandboxId).catch(() => undefined);
-    }
-    if (error instanceof VerifierTemplateMismatchError) {
-      return noStore(503, { error: "verifier_template_stale", message: error.message });
     }
     if (error instanceof RequestBodyTooLargeError) {
       return noStore(413, { error: "submission_too_large", message: error.message });

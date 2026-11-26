@@ -29,6 +29,7 @@ for kind in Challenge Solution; do
     done
   } > prepared/comparator/$kind/Candidate.lean
 done
+chmod -R a+rX,go-w runtime prepared
 bash "$here/run-job.sh" "$PWD/prepared" "$PWD/runtime" "$prefix" 12G "$PWD/pass.json"
 cp prepared/comparator/Solution/Candidate.lean original.lean
 sed -i 's/candidate_critical_line_bound : True := riemannHypothesis/candidate_critical_line_bound : 1 = 1 := rfl/' prepared/comparator/Solution/Candidate.lean
