@@ -35,14 +35,19 @@ export function readReleaseMaterial(bytes: Buffer, revision: string | null, pin:
   };
 }
 
-let loaded: ReturnType<typeof readReleaseMaterial> | undefined;
+let loaded: { revision: string; pin: string; digests: ReturnType<typeof readReleaseMaterial> } | undefined;
 
 export async function publicationDigests(snapshot?: string) {
   if (process.env.VERCEL_ENV === "production" || process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256) {
     try {
-      loaded ??= readReleaseMaterial(await readFile(resolve(process.cwd(), "publication-material.bin")),
-        deploymentVerifierCommit(), process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256);
-      return loaded(snapshot);
+      const revision = deploymentVerifierCommit();
+      const pin = process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256;
+      if (!revision || !pin) throw new Error("Missing release pin");
+      if (loaded?.revision !== revision || loaded.pin !== pin) {
+        const bytes = await readFile(resolve(process.cwd(), "publication-material.bin"));
+        loaded = { revision, pin, digests: readReleaseMaterial(bytes, revision, pin) };
+      }
+      return loaded.digests(snapshot);
     } catch {
       throw new PublicationMaterialUnavailable("The publisher could not load the verifier material pinned to its deployment");
     }
