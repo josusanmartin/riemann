@@ -55,6 +55,7 @@ export async function GET(): Promise<NextResponse> {
     verificationPolicyVersion: contract.schemaVersion,
     nanodaVersion: nanodaRelease.version,
     nanodaSourceCommit: nanodaRelease.revision,
+    nanodaBinarySha256: nanodaRelease.linuxX64Sha256,
     leanToolchain: contract.trustedUpstream.leanToolchain,
     compactRuntimePinned: compactRuntimePinned(),
     permittedAxioms: contract.permittedAxioms,
