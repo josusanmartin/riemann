@@ -11,11 +11,13 @@
       "setupLease": 1795780983013,
       "retryAt": 1795781076719,
       "assignedAt": 1795780986719,
+      "stagedAt": 1795780992747,
       "baseCommitSha": "8fe8b05bfc83783294a083196f039aaf69159f8b",
       "previousRecordId": "knausgard-rh-reflected-kernel-8542",
       "issuedAt": 1795779538229,
       "startedAt": 1795780983013,
-      "workerId": "bx_b3pj4e4g"
+      "workerId": "bx_b3pj4e4g",
+      "uploaded": true
     }
   },
   "pending": [],
