@@ -1,27 +1,31 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-2a4de67f-dac0-4f47-93e4-4dee83406d35",
-    "jobId": "2a4de67f-dac0-4f47-93e4-4dee83406d35",
-    "proofDigest": "21f98ff0719f2ebb3174fd099f3e171d2b623fa33f5d462d361e4cad04094e65",
-    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-    "submissionKey": "435b90b0d540f04e547cbce296c460a31b8d53e534e1617a033b8733e1925bd5",
-    "enqueuedAt": "2026-11-27T08:57:06.554Z",
-    "boat": {
-      "setupLease": 1795769830786,
-      "retryAt": 1795769924076,
-      "assignedAt": 1795769834076,
-      "stagedAt": 1795769839192,
-      "baseCommitSha": "8fe8b05bfc83783294a083196f039aaf69159f8b",
-      "previousRecordId": "knausgard-rh-reflected-kernel-8542",
-      "issuedAt": 1795769826554,
-      "startedAt": 1795769830786,
-      "workerId": "bx_rue6znj8",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "2a4de67f-dac0-4f47-93e4-4dee83406d35",
+      "proofDigest": "21f98ff0719f2ebb3174fd099f3e171d2b623fa33f5d462d361e4cad04094e65",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false,
+        "location": {
+          "file": "Solution.lean",
+          "line": 42,
+          "column": 0
+        }
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-27T09:15:30.746Z",
+      "logArchived": true
+    },
     {
       "jobId": "031b9d37-8877-4893-a439-84d1b5845d66",
       "proofDigest": "895c19f2be7947862e3d5070502856519c02c169c103d670f65b76ece48336ed",
