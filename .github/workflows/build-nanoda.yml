@@ -1,0 +1,64 @@
+name: Build the independent nanoda checker
+on:
+  push:
+    tags: ['nanoda-worker-*']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Build pinned upstream source
+        run: |
+          set -euo pipefail
+          revision=0da9f98feadd3a0a2ef4b3dbcf52a298a6fef929
+          git init -q source
+          git -C source fetch --depth=1 https://github.com/ammkrn/nanoda_lib.git "$revision"
+          git -C source checkout -q --detach FETCH_HEAD
+          test "$(git -C source rev-parse HEAD)" = "$revision"
+          rustup toolchain install 1.97.1 --profile minimal
+          cd source
+          cargo +1.97.1 build --locked --release --bin nanoda_bin
+          mkdir ../dist
+          install -m755 target/release/nanoda_bin ../dist/nanoda_bin-linux-x86_64
+          cp LICENSE ../dist/LICENSE
+          cd ../dist
+          ./nanoda_bin-linux-x86_64 --help > help.txt
+          test "$(head -1 help.txt)" = 'nanoda_bin 0.4.32'
+          sha256sum nanoda_bin-linux-x86_64 > SHA256SUMS
+      - name: Replay the archived 85.4225% solution with the three-axiom policy
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 https://github.com/josusanmartin/riemann/releases/download/compact-rh-854225-v1/riemann-854225-compact-replay.zip -o replay.zip
+          echo 'bbb6c92e4c08dbe90296e21aa0912febadb70ec388c811ebc8cab57c2598d4ad  replay.zip' | sha256sum -c -
+          unzip -p replay.zip riemann-compact-32gb/exports/solution.ndjson.zst | zstd -dc > solution.ndjson
+          echo 'e4c9866f587abbeb141cc631136b3ae88a2bbf53f83aa3eb02752d1d19ab8c95  solution.ndjson' | sha256sum -c -
+          printf '%s\n' '{"export_file_path":"solution.ndjson","permitted_axioms":["propext","Classical.choice","Quot.sound"],"unpermitted_axiom_hard_error":true,"num_threads":4,"nat_extension":true,"string_extension":true,"pp_to_stdout":true,"print_axioms":true,"print_success_message":true}' > config.json
+          ./dist/nanoda_bin-linux-x86_64 config.json | tee dist/replay.log
+          grep -Fx 'Checked 216944 declarations with no errors' dist/replay.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: nanoda-linux
+          path: |
+            dist/nanoda_bin-linux-x86_64
+            dist/SHA256SUMS
+            dist/LICENSE
+            dist/replay.log
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Publish qualified binary and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" -n nanoda-linux
+          sha256sum -c SHA256SUMS
+          gh release create "$GITHUB_REF_NAME" --verify-tag --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+            --title 'nanoda 0.4.32 for Linux x86-64' --notes 'Source: ammkrn/nanoda_lib at 0da9f98feadd3a0a2ef4b3dbcf52a298a6fef929. Built with Rust 1.97.1 and Cargo.lock.' \
+            nanoda_bin-linux-x86_64 SHA256SUMS LICENSE replay.log
