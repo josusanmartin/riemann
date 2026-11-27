@@ -6,10 +6,10 @@
     {
       "jobId": "6b8d1685-de53-4b1a-b2b5-38c8eb5d1a99",
       "proofDigest": "8d4f6cba97e426531398a92ef28749d0d8f54efd2726c5c2c0851f5f6ec43f40",
-      "outcome": "superseded",
-      "promotionStatus": null,
-      "message": "Verifier template is stale; rebuild the pinned E2B template before accepting submissions",
-      "evidenceUrl": null,
+      "outcome": "promoted",
+      "promotionStatus": "already-promoted",
+      "message": "Publication recovered from the verified Boat receipt for the identical admitted source. The original publisher had a verifier fingerprint mismatch.",
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/73d24928d2f260ef417e6c39d1cad04dacc2df3f/submissions/knausgard-rh-two-prime-855366",
       "completedAt": "2026-11-27T15:47:06.049Z",
       "logArchived": true
     },
@@ -52,10 +52,10 @@
     {
       "jobId": "10efd401-ed27-4c90-91c6-4303c532c300",
       "proofDigest": "8d4f6cba97e426531398a92ef28749d0d8f54efd2726c5c2c0851f5f6ec43f40",
-      "outcome": "superseded",
-      "promotionStatus": null,
-      "message": "Verifier template is stale; rebuild the pinned E2B template before accepting submissions",
-      "evidenceUrl": null,
+      "outcome": "promoted",
+      "promotionStatus": "already-promoted",
+      "message": "Publication recovered from the verified Boat receipt for the identical admitted source. The original publisher had a verifier fingerprint mismatch.",
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/73d24928d2f260ef417e6c39d1cad04dacc2df3f/submissions/knausgard-rh-two-prime-855366",
       "completedAt": "2026-11-27T12:02:55.882Z",
       "logArchived": true
     },
