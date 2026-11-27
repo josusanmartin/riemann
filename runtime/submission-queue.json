@@ -11,11 +11,13 @@
       "setupLease": 1795816580215,
       "retryAt": 1795816673396,
       "assignedAt": 1795816583396,
+      "stagedAt": 1795816589147,
       "baseCommitSha": "6b22d6acb9f5f21043e56c81d75a702d86d4633d",
       "previousRecordId": "knausgard-rh-two-prime-855366",
       "issuedAt": 1795816576951,
       "startedAt": 1795816580215,
-      "workerId": "bx_cunm8epb"
+      "workerId": "bx_cunm8epb",
+      "uploaded": true
     }
   },
   "pending": [],
