@@ -8,19 +8,14 @@
       "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
       "outcome": "rejected",
       "promotionStatus": null,
-      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "message": "Nanoda exhausted its stack while replaying the exported proof. Verification ended before a kernel verdict.",
       "feedback": {
-        "code": "lean-elaboration-failed",
-        "stage": "lean-compilation",
-        "title": "Lean could not elaborate the proof",
-        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
-        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
-        "retryable": false,
-        "location": {
-          "file": "Solution.lean",
-          "line": 70,
-          "column": 0
-        }
+        "code": "nanoda-stack-overflow",
+        "stage": "nanoda-kernel",
+        "title": "Independent checker stack overflow",
+        "detail": "Nanoda exhausted its stack while replaying the exported proof. Verification ended before a kernel verdict.",
+        "action": "Share the job ID with the maintainers so they can check the checker version and arrange a replay.",
+        "retryable": true
       },
       "evidenceUrl": null,
       "completedAt": "2026-11-27T22:50:53.558Z",
