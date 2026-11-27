@@ -31,7 +31,7 @@ def package(revision):
                 raise ValueError(f"Invalid or duplicate trusted file: {name!r}")
             seen.add(name)
             files.append((name, oid))
-    for name, oid in sorted(files):
+    for name, oid in sorted(files, key=lambda item: item[0].decode().encode("utf-16-be")):
         content = git("cat-file", "blob", oid)
         if name == ledger.encode():
             records = content
