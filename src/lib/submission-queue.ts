@@ -44,7 +44,6 @@ const recoveredJobIdsSchema = z
 
 const boatJobSchema = z.object({
   memoryReplayOf: z.string().uuid().optional(),
-  publicationReplayOf: z.string().uuid().optional(),
   setupLease: z.number().int().positive().optional(),
   retryAt: z.number().int().nonnegative().optional(),
   setupIssue: z.string().max(160).optional(),

@@ -184,18 +184,6 @@ describe("competitive Boat queue", () => {
     expect(m.stop).toHaveBeenCalledWith(id);
     expect(m.promote).not.toHaveBeenCalled();
   });
-  it("loads the admitted archive and caps a publication recovery at one standard worker", async () => {
-    const originalId = "2358d6d0-79e1-4645-a0c0-cccce9a374aa";
-    job.boat!.publicationReplayOf = originalId;
-    await ensureBoatWorker(job);
-    expect(m.archive).toHaveBeenCalledWith(originalId);
-    expect(m.create.mock.calls.map(call => call[4])).toEqual([false]);
-    m.result.mockResolvedValue({status:"rejected", submissionId:"candidate", proofDigest, log:"OOM",
-      message:kernelOomMessage, completedAt:new Date().toISOString()});
-    await reconcileBoat(job);
-    expect(m.retry).not.toHaveBeenCalled();
-    expect(m.stop).toHaveBeenCalledWith(id);
-  });
   it("replays only a trusted OOM receipt, once, using the original archive", async () => {
     await ensureBoatWorker(job);
     const original = job;
