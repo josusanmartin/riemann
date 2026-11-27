@@ -1,0 +1,60 @@
+name: Preserve an existing Boat receipt for the reported proof
+on:
+  push:
+    tags: ['capture-reported-proof-20261127']
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Read existing assigned worker and seal the private receipt
+        env:
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,json,os,pathlib,subprocess,time,urllib.request,urllib.error
+          from cryptography.hazmat.primitives import hashes,serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+          worker="bx_uu5qnm4h"; job="6b8d1685-de53-4b1a-b2b5-38c8eb5d1a99"; sha="8fe8b05bfc83783294a083196f039aaf69159f8b"
+          digest="8d4f6cba97e426531398a92ef28749d0d8f54efd2726c5c2c0851f5f6ec43f40"
+          def get(url, token=None):
+              req=urllib.request.Request(url,headers={"Authorization":"Bearer "+token} if token else {})
+              with urllib.request.urlopen(req,timeout=15) as r:return json.load(r)
+          def boat(path):
+              return get("https://boat.dev/api/v1/sandboxes/"+worker+path, os.environ["BOAT_KEY"])
+          def file(name):
+              return boat("/files?path="+name+"&encoding=utf8")["content"]
+          state=get("https://raw.githubusercontent.com/josusanmartin/riemann/automation-queue/runtime/submission-queue.json")["active"]
+          assert state and state["jobId"]==job and state["proofDigest"]==digest and state["boat"]["baseCommitSha"]==sha and state["boat"]["workerId"]==worker
+          labels=boat("")["sandbox"]["labels"]
+          assert labels["job"]==job and labels["revision"]==sha and labels["kind"]=="competitive" and labels["service"]=="riemann"
+          assert file("riemann-source-revision").strip()==sha
+          manifest=file("riemann-incoming/manifest");source=file("riemann-incoming/solution")
+          assert hashlib.sha256(b"submission.json\0"+manifest.encode()+b"proof/Solution.lean\0"+source.encode()).hexdigest()==digest
+          for _ in range(900):
+              try:
+                  result=json.loads(file("riemann-receipt.json"));break
+              except urllib.error.HTTPError as e:
+                  if e.code not in (404,409,429,502,503,504):raise
+              except (TimeoutError,urllib.error.URLError):pass
+              time.sleep(2)
+          else:raise RuntimeError("Receipt not available")
+          assert result["proofDigest"]==digest and result["submissionId"]==json.loads(manifest)["id"]
+          data=json.dumps({"manifest":manifest,"solution":source,"result":result,"baseCommitSha":sha,"previousRecordId":state["boat"]["previousRecordId"],"issuedAt":state["boat"]["issuedAt"],"proofDigest":digest}).encode()
+          key=AESGCM.generate_key(bit_length=256);nonce=os.urandom(12)
+          public=serialization.load_pem_public_key(pathlib.Path(".github/receipt-recovery-public.pem").read_bytes())
+          wrapped=public.encrypt(key,padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),algorithm=hashes.SHA256(),label=None))
+          pathlib.Path("recovery.enc").write_bytes(wrapped+nonce+AESGCM(key).encrypt(nonce,data,job.encode()))
+          print("Original authenticated worker verdict captured:",result["status"])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sealed-recovery
+          path: recovery.enc
+          retention-days: 1
