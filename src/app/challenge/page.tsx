@@ -1,3 +1,4 @@
+import nanodaRelease from "../../../boat/compact/nanoda-release.json";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -146,7 +147,8 @@ export default function ChallengePage() {
           <div><dt>Lean</dt><dd>{contract.trustedUpstream.leanToolchain}</dd></div>
           <div><dt>Accepted RH proof</dt><dd><a href={`https://github.com/${contract.trustedUpstream.rh.repository}/tree/${contract.trustedUpstream.rh.commit}`}>{contract.trustedUpstream.rh.commit.slice(0,12)}</a></dd></div>
           <div><dt>Mathlib</dt><dd>{contract.trustedUpstream.mathlibCommit.slice(0, 12)}</dd></div>
-          <div><dt>Comparator and kernels</dt><dd><a href={`https://github.com/leanprover/lean4/tree/${contract.verifier.leanReleaseCommit}`}>Lean release {contract.verifier.leanReleaseCommit.slice(0, 12)}</a></dd></div>
+          <div><dt>Comparator and Lean kernel</dt><dd><a href={`https://github.com/leanprover/lean4/tree/${contract.verifier.leanReleaseCommit}`}>Lean release {contract.verifier.leanReleaseCommit.slice(0, 12)}</a></dd></div>
+          <div><dt>Independent kernel</dt><dd><a href={`https://github.com/ammkrn/nanoda_lib/tree/${nanodaRelease.revision}`}>nanoda {nanodaRelease.version}</a></dd></div>
         </dl>
         <Link className="text-link" href="/methodology">See the complete trust model <ArrowRight size={16} /></Link>
       </section>

@@ -1,4 +1,5 @@
-import { publicationMismatchMessage } from "./publication-feedback";
+import nanodaRelease from "../../boat/compact/nanoda-release.json";
+import { publicationMismatchMessage, nanodaMismatchMessage } from "./publication-feedback";
 import {
   compareRationals,
   rationalToDecimal,
@@ -33,6 +34,10 @@ export function assertValidAttestation(
   if (contract.schemaVersion === 3 && !attestation.compactReplay) {
     throw new Error("The compact RH policy requires a sealed dual-kernel replay");
   }
+  if (contract.schemaVersion === 3 && (
+    attestation.compactReplay?.nanoda?.version !== nanodaRelease.version ||
+    attestation.compactReplay?.nanoda?.sha256 !== nanodaRelease.linuxX64Sha256
+  )) throw new Error(nanodaMismatchMessage);
   if (attestation.rhFoundationCommit !== contract.trustedUpstream.rh.commit) {
     throw new Error("Attestation used a different RH foundation");
   }

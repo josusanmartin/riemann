@@ -1,3 +1,4 @@
+import nanodaRelease from "../../boat/compact/nanoda-release.json";
 import { describe, expect, it } from "vitest";
 import { validateFlowTestAttestation } from "./flow-test-attestation";
 import { prepareFlowTestSubmission } from "./flow-test-server";
@@ -20,7 +21,7 @@ describe("flow-test publication gate", () => {
         previousRecordId: flowTestRecord.id, upstreamCommit: contract.trustedUpstream.commit,
         theoremNames: [contract.theorems.strictImprovement, contract.theorems.dyadicBound, contract.theorems.cumulativeBound],
         verifiedAt: new Date().toISOString(), kernels: ["lean", "nanoda"], permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
-        compactReplay: { policyVersion: 3, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
+        compactReplay: { policyVersion: 3, nanoda: {version: nanodaRelease.version, sha256: nanodaRelease.linuxX64Sha256}, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
         challengeDigest: await computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths, {
           "data/records.json": `${JSON.stringify([flowTestRecord], null, 2)}\n`,
         }),
@@ -29,6 +30,8 @@ describe("flow-test publication gate", () => {
     };
     await expect(validateFlowTestAttestation(result, prepared)).resolves.toBeUndefined();
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, compactReplay: undefined } }, prepared)).rejects.toThrow("sealed dual-kernel replay");
+    const staleChecker = { ...result.attestation.compactReplay!, nanoda: {version: "0.4.19", sha256: "0".repeat(64)} };
+    await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, compactReplay: staleChecker } }, prepared)).rejects.toThrow("pinned nanoda release");
     await expect(validateFlowTestAttestation(result, { ...prepared, solution: prepared.solution + "\n" })).rejects.toThrow("digest");
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, verifierTemplateDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("verifier fingerprints differ");
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, challengeDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("changed");

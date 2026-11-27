@@ -37,3 +37,9 @@ if bash "$here/run-job.sh" "$PWD/prepared" "$PWD/runtime" "$prefix" 12G "$PWD/wr
 sed 's/candidate_critical_line_bound : True := riemannHypothesis/candidate_critical_line_bound : True := by sorry/' original.lean > prepared/comparator/Solution/Candidate.lean
 if bash "$here/run-job.sh" "$PWD/prepared" "$PWD/runtime" "$prefix" 12G "$PWD/extra.json"; then exit 31; fi
 test -f pass.json && test ! -e wrong.json && test ! -e extra.json
+python3 - "$here/nanoda-release.json" pass.json <<'PY'
+import json, pathlib, sys
+pins, receipt = (json.loads(pathlib.Path(p).read_text()) for p in sys.argv[1:])
+if receipt["nanoda"] != {"version": pins["version"], "sha256": pins["linuxX64Sha256"]}:
+    raise ValueError("Positive control used a different independent checker")
+PY

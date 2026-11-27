@@ -100,3 +100,14 @@ describe("human-readable verifier feedback", () => {
     });
   });
 });
+
+it("identifies a nanoda process abort in retained logs even with an older Lean diagnosis", () => {
+  const earlier = describeVerifierRejection("Solution/Candidate.lean:2:3: error: unknown identifier 'x'", "Failed");
+  const log = "thread '<unnamed>' has overflowed its stack\nfatal runtime error: stack overflow\n" +
+    "/opt/site/boat/compact/check-export.sh: line 29: 123 Aborted (core dumped) nanoda_bin nanoda.json\n" +
+    "2026-11-27T22:50:52Z  check-proof  exit=134";
+  expect(describeVerifierRejection(log, "Failed", earlier)).toMatchObject({
+    code: "nanoda-stack-overflow", stage: "nanoda-kernel",
+  });
+  expect(describeVerifierRejection("stack overflow", "Failed", earlier)).toEqual(earlier);
+});

@@ -112,7 +112,7 @@ chmod 444 "$work"/*.ndjson
 echo 'Comparing both interval statements and replaying the sealed proof with nanoda and Lean.'
 isolated referee "$work" -- /bin/bash "$here/check-export.sh" \
   "$work/reference.ndjson" "$work/solution.ndjson" "$runtime/checker/matchrunner"
-python3 - "$work" "$receipt" <<'PYTHON'
+python3 - "$work" "$receipt" "$here/nanoda-release.json" <<'PYTHON'
 import hashlib, json, pathlib, sys
 work = pathlib.Path(sys.argv[1])
 def digest(name):
@@ -121,7 +121,9 @@ def digest(name):
         while block := file.read(1024 * 1024):
             checksum.update(block)
         return checksum.hexdigest()
+pins = json.loads(pathlib.Path(sys.argv[3]).read_text())
 with open(sys.argv[2], "x") as out:
-    json.dump({"policyVersion": 3, "referenceSha256": digest("reference.ndjson"),
+    json.dump({"policyVersion": 3, "nanoda": {"version": pins["version"], "sha256": pins["linuxX64Sha256"]},
+               "referenceSha256": digest("reference.ndjson"),
                "solutionSha256": digest("solution.ndjson")}, out)
 PYTHON

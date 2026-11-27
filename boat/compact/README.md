@@ -7,3 +7,5 @@ To reproduce the worker on a fresh x86-64 Linux VM with systemd and Node 22, ins
 build-runtime.sh rebuilds the cache from source. The compact GRH project and its Mathlib tree are pinned. zeta35.patch and LinearCombinationPrime.lean port the upstream Zeta23 proof scripts. LegacyFinsetSyntax.lean supplies the previous name for a product inequality. The reference uses the original counting definitions. The match runner calls the statement-comparison and axiom-check routines bundled with the pinned Lean release.
 
 [Compact GRH sources and attribution](https://github.com/lsernau/grh-lean/tree/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact) · [Zeta23 sources](https://github.com/anthropics/formal-math/tree/3635e74826a4c1fcece7d1cd2b6fa75e43a00510) · [Lean release](https://github.com/leanprover/lean4/releases/tag/v4.35.0)
+
+The toolchain installer installs the independent nanoda executable recorded in `nanoda-release.json`. Before each kernel replay the worker checks its SHA-256 and version and prints its upstream revision in the verification log.

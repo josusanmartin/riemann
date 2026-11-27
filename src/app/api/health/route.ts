@@ -1,3 +1,4 @@
+import nanodaRelease from "../../../../boat/compact/nanoda-release.json";
 import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit, e2bTemplatePinMatches } from "@/lib/verifier-identity";
 import { boatSelected, boatConfigured } from "@/lib/boat-worker";
@@ -52,6 +53,9 @@ export async function GET(): Promise<NextResponse> {
     checkScope: isBoat ? "configuration-only; each Boat job checks its worker identity and checked-out source revision before proof transfer, and its attestation digest before publication" : "configuration-only; each upload checks the actual sandbox identity before admission",
     service: "riemann-fail",
     verificationPolicyVersion: contract.schemaVersion,
+    nanodaVersion: nanodaRelease.version,
+    nanodaSourceCommit: nanodaRelease.revision,
+    nanodaBinarySha256: nanodaRelease.linuxX64Sha256,
     leanToolchain: contract.trustedUpstream.leanToolchain,
     compactRuntimePinned: compactRuntimePinned(),
     permittedAxioms: contract.permittedAxioms,

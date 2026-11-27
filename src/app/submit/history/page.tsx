@@ -29,7 +29,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
   const finalLog = detail?.logs.find(log => log.jobId === receipt?.jobId)?.log;
   const excerpt = receipt?.outcome === "rejected" ? privateDiagnostic(finalLog) : undefined;
   const diagnostic = receipt?.outcome === "rejected"
-    ? receipt.feedback ?? describeVerifierRejection(finalLog ?? "", receipt.message ?? "")
+    ? describeVerifierRejection(finalLog ?? "", receipt.message ?? "", receipt.feedback)
     : null;
   return (
     <main id="main-content" className="submission-history">
