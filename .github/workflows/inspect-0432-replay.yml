@@ -1,0 +1,32 @@
+name: Inspect phases of the 0.4.32 replay
+on:
+  push:
+    tags: ['inspect-0432-replay-20261127']
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Inspect only stage markers for the authorized worker
+        env:
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json,os,re,urllib.request,urllib.error
+          base='https://boat.dev/api/v1/sandboxes/bx_m8vg7ssv'
+          def read(path):
+              req=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['BOAT_KEY']})
+              with urllib.request.urlopen(req,timeout=30) as r:return r.read(4_000_000)
+          info=json.loads(read(''))['sandbox']
+          assert info['labels']['job']=='93b7d587-41d4-470e-9e94-6b572307c48e' and info['labels']['service']=='riemann'
+          usage=json.loads(read('/usage'))
+          print('worker meter',usage['sandboxType'],usage['dollars'],usage['until'])
+          stages=json.loads(read('/files?path=riemann-stages.tsv&encoding=utf8'))['content']
+          print('trusted phase journal', [line for line in stages.splitlines() if re.fullmatch(r'[0-9TZ:-]+\t[a-z-]+\t(start|exit=\d+)',line)][-3:])
+          data=read('/files?path=riemann-proof.log&encoding=utf8')
+          for marker in ('Compiling the submitted source','Linking the compact proof of RH','Comparing both interval statements','Matched target declarations','nanoda_bin 0.4.32','Lean default kernel accepts the solution'):
+              if marker.encode() in data:print('observed marker',marker)
+          for n in re.findall(rb'Checked (\d{1,9}) declarations with no errors',data):
+              print('observed nanoda declaration count',n.decode())
+          PY
