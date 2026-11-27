@@ -43,7 +43,7 @@ export function reserveBoatJob(
 }
 
 async function archived(job: QueuedVerificationJob) {
-  const entry = await readSubmissionArchive(job.boat?.memoryReplayOf ?? job.jobId);
+  const entry = await readSubmissionArchive(job.boat?.checkerReplayOf ?? job.boat?.memoryReplayOf ?? job.jobId);
   if (
     !entry ||
     entry.payload.proofDigest !== job.proofDigest ||
@@ -223,7 +223,7 @@ export async function reconcileBoat(job: QueuedVerificationJob, receiptReady = f
   if (
     result.status === "rejected" &&
     result.message === kernelOomMessage &&
-    !active.boat?.memoryReplayOf
+    !active.boat?.memoryReplayOf && !active.boat?.checkerReplayOf
   ) {
     const retry = await retryBoatAfterOom(
       active,

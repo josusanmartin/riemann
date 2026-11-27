@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { z } from "zod";
 import {
   githubLoginSchema,
@@ -44,6 +44,7 @@ const recoveredJobIdsSchema = z
 
 const boatJobSchema = z.object({
   memoryReplayOf: z.string().uuid().optional(),
+  checkerReplayOf: z.string().uuid().optional(),
   setupLease: z.number().int().positive().optional(),
   retryAt: z.number().int().nonnegative().optional(),
   setupIssue: z.string().max(160).optional(),
@@ -450,6 +451,7 @@ export function completeQueueState(
       ? { recoveredJobIds: parsed.active.recoveredJobIds }
       : {}),
     ...(logArchived ? { logArchived: true } : {}),
+    ...(parsed.active.boat?.checkerReplayOf ? { firstAttemptLogId: parsed.active.boat.checkerReplayOf } : {}),
     ...(parsed.active.boat?.retiredWorkerId
       ? { firstAttemptLogId: parsed.active.boat.memoryReplayOf }
       : {}),
@@ -995,6 +997,47 @@ export function retryBoatAfterOom(
       jobId: expected.jobId, proofDigest: expected.proofDigest, completedAt, log,
     }, requiredArchiveKey({}));
     return { ...mutation, files: [{ path: verifierLogPath(expected.jobId), content: JSON.stringify(envelope) + "\n" }] };
+  });
+}
+
+/** Operator-only recovery. The original admission supplies identity and archive coordinates.
+ * The public submission route cannot request this operation or supply these fields.
+ */
+export async function requeueCheckerFailure(admissionRevision: string, originalId: string, release: string, options: QueueOptions) {
+  shaSchema.parse(admissionRevision);
+  shaSchema.parse(release);
+  z.string().uuid().parse(originalId);
+  const client = new QueueGitHubClient(requiredToken(options), options.fetchImplementation ?? fetch);
+  if (await getRef(client, RECORDS_BRANCH) !== release) throw new Error("Deploy the current main revision first");
+  const lineage = z.object({ status: z.enum(["ahead", "identical"]) });
+  lineage.parse(await client.json(repositoryPath(`compare/${admissionRevision}...${SUBMISSION_QUEUE_BRANCH}`)));
+  const historical = await readState(client, admissionRevision);
+  const original = historical.active;
+  if (original?.jobId !== originalId || !original.boat?.uploaded || original.boat.checkerReplayOf || original.boat.memoryReplayOf) {
+    throw new Error("Select the original staged Boat admission");
+  }
+  const incumbent = await readPublishedRecordId(options);
+  if (!incumbent || incumbent !== original.boat.previousRecordId) throw new Error("The incumbent changed since admission");
+  const id = randomUUID();
+  const now = Date.now();
+  return mutateQueue<string>(options, "queue: replay archived proof once after checker upgrade", state => {
+    const prior = state.completed.find(r => r.jobId === originalId);
+    if (prior?.outcome !== "rejected" || prior.feedback?.code !== "nanoda-stack-overflow" || prior.proofDigest !== original.proofDigest) {
+      throw new Error("The archived job must have a confirmed independent-checker stack overflow");
+    }
+    const jobs = state.active ? [state.active, ...state.pending] : state.pending;
+    const existing = [...jobs, ...state.completed].find(entry => entry.recoveredJobIds?.includes(originalId));
+    if (existing) return { state, changed: false, result: existing.jobId };
+    if (jobs.length >= MAX_QUEUED_SUBMISSIONS || jobs.some(job => job.submissionKey === original.submissionKey)) {
+      throw new Error("Queue already contains this submission or is full");
+    }
+    const job = queuedVerificationJobSchema.parse({
+      jobId: id, sandboxId: `boat-${id}`, ownerKey: original.ownerKey, submissionKey: original.submissionKey,
+      proofDigest: original.proofDigest, recoveredJobIds: [originalId], enqueuedAt: new Date(now).toISOString(),
+      boat: { checkerReplayOf: originalId, baseCommitSha: release, previousRecordId: incumbent, issuedAt: now },
+    });
+    const next = state.active ? { ...state, pending: [...state.pending, job] } : { ...state, active: job };
+    return { state: submissionQueueStateSchema.parse(next), changed: true, result: id };
   });
 }
 
