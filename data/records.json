@@ -2007,5 +2007,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. Policy v2 (RH foundation). The reflected certificate of knausgard-rh-reflected-bhb-78 with a new kernel in the explicit formula: the multiplicity bound uses the normalised autocorrelation of Ψ(u) = 1 − (2u/h)²/5 instead of the Fejér kernel, so m(ρ) ≤ w(0) − 2 Re W(ρ) with a degree-5 polynomial weight w. The high prime band, strip and tail of the 85.39 proof are re-proved for this weight; the mollifier (P(v) = 1.78v − 0.78v²), the low band and the short prime sum are unchanged. This yields N_d ≥ (0.854225 − o(1))N on (T, 2T] and (0, T]. The new modules fork modules of knausgard-rh-reflected-bhb-78; the formal 19/27 development comes from knausgard-rh-bui-heath-brown-deg40.",
     "rhFoundationCommit": "2f097b744a6460c73f3e4cc550baa83698409876"
+  },
+  {
+    "id": "knausgard-rh-two-prime-855366",
+    "track": "critical-line",
+    "date": "2026-11-27",
+    "author": "Kristian Muri Knausgård",
+    "github": "kristianmk",
+    "title": "Certified critical-line bound 0.855366277780000000000000000000",
+    "method": "Reflected mixed-moment certificate with the optimised explicit-formula kernel, a two-prime mixed moment and a rational sum-of-squares bound for multiplicities.",
+    "model": "GPT-6.2 Astra and Claude Opus 5.5",
+    "harness": "Codex and Claude",
+    "scoreDecimal": "0.855366277780000000000000000000",
+    "scorePercent": "85.5366277780000000000000000000",
+    "exactRational": {
+      "numerator": "85536627778",
+      "denominator": "100000000000"
+    },
+    "exactExpression": "(85536627778 : ℝ) / 100000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/73d24928d2f260ef417e6c39d1cad04dacc2df3f/submissions/knausgard-rh-two-prime-855366/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/73d24928d2f260ef417e6c39d1cad04dacc2df3f/submissions/knausgard-rh-two-prime-855366/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Contribution by Kristian Muri Knausgård. The proof uses the reflected one-prime moment of knausgard-rh-reflected-bhb-78 (85.39%) and the optimised kernel of knausgard-rh-reflected-kernel-8542 (85.4225%). Let U be the short prime sum and F = ζ′(ρ)B(ρ)/log T the mollified derivative. The new input is the mean of Re(F conj(U²)). The D9 modules prove the two-prime case of Yuanda Xu’s Theorem 5.1 (arXiv:2611.34546) for these weights. A rational sum-of-squares inequality at each zero, averaged using fifteen moment bounds, gives N_d ≥ (0.85536627778 − o(1))N under RH on (T, 2T] and (0, T]. The formal proof of the Bui–Heath-Brown mollified moments comes from knausgard-rh-bui-heath-brown-deg40.",
+    "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
   }
 ]
