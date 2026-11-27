@@ -1,0 +1,27 @@
+name: Check reported worker receipt availability
+on:
+  push:
+    tags: ['receipt-availability-20261127']
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check stored verdict without allocating or resuming a machine
+        env:
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json,os
+          url='https://boat.dev/api/v1/sandboxes/bx_mqard67y'
+          for path in ('','/files?path=riemann-receipt.json&encoding=utf8'):
+              req=urllib.request.Request(url+path,headers={'Authorization':'Bearer '+os.environ['BOAT_KEY']})
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as r:data=json.load(r)
+                  if path:
+                      receipt=json.loads(data['content'])
+                      assert receipt['proofDigest']=='8d4f6cba97e426531398a92ef28749d0d8f54efd2726c5c2c0851f5f6ec43f40'
+                      print('original receipt readable',receipt['status'])
+                  else: print('worker state',data.get('sandbox',{}).get('state'))
+              except urllib.error.HTTPError as e:print('receipt read' if path else 'worker read',e.code)
+          PY
