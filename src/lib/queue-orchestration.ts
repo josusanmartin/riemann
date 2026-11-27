@@ -1,3 +1,4 @@
+import type { RetainedVerifierOutput } from "./submission-archive";
 import { scheduleBoatSetup } from "./boat-queue";
 import {
   launchQueuedE2BVerification,
@@ -123,7 +124,7 @@ async function isSupersededBeforeStart(
 export async function advanceVerificationQueue(
   jobId: string,
   completion: QueueCompletionInput,
-  verifierLog?: string,
+  verifierLog?: RetainedVerifierOutput,
   setupLease?: number,
 ): Promise<QueueAdvance & { nextStarted: boolean }> {
   const advance = setupLease === undefined

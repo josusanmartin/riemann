@@ -293,7 +293,7 @@ export async function reconcileBoat(job: QueuedVerificationJob, receiptReady = f
         message: error.message,
         completedAt: result.completedAt,
       },
-      result.log,
+      { log: result.log, attestation: result.attestation },
     );
     await stopBoatWorker(workerId!).catch(() => undefined);
     return {
