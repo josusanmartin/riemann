@@ -12,12 +12,14 @@
     ],
     "boat": {
       "checkerReplayOf": "03af698b-4dd2-4699-ac1d-da23c37f6201",
+      "setupLease": 1795820673386,
+      "retryAt": 1795820767219,
+      "assignedAt": 1795820677219,
       "baseCommitSha": "2f48446f2b6f18841d1c299ebffa23cc12f35a83",
       "previousRecordId": "knausgard-rh-two-prime-855366",
       "issuedAt": 1795820642361,
       "startedAt": 1795820673386,
-      "setupLease": 1795820673386,
-      "retryAt": 1795820763386
+      "workerId": "bx_m8vg7ssv"
     }
   },
   "pending": [],
