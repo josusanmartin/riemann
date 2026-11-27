@@ -13,6 +13,7 @@ export const verifierFeedbackSchema = z
       "theorem-contract-mismatch",
       "unpermitted-axiom",
       "nanoda-rejected",
+      "nanoda-stack-overflow",
       "lean-kernel-rejected",
       "verification-timeout",
       "verification-out-of-memory",
@@ -103,9 +104,24 @@ export function recordSupersededFeedback(): VerifierFeedback {
 export function describeVerifierRejection(
   log: string,
   fallbackMessage: string,
+  recorded?: VerifierFeedback,
 ): VerifierFeedback {
   const diagnostic = `${fallbackMessage}\n${log}`.toLowerCase();
   const location = candidateLocation(log);
+
+  // Prefer the terminal checker failure over earlier elaboration diagnostics in the same log.
+  // This classification is for display only. It never initiates a worker retry.
+  if ((diagnostic.includes("stack overflow") || diagnostic.includes("overflowed its stack")) &&
+      /check-export\.sh:[^\n]*aborted[^\n]*nanoda_bin/.test(diagnostic) &&
+      /check-proof\s+exit=134\b/.test(diagnostic)) {
+    return feedback({
+      code: "nanoda-stack-overflow", stage: "nanoda-kernel", title: "Independent checker stack overflow",
+      detail: "Nanoda exhausted its stack while replaying the exported proof. Verification ended before a kernel verdict.",
+      action: "Share the job ID with the maintainers so they can check the checker version and arrange a replay.",
+      retryable: true,
+    });
+  }
+  if (recorded) return recorded;
 
   if (fallbackMessage === "Boat worker identity mismatch.") {
     return feedback({

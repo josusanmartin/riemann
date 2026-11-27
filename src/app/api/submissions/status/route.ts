@@ -75,10 +75,10 @@ async function completedReceiptResponse(
   const { log, logState } = await retainedLog(receipt);
   if (receipt.outcome === "rejected") {
     const feedback =
-      receipt.feedback ??
       describeVerifierRejection(
         log ?? "",
         receipt.message ?? "The formal verifier rejected this candidate.",
+        receipt.feedback,
       );
     return noStore(200, {
       status: "rejected",
