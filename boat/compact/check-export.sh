@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run as the independent checker, with immutable exports and a trusted matchrunner.
 set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
 reference=$(realpath "${1:?reference export}")
 solution=$(realpath "${2:?solution export}")
 matcher=$(realpath "${3:?matchrunner binary}")
@@ -26,6 +27,7 @@ with open("nanoda.json", "x") as output:
         "pp_to_stdout": True, "print_axioms": True, "print_success_message": True,
     }, output)
 PY
-nanoda_bin nanoda.json
+python3 "$here/nanoda.py" check "$prefix"
+"$prefix/bin/nanoda_bin" nanoda.json
 leanchecker --from-export "$solution"
 sha256sum "$reference" "$solution"

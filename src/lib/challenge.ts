@@ -221,6 +221,10 @@ export const verificationAttestationSchema = z
     kernels: z.tuple([z.literal("lean"), z.literal("nanoda")]),
     compactReplay: z.object({
       policyVersion: z.literal(3),
+      nanoda: z.object({
+        version: z.string().max(32),
+        sha256: z.string().regex(/^[0-9a-f]{64}$/),
+      }).strict().optional(),
       referenceSha256: z.string().regex(/^[0-9a-f]{64}$/),
       solutionSha256: z.string().regex(/^[0-9a-f]{64}$/),
     }).strict().optional(),

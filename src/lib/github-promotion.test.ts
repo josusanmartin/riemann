@@ -1,3 +1,4 @@
+import nanodaRelease from "../../boat/compact/nanoda-release.json";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
@@ -155,7 +156,7 @@ async function fixture(recordsSnapshot = canonicalRecordsSnapshot) {
     ),
     kernels: ["lean", "nanoda"],
     permittedAxioms: contract.permittedAxioms, rhFoundationCommit: contract.trustedUpstream.rh.commit,
-        compactReplay: { policyVersion: 3, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
+        compactReplay: { policyVersion: 3, nanoda: {version: nanodaRelease.version, sha256: nanodaRelease.linuxX64Sha256}, referenceSha256: "b".repeat(64), solutionSha256: "c".repeat(64) },
   };
   const result: Extract<E2BVerificationResult, { status: "verified" }> = {
     schemaVersion: 1,
