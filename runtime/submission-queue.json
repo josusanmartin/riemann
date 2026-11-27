@@ -1,25 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-ccdbb35b-f6c2-4449-b8a2-db095015b319",
-    "jobId": "ccdbb35b-f6c2-4449-b8a2-db095015b319",
-    "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
-    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-    "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
-    "enqueuedAt": "2026-11-27T21:51:11.106Z",
-    "boat": {
-      "setupLease": 1795816274739,
-      "retryAt": 1795816367986,
-      "assignedAt": 1795816277986,
-      "baseCommitSha": "6b22d6acb9f5f21043e56c81d75a702d86d4633d",
-      "previousRecordId": "knausgard-rh-two-prime-855366",
-      "issuedAt": 1795816271106,
-      "startedAt": 1795816274739,
-      "workerId": "bx_wfcueye9"
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "ccdbb35b-f6c2-4449-b8a2-db095015b319",
+      "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Boat declined worker setup.",
+      "feedback": {
+        "code": "verifier-infrastructure",
+        "stage": "infrastructure",
+        "title": "Boat declined worker setup",
+        "detail": "The provider declined a setup request. No proof verdict was recorded.",
+        "action": "Open the recorded setup log for the last available error and share the job ID with the maintainers.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-27T21:51:21.787Z",
+      "logArchived": true
+    },
     {
       "jobId": "6b8d1685-de53-4b1a-b2b5-38c8eb5d1a99",
       "proofDigest": "8d4f6cba97e426531398a92ef28749d0d8f54efd2726c5c2c0851f5f6ec43f40",
