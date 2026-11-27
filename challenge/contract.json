@@ -87,6 +87,8 @@
     ".github/workflows/build-compact-runtime.yml",
     "challenge/compact-runtime.json",
     "src/lib/compact-runtime.ts",
-    "src/lib/verifier-identity.ts"
+    "src/lib/verifier-identity.ts",
+    "scripts/package-publication-material.py",
+    "src/lib/publication-material.ts"
   ]
 }

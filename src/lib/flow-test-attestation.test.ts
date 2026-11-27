@@ -30,7 +30,7 @@ describe("flow-test publication gate", () => {
     await expect(validateFlowTestAttestation(result, prepared)).resolves.toBeUndefined();
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, compactReplay: undefined } }, prepared)).rejects.toThrow("sealed dual-kernel replay");
     await expect(validateFlowTestAttestation(result, { ...prepared, solution: prepared.solution + "\n" })).rejects.toThrow("digest");
-    await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, verifierTemplateDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("stale");
+    await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, verifierTemplateDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("verifier fingerprints differ");
     await expect(validateFlowTestAttestation({ ...result, attestation: { ...result.attestation, challengeDigest: "0".repeat(64) } }, prepared)).rejects.toThrow("changed");
   });
 });

@@ -1,3 +1,4 @@
+import { isPublicationMismatch } from "./publication-feedback";
 import { boatCompletionToken } from "./boat-completion-token";
 import { after } from "next/server";
 import { setTimeout as delay } from "node:timers/promises";
@@ -286,7 +287,7 @@ export async function reconcileBoat(job: QueuedVerificationJob, receiptReady = f
     await advanceVerificationQueue(
       job.jobId,
       {
-        outcome: "superseded",
+        outcome: isPublicationMismatch(error.message) ? "publication-blocked" : "superseded",
         promotionStatus: null,
         evidenceUrl: null,
         message: error.message,

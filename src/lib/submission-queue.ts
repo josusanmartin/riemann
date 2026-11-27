@@ -75,7 +75,7 @@ export const queueCompletionReceiptSchema = z
   .object({
     jobId: z.string().uuid(),
     proofDigest: digestSchema,
-    outcome: z.enum(["rejected", "promoted", "superseded"]),
+    outcome: z.enum(["rejected", "promoted", "superseded", "publication-blocked"]),
     promotionStatus: z.enum(["promoted", "already-promoted"]).nullable(),
     message: z.string().min(1).max(2_000).nullable(),
     feedback: verifierFeedbackSchema.optional(),
