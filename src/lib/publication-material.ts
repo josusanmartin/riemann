@@ -53,3 +53,12 @@ export async function publicationDigests(snapshot?: string) {
   ]);
   return { template, challenge };
 }
+
+export async function publicationReady() {
+  try {
+    await publicationDigests();
+    return true;
+  } catch {
+    return false;
+  }
+}

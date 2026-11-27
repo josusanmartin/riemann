@@ -89,6 +89,7 @@
     "src/lib/compact-runtime.ts",
     "src/lib/verifier-identity.ts",
     "scripts/package-publication-material.py",
-    "src/lib/publication-material.ts"
+    "src/lib/publication-material.ts",
+    "src/lib/publication-feedback.ts"
   ]
 }

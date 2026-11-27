@@ -1,3 +1,4 @@
+import { publicationReady } from "@/lib/publication-material";
 import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
@@ -42,7 +43,7 @@ export async function POST(request: Request): Promise<Response> {
       message: "The noncompetitive flow test is currently restricted to site operators.",
     });
   }
-  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned()) {
+  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned() || !(await publicationReady())) {
     return noStore(503, {
       error: "verifier_unavailable",
       message: "The compact Boat verifier is unavailable on this deployment.",
