@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-ccdbb35b-f6c2-4449-b8a2-db095015b319",
+    "jobId": "ccdbb35b-f6c2-4449-b8a2-db095015b319",
+    "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
+    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
+    "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
+    "enqueuedAt": "2026-11-27T21:51:11.106Z",
+    "boat": {
+      "baseCommitSha": "6b22d6acb9f5f21043e56c81d75a702d86d4633d",
+      "previousRecordId": "knausgard-rh-two-prime-855366",
+      "issuedAt": 1795816271106
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1561,7 +1573,7 @@
   "daily": {
     "day": "2026-11-27",
     "attempts": {
-      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 2,
+      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 3,
       "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78": 3
     }
   }
