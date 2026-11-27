@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "knausgard-rh-two-prime-855366",
+  "track": "critical-line",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "score": {
+    "numerator": "85536627778",
+    "denominator": "100000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Contribution by Kristian Muri Knausgård. The proof uses the reflected one-prime moment of knausgard-rh-reflected-bhb-78 (85.39%) and the optimised kernel of knausgard-rh-reflected-kernel-8542 (85.4225%). Let U be the short prime sum and F = ζ′(ρ)B(ρ)/log T the mollified derivative. The new input is the mean of Re(F conj(U²)). The D9 modules prove the two-prime case of Yuanda Xu’s Theorem 5.1 (arXiv:2611.34546) for these weights. A rational sum-of-squares inequality at each zero, averaged using fifteen moment bounds, gives N_d ≥ (0.85536627778 − o(1))N under RH on (T, 2T] and (0, T]. The formal proof of the Bui–Heath-Brown mollified moments comes from knausgard-rh-bui-heath-brown-deg40.",
+  "method": "Reflected mixed-moment certificate with the optimised explicit-formula kernel, a two-prime mixed moment and a rational sum-of-squares bound for multiplicities.",
+  "model": "GPT-6.2 Astra and Claude Opus 5.5",
+  "harness": "Codex and Claude",
+  "license": "Apache-2.0"
+}
