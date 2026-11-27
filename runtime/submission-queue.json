@@ -1,6 +1,22 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-93b7d587-41d4-470e-9e94-6b572307c48e",
+    "jobId": "93b7d587-41d4-470e-9e94-6b572307c48e",
+    "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
+    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
+    "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
+    "enqueuedAt": "2026-11-27T23:04:02.361Z",
+    "recoveredJobIds": [
+      "03af698b-4dd2-4699-ac1d-da23c37f6201"
+    ],
+    "boat": {
+      "checkerReplayOf": "03af698b-4dd2-4699-ac1d-da23c37f6201",
+      "baseCommitSha": "2f48446f2b6f18841d1c299ebffa23cc12f35a83",
+      "previousRecordId": "knausgard-rh-two-prime-855366",
+      "issuedAt": 1795820642361
+    }
+  },
   "pending": [],
   "completed": [
     {
