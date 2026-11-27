@@ -8,12 +8,14 @@
     "submissionKey": "5289155a49c49d8a903275c368045e8779bc67b689573f3793b2b6071257deb4",
     "enqueuedAt": "2026-11-27T13:10:14.040Z",
     "boat": {
+      "setupLease": 1795787260405,
+      "retryAt": 1795787354596,
+      "assignedAt": 1795787264596,
       "baseCommitSha": "8fe8b05bfc83783294a083196f039aaf69159f8b",
       "previousRecordId": "knausgard-rh-reflected-kernel-8542",
       "issuedAt": 1795785014040,
       "startedAt": 1795787260405,
-      "setupLease": 1795787260405,
-      "retryAt": 1795787350405
+      "workerId": "bx_grendvz7"
     }
   },
   "pending": [],
