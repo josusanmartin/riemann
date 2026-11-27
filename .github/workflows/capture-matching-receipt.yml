@@ -1,7 +1,7 @@
 name: Preserve an existing Boat receipt for the reported proof
 on:
   push:
-    tags: ['capture-reported-proof-20261127']
+    tags: ['capture-reported-proof-20261127-*']
 permissions:
   contents: read
 jobs:
@@ -37,11 +37,11 @@ jobs:
           assert file("riemann-source-revision").strip()==sha
           manifest=file("riemann-incoming/manifest");source=file("riemann-incoming/solution")
           assert hashlib.sha256(b"submission.json\0"+manifest.encode()+b"proof/Solution.lean\0"+source.encode()).hexdigest()==digest
-          for _ in range(900):
+          for _ in range(1200):
               try:
                   result=json.loads(file("riemann-receipt.json"));break
               except urllib.error.HTTPError as e:
-                  if e.code not in (404,409,429,502,503,504):raise
+                  if e.code not in (400,404,409,429,502,503,504):raise
               except (TimeoutError,urllib.error.URLError):pass
               time.sleep(2)
           else:raise RuntimeError("Receipt not available")
