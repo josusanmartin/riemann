@@ -10,7 +10,10 @@
     "boat": {
       "baseCommitSha": "6b22d6acb9f5f21043e56c81d75a702d86d4633d",
       "previousRecordId": "knausgard-rh-two-prime-855366",
-      "issuedAt": 1795816271106
+      "issuedAt": 1795816271106,
+      "startedAt": 1795816274739,
+      "setupLease": 1795816274739,
+      "retryAt": 1795816364739
     }
   },
   "pending": [],
