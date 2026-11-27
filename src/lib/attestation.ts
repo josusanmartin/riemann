@@ -1,3 +1,4 @@
+import { publicationMismatchMessage } from "./publication-feedback";
 import {
   compareRationals,
   rationalToDecimal,
@@ -68,9 +69,7 @@ export function assertValidAttestation(
     throw new Error("Attested decimal differs from the exact submission score");
   }
   if (attestation.verifierTemplateDigest !== verifierTemplateDigest) {
-    throw new Error(
-      "Verifier template is stale; rebuild the pinned E2B template before accepting submissions",
-    );
+    throw new Error(publicationMismatchMessage);
   }
   if (attestation.challengeDigest !== challengeDigest) {
     throw new Error("Trusted challenge material changed after verification");

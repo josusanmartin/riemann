@@ -1,3 +1,4 @@
+import { publicationReady } from "@/lib/publication-material";
 import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { deploymentVerifierCommit } from "@/lib/verifier-identity";
 import { guardUserApi } from "@/lib/api-guard";
@@ -61,7 +62,7 @@ export async function POST(request: Request): Promise<Response> {
     error: "sign_in_again",
     message: "Refresh your GitHub sign-in on the submission page before uploading.",
   });
-  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned()) {
+  if (!boatSelected() || !boatConfigured() || !compactRuntimePinned() || !(await publicationReady())) {
     return noStore(503, {
       error: "verifier_unavailable",
       message: "The verifier is not configured for this deployment.",

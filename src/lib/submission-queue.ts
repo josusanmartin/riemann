@@ -10,6 +10,7 @@ import {
   isSubmissionArchiveConfigured,
   sealSubmissionArchive,
   sealVerifierLog,
+  type RetainedVerifierOutput,
   submissionArchivePath,
   verifierLogPath,
 } from "@/lib/submission-archive";
@@ -75,7 +76,7 @@ export const queueCompletionReceiptSchema = z
   .object({
     jobId: z.string().uuid(),
     proofDigest: digestSchema,
-    outcome: z.enum(["rejected", "promoted", "superseded"]),
+    outcome: z.enum(["rejected", "promoted", "superseded", "publication-blocked"]),
     promotionStatus: z.enum(["promoted", "already-promoted"]).nullable(),
     message: z.string().min(1).max(2_000).nullable(),
     feedback: verifierFeedbackSchema.optional(),
@@ -915,7 +916,7 @@ export function completeVerificationJob(
   jobId: string,
   completion: QueueCompletionInput,
   options: QueueOptions = {},
-  verifierLog?: string,
+  verifierLog?: RetainedVerifierOutput,
   setupLease?: number,
 ): Promise<QueueAdvance> {
   z.string().uuid().parse(jobId);
@@ -934,7 +935,7 @@ export function completeVerificationJob(
       if (!mutation.changed || archiveKey === undefined || !receipt) return mutation;
       // The log is committed atomically with the receipt that points at it.
       const envelope = sealVerifierLog(
-        { jobId: receipt.jobId, proofDigest: receipt.proofDigest, completedAt: receipt.completedAt, log: verifierLog! },
+        { jobId: receipt.jobId, proofDigest: receipt.proofDigest, completedAt: receipt.completedAt, ...(typeof verifierLog === "string" ? { log: verifierLog } : verifierLog!) },
         archiveKey,
       );
       return {

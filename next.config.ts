@@ -25,6 +25,7 @@ const securityHeaders = [
 ];
 
 const trustedPromotionRuntimeFiles = [
+  "publication-material.bin",
   ".github/workflows/build-e2b-template.yml",
   ".github/workflows/verifier-smoke.yml",
   "challenge/**/*",

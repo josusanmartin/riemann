@@ -1,3 +1,4 @@
+import { isPublicationMismatch } from "./publication-feedback";
 import { z } from "zod";
 import { isPrivilegedIdentity } from "./privileged-identity";
 import { RECORDS_REPOSITORY } from "@/lib/github-promotion";
@@ -247,6 +248,10 @@ export async function readOwnerHistory(github: string, selectedId?: string, opti
   const stateEntry = tree.tree.find(entry => entry.path === SUBMISSION_QUEUE_PATH);
   if (!stateEntry) throw new Error("Submission queue state unavailable");
   const state = submissionQueueStateSchema.parse(await jsonBlob(stateEntry.sha));
+  const blocked = new Set(state.completed.filter(receipt => isPublicationMismatch(receipt.message)).map(receipt => receipt.jobId));
+  for (const row of completed) {
+    if (row.status === "superseded" && blocked.has(row.jobId)) row.status = "publication-blocked";
+  }
   const active = [state.active, ...state.pending].flatMap((job, index) => {
     if (!job || !owners.includes(job.ownerKey)) return [];
     const status = index ? "Queued" : !job.boat ? "In progress" : job.boat.uploaded

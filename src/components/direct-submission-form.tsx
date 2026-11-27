@@ -1,5 +1,6 @@
 "use client";
 
+import { isPublicationMismatch } from "@/lib/publication-feedback";
 import { privateDiagnostic } from "@/lib/private-diagnostic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -19,6 +20,7 @@ type JobPhase =
   | "queued"
   | "running"
   | "verified"
+  | "publication-blocked"
   | "superseded"
   | "rejected"
   | "error";
@@ -53,6 +55,7 @@ type StatusPayload = {
   feedback?: VerifierFeedbackPayload;
   promotion?: {
     status?: string;
+    reason?: string;
     message?: string;
     evidenceUrl?: string;
   };
@@ -217,7 +220,7 @@ export function DirectSubmissionForm({
         // and its retained log instead of losing both. A new upload replaces it.
         if (payload.status === "verified") {
           if (payload.promotion?.status === "superseded") {
-            setPhase("superseded");
+            setPhase(payload.promotion.reason === "publication-blocked" || isPublicationMismatch(payload.promotion.message) ? "publication-blocked" : "superseded");
             setMessage(
               payload.promotion.message ??
                 "The proof passed, but another record landed first. Verify again against the new record.",
@@ -507,7 +510,7 @@ export function DirectSubmissionForm({
           {busy ? <LoaderCircle className="spin" size={23} /> : phase === "verified" ? <CheckCircle2 size={23} /> : <ShieldAlert size={23} />}
         </div>
         <div>
-          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "starting" ? "Saving your submission" : phase === "allocation" ? "Requesting a worker" : phase === "staging" ? "Transferring proof files" : phase === "verified" ? "Kernel verified and published" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? feedback?.title ?? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
+          <strong>{phase === "idle" ? "Ready for isolated verification" : phase === "starting" ? "Saving your submission" : phase === "allocation" ? "Requesting a worker" : phase === "staging" ? "Transferring proof files" : phase === "verified" ? "Kernel verified and published" : phase === "publication-blocked" ? "Verified · publication blocked" : phase === "superseded" ? "Verified against an older record" : phase === "rejected" ? feedback?.title ?? "Proof rejected" : phase === "error" ? "Submission unavailable" : phase === "queued" ? "Waiting in the verification queue" : "Verification running"}</strong>
           <p>{message || "Nothing is accepted until Lean and nanoda independently replay the proof."}</p>
           {jobId && <code>Job {jobId}</code>}
           {digest && <code>sha256:{digest}</code>}

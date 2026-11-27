@@ -8,17 +8,15 @@ import { isE2BWebhookConfigured } from "@/lib/e2b-webhooks";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import { isSubmissionQueueConfigured } from "@/lib/submission-queue";
 import { isSubmissionArchiveConfigured } from "@/lib/submission-archive";
-import { computeTrustedMaterialDigest, computeVerifierTemplateDigest } from "../../../../scripts/trusted-material";
+import { publicationDigests } from "@/lib/publication-material";
 
 // Trusted files are immutable within a deployment. Share in-flight hash work
 // across probes, with a short retry interval if a filesystem check fails.
-let cachedChecks: { expires: number; value: Promise<[string | null, boolean]> } | undefined;
+let cachedChecks: { expires: number; value: Promise<[string | null, string | null]> } | undefined;
 function checkTrustedFiles() {
   if (!cachedChecks || cachedChecks.expires <= Date.now()) {
-    const value = Promise.all([
-      computeVerifierTemplateDigest(process.cwd(), contract.trustedPaths).catch(() => null),
-      computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths).then(() => true, () => false),
-    ] as const);
+    const value = publicationDigests().then(({ template, challenge }): [string, string] => [template, challenge])
+      .catch((): [null, null] => [null, null]);
     cachedChecks = { expires: Date.now() + 60_000, value };
   }
   return cachedChecks.value;
@@ -31,7 +29,8 @@ export async function GET(): Promise<NextResponse> {
   const promotionConfigured = isGitHubPromotionConfigured();
   const submissionQueueConfigured = isSubmissionQueueConfigured();
   const submissionArchiveConfigured = isSubmissionArchiveConfigured();
-  const [expectedVerifierTemplateDigest, trustedMaterialAvailable] = await checkTrustedFiles();
+  const [expectedVerifierTemplateDigest, expectedChallengeDigest] = await checkTrustedFiles();
+  const trustedMaterialAvailable = Boolean(expectedChallengeDigest);
   const isBoat = boatSelected();
   const sourceCommit = deploymentVerifierCommit();
   const deploymentIdentityConfigured = sourceCommit !== null;
@@ -69,6 +68,7 @@ export async function GET(): Promise<NextResponse> {
     e2bConfigured,
     e2bTemplate: getE2BTemplate(),
     expectedVerifierTemplateDigest,
+    expectedChallengeDigest,
     verifierIdentity,
     // Backward-compatible active-provider signal for existing monitors.
     verifierTemplateIdentityConfigured: verifierIdentity.configured,

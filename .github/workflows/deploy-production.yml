@@ -68,6 +68,7 @@ jobs:
           test -n "$VERCEL_TOKEN"
           test -n "$VERCEL_ORG_ID"
           test -n "$VERCEL_PROJECT_ID"
+          material_sha=$(python3 scripts/package-publication-material.py "$GITHUB_SHA" publication-material.bin)
           maintenance=()
           if [[ "$PAUSE_ADMISSIONS" == "true" ]]; then
             maintenance+=(--env SUBMISSIONS_PAUSED=1)
@@ -79,6 +80,7 @@ jobs:
             --yes \
             --archive=tgz \
             "${maintenance[@]}" \
+            --env RIEMANN_PUBLICATION_MATERIAL_SHA256="$material_sha" \
             --env RIEMANN_VERIFIER_PROVIDER="$PROVIDER" \
             --build-env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
             --env RIEMANN_BASE_COMMIT_SHA="$GITHUB_SHA" \
@@ -86,3 +88,7 @@ jobs:
             --meta githubCommitRef="$GITHUB_REF_NAME" \
             --meta githubRepository="$GITHUB_REPOSITORY" \
             --token "$VERCEL_TOKEN"
+
+      - name: Confirm the live publisher fingerprints
+        if: github.ref == 'refs/heads/main'
+        run: python3 scripts/check-publication-release.py publication-material.bin

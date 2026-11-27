@@ -1,3 +1,4 @@
+import { isPublicationMismatch, publicationMismatchMessage } from "@/lib/publication-feedback";
 import { privateDiagnostic } from "@/lib/private-diagnostic";
 import { guardUserApi } from "@/lib/api-guard";
 import { boatMetadata,reconcileBoat } from "@/lib/boat-queue";
@@ -98,11 +99,12 @@ async function completedReceiptResponse(
     jobId: receipt.jobId, logState,
     ...(log === undefined ? {} : { log }),
     promotion:
-      receipt.outcome === "superseded"
+      (receipt.outcome === "superseded" || receipt.outcome === "publication-blocked")
         ? {
             status: "superseded",
+            ...(receipt.outcome === "publication-blocked" || isPublicationMismatch(receipt.message) ? { reason: "publication-blocked" } : {}),
             message:
-              receipt.message ??
+              isPublicationMismatch(receipt.message) ? publicationMismatchMessage : receipt.message ??
               "Another verified record landed before this result was published.",
           }
         : {

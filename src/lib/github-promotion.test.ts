@@ -346,7 +346,7 @@ describe("automatic GitHub record promotion", () => {
     ).rejects.toSatisfy(
       (error) =>
         error instanceof UnpublishableResultError &&
-        error.message.includes("Verifier template is stale"),
+        error.message.includes("verifier fingerprints differ"),
     );
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });

@@ -6,7 +6,7 @@ import {
 } from "node:crypto";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { z } from "zod";
-import { submissionSchema, type Submission } from "@/lib/challenge";
+import { submissionSchema, verificationAttestationSchema, type VerificationAttestation, type Submission } from "@/lib/challenge";
 import {
   computeDirectProofDigest,
   MAX_DIRECT_SOLUTION_BYTES,
@@ -261,8 +261,11 @@ export const verifierLogPayloadSchema = z
     completedAt: z.string().datetime({ offset: true }),
     omittedBytes: z.number().int().nonnegative(),
     log: z.string().max(MAX_RETAINED_LOG_BYTES),
+    attestation: verificationAttestationSchema.optional(),
   })
   .strict();
+
+export type RetainedVerifierOutput = string | { log: string; attestation: VerificationAttestation };
 
 export type VerifierLogPayload = z.infer<typeof verifierLogPayloadSchema>;
 
@@ -285,7 +288,7 @@ export function tailVerifierLog(log: string): { log: string; omittedBytes: numbe
 }
 
 export function sealVerifierLog(
-  input: { jobId: string; proofDigest: string; completedAt: string; log: string },
+  input: { jobId: string; proofDigest: string; completedAt: string; log: string; attestation?: VerificationAttestation },
   encodedKey: string,
   nonce = randomBytes(12),
 ): SubmissionArchiveEnvelope {
@@ -295,6 +298,7 @@ export function sealVerifierLog(
     proofDigest: input.proofDigest,
     completedAt: input.completedAt,
     ...tailVerifierLog(input.log),
+    attestation: input.attestation,
   });
   if (nonce.length !== 12) {
     throw new Error("Verifier log nonces must be exactly 12 bytes");

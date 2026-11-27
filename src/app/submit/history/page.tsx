@@ -1,3 +1,4 @@
+import { isPublicationMismatch, publicationMismatchMessage } from "@/lib/publication-feedback";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -24,6 +25,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
   });
   const detail = history?.detail;
   const receipt = detail?.receipt;
+  const blocked = receipt?.outcome === "publication-blocked" || isPublicationMismatch(receipt?.message);
   const finalLog = detail?.logs.find(log => log.jobId === receipt?.jobId)?.log;
   const excerpt = receipt?.outcome === "rejected" ? privateDiagnostic(finalLog) : undefined;
   const diagnostic = receipt?.outcome === "rejected"
@@ -39,9 +41,9 @@ export default async function History({ searchParams }: { searchParams: Promise<
       {history ? <>
         {detail && receipt ? (
           <section className="history-detail" aria-label="Attempt details">
-            <h2>{diagnostic?.title ?? (receipt.outcome === "promoted" ? "Published" : "Superseded")}</h2>
+            <h2>{diagnostic?.title ?? (blocked ? "Verified · publication blocked" : receipt.outcome === "promoted" ? "Published" : "Superseded")}</h2>
             <p><time dateTime={receipt.completedAt}>{time(receipt.completedAt)} UTC</time></p>
-            <p>{diagnostic?.detail ?? receipt.message}</p>
+            <p>{blocked ? publicationMismatchMessage : diagnostic?.detail ?? receipt.message}</p>
             {diagnostic && receipt.message && receipt.message !== diagnostic.detail && (
               <p>Recorded message: <code>{receipt.message}</code></p>
             )}
@@ -66,7 +68,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
               {history.active.map(row => <tr key={row.jobId}><td><time dateTime={row.date}>{time(row.date)}</time><code title={row.digest} aria-label={`Proof SHA-256 prefix ${row.digest.slice(0, 12)}`}>{row.digest.slice(0, 12)}</code></td><td>{row.status}</td>
                 <td></td></tr>)}
               {history.completed.map(row => <tr key={row.jobId}><td><time dateTime={row.date}>{time(row.date)}</time><code title={row.digest} aria-label={`Proof SHA-256 prefix ${row.digest.slice(0, 12)}`}>{row.digest.slice(0, 12)}</code></td>
-                <td>{row.status === "promoted" ? "Published" : row.status === "rejected" ? "Unsuccessful" : "Superseded"}</td>
+                <td>{row.status === "promoted" ? "Published" : row.status === "rejected" ? "Unsuccessful" : row.status === "publication-blocked" ? "Publication blocked" : "Superseded"}</td>
                 <td><Link className="text-link" prefetch={false} href={`/submit/history?attempt=${row.jobId}`}>Details</Link></td>
               </tr>)}
             </tbody>

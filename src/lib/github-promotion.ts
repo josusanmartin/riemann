@@ -14,10 +14,7 @@ import {
 import { assertValidAttestation } from "@/lib/attestation";
 import { computeDirectProofDigest } from "@/lib/direct-submission";
 import type { E2BVerificationResult } from "@/lib/e2b-verifier";
-import {
-  computeTrustedMaterialDigest,
-  computeVerifierTemplateDigest,
-} from "../../scripts/trusted-material";
+import { publicationDigests, PublicationMaterialUnavailable } from "./publication-material";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_API_VERSION = "2026-03-10";
@@ -469,12 +466,7 @@ async function validatePromotionInput(
     null,
     2,
   )}\n`;
-  const [challengeDigest, verifierTemplateDigest] = await Promise.all([
-    computeTrustedMaterialDigest(process.cwd(), contract.trustedPaths, {
-      "data/records.json": canonicalRecordsSnapshot,
-    }),
-    computeVerifierTemplateDigest(process.cwd(), contract.trustedPaths),
-  ]);
+  const { challenge: challengeDigest, template: verifierTemplateDigest } = await publicationDigests(canonicalRecordsSnapshot);
   assertValidAttestation(
     submission,
     attestation,
@@ -515,7 +507,7 @@ export async function promoteVerifiedSubmission(
   } catch (error) {
     // Every check here is deterministic over the signed job, the verifier
     // output and this deployment's trusted files, so a failure is permanent.
-    if (error instanceof UnpublishableResultError) throw error;
+    if (error instanceof UnpublishableResultError || error instanceof PublicationMaterialUnavailable) throw error;
     throw new UnpublishableResultError(
       error instanceof ZodError
         ? "Verified evidence failed the trusted promotion schema"
