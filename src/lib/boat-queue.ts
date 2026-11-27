@@ -298,7 +298,8 @@ export async function reconcileBoat(job: QueuedVerificationJob, receiptReady = f
     await stopBoatWorker(workerId!).catch(() => undefined);
     return {
       ...result,
-      promotion: { status: "superseded" as const, message: error.message },
+      promotion: { status: "superseded" as const, message: error.message,
+        ...(isPublicationMismatch(error.message) ? { reason: "publication-blocked" as const } : {}) },
     };
   }
 }

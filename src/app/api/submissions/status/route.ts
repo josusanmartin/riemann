@@ -102,6 +102,7 @@ async function completedReceiptResponse(
       (receipt.outcome === "superseded" || receipt.outcome === "publication-blocked")
         ? {
             status: "superseded",
+            ...(receipt.outcome === "publication-blocked" || isPublicationMismatch(receipt.message) ? { reason: "publication-blocked" } : {}),
             message:
               isPublicationMismatch(receipt.message) ? publicationMismatchMessage : receipt.message ??
               "Another verified record landed before this result was published.",

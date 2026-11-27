@@ -38,7 +38,7 @@ export function readReleaseMaterial(bytes: Buffer, revision: string | null, pin:
 let loaded: { revision: string; pin: string; digests: ReturnType<typeof readReleaseMaterial> } | undefined;
 
 export async function publicationDigests(snapshot?: string) {
-  if (process.env.VERCEL_ENV === "production" || process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256) {
+  if (process.env.VERCEL === "1" || process.env.VERCEL_ENV || process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256) {
     try {
       const revision = deploymentVerifierCommit();
       const pin = process.env.RIEMANN_PUBLICATION_MATERIAL_SHA256;

@@ -55,6 +55,7 @@ type StatusPayload = {
   feedback?: VerifierFeedbackPayload;
   promotion?: {
     status?: string;
+    reason?: string;
     message?: string;
     evidenceUrl?: string;
   };
@@ -219,7 +220,7 @@ export function DirectSubmissionForm({
         // and its retained log instead of losing both. A new upload replaces it.
         if (payload.status === "verified") {
           if (payload.promotion?.status === "superseded") {
-            setPhase(isPublicationMismatch(payload.promotion.message) ? "publication-blocked" : "superseded");
+            setPhase(payload.promotion.reason === "publication-blocked" || isPublicationMismatch(payload.promotion.message) ? "publication-blocked" : "superseded");
             setMessage(
               payload.promotion.message ??
                 "The proof passed, but another record landed first. Verify again against the new record.",
