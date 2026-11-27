@@ -1,0 +1,66 @@
+name: Observe the authorized 0.4.32 proof replay
+on:
+  push:
+    tags: ['observe-0432-replay-20261127']
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 140
+    steps:
+      - name: Read only the assigned replay's stages and usage
+        env:
+          BOAT_KEY: ${{ secrets.RIEMANN_BOAT_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -u - <<'PY'
+          import datetime, json, os, pathlib, re, time, urllib.error, urllib.request
+          original='03af698b-4dd2-4699-ac1d-da23c37f6201'
+          digest='0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816'
+          def read(url,token,raw=False):
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github.raw+json' if raw else 'application/json'})
+              with urllib.request.urlopen(req,timeout=15) as r:return json.load(r)
+          def boat(path):return read('https://boat.dev/api/v1'+path,os.environ['BOAT_KEY'])
+          worker=None; replay=None; previous=None; usage=None; outcome=None; terminal_age=0
+          for i in range(275):
+              try:
+                  q=read('https://api.github.com/repos/josusanmartin/riemann/contents/runtime/submission-queue.json?ref=automation-queue',os.environ['GH_TOKEN'],True)
+                  a=q.get('active') or {}; b=a.get('boat') or {}
+                  if b.get('checkerReplayOf')==original and a['proofDigest']==digest:
+                      replay=a['jobId']
+                      if b.get('workerId'):
+                          if worker and worker!=b['workerId']:raise RuntimeError('Unexpected second worker')
+                          worker=b['workerId']
+                  receipt=next((r for r in q['completed'] if original in (r.get('recoveredJobIds') or []) and r['proofDigest']==digest),None)
+                  if receipt:outcome=receipt['outcome'];terminal_age+=1
+                  if worker:
+                      assert re.fullmatch(r'bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}',worker)
+                      endpoint='/sandboxes/'+worker
+                      try:
+                          info=boat(endpoint)['sandbox'];labels=info['labels']
+                          assert labels['job']==replay and labels['service']=='riemann' and info['environment']=='riemann-production'
+                          u=boat(endpoint+'/usage')
+                          assert u['sandboxType']=='large'
+                          usage={k:u.get(k) for k in ('sandboxType','since','until','dollars','running')}
+                          if not u['running'] and receipt:break
+                          try:
+                              raw=boat(endpoint+'/files?path=riemann-stages.tsv&encoding=utf8')['content']
+                              phases=[s for s in raw[:8192].splitlines() if re.fullmatch(r'[0-9TZ:-]+\t[a-z-]+\t(start|exit=\d+)',s)]
+                          except urllib.error.HTTPError:phases=[]
+                          phase=phases[-1] if phases else None
+                          if phase!=previous or i%12==0:print('meter',usage,'last stage',phase,flush=True)
+                          previous=phase
+                      except urllib.error.HTTPError as e:
+                          if e.code==404 and receipt:
+                              boxes=boat('/sandboxes?label=job%3D'+replay)['sandboxes']
+                              if not any(x['id']==worker and x['state'] not in ('archived','stopped','deleted') for x in boxes):
+                                  print('Worker absent after queue completion');break
+                          if e.code not in (400,404,409,429,500,502,503,504):raise
+                  if receipt and (not worker or terminal_age>5):break
+              except (TimeoutError,urllib.error.URLError) as e:
+                  if isinstance(e,urllib.error.HTTPError) and e.code in (401,403):raise
+              time.sleep(30)
+          print('terminal outcome',outcome,'last provider meter',usage,flush=True)
+          if not outcome:raise RuntimeError('No terminal outcome observed')
+          PY
