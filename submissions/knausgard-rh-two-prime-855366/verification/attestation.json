@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "knausgard-rh-two-prime-855366",
+  "author": {
+    "github": "kristianmk",
+    "displayName": "Kristian Muri Knausgård"
+  },
+  "model": "GPT-6.2 Astra and Claude Opus 5.5",
+  "harness": "Codex and Claude",
+  "score": {
+    "numerator": "85536627778",
+    "denominator": "100000000000"
+  },
+  "scoreDecimal": "0.855366277780000000000000000000",
+  "previousRecordId": "knausgard-rh-reflected-kernel-8542",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-27T15:47:05.799Z",
+  "challengeDigest": "d5b2b5881dd6ecb7d142af0eb7c4d3ec6c36df2d96fa7d884cef4acc985f4d8c",
+  "verifierTemplateDigest": "9c28768ac3115c30cf83a5ec16accd86adaa290f274371033f333f2769b28eba",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "compactReplay": {
+    "policyVersion": 3,
+    "referenceSha256": "6c7eda84f8e4e634fcfd2b596d23f37e3d6fdfebdcc4f09ff8a0d39d44e1c48d",
+    "solutionSha256": "ff4f8abdd58afefeaf7f95c7e2d06da12daad2b39ab2c7691153f657995e0f8a"
+  },
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+}
