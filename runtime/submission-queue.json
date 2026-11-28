@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-b0bd9c46-360d-4388-a001-c00f08082555",
+    "jobId": "b0bd9c46-360d-4388-a001-c00f08082555",
+    "proofDigest": "221769c49f92d0921850096b4c23b8edb7e71fd0385c4875b557574fc446fedd",
+    "ownerKey": "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53",
+    "submissionKey": "30527cb30a25e55ea3f11d34e1e03a6b13abf539a6a28602d0f763e189b74f48",
+    "enqueuedAt": "2026-11-28T08:01:39.162Z",
+    "boat": {
+      "baseCommitSha": "3e027803de62d0ecc90b8eaa639fb861836cff6a",
+      "previousRecordId": "devine-xu-joint-certificate-855579",
+      "issuedAt": 1795852899162
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1675,7 +1687,8 @@
   "daily": {
     "day": "2026-11-28",
     "attempts": {
-      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 4
+      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 4,
+      "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 1
     }
   }
 }
