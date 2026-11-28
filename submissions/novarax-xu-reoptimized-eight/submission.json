@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "novarax-xu-reoptimized-eight",
+  "track": "critical-line",
+  "author": {
+    "github": "onlypositivetravelvibes-dotcom",
+    "displayName": "Rafał Wiktorowicz and Braun SI Wiktorowicz (NovaraX)"
+  },
+  "score": {
+    "numerator": "85640201905557154185462733680664079111989355705117781384288176474682649",
+    "denominator": "100000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Rafał Wiktorowicz and Braun SI adapt Michael Devine's public Apache-2.0 eight-detector formalisation (85.6399404234%) in Yuanda Xu's distinct-zero counting framework, on Kristian Muri Knausgård's Lean foundations. We reoptimise the affine dual multipliers and rebuild the four rational PSD repairs, lowering the repair cost about tenfold. The distinct-zero transfer also appears in our v15 Zenodo record. Warm thanks to all three.",
+  "method": "Eight-detector certificate with reoptimized dual multipliers, four rational PSD repairs and the signed multiplicity bound.",
+  "model": "Braun SI engine",
+  "harness": "NovaraX",
+  "license": "Apache-2.0"
+}

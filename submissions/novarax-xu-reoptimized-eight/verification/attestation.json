@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "track": "critical-line",
+  "submissionId": "novarax-xu-reoptimized-eight",
+  "author": {
+    "github": "onlypositivetravelvibes-dotcom",
+    "displayName": "Rafał Wiktorowicz and Braun SI Wiktorowicz (NovaraX)"
+  },
+  "model": "Braun SI engine",
+  "harness": "NovaraX",
+  "score": {
+    "numerator": "85640201905557154185462733680664079111989355705117781384288176474682649",
+    "denominator": "100000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "scoreDecimal": "0.856402019055571541854627336806",
+  "previousRecordId": "beiyi-devine-xu-detector-856103644555",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-28T13:16:16.231Z",
+  "challengeDigest": "5543ce2078f3d952717071b666e470ec843be92713af0260df8ee42561716d4f",
+  "verifierTemplateDigest": "0f492db6b4c5b4b4123cf2bab67b4f5d2124ee4c1d0eec0880499ae8fbb92ce1",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "compactReplay": {
+    "policyVersion": 3,
+    "nanoda": {
+      "version": "0.4.32",
+      "sha256": "0b0a1335b7bba0a6d3ad66cf2b7cd7861a1a4c985553dccfff0e3c983963f762"
+    },
+    "referenceSha256": "d2304c39268b13848aec0d29c7c06a847ecfe40b606e9bf67223199477854a40",
+    "solutionSha256": "bea94bfc436ee070b06d55e95555b4072c0baa4fae3ba3992193dfbfe97ff650"
+  },
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+}
