@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-xu-joint-856103644552",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "7813244785503676610628919500940653455714411",
+    "denominator": "9126517373473500000000000000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Assuming RH, the asymptotic proportion of distinct critical-line zeros is at least 85.6103644552% in both dyadic (T, 2T] and cumulative (0, T] windows, with the denominator counting multiplicity. We combine Yuanda Xu’s weighted simple-zero estimate with our joint certificate.",
+  "method": "Xu’s weighted simple-zero method and a joint rational certificate for distinct zeros",
+  "model": "Astra 6.2, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon and Carbon",
+  "harness": "Codex, Claude Code, Antigravity CLI",
+  "license": "Apache-2.0"
+}
