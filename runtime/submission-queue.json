@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-8367ca24-ea74-4710-991f-b7ea15388c3f",
-    "jobId": "8367ca24-ea74-4710-991f-b7ea15388c3f",
-    "proofDigest": "2d86bfa7b3f95df0f6dcdf7b2826be4fe9151afee9858a2b4f24e8592f248945",
-    "ownerKey": "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78",
-    "submissionKey": "7dde337f819eb5175457fc3899377cf8cb7bc519b5100bd545e376c856a732a8",
-    "enqueuedAt": "2026-11-28T20:03:37.627Z",
-    "boat": {
-      "setupLease": 1795896221074,
-      "retryAt": 1795896314231,
-      "assignedAt": 1795896224231,
-      "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
-      "track": "critical-line",
-      "previousRecordId": "novarax-xu-reoptimized-eight",
-      "issuedAt": 1795896217627,
-      "startedAt": 1795896221074,
-      "workerId": "bx_aubtabrd"
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "8367ca24-ea74-4710-991f-b7ea15388c3f",
+      "proofDigest": "2d86bfa7b3f95df0f6dcdf7b2826be4fe9151afee9858a2b4f24e8592f248945",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Boat declined worker setup.",
+      "feedback": {
+        "code": "verifier-infrastructure",
+        "stage": "infrastructure",
+        "title": "Boat declined worker setup",
+        "detail": "The provider declined a setup request. No proof verdict was recorded.",
+        "action": "Open the recorded setup log for the last available error and share the job ID with the maintainers.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-28T20:03:47.923Z",
+      "logArchived": true
+    },
     {
       "jobId": "fa31d6f8-9fbf-41dd-bb57-a33d1ae97609",
       "proofDigest": "3266f3a90d46aa12f9ee94bb4c5f49cb16542246d3f9e8384dbd8fb2c8689487",

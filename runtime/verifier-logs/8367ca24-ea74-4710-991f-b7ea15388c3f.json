@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "aes-256-gcm",
+  "compression": "gzip",
+  "keyId": "760ded5183bb4b24",
+  "jobId": "8367ca24-ea74-4710-991f-b7ea15388c3f",
+  "proofDigest": "2d86bfa7b3f95df0f6dcdf7b2826be4fe9151afee9858a2b4f24e8592f248945",
+  "createdAt": "2026-11-28T20:03:47.923Z",
+  "nonce": "vFor4xhHxs8yJye9",
+  "authenticationTag": "fmcZKMof15au41apE4wgRw==",
+  "ciphertext": "3aB2uQx/Nl9tzORkxvzKT6VQf6GskUGnujJtlPO0Zh0oao0uQ82ARWbcRUr3iEDkAePmHsnaITIMsqpTkdzAi1hKROvoW+G/usEE0D/1ybe3nsXgEKCSy8LY4QEya9xoFYzp7bt41YSeNpWjAtPpIdnB75gt3JrRvWh5I1G2VDKzGKDKf8t5WUEdz+vnVabf5iuDi+85cBxxHkrwbQJEQwBQGG5c8zwN/mWYbw7EtMuapJM3pakzp8EPzoRUDEfSMz72ERkZG7G0OYoJEmZwnxZTF+gHW1EF0Qy6Fbiqn8vFmS/61iroVb7gPosXNRtR5w1tVl9ys9gTgqQ2HkKJAbMvKy9bWOWTiL4NMIxuP6fNJlIrXCFt2QzrXWbrKG+9GVK+R2UU33/hUr25opd7MZuy1b6Ne1KgyTgNyuzBauMF7nAD+uJ9qW0tNS7nyy4eIJYdjlJ+pBPK7g=="
+}
