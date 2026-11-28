@@ -8,13 +8,15 @@
     "submissionKey": "24b18b75c11f8736b462aeb9cc5fa99e7a2856b190429faf83b435e1f6fd2f1e",
     "enqueuedAt": "2026-11-28T08:21:25.293Z",
     "boat": {
+      "setupLease": 1795854088705,
+      "retryAt": 1795854182012,
+      "assignedAt": 1795854092012,
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
       "track": "simple-zeros",
       "previousRecordId": "simple-zeros:opening",
       "issuedAt": 1795854085292,
       "startedAt": 1795854088705,
-      "setupLease": 1795854088705,
-      "retryAt": 1795854178705
+      "workerId": "bx_arm456un"
     }
   },
   "pending": [],
