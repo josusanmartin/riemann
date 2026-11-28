@@ -1,6 +1,19 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-fa31d6f8-9fbf-41dd-bb57-a33d1ae97609",
+    "jobId": "fa31d6f8-9fbf-41dd-bb57-a33d1ae97609",
+    "proofDigest": "3266f3a90d46aa12f9ee94bb4c5f49cb16542246d3f9e8384dbd8fb2c8689487",
+    "ownerKey": "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631",
+    "submissionKey": "5a6af28a42f41be2d71aff691ce5688a90e53dd7179e66fb39f16b847e0d4104",
+    "enqueuedAt": "2026-11-28T14:27:36.846Z",
+    "boat": {
+      "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
+      "track": "critical-line",
+      "previousRecordId": "novarax-xu-reoptimized-eight",
+      "issuedAt": 1795876056845
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1803,7 +1816,7 @@
       "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 5,
       "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 5,
       "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf": 1,
-      "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631": 1
+      "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631": 2
     }
   }
 }
