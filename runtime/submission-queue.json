@@ -1,27 +1,31 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-b0bd9c46-360d-4388-a001-c00f08082555",
-    "jobId": "b0bd9c46-360d-4388-a001-c00f08082555",
-    "proofDigest": "221769c49f92d0921850096b4c23b8edb7e71fd0385c4875b557574fc446fedd",
-    "ownerKey": "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53",
-    "submissionKey": "30527cb30a25e55ea3f11d34e1e03a6b13abf539a6a28602d0f763e189b74f48",
-    "enqueuedAt": "2026-11-28T08:01:39.162Z",
-    "boat": {
-      "setupLease": 1795852902765,
-      "retryAt": 1795852996210,
-      "assignedAt": 1795852906210,
-      "stagedAt": 1795852911625,
-      "baseCommitSha": "3e027803de62d0ecc90b8eaa639fb861836cff6a",
-      "previousRecordId": "devine-xu-joint-certificate-855579",
-      "issuedAt": 1795852899162,
-      "startedAt": 1795852902765,
-      "workerId": "bx_ygxz5wnx",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "b0bd9c46-360d-4388-a001-c00f08082555",
+      "proofDigest": "221769c49f92d0921850096b4c23b8edb7e71fd0385c4875b557574fc446fedd",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+      "feedback": {
+        "code": "lean-elaboration-failed",
+        "stage": "lean-compilation",
+        "title": "Lean could not elaborate the proof",
+        "detail": "The source parsed, but Lean found an unresolved name, type mismatch, missing instance, failed tactic, metavariable, or unfinished goal.",
+        "action": "Open the technical log and fix the first Lean error; later errors are often consequences of that one. Rebuild locally before resubmitting.",
+        "retryable": false,
+        "location": {
+          "file": "Solution.lean",
+          "line": 833,
+          "column": 91
+        }
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-28T08:13:30.489Z",
+      "logArchived": true
+    },
     {
       "jobId": "b89e0239-4edc-4fcd-bc9b-77b6457e277e",
       "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
