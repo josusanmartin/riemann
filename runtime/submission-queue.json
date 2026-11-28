@@ -8,13 +8,15 @@
     "submissionKey": "fa1466d1fd60ea40ba24a9d123086052b2974e8e7d4418b720eb35a413a574c1",
     "enqueuedAt": "2026-11-28T20:13:33.472Z",
     "boat": {
+      "setupLease": 1795896817578,
+      "retryAt": 1795896910816,
+      "assignedAt": 1795896820816,
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "simple-zeros",
       "previousRecordId": "devine-simple-zeros-opening",
       "issuedAt": 1795896813472,
       "startedAt": 1795896817578,
-      "setupLease": 1795896817578,
-      "retryAt": 1795896907578
+      "workerId": "bx_jg286xn4"
     }
   },
   "pending": [],
