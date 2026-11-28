@@ -8,13 +8,15 @@
     "submissionKey": "aa2e1674787a28cd454f9a917fd44a0c3d8d9e6eb3baeef881e368a18d1938c1",
     "enqueuedAt": "2026-11-28T08:22:28.346Z",
     "boat": {
+      "setupLease": 1795859593024,
+      "retryAt": 1795859686175,
+      "assignedAt": 1795859596175,
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
       "track": "critical-line",
       "previousRecordId": "devine-xu-joint-856103644552",
       "issuedAt": 1795854148346,
       "startedAt": 1795859593024,
-      "setupLease": 1795859593024,
-      "retryAt": 1795859683024
+      "workerId": "bx_jkg4gu4c"
     }
   },
   "pending": [
