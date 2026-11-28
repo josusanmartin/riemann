@@ -1,0 +1,25 @@
+name: Formalization of Xu's simple-zero theorem
+description: Submit a reproducible Lean project for review of the cumulative theorem.
+title: "[Simple zeros] "
+body:
+  - type: input
+    id: revision
+    attributes:
+      label: Public source at an immutable revision
+      placeholder: Repository link with full commit hash
+    validations:
+      required: true
+  - type: textarea
+    id: theorem
+    attributes:
+      label: Lean theorem and assumptions
+      description: Include its module and declaration, the theorem statement, and the output of printing its axioms.
+    validations:
+      required: true
+  - type: textarea
+    id: replay
+    attributes:
+      label: Reproduction
+      description: Provide dependency and toolchain pins, clean build commands, certificate inputs, authorship and license. Explain how the analytic estimates enter the proof.
+    validations:
+      required: true

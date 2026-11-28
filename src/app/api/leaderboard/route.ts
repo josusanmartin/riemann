@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { contract, getCurrentRecord, records } from "@/lib/records";
 
-export function GET(): NextResponse {
+export function GET(request: Request): NextResponse {
+  const track = new URL(request.url).searchParams.get("track");
+  if (track && track !== "critical-line") return NextResponse.json({ error: "leaderboard_unavailable" }, { status: 503 });
   return NextResponse.json(
     {
       schemaVersion: 1,

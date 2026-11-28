@@ -39,6 +39,10 @@ function noStore(status: number, body: object): Response {
 export async function POST(request: Request): Promise<Response> {
   const denied = guardUserApi(request, "upload");
   if (denied) return denied;
+  const track = new URL(request.url).searchParams.get("track");
+  if (track && track !== "critical-line") return noStore(503, {
+    error: "verifier_unavailable", message: "This leaderboard has not opened for ranked uploads. No slot was used.",
+  });
   // Operator switch for verifier upgrades: refuse new uploads before any
   // worker or daily slot is touched. In-flight proofs are unaffected.
   if (process.env.SUBMISSIONS_PAUSED === "1") {

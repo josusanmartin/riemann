@@ -1,0 +1,14 @@
+.directory { max-width: 1100px; }
+.directory h1 { font-size: clamp(2.8rem, 6vw, 5rem); margin: 1rem 0; }
+.directory h2 { font-size: clamp(1.8rem, 3vw, 2.7rem); margin: 2rem 0 .55rem; }
+.directory p { max-width: 65ch; margin: .8rem 0 1.2rem; }
+.lede { color: var(--muted); font-size: 1.12rem; }
+.boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1.4rem; margin: 2rem 0 3rem; }
+.boards article { display: flex; flex-direction: column; align-items: flex-start; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md); padding: clamp(1.4rem, 3vw, 2.4rem); }
+.boards h2 { margin-top: 0; }
+.boards strong { margin-top: auto; font-size: 1.3rem; }
+.boards small { color: var(--muted); margin-bottom: 1.2rem; }
+.cardLinks { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1.2rem; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem; margin: 1.5rem 0 2rem; }
+.directory section { scroll-margin-top: 5rem; }
+.directory pre { overflow-x: auto; }
