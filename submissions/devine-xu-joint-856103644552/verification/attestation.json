@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "submissionId": "devine-xu-joint-856103644552",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "model": "Astra 6.2, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon and Carbon",
+  "harness": "Codex, Claude Code, Antigravity CLI",
+  "score": {
+    "numerator": "7813244785503676610628919500940653455714411",
+    "denominator": "9126517373473500000000000000000000000000000"
+  },
+  "scoreDecimal": "0.856103644552642822754559076251",
+  "previousRecordId": "devine-xu-joint-certificate-855579",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-28T07:59:06.217Z",
+  "challengeDigest": "7092bed293df4f1b050ad894153db27d253ee00cfb982c6c373b388ae37cc764",
+  "verifierTemplateDigest": "44b2689b4ebd4cbfbe58785ed525e1e9cc78ef4e9957dcc2aa8b3df05fd0d620",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "compactReplay": {
+    "policyVersion": 3,
+    "nanoda": {
+      "version": "0.4.32",
+      "sha256": "0b0a1335b7bba0a6d3ad66cf2b7cd7861a1a4c985553dccfff0e3c983963f762"
+    },
+    "referenceSha256": "21fb865b746cc96662e6727b0bd25eada73f10de895601913c8b82b07f76f81a",
+    "solutionSha256": "b842b8cafbe7c082e11012447e04744a968f4d3a43581c22a33fec915ab90b39"
+  },
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+}
