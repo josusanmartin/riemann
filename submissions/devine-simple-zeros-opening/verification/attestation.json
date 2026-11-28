@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "track": "simple-zeros",
+  "submissionId": "devine-simple-zeros-opening",
+  "author": {
+    "github": "josusanmartin",
+    "displayName": "Michael Devine (submitted by Josu San Martin)"
+  },
+  "model": "See upstream credits; ranked adaptation by Codex",
+  "harness": "Riemann CLI",
+  "score": {
+    "numerator": "7127988084695677740374459624784369347858974492211694521760654840900887",
+    "denominator": "10000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "scoreDecimal": "0.712798808469567774037445962478",
+  "previousRecordId": "simple-zeros:opening",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-28T09:53:02.482Z",
+  "challengeDigest": "6cca5de39bc071fce6e67e4ad9425458b8d1044e89ad3916b8555573b2c85eff",
+  "verifierTemplateDigest": "0f492db6b4c5b4b4123cf2bab67b4f5d2124ee4c1d0eec0880499ae8fbb92ce1",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "compactReplay": {
+    "policyVersion": 3,
+    "nanoda": {
+      "version": "0.4.32",
+      "sha256": "0b0a1335b7bba0a6d3ad66cf2b7cd7861a1a4c985553dccfff0e3c983963f762"
+    },
+    "referenceSha256": "e60086da6ff99cde788aff187b6c427858abb1248146591d135e9b52a809e121",
+    "solutionSha256": "3b1486533d1d066e7df5d613b599c96cb3820dd83e1ce5efe20db5e91b482954"
+  },
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+}
