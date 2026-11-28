@@ -33,8 +33,8 @@ const input = {
   id: "audit-proof", displayName: "Audit Solver", score,
   summary: "An explicitly noncompetitive audit fixture.", method: "Audit fixture", solution: "-- source", acceptLicense: true,
 };
-function request(body: unknown = input) {
-  return new Request("https://www.riemannzeta.fun/api/submissions", {
+function request(body: unknown = input, query = "") {
+  return new Request("https://www.riemannzeta.fun/api/submissions" + query, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
 }
@@ -121,6 +121,18 @@ describe("official submission admission", () => {
     expect(response.status).toBe(400);
     expect(body.issues.map((issue: { field: string }) => issue.field).sort()).toEqual(["score.denominator", "score.numerator", "summary"]);
     expect(body.message).not.toContain("private fixture");
+    expect(mocks.enqueue).not.toHaveBeenCalled();
+  });
+  it("archives the selected simple-zero target and uses the shared quota", async () => {
+    const response = await POST(request(input, "?track=simple-zeros"));
+    expect(response.ok).toBe(true);
+    const [job, , archive] = mocks.enqueue.mock.calls[0];
+    expect(job.boat.track).toBe("simple-zeros");
+    expect(JSON.parse(archive.manifest).track).toBe("simple-zeros");
+    expect(mocks.usage).toHaveBeenCalledWith("solver", { githubId: "123" });
+  });
+  it("rejects an unknown target before queue admission", async () => {
+    expect((await POST(request(input, "?track=typo"))).status).toBe(400);
     expect(mocks.enqueue).not.toHaveBeenCalled();
   });
   it("rejects oversized unannounced bodies and forged manifest fields", async () => {

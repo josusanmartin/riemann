@@ -39,3 +39,32 @@ it("binds the proof digest, attestation and incumbent to the selected challenge"
   expect(() => assertCurrentRecord(both, {...simple.submission, id: "later"}, opening.id)).toThrow();
   expect(() => prepareDirectSubmission(input, "tester", first, "simple-zeros")).toThrow("strictly exceed");
 });
+
+it("generates different trusted Lean statements from the same claimed score", async () => {
+  const { execFileSync } = await import("node:child_process");
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join, resolve } = await import("node:path");
+  const root = mkdtempSync(join(tmpdir(), "riemann-tracks-"));
+  try {
+    for (const track of ["critical-line", "simple-zeros"] as const) {
+      const dir = join(root, track);
+      const out = join(dir, "out");
+      mkdirSync(join(dir, "proof"), { recursive: true });
+      mkdirSync(join(out, "comparator"), { recursive: true });
+      const incumbent = competitionIncumbent(records, track);
+      const candidate = prepareDirectSubmission({ id: "bound", displayName: "Test", method: "generation",
+        summary: "Check both interval declarations in the trusted reference.", score: { numerator: "1", denominator: "1" },
+        solution: "-- fixture", acceptLicense: true }, "tester", incumbent, track);
+      writeFileSync(join(dir, "submission.json"), candidate.manifest);
+      writeFileSync(join(dir, "proof/Solution.lean"), candidate.solution);
+      execFileSync(resolve("node_modules/.bin/tsx"), ["scripts/prepare-candidate.ts", dir, out]);
+      const reference = readFileSync(join(out, "comparator/Challenge/Candidate.lean"), "utf8");
+      const meta = JSON.parse(readFileSync(join(out, "verification-artifacts/bound.prepared.json"), "utf8"));
+      expect(meta).toMatchObject({ track, previousRecordId: incumbent.id });
+      const count = track === "simple-zeros" ? "Zeta23.Nsimple" : "N0star";
+      expect(reference).toContain("≤ " + count + " T (2 * T)");
+      expect(reference).toContain("≤ " + count + " 0 T");
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

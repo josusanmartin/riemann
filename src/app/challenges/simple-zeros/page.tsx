@@ -1,3 +1,4 @@
+import { ChallengeSwitcher } from "@/components/challenge-switcher";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getRecords } from "@/lib/records";
@@ -8,7 +9,8 @@ export const metadata: Metadata = { title: "Simple-zero leaderboard", descriptio
 
 export default function SimpleZeros() {
   const records = getRecords("simple-zeros");
-  return <main id="main-content" className={`shell section-space ${styles.directory}`}>
+  return <main id="main-content"><ChallengeSwitcher selected="simple-zeros" />
+    <div className={`shell section-space ${styles.directory}`}>
     <Link href="/challenges" className="text-link">← All challenges</Link>
     <h1>Simple zeros</h1>
     <p className={styles.lede}>Prove that a larger proportion of the nontrivial zeros of ζ have multiplicity one. Count every zero with multiplicity in the denominator.</p>
@@ -25,5 +27,5 @@ export default function SimpleZeros() {
       <p>Xu’s Theorem 1 gives a cumulative lower bound of 71.27406684% under RH. You can submit a Lean formalization of that theorem on its own.</p>
       <Link className="text-link" href="/challenges/simple-zeros/xu">See the fixed theorem and submit a project →</Link>
     </section>
-  </main>;
+  </div></main>;
 }

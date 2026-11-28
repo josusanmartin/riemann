@@ -1,3 +1,4 @@
+import { ChallengeSwitcher } from "@/components/challenge-switcher";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, CircleDot, Github, LockKeyhole, Sigma } from "lucide-react";
 import { ZetaField } from "@/components/zeta-field";
@@ -27,6 +28,7 @@ node public/cli/riemann.mjs submit Solution.lean --metadata candidate.json --dry
 
   return (
     <main id="main-content">
+      <ChallengeSwitcher selected="critical-line" />
       <section className="hero shell-wrap">
         <div className="shell hero-panel">
           <ZetaField />

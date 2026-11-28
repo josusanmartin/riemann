@@ -8,7 +8,6 @@ import { MobileMenu } from "@/components/mobile-menu";
 
 const primaryLinks = [
   { href: "/challenges", label: "Challenges" },
-  { href: "/challenge", label: "Rules" },
   { href: "/methodology", label: "Verification" },
   { href: "/submit", label: "Submit" },
 ];
