@@ -366,6 +366,20 @@ describe("automatic GitHub record promotion", () => {
     expect(github.requests.some((request) => request.method === "POST")).toBe(false);
   });
 
+  it("archives an old worker as superseded if its own board advanced before the verifier upgrade", async () => {
+    const { prepared, result, verifiedAt } = await fixture();
+    const newer = { ...getCurrentRecord(), id: "advanced-incumbent" };
+    const github = fakeGitHub("b".repeat(40), canonicalRecordsSnapshot, {
+      headRecordsSnapshot: JSON.stringify([...records, newer]),
+    });
+    const stale = { ...result, attestation: { ...result.attestation, verifierTemplateDigest: "0".repeat(64) } };
+    await expect(promoteVerifiedSubmission({
+      baseCommitSha: "a".repeat(40), previousRecordId: getCurrentRecord().id,
+      issuedAt: Date.parse(verifiedAt) - 1000, proofDigest: prepared.proofDigest,
+      manifest: prepared.manifest, solution: prepared.solution, result: stale,
+    }, {token: "test-token", fetchImplementation: github.fetchImplementation})).rejects.toBeInstanceOf(PromotionRaceError);
+    expect(github.requests.some(request => request.method === "POST")).toBe(false);
+  });
   it("rejects model or harness attribution changed after verification", async () => {
     const baseCommitSha = "e".repeat(40);
     const github = fakeGitHub(baseCommitSha);

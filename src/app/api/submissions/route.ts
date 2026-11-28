@@ -22,6 +22,7 @@ import {
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
   QueueCommitUncertainError,
+  readPublishedRecordId,
   SubmissionAlreadyQueuedError,
   SubmissionQueueFullError,
 } from "@/lib/submission-queue";
@@ -152,6 +153,12 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
+    // The public Git ledger may advance while the next website build is rolling out.
+    const publishedId = await readPublishedRecordId({}, track);
+    if (publishedId !== currentRecord.id) return noStore(409, {
+      error: "record_changed", message: "This leaderboard has a newer record. Refresh after the site updates before submitting. No slot was used.",
+      currentRecordId: publishedId,
+    });
     const issuedAt = Date.now();
     const job = reserveBoatJob(baseCommitSha, currentRecord.id, issuedAt);
     const admission = await enqueueVerificationJob(

@@ -1,3 +1,4 @@
+import { isPublicationMismatch } from "./publication-feedback";
 import { ZodError, z } from "zod";
 import contractJson from "../../challenge/contract.json";
 import {
@@ -499,6 +500,13 @@ export async function promoteVerifiedSubmission(
   try {
     validated = await validatePromotionInput(input, baseRecordsSnapshot);
   } catch (error) {
+    // A completed worker keeps its original receipt across upgrades. If its
+    // incumbent already lost, report the definitive scoring outcome.
+    if (initialHead !== input.baseCommitSha && error instanceof Error && isPublicationMismatch(error.message)) {
+      const manifest = submissionSchema.parse(JSON.parse(input.manifest));
+      const current = competitionIncumbent(await readRecords(client, initialHead), manifest.track);
+      if (current.id !== input.previousRecordId) throw new PromotionRaceError();
+    }
     // Every check here is deterministic over the signed job, the verifier
     // output and this deployment's trusted files, so a failure is permanent.
     if (error instanceof UnpublishableResultError || error instanceof PublicationMaterialUnavailable) throw error;
