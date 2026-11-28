@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "beiyi-devine-xu-detector-856103644555",
+  "track": "critical-line",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "score": {
+    "numerator": "17122072891114747019",
+    "denominator": "20000000000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Bei Yi adapts Michael Devine’s Apache-2.0 joint certificate in Yuanda Xu’s distinct-zero counting framework. This version retains the eight detectors and the weighted simple-zero estimate. It changes two detector coefficients in one square, preserves the unknown moment coefficients and weight, and updates the finite-precision error bounds with exact rational arithmetic.",
+  "method": "Two derivative-detector coefficients in the Devine–Xu joint moment certificate",
+  "model": null,
+  "harness": "Codex",
+  "license": "Apache-2.0"
+}

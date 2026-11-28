@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "track": "critical-line",
+  "submissionId": "beiyi-devine-xu-detector-856103644555",
+  "author": {
+    "github": "shudetangbei-glitch",
+    "displayName": "贝奕"
+  },
+  "model": null,
+  "harness": "Codex",
+  "score": {
+    "numerator": "17122072891114747019",
+    "denominator": "20000000000000000000"
+  },
+  "scoreDecimal": "0.856103644555737350950000000000",
+  "previousRecordId": "devine-xu-joint-856103644552",
+  "upstreamCommit": "3635e74826a4c1fcece7d1cd2b6fa75e43a00510",
+  "theoremNames": [
+    "candidate_strict_improvement",
+    "candidate_critical_line_bound",
+    "candidate_critical_line_bound_cumulative"
+  ],
+  "result": "kernel-verified",
+  "verifiedAt": "2026-11-28T11:49:01.761Z",
+  "challengeDigest": "6cca5de39bc071fce6e67e4ad9425458b8d1044e89ad3916b8555573b2c85eff",
+  "verifierTemplateDigest": "0f492db6b4c5b4b4123cf2bab67b4f5d2124ee4c1d0eec0880499ae8fbb92ce1",
+  "kernels": [
+    "lean",
+    "nanoda"
+  ],
+  "compactReplay": {
+    "policyVersion": 3,
+    "nanoda": {
+      "version": "0.4.32",
+      "sha256": "0b0a1335b7bba0a6d3ad66cf2b7cd7861a1a4c985553dccfff0e3c983963f762"
+    },
+    "referenceSha256": "8ce21c6bd04f50dbc21283f8d33917297c058861af2b1933947c5844c9c9d5f9",
+    "solutionSha256": "16537acb936b5dd25f74a83c725b5c5053eb8d3523cea4319698bb36349a3552"
+  },
+  "permittedAxioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+}
