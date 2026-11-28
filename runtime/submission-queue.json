@@ -1,6 +1,19 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-5516af12-f7e8-4c0d-ad2b-dee38abf6808",
+    "jobId": "5516af12-f7e8-4c0d-ad2b-dee38abf6808",
+    "proofDigest": "b408798d749debae07d073381ab923f993c61b418850a3eed5c69642b85f1c26",
+    "ownerKey": "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf",
+    "submissionKey": "24b18b75c11f8736b462aeb9cc5fa99e7a2856b190429faf83b435e1f6fd2f1e",
+    "enqueuedAt": "2026-11-28T08:21:25.293Z",
+    "boat": {
+      "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
+      "track": "simple-zeros",
+      "previousRecordId": "simple-zeros:opening",
+      "issuedAt": 1795854085292
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1699,7 +1712,8 @@
     "day": "2026-11-28",
     "attempts": {
       "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 4,
-      "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 1
+      "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 1,
+      "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf": 1
     }
   }
 }
