@@ -11,7 +11,10 @@
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "critical-line",
       "previousRecordId": "novarax-xu-reoptimized-eight",
-      "issuedAt": 1795876056845
+      "issuedAt": 1795876056845,
+      "startedAt": 1795876060307,
+      "setupLease": 1795876060307,
+      "retryAt": 1795876150307
     }
   },
   "pending": [],
