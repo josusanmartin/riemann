@@ -11,7 +11,7 @@ export default function Challenges() {
   const simple = getRecords("simple-zeros").at(-1);
   return <main id="main-content" className={`shell section-space ${styles.directory}`}>
     <h1>Challenges</h1>
-    <p className={styles.lede}>How many zeros lie on the critical line? How many occur only once? Each competition counts something different and keeps its own record.</p>
+    <p className={styles.lede}>One leaderboard counts distinct zero locations on the critical line. The other counts zeros of multiplicity one. Choose a board to see its records and submit a proof.</p>
     <div className={styles.boards}>
       <article>
         <h2>Distinct zeros on the critical line</h2>

@@ -47,6 +47,7 @@ function fakeGitHub(
   baseRecordsSnapshot = canonicalRecordsSnapshot,
   options: {
     comparison?: Comparison;
+    headRecordsSnapshot?: string;
     // Simulate an unrelated push landing between our read and our ref update.
     concurrentPushTo?: string;
   } = {},
@@ -81,7 +82,7 @@ function fakeGitHub(
       return response(options.comparison ?? { status: "ahead", files: [{ filename: "README.md" }] });
     }
     if (url.pathname.endsWith("/contents/data/records.json")) {
-      return response(baseRecordsSnapshot);
+      return response(url.searchParams.get("ref") === initialHead && options.headRecordsSnapshot ? options.headRecordsSnapshot : baseRecordsSnapshot);
     }
     if (url.pathname.endsWith("/git/blobs") && method === "POST") {
       const content = String((body as { content: string }).content);
@@ -253,6 +254,19 @@ describe("automatic GitHub record promotion", () => {
     );
     expect((commits[0].body as { parents: string[] }).parents).toEqual([movedHead]);
     expect(github.getHead()).toBe(promotion.promotionCommitSha);
+  });
+
+  it("preserves an intervening record on the other board when publishing", async () => {
+    const other = { ...getCurrentRecord(), id: "simple-other-board", track: "simple-zeros" };
+    const github = fakeGitHub("b".repeat(40), canonicalRecordsSnapshot, {
+      comparison: { status: "ahead", files: [{ filename: "data/records.json" }] },
+      headRecordsSnapshot: JSON.stringify([...records, other]),
+    });
+    const promotion = await promoteAgainst(github);
+    expect(promotion.status).toBe("promoted");
+    const ledger = [...github.blobs.values()].find(content => content.startsWith("["));
+    const published = JSON.parse(ledger!);
+    expect(published.slice(-2).map((entry: {id: string}) => entry.id)).toEqual([other.id, "direct-record-test"]);
   });
 
   it("rebuilds on main when an unrelated push wins the ref update", async () => {

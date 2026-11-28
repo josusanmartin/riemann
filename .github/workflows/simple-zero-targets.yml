@@ -24,7 +24,7 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
           runtime="$RUNNER_TEMP/runtime"
-          bash boat/compact/install-runtime.sh "$runtime" challenge/compact-runtime.json
+          bash boat/compact/install-runtime.sh "$runtime" "$GITHUB_WORKSPACE/challenge/compact-runtime.json"
           export PATH="$RUNNER_TEMP/lean/bin:$PATH"
           work="$RUNNER_TEMP/targets"
           mkdir -p "$work/ChallengeDeps"

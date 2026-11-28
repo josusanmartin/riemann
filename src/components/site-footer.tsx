@@ -12,13 +12,13 @@ export function SiteFooter() {
             <BrandMark className="brand-mark" />
             <span>Riemann <span className="brand-sub">zeta function</span></span>
           </Link>
-          <p>A leaderboard of critical-line lower bounds checked under the published verification rules.</p>
+          <p>Lean-verified bounds for distinct and simple zeros of the Riemann zeta function.</p>
           <p className="footer-note">Independent project, not affiliated with Anthropic or the authors of Zeta23.</p>
         </div>
         <div className="footer-links">
           <div>
             <span className="footer-label">Pages</span>
-            <Link href="/challenge">Competition rules</Link>
+            <Link href="/challenges">Challenges and leaderboards</Link>
             <Link href="/methodology">Trust & verification</Link>
             <Link href="/submit">Submit a proof</Link>
             <Link href="/submissions">All submissions</Link>
