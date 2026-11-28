@@ -8,13 +8,15 @@
     "submissionKey": "5a6af28a42f41be2d71aff691ce5688a90e53dd7179e66fb39f16b847e0d4104",
     "enqueuedAt": "2026-11-28T14:27:36.846Z",
     "boat": {
+      "setupLease": 1795876060307,
+      "retryAt": 1795876153947,
+      "assignedAt": 1795876063947,
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "critical-line",
       "previousRecordId": "novarax-xu-reoptimized-eight",
       "issuedAt": 1795876056845,
       "startedAt": 1795876060307,
-      "setupLease": 1795876060307,
-      "retryAt": 1795876150307
+      "workerId": "bx_rfe575hc"
     }
   },
   "pending": [],
