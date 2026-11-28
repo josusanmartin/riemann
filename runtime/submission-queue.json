@@ -8,13 +8,15 @@
     "submissionKey": "7a866e5e263b44e0a77bf64805c7c47fb04282712b01b166657009bafe848cf1",
     "enqueuedAt": "2026-11-28T12:01:48.502Z",
     "boat": {
+      "setupLease": 1795867312421,
+      "retryAt": 1795867405661,
+      "assignedAt": 1795867315661,
       "baseCommitSha": "fc4b753e2311b7a723b4c99a3ca6330875239eff",
       "track": "critical-line",
       "previousRecordId": "beiyi-devine-xu-detector-856103644555",
       "issuedAt": 1795867308502,
       "startedAt": 1795867312421,
-      "setupLease": 1795867312421,
-      "retryAt": 1795867402421
+      "workerId": "bx_fncdrqtm"
     }
   },
   "pending": [],
