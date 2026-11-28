@@ -2033,5 +2033,31 @@
     "pullRequestUrl": null,
     "summary": "Contribution by Kristian Muri Knausgård. The proof uses the reflected one-prime moment of knausgard-rh-reflected-bhb-78 (85.39%) and the optimised kernel of knausgard-rh-reflected-kernel-8542 (85.4225%). Let U be the short prime sum and F = ζ′(ρ)B(ρ)/log T the mollified derivative. The new input is the mean of Re(F conj(U²)). The D9 modules prove the two-prime case of Yuanda Xu’s Theorem 5.1 (arXiv:2611.34546) for these weights. A rational sum-of-squares inequality at each zero, averaged using fifteen moment bounds, gives N_d ≥ (0.85536627778 − o(1))N under RH on (T, 2T] and (0, T]. The formal proof of the Bui–Heath-Brown mollified moments comes from knausgard-rh-bui-heath-brown-deg40.",
     "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+  },
+  {
+    "id": "devine-xu-joint-certificate-855579",
+    "track": "critical-line",
+    "date": "2026-11-28",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.855579914687000000000000000000",
+    "method": "RH, Xu's counting framework for distinct zeros, and a joint dual certificate over mollified-derivative detectors with prime and two-prime sums",
+    "model": "Astra 6.2, Claude Fable 5.2, Claude Opus 5.5, Gemini Neon, Gemini Carbon",
+    "harness": "Codex, Claude Code, Antigravity CLI",
+    "scoreDecimal": "0.855579914687000000000000000000",
+    "scorePercent": "85.5579914687000000000000000000",
+    "exactRational": {
+      "numerator": "855579914687",
+      "denominator": "1000000000000"
+    },
+    "exactExpression": "(855579914687 : ℝ) / 1000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/72ccf50ede8b3933293de2d891b18be250859334/submissions/devine-xu-joint-certificate-855579/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/72ccf50ede8b3933293de2d891b18be250859334/submissions/devine-xu-joint-certificate-855579/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Assuming the Riemann hypothesis, we prove an asymptotic lower bound of 85.5579914687% for distinct critical-line zeros counted relative to all zeros counted with multiplicity, in both (T, 2T] and (0, T]. The proof applies Yuanda Xu's counting framework (arXiv:2611.34546v1) through a joint dual certificate whose moment inputs are all proved under RH; the separate simple-zero estimate enters with weight zero. It builds on the Bui–Heath-Brown mollifier method and Kristian Muri Knausgård's earlier Lean formalization.",
+    "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
   }
 ]
