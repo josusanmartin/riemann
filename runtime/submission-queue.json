@@ -1,41 +1,20 @@
 {
   "schemaVersion": 1,
   "active": {
-    "sandboxId": "boat-5516af12-f7e8-4c0d-ad2b-dee38abf6808",
-    "jobId": "5516af12-f7e8-4c0d-ad2b-dee38abf6808",
-    "proofDigest": "b408798d749debae07d073381ab923f993c61b418850a3eed5c69642b85f1c26",
-    "ownerKey": "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf",
-    "submissionKey": "24b18b75c11f8736b462aeb9cc5fa99e7a2856b190429faf83b435e1f6fd2f1e",
-    "enqueuedAt": "2026-11-28T08:21:25.293Z",
+    "sandboxId": "boat-0a091f4a-1ad3-40dd-9177-2b787cfcde33",
+    "jobId": "0a091f4a-1ad3-40dd-9177-2b787cfcde33",
+    "proofDigest": "643321fb49941299e19ad971c36a37118eb7446e354ede7082b48c9db60d5fb2",
+    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
+    "submissionKey": "aa2e1674787a28cd454f9a917fd44a0c3d8d9e6eb3baeef881e368a18d1938c1",
+    "enqueuedAt": "2026-11-28T08:22:28.346Z",
     "boat": {
-      "setupLease": 1795854088705,
-      "retryAt": 1795854182012,
-      "assignedAt": 1795854092012,
-      "stagedAt": 1795854097133,
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
-      "track": "simple-zeros",
-      "previousRecordId": "simple-zeros:opening",
-      "issuedAt": 1795854085292,
-      "startedAt": 1795854088705,
-      "workerId": "bx_arm456un",
-      "uploaded": true
+      "track": "critical-line",
+      "previousRecordId": "devine-xu-joint-856103644552",
+      "issuedAt": 1795854148346
     }
   },
   "pending": [
-    {
-      "sandboxId": "boat-0a091f4a-1ad3-40dd-9177-2b787cfcde33",
-      "jobId": "0a091f4a-1ad3-40dd-9177-2b787cfcde33",
-      "proofDigest": "643321fb49941299e19ad971c36a37118eb7446e354ede7082b48c9db60d5fb2",
-      "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-      "submissionKey": "aa2e1674787a28cd454f9a917fd44a0c3d8d9e6eb3baeef881e368a18d1938c1",
-      "enqueuedAt": "2026-11-28T08:22:28.346Z",
-      "boat": {
-        "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
-        "track": "critical-line",
-        "previousRecordId": "devine-xu-joint-856103644552",
-        "issuedAt": 1795854148346
-      }
-    },
     {
       "sandboxId": "boat-edcf60aa-ed38-42cc-9c7b-c49e5f23d167",
       "jobId": "edcf60aa-ed38-42cc-9c7b-c49e5f23d167",
@@ -52,6 +31,16 @@
     }
   ],
   "completed": [
+    {
+      "jobId": "5516af12-f7e8-4c0d-ad2b-dee38abf6808",
+      "proofDigest": "b408798d749debae07d073381ab923f993c61b418850a3eed5c69642b85f1c26",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/75065e5f4ca6d2a6c4388c7166dedbbac9032e0d/submissions/devine-simple-zeros-opening",
+      "completedAt": "2026-11-28T09:53:02.736Z",
+      "logArchived": true
+    },
     {
       "jobId": "b0bd9c46-360d-4388-a001-c00f08082555",
       "proofDigest": "221769c49f92d0921850096b4c23b8edb7e71fd0385c4875b557574fc446fedd",
