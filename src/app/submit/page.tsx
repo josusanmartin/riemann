@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { verificationDuration } from "@/lib/verification-duration";
 import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { boatSelected,boatConfigured } from "@/lib/boat-worker";
@@ -53,7 +54,8 @@ export const metadata: Metadata = {
     "Upload an exact rational and Lean proof for isolated two-kernel verification.",
 };
 
-export default async function SubmitPage() {
+export default async function SubmitPage({ searchParams }: {searchParams: Promise<{track?: string}>}) {
+  if ((await searchParams).track === "simple-zeros") redirect("/challenges/simple-zeros");
   const session = await getSession();
   const github = session?.user.githubLogin;
   const current = getCurrentRecord();
