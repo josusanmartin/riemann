@@ -2137,5 +2137,31 @@
     "pullRequestUrl": null,
     "summary": "Bei Yi adapts Michael Devine’s Apache-2.0 joint certificate in Yuanda Xu’s distinct-zero counting framework. This version retains the eight detectors and the weighted simple-zero estimate. It changes two detector coefficients in one square, preserves the unknown moment coefficients and weight, and updates the finite-precision error bounds with exact rational arithmetic.",
     "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+  },
+  {
+    "id": "novarax-xu-reoptimized-eight",
+    "track": "critical-line",
+    "date": "2026-11-28",
+    "author": "Rafał Wiktorowicz and Braun SI Wiktorowicz (NovaraX)",
+    "github": "onlypositivetravelvibes-dotcom",
+    "title": "Certified critical-line bound 0.856402019055571541854627336806",
+    "method": "Eight-detector certificate with reoptimized dual multipliers, four rational PSD repairs and the signed multiplicity bound.",
+    "model": "Braun SI engine",
+    "harness": "NovaraX",
+    "scoreDecimal": "0.856402019055571541854627336806",
+    "scorePercent": "85.6402019055571541854627336806",
+    "exactRational": {
+      "numerator": "85640201905557154185462733680664079111989355705117781384288176474682649",
+      "denominator": "100000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "exactExpression": "(85640201905557154185462733680664079111989355705117781384288176474682649 : ℝ) / 100000000000000000000000000000000000000000000000000000000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/401452f6d1bf91c728f5f1d54dff88090c4e61c4/submissions/novarax-xu-reoptimized-eight/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/401452f6d1bf91c728f5f1d54dff88090c4e61c4/submissions/novarax-xu-reoptimized-eight/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Rafał Wiktorowicz and Braun SI adapt Michael Devine's public Apache-2.0 eight-detector formalisation (85.6399404234%) in Yuanda Xu's distinct-zero counting framework, on Kristian Muri Knausgård's Lean foundations. We reoptimise the affine dual multipliers and rebuild the four rational PSD repairs, lowering the repair cost about tenfold. The distinct-zero transfer also appears in our v15 Zenodo record. Warm thanks to all three.",
+    "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
   }
 ]
