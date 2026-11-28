@@ -11,12 +11,14 @@
       "setupLease": 1795859602495,
       "retryAt": 1795859695576,
       "assignedAt": 1795859605576,
+      "stagedAt": 1795859610812,
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
       "track": "critical-line",
       "previousRecordId": "devine-xu-joint-856103644552",
       "issuedAt": 1795859032057,
       "startedAt": 1795859602495,
-      "workerId": "bx_rtqt3e6k"
+      "workerId": "bx_rtqt3e6k",
+      "uploaded": true
     }
   },
   "pending": [],
