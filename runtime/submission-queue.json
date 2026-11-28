@@ -11,7 +11,10 @@
       "baseCommitSha": "fc4b753e2311b7a723b4c99a3ca6330875239eff",
       "track": "critical-line",
       "previousRecordId": "beiyi-devine-xu-detector-856103644555",
-      "issuedAt": 1795867308502
+      "issuedAt": 1795867308502,
+      "startedAt": 1795867312421,
+      "setupLease": 1795867312421,
+      "retryAt": 1795867402421
     }
   },
   "pending": [],
