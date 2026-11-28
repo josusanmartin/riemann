@@ -11,11 +11,13 @@
       "setupLease": 1795844929167,
       "retryAt": 1795845022613,
       "assignedAt": 1795844932613,
+      "stagedAt": 1795844937421,
       "baseCommitSha": "4bcf1b23d82cdd53df8d5722c4e57cdc54b8c28b",
       "previousRecordId": "devine-xu-joint-certificate-855579",
       "issuedAt": 1795844925180,
       "startedAt": 1795844929167,
-      "workerId": "bx_8mkmpr65"
+      "workerId": "bx_8mkmpr65",
+      "uploaded": true
     }
   },
   "pending": [],
