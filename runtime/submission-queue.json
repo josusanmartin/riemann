@@ -8,12 +8,14 @@
     "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
     "enqueuedAt": "2026-11-28T01:31:21.225Z",
     "boat": {
+      "setupLease": 1795829484601,
+      "retryAt": 1795829578793,
+      "assignedAt": 1795829488793,
       "baseCommitSha": "80ff930eb6b68b755876d41eda4e408cb0b3fbf8",
       "previousRecordId": "knausgard-rh-two-prime-855366",
       "issuedAt": 1795829481225,
       "startedAt": 1795829484601,
-      "setupLease": 1795829484601,
-      "retryAt": 1795829574601
+      "workerId": "bx_rcwsjtu2"
     }
   },
   "pending": [],
