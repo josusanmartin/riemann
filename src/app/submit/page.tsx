@@ -1,3 +1,4 @@
+import { verificationDuration } from "@/lib/verification-duration";
 import { compactRuntimePinned } from "@/lib/compact-runtime";
 import { boatSelected,boatConfigured } from "@/lib/boat-worker";
 import type { Metadata } from "next";
@@ -220,7 +221,7 @@ export default async function SubmitPage() {
               <code> 1/3 → 2/3 </code> test proof belongs in the noncompetitive
               flow-test lane above, not here.
             </p>
-            {boatSelected() && <p>The standard 16 GB worker verified the 85.4225% record in 89 minutes, including setup. Each proof has a 5,800-second verification limit. Time spent in the queue is additional.</p>}
+            {boatSelected() && <p>The standard 16 GB worker verified the 85.4225% record in 89 minutes, including setup. Each proof has up to {verificationDuration} for verification. Time spent in the queue is additional.</p>}
           </div>
           <div className="current-record-chip">
             <span>Current formal record</span>

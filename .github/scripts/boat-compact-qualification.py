@@ -35,7 +35,8 @@ def api(path, method="GET", data=None, idempotency=None):
         raise RuntimeError("Boat did not confirm " + path)
     return result
 
-# Two hours on the normal 16 GB worker at $0.072/hour plus one start surcharge of at most $0.07.
+limits = json.loads((Path(__file__).resolve().parents[2] / "boat/compact/time-limits.json").read_text())
+lifetime = limits["workerLifetimeSeconds"]
 # No API key, organization environment, snapshot or forwarding is copied into the guest.
 setup = f"""set -euo pipefail
 cd "$HOME"
@@ -51,7 +52,7 @@ done > qualification-diagnostic.txt
 exit "$status" """
 request = {"type": "large", "name": "Compact RH qualification", "org": "personal",
            "environment": "riemann-production", "visibility": "private", "noEnv": True,
-           "snapshots": False, "monitoring": False, "ttlSeconds": 7200,
+           "snapshots": False, "monitoring": False, "ttlSeconds": lifetime,
            "labels": {"service": "riemann", "kind": "qualification", "revision": revision}, "setupScript": setup}
 worker = api("/sandboxes", "POST", request, "compact-qualification-" + os.environ["GITHUB_RUN_ID"])["sandbox"]["id"]
 if not re.fullmatch(r"bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}", worker):
@@ -59,7 +60,8 @@ if not re.fullmatch(r"bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}", worker):
 endpoint = "/sandboxes/" + worker
 print("Qualification worker", worker, flush=True)
 try:
-    for _ in range(240):
+    deadline = time.monotonic() + lifetime
+    while time.monotonic() < deadline:
         box = api(endpoint)["sandbox"]
         if box.get("holdsCreatorLogins") is not False or box.get("snapshots") is not False or box.get("environment") != "riemann-production":
             raise RuntimeError("Qualification worker isolation differs from production")
@@ -101,7 +103,7 @@ finally:
     except urllib.error.HTTPError as error:
         if error.code not in (403, 404):
             raise
-        print("Usage is unavailable to the scoped key. The two-hour worker TTL applies.", flush=True)
+        print("Usage is unavailable to the scoped key. The configured worker auto-stop applies.", flush=True)
     finally:
         try:
             api(endpoint + "/stop", "POST", {})

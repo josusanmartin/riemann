@@ -72,7 +72,8 @@ sudo chmod -R a+rX,go-w "$root"
 sudo chmod 0700 "$HOME"
 enter_stage check-proof
 status=0
-sudo timeout -k 15s 5800s bash boat/compact/run-job.sh "$root/prepared" "$root/runtime" "$root/lean" \
+verification_seconds=$(python3 -c 'import json; print(json.load(open("boat/compact/time-limits.json"))["verificationSeconds"])')
+sudo timeout -k 15s "${verification_seconds}s" bash boat/compact/run-job.sh "$root/prepared" "$root/runtime" "$root/lean" \
   "$memory_limit" "$root/kernel-receipt.json" > "$HOME/riemann-proof.log" 2>&1 || status=$?
 stage_event "exit=$status"
 enter_stage seal-receipt
