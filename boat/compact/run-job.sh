@@ -10,6 +10,7 @@ memory=${4:?memory ceiling}
 [[ "$memory" == 12G || "$memory" == 28G ]]
 receipt=$(realpath -m "${5:?supervisor-owned receipt destination}")
 here=$(cd "$(dirname "$0")" && pwd)
+verification_seconds=$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["verificationSeconds"])' "$here/time-limits.json")
 export PATH="$prefix/bin:/usr/bin:/bin"
 [[ $(lean --githash) == eb6cafb7290e8bd5f2937522d8d804f58f02bafc ]]
 work=$(mktemp -d /var/lib/riemann-compact.XXXXXXXX)
@@ -60,7 +61,7 @@ isolated() {
     -p PrivateTmp=yes -p PrivateDevices=yes -p ProtectProc=invisible -p ProtectControlGroups=yes \
     -p ProtectKernelTunables=yes -p RestrictSUIDSGID=yes -p KillMode=control-group -p UMask=0077 \
     -p "MemoryMax=$memory" -p MemorySwapMax=0 -p TasksMax=512 -p LimitFSIZE=8589934592 -p LimitSTACK=infinity \
-    -p RuntimeMaxSec=5800 -p OOMPolicy=kill "$@" || status=$?
+    -p "RuntimeMaxSec=$verification_seconds" -p OOMPolicy=kill "$@" || status=$?
   if (( status != 0 )) && [[ $(systemctl show "$unit.service" -p Result --value) == oom-kill ]]; then
     touch "$receipt.oom"
   fi

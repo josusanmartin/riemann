@@ -77,7 +77,7 @@ Lean elaboration executes contributor-controlled metaprograms. Never run an unfa
 
 ## Test the verifier on Boat
 
-The operator flow test submits the fixed 2/3 proof against the 1/3 test incumbent through the same production worker. Its receipt stays outside the competitive ranking. To qualify a new runtime against the archived 85.4225% upload, use the **Qualify the compact verifier on Boat** workflow. Each launch creates a paid worker with a two-hour auto-stop. [Worker build and local replay](boat/compact/README.md).
+The operator flow test submits the fixed 2/3 proof against the 1/3 test incumbent through the same production worker. Its receipt stays outside the competitive ranking. To qualify a new runtime against the archived 85.4225% upload, use the **Qualify the compact verifier on Boat** workflow. Each launch creates a paid worker that stops automatically after at most 3 hours 20 minutes. [Worker build and local replay](boat/compact/README.md).
 
 ## Research evidence
 
@@ -87,7 +87,7 @@ Promotion to the competitive leaderboard requires an official verification of th
 
 ## On-demand Boat verification
 
-The deployment setting `RIEMANN_VERIFIER_PROVIDER=boat` selects disposable Boat workers for new submissions and the operator flow test. The website and the encrypted Git-backed FIFO remain on their existing services. A waiting competitive proof has a logical job ID. Only the head of the FIFO can provision a VM. A job-specific signed notification wakes the website when a competitive receipt is ready. The website fetches that receipt directly from Boat. Status polling and the scheduled sweep resume interrupted provisioning and recover missed notifications. A two-hour auto-stop bounds an orphaned worker's lifetime.
+The deployment setting `RIEMANN_VERIFIER_PROVIDER=boat` selects disposable Boat workers for new submissions and the operator flow test. The website and the encrypted Git-backed FIFO remain on their existing services. A waiting competitive proof has a logical job ID. Only the head of the FIFO can provision a VM. A job-specific signed notification wakes the website when a competitive receipt is ready. The website fetches that receipt directly from Boat. Status polling and the scheduled sweep resume interrupted provisioning and recover missed notifications. Boat automatically stops an orphaned worker after 3 hours 20 minutes.
 
 Create the Boat environment `riemann-production` with **Safe for third parties** enabled. Restrict its expiring API key to this environment and the actions `sandbox.create`, `sandbox.read`, `sandbox.stop`, `file.read`, and `file.write`. Set the GitHub Actions secret `RIEMANN_BOAT_API_KEY` and the repository variable `RIEMANN_VERIFIER_PROVIDER`. Dispatch **Deploy production website** on main with `sync_boat_key` enabled to put the key in the production project's sensitive environment. Rotate the key before expiry. Policy v3 requires Boat for new admissions. Historical receipts identify the provider and revision that checked them.
 

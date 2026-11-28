@@ -34,7 +34,7 @@ vi.mock("./boat-worker", () => ({
   stageBoatFiles: m.upload,
   boatResult: m.result,
   stopBoatWorker: m.stop,
-  workerLifetime: 7200000,
+  workerLifetime: 12000000,
 }));
 vi.mock("./queue-orchestration", () => ({
   advanceVerificationQueue: m.advance,

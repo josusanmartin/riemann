@@ -11,6 +11,7 @@ it("reports the active Boat source pin separately from a stale E2B template", as
   vi.stubEnv("E2B_TEMPLATE_DIGEST", "b".repeat(64));
   const health = await (await GET()).json();
   expect(health).toMatchObject({
+    verificationSeconds: 10800, workerLifetimeSeconds: 12000,
     verifierIdentity: { provider: "boat", pinType: "git-commit", expectedCommit: sha, configured: true },
     e2bTemplateIdentityConfigured: false, verifierTemplateIdentityConfigured: true,
   });

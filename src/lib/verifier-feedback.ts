@@ -145,7 +145,7 @@ export function describeVerifierRejection(
     return feedback({
       code: "verifier-infrastructure", stage: "infrastructure",
       title: "Worker setup timed out",
-      detail: "The service reached its two-hour limit while preparing a worker. No Lean or kernel verdict was recorded.",
+      detail: "The worker setup window expired. No Lean or kernel verdict was recorded.",
       action: "Check your submission history for an existing retry. Please contact the maintainers if worker setup fails again.",
       retryable: true,
     });

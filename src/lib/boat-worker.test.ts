@@ -30,7 +30,7 @@ it("uses one idempotency key per reserved job and isolates account data", async 
     monitoring: false,
     snapshots: false,
     environment: "riemann-production",
-    ttlSeconds: 7200,
+    ttlSeconds: 12000,
   });
   expect(JSON.parse(init.body).labels).toMatchObject({ job, kind: "competitive", revision: sha });
   expect(JSON.parse(init.body).setupScript).toContain('test "$actual" = ' + sha);

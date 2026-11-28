@@ -1,3 +1,4 @@
+import limits from "../../boat/compact/time-limits.json";
 import { readBoundedText } from "./request-json";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -13,7 +14,7 @@ export function boatConfigured() {
 export const workerId = z
   .string()
   .regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/);
-export const workerLifetime = 2 * 60 * 60 * 1000;
+export const workerLifetime = limits.workerLifetimeSeconds * 1000;
 const commit = z.string().regex(/^[0-9a-f]{40}$/);
 const digest = z.string().regex(/^[0-9a-f]{64}$/);
 

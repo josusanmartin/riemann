@@ -1,3 +1,4 @@
+import { verificationDuration, workerDuration } from "@/lib/verification-duration";
 import nanodaRelease from "../../../boat/compact/nanoda-release.json";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -97,7 +98,7 @@ export default function ChallengePage() {
         <dl className="sandbox-limits">
           <div><dt>Source and dependencies</dt><dd>One UTF-8 <code>Solution.lean</code>, up to 2,000,000 bytes. The entire encoded API request may use up to 4,000,000 bytes. Imports must be available in the pinned environment.</dd></div>
           <div><dt>Memory and retry</dt><dd>The standard worker has 16 GB of RAM and a 12 GiB verifier cap. A kernel-confirmed out-of-memory kill triggers one retry on a 32 GB worker with a 28 GiB cap. It keeps the same proof, queue position and daily slot. A timeout or proof error ends the attempt.</dd></div>
-          <div><dt>Time</dt><dd>The full verification command has 5,800 seconds (96 minutes 40 seconds) per attempt for preparation, compilation, export and replay. The site retries worker assignment and proof transfer within a three-minute setup window. Each assigned VM has a two-hour lifetime.</dd></div>
+          <div><dt>Time</dt><dd>Each attempt has {verificationDuration} in total for proof compilation, export and kernel checks. Queue time is separate. The site retries worker assignment and proof transfer within a three-minute setup window. The VM stops when the job finishes and has a maximum lifetime of {workerDuration}.</dd></div>
           <div><dt>Processes and files</dt><dd>Lean is configured for two threads. The isolated check allows up to 512 tasks (processes and threads) and limits each file it writes to 8 GiB.</dd></div>
           <div><dt>Isolation</dt><dd>Proof code runs as an unprivileged user without network access or publishing credentials. The verifier, toolchain and staged inputs are read-only to that user. Dependencies are prepared before the proof runs.</dd></div>
           <div><dt>Queue and publication</dt><dd>One job runs at a time in admission order. Each GitHub account gets five admissions per UTC day, resetting at 00:00 UTC. Every admitted upload is archived privately, including failed attempts. Accepted proofs are published under Apache-2.0.</dd></div>
