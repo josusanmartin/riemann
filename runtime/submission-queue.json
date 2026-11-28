@@ -1,28 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-edcf60aa-ed38-42cc-9c7b-c49e5f23d167",
-    "jobId": "edcf60aa-ed38-42cc-9c7b-c49e5f23d167",
-    "proofDigest": "56f5e053b8dffe1ef4773a1f7bf59ad4c2def257a2f38e8629c519331696d6db",
-    "ownerKey": "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631",
-    "submissionKey": "37c134af0006f7927d51cb772c241a0d321f88b8bb49fc9a8b5855fc4e33d2ae",
-    "enqueuedAt": "2026-11-28T09:43:52.057Z",
-    "boat": {
-      "setupLease": 1795859602495,
-      "retryAt": 1795859695576,
-      "assignedAt": 1795859605576,
-      "stagedAt": 1795859610812,
-      "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
-      "track": "critical-line",
-      "previousRecordId": "devine-xu-joint-856103644552",
-      "issuedAt": 1795859032057,
-      "startedAt": 1795859602495,
-      "workerId": "bx_rtqt3e6k",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "edcf60aa-ed38-42cc-9c7b-c49e5f23d167",
+      "proofDigest": "56f5e053b8dffe1ef4773a1f7bf59ad4c2def257a2f38e8629c519331696d6db",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/0bde2ecb266bf9a406f849f2c3b90bd7374e7c22/submissions/beiyi-devine-xu-detector-856103644555",
+      "completedAt": "2026-11-28T11:49:02.002Z",
+      "logArchived": true
+    },
     {
       "jobId": "0a091f4a-1ad3-40dd-9177-2b787cfcde33",
       "proofDigest": "643321fb49941299e19ad971c36a37118eb7446e354ede7082b48c9db60d5fb2",
