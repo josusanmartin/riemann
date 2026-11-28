@@ -1,25 +1,26 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-fb63a73b-9679-4eba-98d3-1111842312bc",
-    "jobId": "fb63a73b-9679-4eba-98d3-1111842312bc",
-    "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
-    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-    "submissionKey": "c15c1a18d2469b69c2e7147aea440ee755264571dfbaf7e38822b6ae8064619b",
-    "enqueuedAt": "2026-11-28T05:32:57.732Z",
-    "boat": {
-      "setupLease": 1795843981292,
-      "retryAt": 1795844074444,
-      "assignedAt": 1795843984444,
-      "baseCommitSha": "4bcf1b23d82cdd53df8d5722c4e57cdc54b8c28b",
-      "previousRecordId": "devine-xu-joint-certificate-855579",
-      "issuedAt": 1795843977732,
-      "startedAt": 1795843981292,
-      "workerId": "bx_d8w2v6dz"
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "fb63a73b-9679-4eba-98d3-1111842312bc",
+      "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
+      "outcome": "rejected",
+      "promotionStatus": null,
+      "message": "Boat declined worker setup.",
+      "feedback": {
+        "code": "verifier-infrastructure",
+        "stage": "infrastructure",
+        "title": "Boat declined worker setup",
+        "detail": "The provider declined a setup request. No proof verdict was recorded.",
+        "action": "Open the recorded setup log for the last available error and share the job ID with the maintainers.",
+        "retryable": true
+      },
+      "evidenceUrl": null,
+      "completedAt": "2026-11-28T05:33:09.002Z",
+      "logArchived": true
+    },
     {
       "jobId": "17890daa-167f-480b-a6db-96720a30a98e",
       "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
