@@ -1,28 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-5b8a098f-635e-4ed8-873e-a4344acf6b9e",
-    "jobId": "5b8a098f-635e-4ed8-873e-a4344acf6b9e",
-    "proofDigest": "ab12aebc158e6f5cc4476277e37d20ff43883a9a02dbe27b513d5f6313abc5c0",
-    "ownerKey": "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53",
-    "submissionKey": "7a866e5e263b44e0a77bf64805c7c47fb04282712b01b166657009bafe848cf1",
-    "enqueuedAt": "2026-11-28T12:04:20.824Z",
-    "boat": {
-      "setupLease": 1795867465039,
-      "retryAt": 1795867558612,
-      "assignedAt": 1795867468612,
-      "stagedAt": 1795867474600,
-      "baseCommitSha": "fc4b753e2311b7a723b4c99a3ca6330875239eff",
-      "track": "critical-line",
-      "previousRecordId": "beiyi-devine-xu-detector-856103644555",
-      "issuedAt": 1795867460824,
-      "startedAt": 1795867465039,
-      "workerId": "bx_4kx35k2v",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "5b8a098f-635e-4ed8-873e-a4344acf6b9e",
+      "proofDigest": "ab12aebc158e6f5cc4476277e37d20ff43883a9a02dbe27b513d5f6313abc5c0",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/401452f6d1bf91c728f5f1d54dff88090c4e61c4/submissions/novarax-xu-reoptimized-eight",
+      "completedAt": "2026-11-28T13:16:16.415Z",
+      "logArchived": true
+    },
     {
       "jobId": "a3839998-4321-48f5-9ddb-208f87b128e9",
       "proofDigest": "ab12aebc158e6f5cc4476277e37d20ff43883a9a02dbe27b513d5f6313abc5c0",
