@@ -11,7 +11,10 @@
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
       "track": "critical-line",
       "previousRecordId": "devine-xu-joint-856103644552",
-      "issuedAt": 1795854148346
+      "issuedAt": 1795854148346,
+      "startedAt": 1795859593024,
+      "setupLease": 1795859593024,
+      "retryAt": 1795859683024
     }
   },
   "pending": [
