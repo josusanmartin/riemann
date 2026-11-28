@@ -12,14 +12,16 @@
     ],
     "boat": {
       "memoryReplayOf": "c9840120-af03-4e9c-8aee-cbe279c86d43",
+      "setupLease": 1795898771098,
+      "retryAt": 1795898864420,
+      "assignedAt": 1795898774420,
       "retiredWorkerId": "bx_jg286xn4",
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "simple-zeros",
       "previousRecordId": "devine-simple-zeros-opening",
       "issuedAt": 1795898768315,
       "startedAt": 1795898771098,
-      "setupLease": 1795898771098,
-      "retryAt": 1795898861098
+      "workerId": "bx_awvaz45c"
     }
   },
   "pending": [
