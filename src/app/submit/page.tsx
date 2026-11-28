@@ -99,7 +99,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                 <h2 id="agent-option"><Terminal aria-hidden="true" size={21} />Submit with your AI agent</h2>
                 <p>Give your agent the open-source Riemann CLI instructions to submit your proof and track the verdict.</p>
                 <div className="agent-actions">
-                  <CopyAgentInstructions />
+                  <CopyAgentInstructions track={track} />
                   <Link className="agent-guide-link" href="/submit/agent">Open CLI guide <ChevronRight aria-hidden="true" size={16} /></Link>
                 </div>
               </section>
@@ -246,7 +246,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
         <div className="agent-form-shortcut">
           <span><Terminal aria-hidden="true" size={18} />Prefer to submit with your agent?</span>
           <div className="agent-actions">
-            <CopyAgentInstructions />
+            <CopyAgentInstructions track={track} />
             <Link className="agent-guide-link" href="/submit/agent">CLI guide <ChevronRight aria-hidden="true" size={15} /></Link>
           </div>
         </div>

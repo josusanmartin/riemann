@@ -14,6 +14,9 @@ export default function XuTheorem() {
     <p className={styles.lede}>Assuming RH, at least 71.27406684% of nontrivial zeta zeros are simple in the cumulative limit. The challenge is to formalize this theorem in Lean.</p>
     <div className={styles.actions}><a className="button button-dark" href={`${repositoryUrl}/issues/new?template=simple-zeros.yml`}>Submit a project for review</a>
       <a className="text-link" href="/templates/XuSimpleZeros.lean" download>Download the Lean statement</a></div>
+    <h2>Submitted for review</h2>
+    <p>Michael Devine submitted an alternative derivation of the fixed cumulative statement in a pinned Lean project. Its stronger declaration, <code>devine_simple_zeros_fullscale</code>, states <strong>71.27988084695677%</strong> for the ordinary simple-zero count under RH. It converts a distinct-zero estimate using S ≥ 2D − N.</p>
+    <p>Devine reports a successful Lean check against compiled dependencies with the three standard axioms. Independent replay of the submitted project is pending. The project is listed here as research evidence. A ranked entry requires both interval statements and an official two-kernel replay. <a className="text-link" href="https://github.com/josusanmartin/riemann/issues/29">Review submission #29</a> · <a className="text-link" href="https://github.com/MichaelDevine/riemann-lean-proofs/blob/09360ed245f3fa5c75499484d100e2e917303b0f/Proofs/DevineSimpleZeros.lean#L37">Pinned stronger theorem</a></p>
     <h2>The target</h2>
     <p>Prove Theorem 1 at its stated precision for positive ordinates up to height T. The abstract truncates the percentage. The paper gives a separate theorem about distinct zeros. <a className="text-link" href="https://arxiv.org/html/2611.34546v1#S1.SS2">Read Xu’s theorems</a></p>
     <CodeBlock label="XuSimpleZeros.lean">{readFileSync("public/templates/XuSimpleZeros.lean", "utf8")}</CodeBlock>
