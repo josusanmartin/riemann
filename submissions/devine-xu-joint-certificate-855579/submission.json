@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "devine-xu-joint-certificate-855579",
+  "track": "critical-line",
+  "author": {
+    "github": "MichaelDevine",
+    "displayName": "Michael Devine"
+  },
+  "score": {
+    "numerator": "855579914687",
+    "denominator": "1000000000000"
+  },
+  "proof": {
+    "solution": "proof/Solution.lean",
+    "theorem": "candidate_critical_line_bound",
+    "cumulativeTheorem": "candidate_critical_line_bound_cumulative",
+    "improvementTheorem": "candidate_strict_improvement"
+  },
+  "summary": "Assuming the Riemann hypothesis, we prove an asymptotic lower bound of 85.5579914687% for distinct critical-line zeros counted relative to all zeros counted with multiplicity, in both (T, 2T] and (0, T]. The proof applies Yuanda Xu's counting framework (arXiv:2611.34546v1) through a joint dual certificate whose moment inputs are all proved under RH; the separate simple-zero estimate enters with weight zero. It builds on the Bui–Heath-Brown mollifier method and Kristian Muri Knausgård's earlier Lean formalization.",
+  "method": "RH, Xu's counting framework for distinct zeros, and a joint dual certificate over mollified-derivative detectors with prime and two-prime sums",
+  "model": "Astra 6.2, Claude Fable 5.2, Claude Opus 5.5, Gemini Neon, Gemini Carbon",
+  "harness": "Codex, Claude Code, Antigravity CLI",
+  "license": "Apache-2.0"
+}
