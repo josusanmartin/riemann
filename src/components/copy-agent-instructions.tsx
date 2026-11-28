@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
-const instructions = "Use the open-source Riemann CLI to submit my Lean proof and track the verdict. Follow https://www.riemannzeta.fun/agent-guide.md for login, required metadata, the local dry-run, submission and polling.";
+import type { CompetitionTrack } from "@/lib/challenge";
 
-export function CopyAgentInstructions() {
+export function CopyAgentInstructions({ track }: { track: CompetitionTrack }) {
+  const starter = track === "simple-zeros" ? "Simple.lean" : "Solution.lean";
+  const instructions = `Use the open-source Riemann CLI to submit my Lean proof to the ${track} leaderboard and track the verdict. Pass --track ${track} to both riemann record and riemann submit, including the dry-run. Get the starter at https://www.riemannzeta.fun/templates/${starter}. Follow https://www.riemannzeta.fun/agent-guide.md for login, metadata and polling.`;
   const [state, setState] = useState<"ready" | "copied" | "manual">("ready");
   async function copy() {
     try {
