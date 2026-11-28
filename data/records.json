@@ -2085,5 +2085,31 @@
     "pullRequestUrl": null,
     "summary": "Assuming RH, the asymptotic proportion of distinct critical-line zeros is at least 85.6103644552% in both dyadic (T, 2T] and cumulative (0, T] windows, with the denominator counting multiplicity. We combine Yuanda Xu’s weighted simple-zero estimate with our joint certificate.",
     "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+  },
+  {
+    "id": "devine-simple-zeros-opening",
+    "track": "simple-zeros",
+    "date": "2026-11-28",
+    "author": "Michael Devine (submitted by Josu San Martin)",
+    "github": "josusanmartin",
+    "title": "Certified simple-zero bound 0.712798808469567774037445962478",
+    "method": "Michael Devine’s eight-detector distinct-zero bound and the inequality S ≥ 2D − N in each height interval.",
+    "model": "See upstream credits; ranked adaptation by Codex",
+    "harness": "Riemann CLI",
+    "scoreDecimal": "0.712798808469567774037445962478",
+    "scorePercent": "71.2798808469567774037445962478",
+    "exactRational": {
+      "numerator": "7127988084695677740374459624784369347858974492211694521760654840900887",
+      "denominator": "10000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "exactExpression": "(7127988084695677740374459624784369347858974492211694521760654840900887 : ℝ) / 10000000000000000000000000000000000000000000000000000000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/75065e5f4ca6d2a6c4388c7166dedbbac9032e0d/submissions/devine-simple-zeros-opening/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/75065e5f4ca6d2a6c4388c7166dedbbac9032e0d/submissions/devine-simple-zeros-opening/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Opening simple-zero submission adapted by Josu San Martin from Michael Devine’s Apache-2.0 formalization for issue #29, revision 09360ed245f3fa5c75499484d100e2e917303b0f. At least 71.27988084695677% of zeros are simple in both dyadic and cumulative windows, under the verifier’s pinned RH foundation. Mathematical and upstream credits are retained in the proof.",
+    "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
   }
 ]
