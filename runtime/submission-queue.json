@@ -11,7 +11,10 @@
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "simple-zeros",
       "previousRecordId": "devine-simple-zeros-opening",
-      "issuedAt": 1795900261231
+      "issuedAt": 1795900261231,
+      "startedAt": 1795900271913,
+      "setupLease": 1795900271913,
+      "retryAt": 1795900361913
     }
   },
   "pending": [],
