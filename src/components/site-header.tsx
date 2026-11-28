@@ -3,9 +3,10 @@ import { Github, LogOut } from "lucide-react";
 import { getSession, isGitHubAuthConfigured } from "@/auth";
 import { signInWithGitHub, signOutFromGitHub } from "@/lib/auth-actions";
 import { BrandMark } from "@/components/brand-mark";
+import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import { MobileMenu } from "@/components/mobile-menu";
 
-const navigation = [
+const primaryLinks = [
   { href: "/#leaderboard", label: "Leaderboard" },
   { href: "/challenge", label: "Rules" },
   { href: "/methodology", label: "Verification" },
@@ -14,6 +15,10 @@ const navigation = [
 
 export async function SiteHeader() {
   const session = await getSession();
+  const navigation = [...primaryLinks, { href: "/dashboard", label: "Dashboard" }];
+  if (isSubmissionArchiveMaintainer(session?.user.githubLogin, session?.user.githubId)) {
+    navigation.push({ href: "/admin", label: "Admin" });
+  }
 
   return (
     <header className="site-header">

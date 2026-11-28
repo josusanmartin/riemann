@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Github, KeyRound, ShieldCheck } from "lucide-react";
 import { getSession, isGitHubAuthConfigured } from "@/auth";
 import { BrandMark } from "@/components/brand-mark";
-import { signInWithGitHub, signOutFromGitHub } from "@/lib/auth-actions";
+import { signInToAccountView, signOutFromGitHub } from "@/lib/auth-actions";
 import { repositoryUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -26,10 +26,12 @@ function describeAuthError(code: string): string {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; view?: string }>;
 }) {
   const session = await getSession();
-  const { error } = await searchParams;
+  const { error, view } = await searchParams;
+  const destination = view === "admin" ? "/admin" : view === "dashboard" ? "/dashboard" : "/submit";
+  const label = view === "admin" ? "Open admin view" : view === "dashboard" ? "Open my dashboard" : "Continue to submit";
   const errorMessage = error ? describeAuthError(error) : null;
 
   return (
@@ -43,14 +45,14 @@ export default async function SignInPage({
           <>
             <p>Authenticated as <strong>@{session.user.githubLogin ?? session.user.name}</strong>. You can now upload a formal entry directly to the isolated verifier.</p>
             <div className="signin-actions">
-              <Link className="button button-lime" href="/submit">Continue to submit</Link>
+              <Link className="button button-lime" href={destination}>{label}</Link>
               <form action={signOutFromGitHub}><button className="button button-ghost-light" type="submit">Sign out</button></form>
             </div>
           </>
         ) : isGitHubAuthConfigured ? (
           <>
             <p>Sign in with GitHub to prepare a submission. The site requests read-only access to your public profile and email.</p>
-            <form action={signInWithGitHub}>
+            <form action={signInToAccountView.bind(null, destination.slice(1))}>
               <button className="button button-lime signin-button" type="submit"><Github size={18} /> Continue with GitHub</button>
             </form>
           </>

@@ -93,7 +93,7 @@ export default async function SubmitPage() {
                 </div>
               </section>
               <nav className="submit-resource-nav" aria-label="Submission resources">
-                <Link href="/submit/history"><History aria-hidden="true" size={18} />My submission history<ChevronRight aria-hidden="true" size={16} /></Link>
+                <Link href="/dashboard"><History aria-hidden="true" size={18} />My submission history<ChevronRight aria-hidden="true" size={16} /></Link>
                 <Link href="/challenge#sandbox"><ShieldCheck aria-hidden="true" size={18} />Sandbox and upload limits<ChevronRight aria-hidden="true" size={16} /></Link>
               </nav>
               <p className="submit-research">Multi-file project or large dependencies?<br />
@@ -120,8 +120,8 @@ export default async function SubmitPage() {
               archive; queued proofs wait for their turn.
             </p>
             {archiveMaintainer && (
-              <Link className="archive-admin-link" href="/admin/submissions">
-                <LockKeyhole size={15} /> Open private source archive
+              <Link className="archive-admin-link" href="/admin">
+                <LockKeyhole size={15} /> Open verification desk
               </Link>
             )}
           </aside>

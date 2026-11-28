@@ -135,6 +135,10 @@ export async function listSubmissionArchive(
   options: SubmissionArchiveStoreOptions = {},
 ): Promise<SubmissionArchiveEntry[]> {
   const { tree } = await archiveClientAndTree(options);
+  return archiveEntries(tree);
+}
+
+function archiveEntries(tree: z.infer<typeof treeSchema>): SubmissionArchiveEntry[] {
   return tree.tree
     .filter((entry) => entry.type === "blob")
     .flatMap((entry) => {
@@ -275,4 +279,51 @@ export async function readOwnerHistory(github: string, selectedId?: string, opti
   if (unavailable) console.warn("Attempt has an unavailable log", { jobId: receipt.jobId });
   const logs = attempts.flatMap(attempt => attempt.status === "fulfilled" && attempt.value?.log ? [attempt.value] : []);
   return { active, completed, detail: { receipt, logs, unavailable } };
+}
+
+type DeskRow = {
+  jobId: string; digest: string; date: string; status: string;
+  sourceId?: string; hasLog?: boolean; message?: string; evidenceUrl?: string;
+};
+
+/** Read only archive indexes and queue metadata. Source and log blobs are opened on demand. */
+export async function readVerificationDesk(login: string, githubId: string | undefined, options: SubmissionArchiveStoreOptions = {}) {
+  if (!isSubmissionArchiveMaintainer(login, githubId)) throw new Error("Maintainer access required");
+  const { client, tree } = await archiveClientAndTree(options);
+  const queue = tree.tree.find(e => e.path === SUBMISSION_QUEUE_PATH && e.type === "blob");
+  if (!queue) throw new Error("Queue state unavailable");
+  const blob = blobSchema.parse(await client.json(repositoryPath(`git/blobs/${queue.sha}`)));
+  const state = submissionQueueStateSchema.parse(JSON.parse(Buffer.from(blob.content, "base64").toString("utf8")));
+  const sources = archiveEntries(tree);
+  const sourceByDigest = new Map(sources.map(e => [e.proofDigest, e.jobId]));
+  const rows = new Map<string, DeskRow>(sources.map(e => [e.jobId, {
+    jobId: e.jobId, digest: e.proofDigest, date: e.submittedAt, status: "archived", sourceId: e.jobId,
+  }]));
+  const paths = new Set(tree.tree.map(e => e.path));
+  for (const entry of tree.tree) {
+    if (entry.type !== "blob" || !entry.path.startsWith("runtime/history/")) continue;
+    const [date, status, digest, jobId] = entry.path.split("/").at(-1)!.replace(/\.json$/, "").split("_");
+    if (!jobId || !/^[0-9a-f]{64}$/.test(digest)) continue;
+    const source = rows.get(jobId);
+    rows.set(jobId, { jobId, digest, date: source?.date ?? date, status, sourceId: source?.sourceId ?? sourceByDigest.get(digest), hasLog: paths.has(verifierLogPath(jobId)) });
+  }
+  for (const receipt of state.completed) {
+    const row = rows.get(receipt.jobId);
+    rows.set(receipt.jobId, {
+      jobId: receipt.jobId, digest: receipt.proofDigest, date: row?.date ?? receipt.completedAt,
+      status: isPublicationMismatch(receipt.message) ? "publication-blocked" : receipt.outcome,
+      sourceId: row?.sourceId ?? sourceByDigest.get(receipt.proofDigest),
+      hasLog: receipt.logArchived || row?.hasLog, message: receipt.feedback?.title ?? receipt.message ?? undefined,
+      evidenceUrl: receipt.evidenceUrl ?? undefined,
+    });
+  }
+  const live = [state.active, ...state.pending].flatMap((job, i) => {
+    if (!job) return [];
+    const status = i ? "Queued" : job.boat?.uploaded ? "Verifying" : job.boat?.workerId ? "Transferring files" : "Starting";
+    const row = { jobId: job.jobId, digest: job.proofDigest, date: job.enqueuedAt, status,
+      sourceId: rows.get(job.jobId)?.sourceId ?? sourceByDigest.get(job.proofDigest) };
+    rows.delete(job.jobId);
+    return [row];
+  });
+  return { live, attempts: [...rows.values()].sort((a,b) => b.date.localeCompare(a.date)), sources: sources.length, waiting: state.pending.length, active: Number(Boolean(state.active)) };
 }

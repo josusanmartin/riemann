@@ -10,6 +10,7 @@ import {
   isSubmissionArchiveMaintainer,
   listSubmissionArchive,
   readOwnerHistory,
+  readVerificationDesk,
   readSubmissionArchive,
 } from "@/lib/submission-archive-store";
 
@@ -161,7 +162,18 @@ it("exposes retained output only to the GitHub account that admitted the job", a
     return Response.json({ encoding: "base64", content: Buffer.from(JSON.stringify(file.value)).toString("base64") });
   };
   const options = { fetchImplementation, archiveKey, token: "fixture" };
+  const desk = await readVerificationDesk("josusanmartin", "5554649", options);
+  expect(desk.attempts).toMatchObject([{ jobId, digest: proofDigest, status: "rejected", hasLog: true }]);
+  expect(JSON.stringify(desk)).not.toContain("private diagnostic");
   const own = await readOwnerHistory("Store-Solver", jobId, options);
   expect(own.detail?.logs.map(entry => entry.log)).toEqual(["private diagnostic"]);
   expect(await readOwnerHistory("another-solver", jobId, options)).toEqual({ active: [], completed: [], detail: null });
+});
+
+it("denies non-maintainers before reading the shared dashboard", async () => {
+  const fetchImplementation = vi.fn();
+  for (const [login, id] of [["solver", "123"], ["josusanmartin", "123"], ["josusanmartin", undefined]]) {
+    await expect(readVerificationDesk(login!, id, { token: "fixture", fetchImplementation })).rejects.toThrow("Maintainer access required");
+  }
+  expect(fetchImplementation).not.toHaveBeenCalled();
 });
