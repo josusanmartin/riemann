@@ -3,7 +3,7 @@ import { approveCli, cliBearerPrefix } from "@/lib/cli-login";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  session: vi.fn(), stage: vi.fn(), pinned: vi.fn(), enqueue: vi.fn(), usage: vi.fn(), start: vi.fn(),
+  published: vi.fn(), session: vi.fn(), stage: vi.fn(), pinned: vi.fn(), enqueue: vi.fn(), usage: vi.fn(), start: vi.fn(),
 }));
 vi.mock("@/auth", () => ({ getSession: mocks.session }));
 vi.mock("@/lib/compact-runtime", () => ({ compactRuntimePinned: mocks.pinned }));
@@ -13,11 +13,13 @@ vi.mock("@/lib/submission-queue", async (original) => ({
   ...await original<typeof import("@/lib/submission-queue")>(),
   isSubmissionQueueConfigured: () => true,
   enqueueVerificationJob: mocks.enqueue,
+  readPublishedRecordId: mocks.published,
   getDailySubmissionUsage: mocks.usage,
 }));
 import { POST } from "./route";
 import { QueueCommitUncertainError, DailySubmissionLimitError } from "@/lib/submission-queue";
-import { getCurrentRecord } from "@/lib/records";
+import { competitionIncumbent, type CompetitionTrack } from "@/lib/challenge";
+import { getCurrentRecord, records } from "@/lib/records";
 
 const job = { jobId: "00000000-0000-4000-8000-000000000001", sandboxId: "sandbox-1234567890" };
 // Production promotions append to data/records.json, so derive a score that
@@ -33,8 +35,8 @@ const input = {
   id: "audit-proof", displayName: "Audit Solver", score,
   summary: "An explicitly noncompetitive audit fixture.", method: "Audit fixture", solution: "-- source", acceptLicense: true,
 };
-function request(body: unknown = input) {
-  return new Request("https://www.riemannzeta.fun/api/submissions", {
+function request(body: unknown = input, query = "") {
+  return new Request("https://www.riemannzeta.fun/api/submissions" + query, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
 }
@@ -49,6 +51,7 @@ beforeEach(() => {
   vi.stubEnv("RIEMANN_BOAT_API_KEY", "test-key");
   mocks.stage.mockReturnValue(job);
   mocks.pinned.mockReturnValue(true);
+  mocks.published.mockImplementation(async (_options, track: CompetitionTrack) => competitionIncumbent(records, track).id);
   mocks.usage.mockResolvedValue({ used: 4, limit: 5, retryAt: "2026-09-08T00:00:00.000Z" });
   mocks.enqueue.mockResolvedValue({ job, position: 0, dailyUsed: 5, dailyLimit: 5, shouldStart: true });
   mocks.start.mockResolvedValue(true);
@@ -121,6 +124,26 @@ describe("official submission admission", () => {
     expect(response.status).toBe(400);
     expect(body.issues.map((issue: { field: string }) => issue.field).sort()).toEqual(["score.denominator", "score.numerator", "summary"]);
     expect(body.message).not.toContain("private fixture");
+    expect(mocks.enqueue).not.toHaveBeenCalled();
+  });
+  it("uses no slot when a record was published during deployment", async () => {
+    mocks.published.mockResolvedValueOnce("new-record");
+    const response = await POST(request());
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: "record_changed", currentRecordId: "new-record" });
+    expect(mocks.enqueue).not.toHaveBeenCalled();
+    expect(mocks.stage).not.toHaveBeenCalled();
+  });
+  it("archives the selected simple-zero target and uses the shared quota", async () => {
+    const response = await POST(request(input, "?track=simple-zeros"));
+    expect(response.ok).toBe(true);
+    const [job, , archive] = mocks.enqueue.mock.calls[0];
+    expect(job.boat.track).toBe("simple-zeros");
+    expect(JSON.parse(archive.manifest).track).toBe("simple-zeros");
+    expect(mocks.usage).toHaveBeenCalledWith("solver", { githubId: "123" });
+  });
+  it("rejects an unknown target before queue admission", async () => {
+    expect((await POST(request(input, "?track=typo"))).status).toBe(400);
     expect(mocks.enqueue).not.toHaveBeenCalled();
   });
   it("rejects oversized unannounced bodies and forged manifest fields", async () => {

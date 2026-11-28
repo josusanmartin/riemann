@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   githubLoginSchema,
   recordsSchema,
+  competitionIncumbent, competitionTrackSchema, type CompetitionTrack,
   submissionSchema,
 } from "@/lib/challenge";
 import { RECORDS_BRANCH, RECORDS_REPOSITORY } from "@/lib/github-promotion";
@@ -53,6 +54,7 @@ const boatJobSchema = z.object({
   lastProviderStatus: z.number().int().min(100).max(599).optional(),
   retiredWorkerId: z.string().regex(/^bx_[23456789abcdefghjkmnpqrstuvwxyz]{8}$/).optional(),
   baseCommitSha: shaSchema,
+  track: competitionTrackSchema.optional(),
   previousRecordId: z.string().min(1).max(160),
   issuedAt: z.number().int().positive(),
   startedAt: z.number().int().positive().optional(),
@@ -163,7 +165,7 @@ export type QueueCompletionReceipt = z.infer<typeof queueCompletionReceiptSchema
 export type SubmissionQueueState = z.infer<typeof submissionQueueStateSchema>;
 
 export type QueueJobInput = {
-  boat?: Pick<z.infer<typeof boatJobSchema>, "baseCommitSha" | "previousRecordId" | "issuedAt">;
+  boat?: Pick<z.infer<typeof boatJobSchema>, "baseCommitSha" | "previousRecordId" | "issuedAt" | "track">;
   sandboxId: string;
   jobId: string;
   proofDigest: string;
@@ -980,7 +982,7 @@ export function retryBoatMemoryState(
   });
   const retry = queuedVerificationJobSchema.parse({
     ...replacement.result,
-    boat: { baseCommitSha: boat.baseCommitSha, previousRecordId: boat.previousRecordId,
+    boat: { track: boat.track, baseCommitSha: boat.baseCommitSha, previousRecordId: boat.previousRecordId,
       issuedAt, memoryReplayOf: active.jobId, retiredWorkerId: boat.workerId },
   });
   return { state: { ...replacement.state, active: retry }, result: retry, changed: true };
@@ -1016,7 +1018,7 @@ export async function requeueCheckerFailure(admissionRevision: string, originalI
   if (original?.jobId !== originalId || !original.boat?.uploaded || original.boat.checkerReplayOf || original.boat.memoryReplayOf) {
     throw new Error("Select the original staged Boat admission");
   }
-  const incumbent = await readPublishedRecordId(options);
+  const incumbent = await readPublishedRecordId(options, original.boat.track);
   if (!incumbent || incumbent !== original.boat.previousRecordId) throw new Error("The incumbent changed since admission");
   const id = randomUUID();
   const now = Date.now();
@@ -1034,7 +1036,7 @@ export async function requeueCheckerFailure(admissionRevision: string, originalI
     const job = queuedVerificationJobSchema.parse({
       jobId: id, sandboxId: `boat-${id}`, ownerKey: original.ownerKey, submissionKey: original.submissionKey,
       proofDigest: original.proofDigest, recoveredJobIds: [originalId], enqueuedAt: new Date(now).toISOString(),
-      boat: { checkerReplayOf: originalId, baseCommitSha: release, previousRecordId: incumbent, issuedAt: now },
+      boat: { track: original.boat?.track, checkerReplayOf: originalId, baseCommitSha: release, previousRecordId: incumbent, issuedAt: now },
     });
     const next = state.active ? { ...state, pending: [...state.pending, job] } : { ...state, active: job };
     return { state: submissionQueueStateSchema.parse(next), changed: true, result: id };
@@ -1081,7 +1083,7 @@ export async function inspectVerificationJobForOwner(
  * the previous record for a minute or so after a promotion.
  */
 export async function readPublishedRecordId(
-  options: QueueOptions = {},
+  options: QueueOptions = {}, track: CompetitionTrack = "critical-line",
 ): Promise<string | null> {
   const client = new QueueGitHubClient(
     requiredToken(options),
@@ -1094,10 +1096,7 @@ export async function readPublishedRecordId(
     { headers: { Accept: "application/vnd.github.raw+json" } },
   );
   const records = recordsSchema.parse(JSON.parse(await response.text()));
-  return (
-    records.filter((record) => record.status === "kernel-verified").at(-1)?.id ??
-    null
-  );
+  return competitionIncumbent(records, track).id;
 }
 
 export async function getActiveVerificationJob(

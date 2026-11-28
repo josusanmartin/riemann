@@ -12,7 +12,8 @@ import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
   applyInitialQueueTransition,
 } from "@/lib/queue-orchestration";
-import { getCurrentRecord, records } from "@/lib/records";
+import { competitionIncumbent, competitionTrackSchema } from "@/lib/challenge";
+import { records } from "@/lib/records";
 import { signSubmissionJob } from "@/lib/submission-jobs";
 import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import {
@@ -21,6 +22,7 @@ import {
   getDailySubmissionUsage,
   isSubmissionQueueConfigured,
   QueueCommitUncertainError,
+  readPublishedRecordId,
   SubmissionAlreadyQueuedError,
   SubmissionQueueFullError,
 } from "@/lib/submission-queue";
@@ -39,10 +41,6 @@ function noStore(status: number, body: object): Response {
 export async function POST(request: Request): Promise<Response> {
   const denied = guardUserApi(request, "upload");
   if (denied) return denied;
-  const track = new URL(request.url).searchParams.get("track");
-  if (track && track !== "critical-line") return noStore(503, {
-    error: "verifier_unavailable", message: "This leaderboard has not opened for ranked uploads. No slot was used.",
-  });
   // Operator switch for verifier upgrades: refuse new uploads before any
   // worker or daily slot is touched. In-flight proofs are unaffected.
   if (process.env.SUBMISSIONS_PAUSED === "1") {
@@ -83,11 +81,14 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
+  const selected = competitionTrackSchema.safeParse(new URL(request.url).searchParams.get("track") ?? "critical-line");
+  if (!selected.success) return noStore(400, { error: "invalid_track", message: "Choose critical-line or simple-zeros." });
+  const track = selected.data;
+  const currentRecord = competitionIncumbent(records, track);
   try {
-    const currentRecord = getCurrentRecord();
     let prepared;
     try {
-      prepared = prepareDirectSubmission(await readBoundedJson(request), github, currentRecord);
+      prepared = prepareDirectSubmission(await readBoundedJson(request), github, currentRecord, track);
     } catch (error) {
       if (error instanceof SyntaxError) return noStore(400, {
         error: "invalid_submission_json", message: "Send valid UTF-8 JSON with Content-Type: application/json. No slot was used.",
@@ -152,10 +153,16 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
+    // The public Git ledger may advance while the next website build is rolling out.
+    const publishedId = await readPublishedRecordId({}, track);
+    if (publishedId !== currentRecord.id) return noStore(409, {
+      error: "record_changed", message: "This leaderboard has a newer record. Refresh after the site updates before submitting. No slot was used.",
+      currentRecordId: publishedId,
+    });
     const issuedAt = Date.now();
     const job = reserveBoatJob(baseCommitSha, currentRecord.id, issuedAt);
     const admission = await enqueueVerificationJob(
-      { ...job, proofDigest: prepared.proofDigest, submissionId: prepared.submission.id },
+      { ...job, boat: { ...job.boat, track }, proofDigest: prepared.proofDigest, submissionId: prepared.submission.id },
       github,
       { manifest: prepared.manifest, solution: prepared.solution },
       { githubId },
@@ -222,7 +229,7 @@ export async function POST(request: Request): Promise<Response> {
     }
     const message = error instanceof Error ? error.message : "Verification could not start.";
     if (message.includes("strictly exceed")) {
-      const current = getCurrentRecord();
+      const current = currentRecord;
       return noStore(400, {
         error: "invalid_submission", message: `${message}. Check record ${current.id} before submitting. No slot was used.`,
         currentRecord: { id: current.id, score: current.exactRational },

@@ -2,9 +2,13 @@ import { z } from "zod";
 
 export const trackSchema = z.enum([
   "critical-line",
+  "simple-zeros",
   "simple-critical-line",
   "distinct-zeros",
 ]);
+
+export const competitionTrackSchema = z.enum(["critical-line", "simple-zeros"]);
+export type CompetitionTrack = z.infer<typeof competitionTrackSchema>;
 
 export type Track = z.infer<typeof trackSchema>;
 
@@ -98,6 +102,16 @@ export const recordSchema = z
 
 export type RecordEntry = z.infer<typeof recordSchema>;
 
+export function competitionIncumbent(records: RecordEntry[], track: CompetitionTrack) {
+  const current = records.filter(record => record.track === track && record.status === "kernel-verified").at(-1);
+  if (current) return current;
+  if (track === "simple-zeros") return {
+    id: "simple-zeros:opening", track, exactExpression: "(2 : ℝ) / 3",
+    exactRational: { numerator: "2", denominator: "3" },
+  };
+  throw new Error("No kernel-verified current record is available");
+}
+
 export const recordsSchema = z.array(recordSchema).min(1);
 
 export const contractSchema = z.object({
@@ -147,7 +161,7 @@ export const submissionSchema = z
   .object({
     schemaVersion: z.literal(1),
     id: z.string().max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
-    track: z.literal("critical-line"),
+    track: competitionTrackSchema,
     author: z
       .object({
         github: githubLoginSchema,
@@ -200,6 +214,7 @@ export type DirectSubmissionInput = z.infer<typeof directSubmissionInputSchema>;
 export const verificationAttestationSchema = z
   .object({
     schemaVersion: z.literal(1),
+    track: competitionTrackSchema.optional(),
     submissionId: z.string().max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
     author: z
       .object({

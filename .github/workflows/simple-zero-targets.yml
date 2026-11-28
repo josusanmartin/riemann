@@ -1,0 +1,39 @@
+name: Check simple-zero Lean targets
+on:
+  pull_request:
+    paths:
+      - 'challenge/templates/**'
+      - 'public/templates/XuSimpleZeros.lean'
+      - 'challenge/compact-runtime.json'
+      - '.github/workflows/simple-zero-targets.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  targets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Elaborate both challenge statements with the released Zeta23 environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/local/lib/android
+          bash boat/compact/install-toolchain.sh "$RUNNER_TEMP/lean"
+          runtime="$RUNNER_TEMP/runtime"
+          bash boat/compact/install-runtime.sh "$runtime" "$GITHUB_WORKSPACE/challenge/compact-runtime.json"
+          export PATH="$RUNNER_TEMP/lean/bin:$PATH"
+          work="$RUNNER_TEMP/targets"
+          mkdir -p "$work/ChallengeDeps"
+          ln -s "$runtime/deps/zeta/ChallengeDeps.olean" "$work/ChallengeDeps.olean"
+          cp public/templates/XuSimpleZeros.lean "$work/XuSimpleZeros.lean"
+          cp challenge/templates/Simple.Candidate.lean "$work/Ranked.lean"
+          sed -e 's/{{CURRENT_EXPRESSION}}/(2 : ℝ) \/ 3/' -e 's/{{NUMERATOR}}/7/' -e 's/{{DENOMINATOR}}/10/' challenge/templates/CandidateSpec.lean.tmpl > "$work/ChallengeDeps/CandidateSpec.lean"
+          cd "$work"
+          export LEAN_PATH="$work:$runtime/interface:$runtime/compat:$(find "$runtime/deps" -mindepth 1 -maxdepth 1 -type d | sort | paste -sd:)"
+          lean -o ChallengeDeps/CandidateSpec.olean ChallengeDeps/CandidateSpec.lean
+          lean Ranked.lean
+          lean XuSimpleZeros.lean

@@ -1,3 +1,4 @@
+import { competitions } from "@/lib/competitions";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/auth";
@@ -55,6 +56,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           <h2>{submission.submission.id}</h2>
           <p>{submission.submission.author.displayName} · @{submission.submission.author.github} · {resultLabel(selected.status)}</p>
           <dl className={styles.facts}>
+            <dt>Challenge</dt><dd>{competitions[submission.submission.track].title}</dd>
             <dt>Claimed bound</dt><dd>{submission.submission.score.numerator} / {submission.submission.score.denominator}</dd>
             <dt>Method</dt><dd>{submission.submission.method}</dd>
             <dt>Job</dt><dd><code>{selected.jobId}</code></dd>

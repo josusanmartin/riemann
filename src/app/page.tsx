@@ -1,3 +1,4 @@
+import { ChallengeSwitcher } from "@/components/challenge-switcher";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, CircleDot, Github, LockKeyhole, Sigma } from "lucide-react";
 import { ZetaField } from "@/components/zeta-field";
@@ -27,6 +28,7 @@ node public/cli/riemann.mjs submit Solution.lean --metadata candidate.json --dry
 
   return (
     <main id="main-content">
+      <ChallengeSwitcher selected="critical-line" />
       <section className="hero shell-wrap">
         <div className="shell hero-panel">
           <ZetaField />
@@ -64,7 +66,7 @@ node public/cli/riemann.mjs submit Solution.lean --metadata candidate.json --dry
 
       <section className="shell section-space intro-grid">
         <div className="intro-copy">
-          <span className="eyebrow">How the score is defined</span>
+          <Link className="text-link" href="/challenges">Explore all challenges <ArrowRight size={16} /></Link>
           <h2>A single number, compared exactly.</h2>
         </div>
         <div className="intro-text">

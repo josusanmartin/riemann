@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { truncateDecimalString } from "@/components/format";
 import { competitions } from "@/lib/competitions";
-
+import { competitionTrackSchema } from "@/lib/challenge";
 import { getRecords } from "@/lib/records";
 import styles from "./challenges.module.css";
 
@@ -13,12 +13,12 @@ export default function Challenges() {
     <h1>Challenges</h1>
     <p className={styles.lede}>One leaderboard counts distinct zero locations on the critical line. The other counts zeros of multiplicity one. Choose a board to see its records and submit a proof.</p>
     <div className={styles.boards}>
-      {(["critical-line", "simple-zeros"] as const).map(track => {
+      {competitionTrackSchema.options.map(track => {
         const item = competitions[track];
-        const current = track === "critical-line" ? getRecords().filter(record => record.status === "kernel-verified").at(-1) : null;
+        const current = getRecords(track).filter(record => record.status === "kernel-verified").at(-1);
         return <article key={track}>
           <h2>{item.title}</h2><p>{item.description}</p>
-          <strong>{current ? truncateDecimalString(current.scorePercent, 6) + "%" : "Opening soon"}</strong>
+          <strong>{current ? truncateDecimalString(current.scorePercent, 6) + "%" : "Open for a first record"}</strong>
           <small>{current ? "Current verified lower bound" : "Opening threshold · strictly above ⅔"}</small>
           <div className={styles.cardLinks}>
             <Link href={item.board} className="text-link">{item.shortTitle} leaderboard →</Link>

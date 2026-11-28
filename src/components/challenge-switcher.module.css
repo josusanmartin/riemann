@@ -1,0 +1,4 @@
+.switcher { display: flex; align-items: center; gap: .3rem; margin-block: .85rem; }
+.switcher a { padding: .55rem .95rem; color: var(--forest); font-size: .86rem; font-weight: 650; border-radius: 2rem; }
+.switcher a:hover { background: var(--paper-warm); }
+.switcher a[aria-current] { background: var(--forest); color: var(--white); }

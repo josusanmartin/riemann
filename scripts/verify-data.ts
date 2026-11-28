@@ -221,9 +221,11 @@ for (const record of records) {
   }
 }
 
-for (let index = 1; index < records.length; index += 1) {
-  const previous = records[index - 1];
-  const current = records[index];
+const previousByTrack = new Map<string, (typeof records)[number]>();
+for (const current of records) {
+  const previous = previousByTrack.get(current.track);
+  previousByTrack.set(current.track, current);
+  if (!previous) continue;
   const displayedComparison = compareDecimalStrings(
     current.scoreDecimal,
     previous.scoreDecimal,

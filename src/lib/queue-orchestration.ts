@@ -138,14 +138,17 @@ export async function advanceVerificationQueue(
     });
   }
   let next = advance.next;
-  let publishedRecordId: string | null | undefined;
+  const incumbents = new Map<string, string | null>();
   for (let skippedJobs = 0; next && skippedJobs < 10; skippedJobs += 1) {
+    const track = next.boat?.track ?? "critical-line";
+    let publishedRecordId = incumbents.get(track);
     if (publishedRecordId === undefined) {
-      publishedRecordId = await readPublishedRecordId().catch((error) => {
+      publishedRecordId = await readPublishedRecordId({}, track).catch((error) => {
         console.error("Unable to read the published record before starting a job", error);
         return null;
       });
     }
+    incumbents.set(track, publishedRecordId);
     if (await isSupersededBeforeStart(next, publishedRecordId)) {
       console.warn("Skipping a queued verification superseded by a new record", {
         jobId: next.jobId,

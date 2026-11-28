@@ -124,6 +124,7 @@ function clearActiveJob(storageKey: string): void {
 }
 
 export function DirectSubmissionForm({
+  track,
   github,
   defaultDisplayName,
   verifierConfigured,
@@ -131,6 +132,7 @@ export function DirectSubmissionForm({
   flowTestSource,
   flowTestAvailable,
 }: {
+  track: "critical-line" | "simple-zeros";
   github: string;
   defaultDisplayName: string;
   verifierConfigured: boolean;
@@ -350,7 +352,7 @@ export function DirectSubmissionForm({
     const model = (form.get("model")?.toString() ?? "").trim();
     const harness = (form.get("harness")?.toString() ?? "").trim();
     try {
-      const response = await fetch("/api/submissions", {
+      const response = await fetch(`/api/submissions?track=${track}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

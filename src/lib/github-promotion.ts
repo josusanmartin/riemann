@@ -1,8 +1,10 @@
+import { isPublicationMismatch } from "./publication-feedback";
 import { ZodError, z } from "zod";
 import contractJson from "../../challenge/contract.json";
 import {
   compareRationals,
   contractSchema,
+  competitionIncumbent,
   gitShaSchema,
   rationalToDecimal,
   recordsSchema,
@@ -269,7 +271,7 @@ export function buildRecordEntry(
     date: attestation.verifiedAt.slice(0, 10),
     author: submission.author.displayName,
     github: submission.author.github,
-    title: `Certified critical-line bound ${scoreDecimal}`,
+    title: `Certified ${submission.track === "simple-zeros" ? "simple-zero" : "critical-line"} bound ${scoreDecimal}`,
     method: submission.method,
     model: submission.model,
     harness: submission.harness,
@@ -300,14 +302,6 @@ function recordForSubmission(
   });
 }
 
-function currentFormalRecord(records: RecordEntry[]): RecordEntry {
-  const current = records
-    .filter((record) => record.status === "kernel-verified")
-    .at(-1);
-  if (!current) throw new Error("No kernel-verified current record is available");
-  return current;
-}
-
 export function assertCurrentRecord(
   records: RecordEntry[],
   submission: Submission,
@@ -316,7 +310,7 @@ export function assertCurrentRecord(
   if (records.some((record) => record.id === submission.id)) {
     throw new UnpublishableResultError(`Record already exists: ${submission.id}`);
   }
-  const current = currentFormalRecord(records);
+  const current = competitionIncumbent(records, submission.track);
   if (current.id !== previousRecordId) {
     throw new PromotionRaceError();
   }
@@ -386,15 +380,15 @@ async function existingPromotion(
 /**
  * Commits that land on main during verification are harmless unless they
  * touch what the proof was checked against. Require main to be a descendant
- * of the verified base that leaves the ledger, every trusted path, and this
- * submission's evidence directory untouched.
+ * of the verified base that leaves verifier code and this submission’s evidence
+ * untouched. The caller validates any ledger additions against the track incumbent.
  */
 async function assertHeadPreservesBase(
   client: GitHubClient,
   baseCommitSha: string,
   head: string,
   protectedPaths: string[],
-): Promise<void> {
+): Promise<boolean> {
   const comparison = comparisonSchema.parse(
     await client.json(repositoryApiPath(`compare/${baseCommitSha}...${head}`)),
   );
@@ -417,12 +411,13 @@ async function assertHeadPreservesBase(
       (protectedPath) => path === protectedPath || path.startsWith(`${protectedPath}/`),
     ),
   );
-  if (touched.includes("data/records.json")) throw new PromotionRaceError();
-  if (touched.length > 0) {
+
+  if (touched.some(path => path !== "data/records.json")) {
     throw new PromotionRaceError(
       "The verified challenge files changed on main while this proof was being verified",
     );
   }
+  return touched.includes("data/records.json");
 }
 
 async function validatePromotionInput(
@@ -505,6 +500,13 @@ export async function promoteVerifiedSubmission(
   try {
     validated = await validatePromotionInput(input, baseRecordsSnapshot);
   } catch (error) {
+    // A completed worker keeps its original receipt across upgrades. If its
+    // incumbent already lost, report the definitive scoring outcome.
+    if (initialHead !== input.baseCommitSha && error instanceof Error && isPublicationMismatch(error.message)) {
+      const manifest = submissionSchema.parse(JSON.parse(input.manifest));
+      const current = competitionIncumbent(await readRecords(client, initialHead), manifest.track);
+      if (current.id !== input.previousRecordId) throw new PromotionRaceError();
+    }
     // Every check here is deterministic over the signed job, the verifier
     // output and this deployment's trusted files, so a failure is permanent.
     if (error instanceof UnpublishableResultError || error instanceof PublicationMaterialUnavailable) throw error;
@@ -531,6 +533,7 @@ export async function promoteVerifiedSubmission(
   let head = initialHead;
   for (let attempt = 1; ; attempt += 1) {
     let headTree = baseCommit.tree.sha;
+    let publicationRecords = records;
     if (head !== input.baseCommitSha) {
       const existing = await existingPromotion(
         client,
@@ -539,7 +542,14 @@ export async function promoteVerifiedSubmission(
         input.proofDigest,
       );
       if (existing) return existing;
-      await assertHeadPreservesBase(client, input.baseCommitSha, head, protectedPaths);
+      const ledgerChanged = await assertHeadPreservesBase(client, input.baseCommitSha, head, protectedPaths);
+      if (ledgerChanged) publicationRecords = await readRecords(client, head);
+      // Only append-only promotions on other tracks can carry this proof forward.
+      if ((ledgerChanged && publicationRecords.length <= records.length) ||
+          records.some((entry, i) => JSON.stringify(entry) !== JSON.stringify(publicationRecords[i]))) {
+        throw new PromotionRaceError();
+      }
+      assertCurrentRecord(publicationRecords, submission, input.previousRecordId);
       headTree = commitSchema.parse(
         await client.json(repositoryApiPath(`git/commits/${head}`)),
       ).tree.sha;
@@ -565,9 +575,9 @@ export async function promoteVerifiedSubmission(
       head,
       attestation.verifiedAt,
     );
-    // The ledger is protected, so main's records.json equals the base snapshot.
+    // Append to the checked head so a concurrent record on another track is preserved.
     const promoted = recordForSubmission(submission, attestation, evidenceCommit);
-    const updatedRecords = recordsSchema.parse([...records, promoted]);
+    const updatedRecords = recordsSchema.parse([...publicationRecords, promoted]);
     const recordsBlob = await createBlob(
       client,
       `${JSON.stringify(updatedRecords, null, 2)}\n`,

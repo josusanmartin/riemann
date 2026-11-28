@@ -3,17 +3,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, BookOpen, UploadCloud, UserCheck } from "lucide-react";
 import { displayRecordTitle } from "@/lib/record-times";
-import { getRecords } from "@/lib/records";
+import { records as allRecords } from "@/lib/records";
 import { truncateDecimalString } from "@/components/format";
 
 export const metadata: Metadata = {
   title: "Submissions",
   description:
-    "Every accepted critical-line record, newest first, with immutable proof evidence.",
+    "Every accepted challenge record, newest first, with immutable proof evidence.",
 };
 
 export default function SubmissionsIndexPage() {
-  const records = [...getRecords()].reverse();
+  const records = [...allRecords].reverse();
 
   return (
     <main id="main-content">
@@ -32,7 +32,7 @@ export default function SubmissionsIndexPage() {
                 <span className="submissions-year">{record.date.slice(0, 4)}</span>
                 <span className="submissions-main">
                   <strong>{displayRecordTitle(record)}</strong>
-                  <small>{record.author} · {record.method}</small>
+                  <small>{record.track === "simple-zeros" ? "Simple zeros" : "Distinct zeros"} · {record.author} · {record.method}</small>
                 </span>
                 <span className="submissions-score">
                   {truncateDecimalString(record.scorePercent, record.formalVerification ? 10 : 4)}%

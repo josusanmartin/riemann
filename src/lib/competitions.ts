@@ -1,4 +1,4 @@
-type CompetitionTrack = "critical-line" | "simple-zeros";
+import type { CompetitionTrack } from "./challenge";
 
 // Public navigation and presentation. The verifier owns the trusted Lean targets.
 export const competitions = {

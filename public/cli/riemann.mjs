@@ -38,7 +38,8 @@ const help = `Riemann proof submissions · Node.js 22+
   node riemann.mjs login [--manual | --finish]
   node riemann.mjs whoami
   node riemann.mjs logout
-  node riemann.mjs record
+  node riemann.mjs record [--track critical-line|simple-zeros]
+  Add --track simple-zeros to submit to the simple-zero leaderboard.
   node riemann.mjs submit Solution.lean --metadata candidate.json --dry-run
   node riemann.mjs submit Solution.lean --metadata candidate.json --accept-license [--receipt FILE]
   node riemann.mjs status RECEIPT [--wait] [--log]
@@ -177,14 +178,15 @@ async function saveReceipt(receipt, result) {
 async function submit(solution, opts) {
   if (!opts.metadata) fail("Pass --metadata candidate.json.");
   const prepared = await buildSubmission(solution, opts.metadata);
+  const query = trackQuery(opts.track);
   if (opts["dry-run"]) {
-    return { status: "validated-locally", submissionId: prepared.id, score: prepared.score, sourceBytes: prepared.sourceBytes };
+    return { status: "validated-locally", track: opts.track ?? "critical-line", submissionId: prepared.id, score: prepared.score, sourceBytes: prepared.sourceBytes };
   }
   if (!opts["accept-license"]) fail("Publishing accepted source requires --accept-license (Apache-2.0).");
   const credential = await currentCredential();
   const receipt = await newReceipt(opts.receipt);
   try {
-    const result = await api("/api/submissions", { body: prepared.body, credential });
+    const result = await api("/api/submissions" + query, { body: prepared.body, credential });
     return await saveReceipt(receipt, result);
   } catch (error) {
     const beforeAdmission = ["submissions_paused", "verifier_unavailable", "automation_unavailable",
@@ -386,11 +388,18 @@ async function login({ manual, finish }) {
   return { status: "approval-required", url: pairingLink(pending), code: challenge.slice(0, 8), next: "riemann login --finish" };
 }
 
+function trackQuery(track) {
+  if (track === undefined || track === "critical-line") return "";
+  if (track === "simple-zeros") return "?track=simple-zeros";
+  fail("Choose --track critical-line or --track simple-zeros.");
+}
+
 async function main() {
   const [cmd, ...args] = process.argv.slice(2);
   if (!cmd || cmd === "--help" || cmd === "help" || args.includes("--help")) { console.log(help); return; }
   const options = cmd === "login" ? { manual: { type: "boolean" }, finish: { type: "boolean" } }
-    : cmd === "submit" ? { metadata: { type: "string" }, receipt: { type: "string" }, "dry-run": { type: "boolean" }, "accept-license": { type: "boolean" } }
+    : cmd === "record" ? { track: { type: "string" } }
+    : cmd === "submit" ? { track: { type: "string" }, metadata: { type: "string" }, receipt: { type: "string" }, "dry-run": { type: "boolean" }, "accept-license": { type: "boolean" } }
     : cmd === "status" ? { wait: { type: "boolean" }, log: { type: "boolean" } }
     : cmd === "active" ? { receipt: { type: "string" } } : {};
   const { values, positionals } = parseArgs({ args, options: { ...options, verbose: { type: "boolean" } }, allowPositionals: true });
@@ -403,7 +412,10 @@ async function main() {
     await Promise.all(["session.json", "pending.json"].map(name => rm(join(configDir(), name), { force: true })));
     result = { status: "local-login-cleared", environmentOverride: Boolean(process.env.RIEMANN_GITHUB_TOKEN) };
   }
-  else if (cmd === "record") result = (await api("/api/leaderboard", { authenticated: false })).current;
+  else if (cmd === "record") {
+    const board = await api("/api/leaderboard" + trackQuery(values.track), { authenticated: false });
+    result = board.current ?? { track: board.track, current: null, entryThreshold: board.entryThreshold };
+  }
   else if (cmd === "submit") result = await submit(positionals[0], values);
   else if (cmd === "status") result = await status(positionals[0], values.wait, values.log);
   else if (cmd === "active") {
