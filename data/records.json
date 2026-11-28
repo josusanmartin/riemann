@@ -2059,5 +2059,31 @@
     "pullRequestUrl": null,
     "summary": "Assuming the Riemann hypothesis, we prove an asymptotic lower bound of 85.5579914687% for distinct critical-line zeros counted relative to all zeros counted with multiplicity, in both (T, 2T] and (0, T]. The proof applies Yuanda Xu's counting framework (arXiv:2611.34546v1) through a joint dual certificate whose moment inputs are all proved under RH; the separate simple-zero estimate enters with weight zero. It builds on the Bui–Heath-Brown mollifier method and Kristian Muri Knausgård's earlier Lean formalization.",
     "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
+  },
+  {
+    "id": "devine-xu-joint-856103644552",
+    "track": "critical-line",
+    "date": "2026-11-28",
+    "author": "Michael Devine",
+    "github": "MichaelDevine",
+    "title": "Certified critical-line bound 0.856103644552642822754559076251",
+    "method": "Xu’s weighted simple-zero method and a joint rational certificate for distinct zeros",
+    "model": "Astra 6.2, Claude Opus 5.5, Claude Fable 5.2, Gemini Neon and Carbon",
+    "harness": "Codex, Claude Code, Antigravity CLI",
+    "scoreDecimal": "0.856103644552642822754559076251",
+    "scorePercent": "85.6103644552642822754559076251",
+    "exactRational": {
+      "numerator": "7813244785503676610628919500940653455714411",
+      "denominator": "9126517373473500000000000000000000000000000"
+    },
+    "exactExpression": "(7813244785503676610628919500940653455714411 : ℝ) / 9126517373473500000000000000000000000000000",
+    "status": "kernel-verified",
+    "formalVerification": true,
+    "independentReview": null,
+    "sourceUrl": "https://github.com/josusanmartin/riemann/blob/2e9589455c1fe2f6a80e138315da99fb9e75b0a7/submissions/devine-xu-joint-856103644552/submission.json",
+    "proofUrl": "https://github.com/josusanmartin/riemann/blob/2e9589455c1fe2f6a80e138315da99fb9e75b0a7/submissions/devine-xu-joint-856103644552/proof/Solution.lean",
+    "pullRequestUrl": null,
+    "summary": "Assuming RH, the asymptotic proportion of distinct critical-line zeros is at least 85.6103644552% in both dyadic (T, 2T] and cumulative (0, T] windows, with the denominator counting multiplicity. We combine Yuanda Xu’s weighted simple-zero estimate with our joint certificate.",
+    "rhFoundationCommit": "72fead102f663d5c7a407964a13dc0cf9d977207"
   }
 ]
