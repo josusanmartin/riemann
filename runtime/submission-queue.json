@@ -11,12 +11,14 @@
       "setupLease": 1795854088705,
       "retryAt": 1795854182012,
       "assignedAt": 1795854092012,
+      "stagedAt": 1795854097133,
       "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
       "track": "simple-zeros",
       "previousRecordId": "simple-zeros:opening",
       "issuedAt": 1795854085292,
       "startedAt": 1795854088705,
-      "workerId": "bx_arm456un"
+      "workerId": "bx_arm456un",
+      "uploaded": true
     }
   },
   "pending": [],
