@@ -1,27 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-b89e0239-4edc-4fcd-bc9b-77b6457e277e",
-    "jobId": "b89e0239-4edc-4fcd-bc9b-77b6457e277e",
-    "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
-    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-    "submissionKey": "c15c1a18d2469b69c2e7147aea440ee755264571dfbaf7e38822b6ae8064619b",
-    "enqueuedAt": "2026-11-28T05:48:45.180Z",
-    "boat": {
-      "setupLease": 1795844929167,
-      "retryAt": 1795845022613,
-      "assignedAt": 1795844932613,
-      "stagedAt": 1795844937421,
-      "baseCommitSha": "4bcf1b23d82cdd53df8d5722c4e57cdc54b8c28b",
-      "previousRecordId": "devine-xu-joint-certificate-855579",
-      "issuedAt": 1795844925180,
-      "startedAt": 1795844929167,
-      "workerId": "bx_8mkmpr65",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "b89e0239-4edc-4fcd-bc9b-77b6457e277e",
+      "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/2e9589455c1fe2f6a80e138315da99fb9e75b0a7/submissions/devine-xu-joint-856103644552",
+      "completedAt": "2026-11-28T07:59:06.569Z",
+      "logArchived": true
+    },
     {
       "jobId": "5e8e46d4-5fc7-4ff6-a6e1-24575f1cae25",
       "proofDigest": "54e5baccaafc660a1ca24b25689889fb53bacf13838361cd1181f0e6ac2564a4",
