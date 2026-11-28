@@ -21,7 +21,22 @@
       "uploaded": true
     }
   },
-  "pending": [],
+  "pending": [
+    {
+      "sandboxId": "boat-0a091f4a-1ad3-40dd-9177-2b787cfcde33",
+      "jobId": "0a091f4a-1ad3-40dd-9177-2b787cfcde33",
+      "proofDigest": "643321fb49941299e19ad971c36a37118eb7446e354ede7082b48c9db60d5fb2",
+      "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
+      "submissionKey": "aa2e1674787a28cd454f9a917fd44a0c3d8d9e6eb3baeef881e368a18d1938c1",
+      "enqueuedAt": "2026-11-28T08:22:28.346Z",
+      "boat": {
+        "baseCommitSha": "9cc3cf6cda83986c55acf198a7cd377f61afe7a7",
+        "track": "critical-line",
+        "previousRecordId": "devine-xu-joint-856103644552",
+        "issuedAt": 1795854148346
+      }
+    }
+  ],
   "completed": [
     {
       "jobId": "b0bd9c46-360d-4388-a001-c00f08082555",
@@ -1718,7 +1733,7 @@
   "daily": {
     "day": "2026-11-28",
     "attempts": {
-      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 4,
+      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 5,
       "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 1,
       "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf": 1
     }
