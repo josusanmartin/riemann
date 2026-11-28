@@ -11,12 +11,14 @@
       "setupLease": 1795867465039,
       "retryAt": 1795867558612,
       "assignedAt": 1795867468612,
+      "stagedAt": 1795867474600,
       "baseCommitSha": "fc4b753e2311b7a723b4c99a3ca6330875239eff",
       "track": "critical-line",
       "previousRecordId": "beiyi-devine-xu-detector-856103644555",
       "issuedAt": 1795867460824,
       "startedAt": 1795867465039,
-      "workerId": "bx_4kx35k2v"
+      "workerId": "bx_4kx35k2v",
+      "uploaded": true
     }
   },
   "pending": [],
