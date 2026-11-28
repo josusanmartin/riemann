@@ -5,6 +5,7 @@ import {
   githubLoginSchema,
   submissionSchema,
   type DirectSubmissionInput,
+  type CompetitionTrack,
   type RecordEntry,
   type Submission,
 } from "@/lib/challenge";
@@ -33,7 +34,8 @@ export function computeDirectProofDigest(
 export function prepareDirectSubmission(
   rawInput: unknown,
   authenticatedGithub: string,
-  currentRecord: RecordEntry,
+  currentRecord: Pick<RecordEntry, "exactRational" | "exactExpression">,
+  track: CompetitionTrack = "critical-line",
 ): PreparedDirectSubmission {
   const input: DirectSubmissionInput = directSubmissionInputSchema.parse(rawInput);
   const github = githubLoginSchema.parse(authenticatedGithub);
@@ -59,7 +61,7 @@ export function prepareDirectSubmission(
   const submission = submissionSchema.parse({
     schemaVersion: 1,
     id: input.id,
-    track: "critical-line",
+    track,
     author: { github, displayName: input.displayName },
     score: input.score,
     proof: {

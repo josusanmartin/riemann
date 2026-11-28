@@ -7,7 +7,7 @@ export async function signInWithGitHub(): Promise<void> {
 }
 
 export async function signInToAccountView(view: string): Promise<void> {
-  const redirectTo = view === "admin" ? "/admin" : view === "dashboard" ? "/dashboard" : "/submit";
+  const redirectTo = view === "simple-zeros" ? "/submit?track=simple-zeros" : view === "admin" ? "/admin" : view === "dashboard" ? "/dashboard" : "/submit";
   await signIn("github", { redirectTo });
 }
 

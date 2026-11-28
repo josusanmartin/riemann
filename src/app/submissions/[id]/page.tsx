@@ -9,7 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { compactReplay, compactCertificateUrl } from "@/lib/compact-replay";
-import { getRecord, getRecords } from "@/lib/records";
+import { getRecord, records } from "@/lib/records";
 import { formatRecordTime, recordVerifiedAt } from "@/lib/record-times";
 import { recordPresentation } from "./presentation";
 import styles from "./record.module.css";
@@ -17,7 +17,7 @@ import styles from "./record.module.css";
 type PageProps = { params: Promise<{ id: string }> };
 
 export function generateStaticParams() {
-  return getRecords().map((record) => ({ id: record.id }));
+  return records.map((record) => ({ id: record.id }));
 }
 
 export async function generateMetadata({
@@ -71,7 +71,7 @@ export default async function SubmissionPage({ params }: PageProps) {
 
   return (
     <main id="main-content" className={`submission-sheet ${styles.sheet}`}>
-      <Link className={styles.back} href="/#leaderboard">
+      <Link className={styles.back} href={record.track === "simple-zeros" ? "/challenges/simple-zeros#leaderboard" : "/#leaderboard"}>
         <ArrowLeft size={14} /> Leaderboard
       </Link>
       <article className={styles.card}>

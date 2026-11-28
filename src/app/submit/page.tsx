@@ -24,9 +24,12 @@ import { DirectSubmissionForm } from "@/components/direct-submission-form";
 import { BoatSmokeButton } from "@/components/boat-smoke-button";
 import { isBoatSmokeConfigured } from "@/lib/boat-smoke";
 import { FlowTestPanel } from "@/components/flow-test-panel";
-import { signInWithGitHub } from "@/lib/auth-actions";
+import { signInToAccountView } from "@/lib/auth-actions";
 import { repositoryUrl } from "@/lib/site";
-import { getCurrentRecord } from "@/lib/records";
+import { notFound } from "next/navigation";
+import { competitionIncumbent, competitionTrackSchema } from "@/lib/challenge";
+import { readFileSync } from "node:fs";
+import { records } from "@/lib/records";
 import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
   FLOW_TEST_DOWNLOAD_PATH,
@@ -53,10 +56,16 @@ export const metadata: Metadata = {
     "Upload an exact rational and Lean proof for isolated two-kernel verification.",
 };
 
-export default async function SubmitPage() {
+export default async function SubmitPage({ searchParams }: { searchParams: Promise<{ track?: string }> }) {
+  const parsed = competitionTrackSchema.safeParse((await searchParams).track ?? "critical-line");
+  if (!parsed.success) notFound();
+  const track = parsed.data;
+  const simple = track === "simple-zeros";
+  const rules = simple ? "/challenges/simple-zeros" : "/challenge";
+  const source = simple ? readFileSync("challenge/templates/Simple.Candidate.lean", "utf8") : submissionStarterSource;
   const session = await getSession();
   const github = session?.user.githubLogin;
-  const current = getCurrentRecord();
+  const current = competitionIncumbent(records, track);
   const queueConfigured = isSubmissionQueueConfigured();
   const flowTestAllowed = github ? isFlowTestOperator(github, session?.user.githubId) : false;
   const archiveMaintainer = isSubmissionArchiveMaintainer(github, session?.user.githubId);
@@ -82,7 +91,8 @@ export default async function SubmitPage() {
         <div className="shell inner-hero-grid">
           <div>
             <span className="eyebrow">Submit a formal improvement</span>
-            <h1>Submit a Lean proof</h1>
+            <h1>{simple ? "Submit a simple-zero bound" : "Submit a distinct-zero bound"}</h1>
+            <Link className="agent-guide-link" href="/challenges">Choose a different challenge</Link>
             <p>Enter an exact rational bound and upload your Lean source. The web form and CLI use the same queue and formal verifier.</p>
             <div className="submit-resources">
               <section className="submit-agent-panel" aria-labelledby="agent-option">
@@ -102,7 +112,7 @@ export default async function SubmitPage() {
               </p>
             </div>
             {!github && isGitHubAuthConfigured && (
-              <form action={signInWithGitHub}>
+              <form action={signInToAccountView.bind(null, simple ? "simple-zeros" : "submit")}>
                 <button className="button button-lime" type="submit">
                   <Github size={17} /> Sign in to submit
                 </button>
@@ -156,12 +166,12 @@ export default async function SubmitPage() {
           <div className="template-actions">
             <a
               className="button button-dark"
-              href={SUBMISSION_STARTER_PATH}
+              href={simple ? "/templates/Simple.lean" : SUBMISSION_STARTER_PATH}
               download="Solution.lean"
             >
               <Download size={17} /> Download Solution.lean
             </a>
-            <Link className="text-link" href="/challenge">
+            <Link className="text-link" href={rules}>
               Read the competition rules
             </Link>
           </div>
@@ -172,7 +182,7 @@ export default async function SubmitPage() {
           </ul>
         </div>
         <CodeBlock label="Solution.lean · downloadable starter">
-          {submissionStarterSource}
+          {source}
         </CodeBlock>
       </section>
 
@@ -224,7 +234,7 @@ export default async function SubmitPage() {
             {boatSelected() && <p>The standard 16 GB worker verified the 85.4225% record in 89 minutes, including setup. Each proof has up to {verificationDuration} for verification. Time spent in the queue is additional.</p>}
           </div>
           <div className="current-record-chip">
-            <span>Current formal record</span>
+            <span>{current.id === "simple-zeros:opening" ? "Opening threshold" : "Current formal record"}</span>
             <code>
               {current.exactRational
                 ? `${current.exactRational.numerator}/${current.exactRational.denominator}`
@@ -242,7 +252,7 @@ export default async function SubmitPage() {
         </div>
 
         {github && !session?.user.githubId && isGitHubAuthConfigured && (
-          <form action={signInWithGitHub} className="submission-locked-card">
+          <form action={signInToAccountView.bind(null, simple ? "simple-zeros" : "submit")} className="submission-locked-card">
             <p>Refresh your GitHub sign-in to attach new submissions to your permanent account ID.</p>
             <button className="button button-dark" type="submit"><Github size={17} /> Refresh GitHub sign-in</button>
           </form>
@@ -252,7 +262,8 @@ export default async function SubmitPage() {
             github={github}
             defaultDisplayName={session?.user.name ?? github}
             verifierConfigured={verifierConfigured}
-            starterSource={submissionStarterSource}
+            track={track}
+            starterSource={source}
             flowTestSource={flowTestSolutionSource}
             flowTestAvailable={flowTestAllowed}
           />
@@ -264,7 +275,7 @@ export default async function SubmitPage() {
               <p>The authenticated GitHub login becomes the immutable public author field.</p>
             </div>
             {isGitHubAuthConfigured ? (
-              <form action={signInWithGitHub}>
+              <form action={signInToAccountView.bind(null, simple ? "simple-zeros" : "submit")}>
                 <button className="button button-dark" type="submit"><Github size={17} /> Sign in with GitHub</button>
               </form>
             ) : (

@@ -7,7 +7,7 @@ import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import { MobileMenu } from "@/components/mobile-menu";
 
 const primaryLinks = [
-  { href: "/#leaderboard", label: "Leaderboard" },
+  { href: "/challenges", label: "Challenges" },
   { href: "/challenge", label: "Rules" },
   { href: "/methodology", label: "Verification" },
   { href: "/submit", label: "Submit" },

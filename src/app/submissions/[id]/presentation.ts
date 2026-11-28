@@ -3,7 +3,7 @@ import { truncateDecimalString } from "@/components/format";
 
 export function recordPresentation(record: RecordEntry) {
   const score = truncateDecimalString(record.scorePercent, 6) + "%";
-  const heading = record.title.startsWith("Certified critical-line bound ")
+  const heading = record.track === "simple-zeros" ? "Simple zeros of the zeta function" : record.title.startsWith("Certified critical-line bound ")
     ? "Distinct zeros on the critical line"
     : record.title;
   const status = record.formalVerification

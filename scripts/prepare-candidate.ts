@@ -4,6 +4,7 @@ import contractJson from "../challenge/contract.json";
 import {
   contractSchema,
   compareRationals,
+  competitionIncumbent,
   rationalToDecimal,
   recordsSchema,
   submissionSchema,
@@ -23,15 +24,6 @@ const recordsPath = process.env.RIEMANN_RECORDS_PATH
   ? resolve(process.env.RIEMANN_RECORDS_PATH)
   : join(repositoryRoot, "data", "records.json");
 const recordsJson: unknown = JSON.parse(await readFile(recordsPath, "utf8"));
-const currentRecord = recordsSchema
-  .parse(recordsJson)
-  .filter((record) => record.status === "kernel-verified")
-  .at(-1);
-
-if (!currentRecord) {
-  throw new Error("No kernel-verified current record is available");
-}
-
 function assertWithin(parent: string, child: string, label: string): void {
   const pathFromParent = relative(parent, child);
   if (pathFromParent === "" || (!pathFromParent.startsWith(`..${sep}`) && pathFromParent !== ".." && !pathFromParent.startsWith(sep))) {
@@ -74,6 +66,7 @@ async function assertRegularLeanTree(
 
 const submissionPath = join(submissionDirectory, "submission.json");
 const submission = submissionSchema.parse(JSON.parse(await readFile(submissionPath, "utf8")));
+const currentRecord = competitionIncumbent(recordsSchema.parse(recordsJson), submission.track);
 if (
   compareRationals(submission.score, { numerator: "1", denominator: "1" }) > 0
 ) {
@@ -106,7 +99,7 @@ await writeFile(
 );
 await writeFile(
   join(workspace, "comparator", "Challenge", "Candidate.lean"),
-  await readTemplate("Challenge.Candidate.lean"),
+  await readTemplate(submission.track === "simple-zeros" ? "Simple.Candidate.lean" : "Challenge.Candidate.lean"),
 );
 await writeFile(join(workspace, "comparator", "Solution", "Candidate.lean"), solution);
 // Some valid legacy sources spell the statements directly instead of importing
@@ -151,6 +144,7 @@ await writeFile(
 
 const artifact = {
   schemaVersion: 1,
+  track: submission.track,
   submissionId: submission.id,
   author: submission.author,
   model: submission.model,

@@ -3,6 +3,6 @@ import { siteUrl } from "@/lib/site";
 import { records } from "@/lib/records";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/challenge", "/methodology", "/submit", "/submit/agent", "/submissions", ...records.map((record) => `/submissions/${record.id}`)];
+  const routes = ["", "/challenges", "/challenges/simple-zeros", "/challenges/simple-zeros/xu", "/challenge", "/methodology", "/submit", "/submit/agent", "/submissions", ...records.map((record) => `/submissions/${record.id}`)];
   return routes.map((route) => ({ url: `${siteUrl}${route}`, changeFrequency: route === "" ? "daily" : "weekly", priority: route === "" ? 1 : 0.7 }));
 }

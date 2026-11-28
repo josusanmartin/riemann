@@ -79,6 +79,7 @@ export default function ChallengePage() {
 
         <aside className="toc-card">
           <span className="toc-title">On this page</span>
+          <Link href="/challenges">All challenges</Link>
           <a href="#score">How to earn a record</a>
           <a href="#baseline">Why 67.25% was the baseline</a>
           <a href="#meaning">What 100% means</a>

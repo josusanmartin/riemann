@@ -15,6 +15,9 @@ export function assertValidAttestation(
   challengeDigest: string,
   verifierTemplateDigest: string,
 ): void {
+  if ((attestation.track ?? "critical-line") !== submission.track) {
+    throw new Error("Attestation belongs to a different challenge");
+  }
   if (attestation.submissionId !== submission.id) {
     throw new Error("Attestation belongs to a different submission");
   }

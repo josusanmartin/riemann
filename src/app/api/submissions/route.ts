@@ -12,7 +12,8 @@ import { isGitHubPromotionConfigured } from "@/lib/github-promotion";
 import {
   applyInitialQueueTransition,
 } from "@/lib/queue-orchestration";
-import { getCurrentRecord, records } from "@/lib/records";
+import { competitionIncumbent, competitionTrackSchema } from "@/lib/challenge";
+import { records } from "@/lib/records";
 import { signSubmissionJob } from "@/lib/submission-jobs";
 import { readBoundedJson, RequestBodyTooLargeError } from "@/lib/request-json";
 import {
@@ -79,11 +80,14 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
+  const selected = competitionTrackSchema.safeParse(new URL(request.url).searchParams.get("track") ?? "critical-line");
+  if (!selected.success) return noStore(400, { error: "invalid_track", message: "Choose critical-line or simple-zeros." });
+  const track = selected.data;
+  const currentRecord = competitionIncumbent(records, track);
   try {
-    const currentRecord = getCurrentRecord();
     let prepared;
     try {
-      prepared = prepareDirectSubmission(await readBoundedJson(request), github, currentRecord);
+      prepared = prepareDirectSubmission(await readBoundedJson(request), github, currentRecord, track);
     } catch (error) {
       if (error instanceof SyntaxError) return noStore(400, {
         error: "invalid_submission_json", message: "Send valid UTF-8 JSON with Content-Type: application/json. No slot was used.",
@@ -151,7 +155,7 @@ export async function POST(request: Request): Promise<Response> {
     const issuedAt = Date.now();
     const job = reserveBoatJob(baseCommitSha, currentRecord.id, issuedAt);
     const admission = await enqueueVerificationJob(
-      { ...job, proofDigest: prepared.proofDigest, submissionId: prepared.submission.id },
+      { ...job, boat: { ...job.boat, track }, proofDigest: prepared.proofDigest, submissionId: prepared.submission.id },
       github,
       { manifest: prepared.manifest, solution: prepared.solution },
       { githubId },
@@ -218,7 +222,7 @@ export async function POST(request: Request): Promise<Response> {
     }
     const message = error instanceof Error ? error.message : "Verification could not start.";
     if (message.includes("strictly exceed")) {
-      const current = getCurrentRecord();
+      const current = currentRecord;
       return noStore(400, {
         error: "invalid_submission", message: `${message}. Check record ${current.id} before submitting. No slot was used.`,
         currentRecord: { id: current.id, score: current.exactRational },

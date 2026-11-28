@@ -27,7 +27,7 @@ riemann login --finish`,
   },
   {
     heading: "Get the current record and starter",
-    text: "The record command is public. Use the exact rational in its JSON response when comparing bounds.",
+    text: "For simple zeros, add --track simple-zeros to record and submit, and download /templates/Simple.lean. The record command is public. Use the exact rational in its JSON response when comparing bounds.",
     code: `riemann record
 curl -fsSLo candidate.json ${host}/cli/candidate.example.json
 curl -fsSLo Solution.lean ${host}/templates/Solution.lean`,
