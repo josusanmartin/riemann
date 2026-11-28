@@ -8,12 +8,14 @@
     "submissionKey": "30527cb30a25e55ea3f11d34e1e03a6b13abf539a6a28602d0f763e189b74f48",
     "enqueuedAt": "2026-11-28T08:01:39.162Z",
     "boat": {
+      "setupLease": 1795852902765,
+      "retryAt": 1795852996210,
+      "assignedAt": 1795852906210,
       "baseCommitSha": "3e027803de62d0ecc90b8eaa639fb861836cff6a",
       "previousRecordId": "devine-xu-joint-certificate-855579",
       "issuedAt": 1795852899162,
       "startedAt": 1795852902765,
-      "setupLease": 1795852902765,
-      "retryAt": 1795852992765
+      "workerId": "bx_ygxz5wnx"
     }
   },
   "pending": [],
