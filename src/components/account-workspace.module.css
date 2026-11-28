@@ -34,3 +34,6 @@
   .filters label:first-child { width:100%; }
   .tabs { margin-bottom:20px; }
 }
+
+.facts { display:grid; grid-template-columns:minmax(90px,auto) minmax(0,1fr); gap:8px 20px; margin:16px 0; font-size:.9rem; }
+.facts dt { color:var(--muted); } .facts dd { margin:0; overflow-wrap:anywhere; }
