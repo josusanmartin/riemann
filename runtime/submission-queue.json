@@ -1,24 +1,22 @@
 {
   "schemaVersion": 1,
   "active": {
-    "sandboxId": "boat-c9840120-af03-4e9c-8aee-cbe279c86d43",
-    "jobId": "c9840120-af03-4e9c-8aee-cbe279c86d43",
+    "sandboxId": "boat-ef5ed630-1ffe-4a2a-bfab-35a871c7ae44",
+    "jobId": "ef5ed630-1ffe-4a2a-bfab-35a871c7ae44",
     "proofDigest": "2118e4be8fc15bdb854a1905dc853f646a542c5ba79c5146c861301f2022ccad",
     "ownerKey": "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78",
     "submissionKey": "fa1466d1fd60ea40ba24a9d123086052b2974e8e7d4418b720eb35a413a574c1",
     "enqueuedAt": "2026-11-28T20:13:33.472Z",
+    "recoveredJobIds": [
+      "c9840120-af03-4e9c-8aee-cbe279c86d43"
+    ],
     "boat": {
-      "setupLease": 1795896817578,
-      "retryAt": 1795896910816,
-      "assignedAt": 1795896820816,
-      "stagedAt": 1795896826188,
+      "memoryReplayOf": "c9840120-af03-4e9c-8aee-cbe279c86d43",
+      "retiredWorkerId": "bx_jg286xn4",
       "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
       "track": "simple-zeros",
       "previousRecordId": "devine-simple-zeros-opening",
-      "issuedAt": 1795896813472,
-      "startedAt": 1795896817578,
-      "workerId": "bx_jg286xn4",
-      "uploaded": true
+      "issuedAt": 1795898768315
     }
   },
   "pending": [
