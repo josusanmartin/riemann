@@ -26,6 +26,7 @@ import { isBoatSmokeConfigured } from "@/lib/boat-smoke";
 import { FlowTestPanel } from "@/components/flow-test-panel";
 import { signInToAccountView } from "@/lib/auth-actions";
 import { repositoryUrl } from "@/lib/site";
+import { competitions } from "@/lib/competitions";
 import { notFound } from "next/navigation";
 import { competitionIncumbent, competitionTrackSchema } from "@/lib/challenge";
 import { readFileSync } from "node:fs";
@@ -44,7 +45,6 @@ import {
 } from "@/lib/submission-queue";
 import { isSubmissionArchiveMaintainer } from "@/lib/submission-archive-store";
 import {
-  SUBMISSION_STARTER_PATH,
   submissionStarterSource,
 } from "@/lib/submission-starter";
 
@@ -61,7 +61,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
   if (!parsed.success) notFound();
   const track = parsed.data;
   const simple = track === "simple-zeros";
-  const rules = simple ? "/challenges/simple-zeros" : "/challenge";
+  const competition = competitions[track];
   const source = simple ? readFileSync("challenge/templates/Simple.Candidate.lean", "utf8") : submissionStarterSource;
   const session = await getSession();
   const github = session?.user.githubLogin;
@@ -166,12 +166,12 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
           <div className="template-actions">
             <a
               className="button button-dark"
-              href={simple ? "/templates/Simple.lean" : SUBMISSION_STARTER_PATH}
+              href={competition.starter}
               download="Solution.lean"
             >
               <Download size={17} /> Download Solution.lean
             </a>
-            <Link className="text-link" href={rules}>
+            <Link className="text-link" href={competition.rules}>
               Read the competition rules
             </Link>
           </div>

@@ -8,7 +8,7 @@
 .boards h2 { margin-top: 0; }
 .boards strong { margin-top: auto; font-size: 1.3rem; }
 .boards small { color: var(--muted); margin-bottom: 1.2rem; }
-.boards a + a { margin-top: .5rem; }
+.cardLinks { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1.2rem; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem; margin: 1.5rem 0 2rem; }
 .directory section { scroll-margin-top: 5rem; }
 .directory pre { overflow-x: auto; }
