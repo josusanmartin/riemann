@@ -1,6 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-17890daa-167f-480b-a6db-96720a30a98e",
+    "jobId": "17890daa-167f-480b-a6db-96720a30a98e",
+    "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
+    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
+    "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
+    "enqueuedAt": "2026-11-28T01:31:21.225Z",
+    "boat": {
+      "baseCommitSha": "80ff930eb6b68b755876d41eda4e408cb0b3fbf8",
+      "previousRecordId": "knausgard-rh-two-prime-855366",
+      "issuedAt": 1795829481225
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1617,10 +1629,9 @@
     }
   ],
   "daily": {
-    "day": "2026-11-27",
+    "day": "2026-11-28",
     "attempts": {
-      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 4,
-      "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78": 3
+      "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d": 1
     }
   }
 }
