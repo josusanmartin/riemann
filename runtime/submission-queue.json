@@ -1,27 +1,18 @@
 {
   "schemaVersion": 1,
-  "active": {
-    "sandboxId": "boat-17890daa-167f-480b-a6db-96720a30a98e",
-    "jobId": "17890daa-167f-480b-a6db-96720a30a98e",
-    "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
-    "ownerKey": "c8f24f00845805ba5a780a14da28b306f4366845f198c4404676c5d917bc4e8d",
-    "submissionKey": "0ee6d4409e303d847c2759e81757b674a35651e046471bdc18b2e26d1f8481ed",
-    "enqueuedAt": "2026-11-28T01:31:21.225Z",
-    "boat": {
-      "setupLease": 1795829484601,
-      "retryAt": 1795829578793,
-      "assignedAt": 1795829488793,
-      "stagedAt": 1795829493342,
-      "baseCommitSha": "80ff930eb6b68b755876d41eda4e408cb0b3fbf8",
-      "previousRecordId": "knausgard-rh-two-prime-855366",
-      "issuedAt": 1795829481225,
-      "startedAt": 1795829484601,
-      "workerId": "bx_rcwsjtu2",
-      "uploaded": true
-    }
-  },
+  "active": null,
   "pending": [],
   "completed": [
+    {
+      "jobId": "17890daa-167f-480b-a6db-96720a30a98e",
+      "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
+      "outcome": "promoted",
+      "promotionStatus": "promoted",
+      "message": null,
+      "evidenceUrl": "https://github.com/josusanmartin/riemann/tree/72ccf50ede8b3933293de2d891b18be250859334/submissions/devine-xu-joint-certificate-855579",
+      "completedAt": "2026-11-28T03:23:49.037Z",
+      "logArchived": true
+    },
     {
       "jobId": "93b7d587-41d4-470e-9e94-6b572307c48e",
       "proofDigest": "0c2a676a55a09e8767cfe5458673dfc46b24620a741cc9592f6b4ed727837816",
