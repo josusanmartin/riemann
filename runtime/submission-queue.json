@@ -1,6 +1,19 @@
 {
   "schemaVersion": 1,
-  "active": null,
+  "active": {
+    "sandboxId": "boat-a6445890-435a-4cea-affc-278a54721300",
+    "jobId": "a6445890-435a-4cea-affc-278a54721300",
+    "proofDigest": "2118e4be8fc15bdb854a1905dc853f646a542c5ba79c5146c861301f2022ccad",
+    "ownerKey": "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78",
+    "submissionKey": "fa1466d1fd60ea40ba24a9d123086052b2974e8e7d4418b720eb35a413a574c1",
+    "enqueuedAt": "2026-11-28T21:11:01.231Z",
+    "boat": {
+      "baseCommitSha": "c8df4e82909a25092d3c2636fc55eab17be972c3",
+      "track": "simple-zeros",
+      "previousRecordId": "devine-simple-zeros-opening",
+      "issuedAt": 1795900261231
+    }
+  },
   "pending": [],
   "completed": [
     {
@@ -1898,7 +1911,7 @@
       "8f037c89d95caec177ebe9c413ac3bc1e1e14fc0145c7a74710c25ca6b086c53": 5,
       "765e93b5b18828e0a0f810cf3cb92eb66f6e1080e30a63589700af791b4ac7cf": 1,
       "8f6d3427b5354ba2573bf29330622f2e5c86365f5b1147cdb3006c92d58b7631": 2,
-      "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78": 4
+      "557b4d2ebe81875c8e2025e71b9a42c8614243df8e53156e35367eab1a515c78": 5
     }
   }
 }
